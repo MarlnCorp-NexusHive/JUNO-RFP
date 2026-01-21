@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fi';
 import nexushiveLogo from '../assets/nexushivelogo.png';
 
-export default function UniversityInfo() {
+export default function CorporateInfo() {
   const navigate = useNavigate();
   const { t, i18n, ready } = useTranslation('university');
   const { isRTLMode } = useLocalization();

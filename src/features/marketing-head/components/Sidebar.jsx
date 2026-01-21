@@ -53,7 +53,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
       {/* Fixed Logo at Top */}
       <div className="flex items-center justify-center py-6 px-2">
         <button
-          onClick={() => navigate('/university-info')}
+          onClick={() => navigate('/corporate-info')}
           className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
         >
           <img

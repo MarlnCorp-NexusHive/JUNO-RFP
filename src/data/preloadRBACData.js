@@ -3,7 +3,7 @@
 
 export const preloadTeams = [
   { name: 'Marketing Team', roles: ['Head', 'Manager', 'CityHead', 'FieldExecutive'] },
-  { name: 'Admission Team', roles: ['Head', 'SPOC'] },
+  { name: 'Recruitment Team', roles: ['Head', 'SPOC'] },
   { name: 'HR & Payroll Team', roles: ['CFO/Head', 'Manager', 'HRs'] },
   { name: 'Admin Team', roles: ['Head', 'Manager', 'Executive'] },
   { name: 'IT & Support Team', roles: ['Head', 'Manager', 'Executive'] },

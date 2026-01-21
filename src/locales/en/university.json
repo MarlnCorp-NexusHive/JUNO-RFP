@@ -1,45 +1,45 @@
 {
   "university": {
-    "name": "MBSC - Prince Mohammed Bin Salman College",
-    "motto": "Excellence in Business Education, Innovation in Leadership",
+    "name": "NexusHive Corporation",
+    "motto": "Excellence in Business Operations, Innovation in Corporate Leadership",
     "established": "2018",
-    "type": "Private Business College",
-    "accreditation": "AACSB Accredited",
+    "type": "Enterprise Business Corporation",
+    "accreditation": "ISO 9001 Certified",
     "location": "Riyadh, Kingdom of Saudi Arabia",
-    "website": "www.mbsc.edu.sa",
+    "website": "www.nexushive.com",
     "phone": "+966 11 520 0000",
-    "email": "info@mbsc.edu.sa",
+    "email": "info@nexushive.com",
     "vision2030": "Vision 2030 Initiative",
-    "campusAlt": "MBSC Campus",
-    "campusViewAlt": "MBSC Campus View",
-    "logoAlt": "MBSC Logo",
+    "campusAlt": "NexusHive Headquarters",
+    "campusViewAlt": "NexusHive Corporate Office",
+    "logoAlt": "NexusHive Logo",
     "bannerText": {
-      "excellence": "Excellence in Business Education",
+      "excellence": "Excellence in Business Operations",
       "shaping": "Shaping Future Business Leaders of Saudi Arabia"
     },
     "navigation": {
       "back": "Back",
       "overview": "Overview",
-      "colleges": "Colleges",
+      "colleges": "Departments",
       "achievements": "Achievements",
       "leadership": "Leadership",
       "contact": "Contact"
     },
     "stats": {
       "totalStudents": {
-        "label": "Total Students",
+        "label": "Total Employees",
         "value": "2,400+"
       },
       "facultyMembers": {
-        "label": "Faculty Members",
+        "label": "Team Members",
         "value": "180+"
       },
       "programsOffered": {
-        "label": "Programs Offered",
+        "label": "Active Projects",
         "value": "25+"
       },
       "researchCenters": {
-        "label": "Research Centers",
+        "label": "Business Units",
         "value": "8+"
       },
       "internationalPartners": {
@@ -47,83 +47,83 @@
         "value": "50+"
       },
       "employmentRate": {
-        "label": "Employment Rate",
+        "label": "Client Satisfaction",
         "value": "98%"
       }
     },
     "about": {
-      "title": "About MBSC",
-      "description1": "Mohammed Bin Salman College (MBSC) is a premier business institution in the heart of Riyadh, established as part of Saudi Arabia's Vision 2030 initiative. We are committed to developing world-class business leaders who will drive the Kingdom's economic transformation.",
-      "description2": "Our college offers cutting-edge business programs designed to meet the evolving needs of the global business landscape. With state-of-the-art facilities and partnerships with leading international institutions, MBSC provides an exceptional learning environment.",
-      "description3": "Rooted in Saudi Arabian values while embracing global business practices, MBSC prepares students to excel in both local and international markets, contributing to the Kingdom's ambitious economic goals.",
+      "title": "About NexusHive",
+      "description1": "NexusHive Corporation is a premier business organization in the heart of Riyadh, established as part of Saudi Arabia's Vision 2030 initiative. We are committed to developing world-class business leaders who will drive the Kingdom's economic transformation.",
+      "description2": "Our corporation offers cutting-edge business solutions designed to meet the evolving needs of the global business landscape. With state-of-the-art facilities and partnerships with leading international organizations, NexusHive provides an exceptional business environment.",
+      "description3": "Rooted in Saudi Arabian values while embracing global business practices, NexusHive prepares employees to excel in both local and international markets, contributing to the Kingdom's ambitious economic goals.",
       "details": {
         "type": "Type:",
         "location": "Location:",
-        "accreditation": "Accreditation:",
+        "accreditation": "Certification:",
         "website": "Website:"
       }
     },
     "colleges": {
-      "title": "Our Colleges & Programs",
+      "title": "Our Departments & Projects",
       "list": [
         {
-          "name": "College of Business Administration",
+          "name": "Business Administration Department",
           "programs": 12,
           "students": 1200
         },
         {
-          "name": "College of Finance & Economics", 
+          "name": "Finance & Economics Department", 
           "programs": 8,
           "students": 600
         },
         {
-          "name": "College of Entrepreneurship",
+          "name": "Entrepreneurship Department",
           "programs": 5,
           "students": 400
         },
         {
-          "name": "College of Digital Business",
+          "name": "Digital Business Department",
           "programs": 6,
           "students": 300
         },
         {
-          "name": "College of Leadership & Management",
+          "name": "Leadership & Management Department",
           "programs": 4,
           "students": 200
         }
       ],
-      "programsLabel": "Programs:",
-      "studentsLabel": "Students:"
+      "programsLabel": "Projects:",
+      "studentsLabel": "Employees:"
     },
     "achievements": {
-      "title": "College Achievements",
+      "title": "Corporate Achievements",
       "list": [
-        "Ranked #1 Business College in Saudi Arabia",
-        "AACSB International Accreditation",
+        "Ranked #1 Business Corporation in Saudi Arabia",
+        "ISO 9001 International Certification",
         "Winner of Best Innovation Award 2026",
-        "Partnership with MIT Sloan School of Management",
-        "Accredited by 12 International Bodies",
-        "Research Excellence Award 2026"
+        "Partnership with Leading Global Corporations",
+        "Certified by 12 International Bodies",
+        "Business Excellence Award 2026"
       ]
     },
     "leadership": {
-      "title": "College Leadership",
+      "title": "Corporate Leadership",
       "members": [
         {
           "name": "Dr. Abdullah Al-Rashid",
-          "position": "Dean"
+          "position": "Chief Executive Officer"
         },
         {
           "name": "Dr. Noura Al-Zahra",
-          "position": "Associate Dean Academic"
+          "position": "Chief Operating Officer"
         },
         {
           "name": "Dr. Khalid Al-Sayed",
-          "position": "Associate Dean Research"
+          "position": "Chief Strategy Officer"
         },
         {
           "name": "Dr. Aisha Al-Hassan",
-          "position": "Director of Student Affairs"
+          "position": "Director of Human Resources"
         }
       ]
     },
@@ -155,10 +155,10 @@
   },
   "marlnCrm": {
     "title": "NexusHive ERP",
-    "subtitle": "Transform Your marketing and sales organization with AI-Powered Management",
-    "watchDemo": "Watch Demo",
-    "downloadBrochure": "Download Brochure",
-    "trustedBy": "Trusted by 500+ marketing and sales organizations",
+      "subtitle": "Transform Your corporate organization with AI-Powered ERP Management",
+      "watchDemo": "Watch Demo",
+      "downloadBrochure": "Download Brochure",
+      "trustedBy": "Trusted by 500+ corporate organizations",
     "aiPowered": "AI-Powered • Cloud-Based • Secure",
     "globalPresence": "Global Presence",
     "industryLeader": "Industry Leader",
@@ -179,8 +179,8 @@
     },
     "overview": {
       "title": "Why Choose NexusHive ERP?",
-      "description1": "Our comprehensive CRM solution is designed specifically for marketing and sales organizations, providing everything you need to manage clients, teams, and business processes in one unified platform.",
-      "description2": "With advanced AI capabilities, real-time analytics, and seamless integration options, we help organizations streamline operations and enhance client success.",
+      "description1": "Our comprehensive ERP solution is designed specifically for corporate organizations, providing everything you need to manage employees, teams, and business processes in one unified platform.",
+      "description2": "With advanced AI capabilities, real-time analytics, and seamless integration options, we help organizations streamline operations and enhance business success.",
       "platformType": "Platform Type",
       "deployment": "Deployment",
       "security": "Security",

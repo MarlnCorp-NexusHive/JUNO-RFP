@@ -60,18 +60,18 @@ const DirectorOperationalExcellence = ({
     return value || fallback;
   };
 
-  // Sample university operational data for Director role
-  const sampleUniversityData = {
-    // Academic Operations
-    academic: {
-      totalPrograms: 45,
-      activeStudents: 12500,
-      facultyCount: 850,
+  // Sample corporate operational data for Director role
+  const sampleCorporateData = {
+    // Business Operations
+    business: {
+      totalProjects: 45,
+      activeEmployees: 12500,
+      teamLeads: 850,
       staffCount: 1200,
-      classCapacity: 95,
-      graduationRate: 78,
-      retentionRate: 85,
-      averageClassSize: 28
+      projectCapacity: 95,
+      projectCompletionRate: 78,
+      employeeRetentionRate: 85,
+      averageTeamSize: 28
     },
     
     // Administrative Operations
@@ -113,7 +113,7 @@ const DirectorOperationalExcellence = ({
     // Financial Operations
     financial: {
       operationalBudget: 45000000,
-      costPerStudent: 3600,
+      costPerEmployee: 3600,
       administrativeCosts: 12000000,
       facilityCosts: 8500000,
       technologyCosts: 3500000,
@@ -124,7 +124,7 @@ const DirectorOperationalExcellence = ({
     
     // Quality & Compliance
     quality: {
-      accreditationStatus: "Fully Accredited",
+      certificationStatus: "Fully Certified",
       complianceRate: 94,
       qualityScore: 8.7,
       auditFindings: 3,
@@ -430,7 +430,7 @@ const DirectorOperationalExcellence = ({
       {/* Main Operational Excellence Component */}
       {showDetails && (
         <OperationalExcellence
-          universityData={sampleUniversityData}
+          corporateData={sampleCorporateData}
           onAnalysisComplete={handleOperationalAnalysisComplete}
           isRTL={isRTLMode}
         />

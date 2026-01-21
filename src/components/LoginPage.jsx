@@ -14,8 +14,8 @@ const dashboardRoute = (user) => {
   if (user.role === "Super Admin") return "/rbac";
   if (user.team === "Marketing Team" && user.role === "Head") return "/rbac/marketing-head";
   if (user.team === "Marketing Team" && user.role === "Manager") return "/rbac/marketing-manager";
-  if (user.team === "Admission Team" && user.role === "Head") return "/rbac/admission-head";
-  if (user.team === "Admission Team" && user.role === "SPOC") return "/rbac/admission-spoc";
+  if ((user.team === "Admission Team" || user.team === "Recruitment Team") && user.role === "Head") return "/rbac/admission-head";
+  if ((user.team === "Admission Team" || user.team === "Recruitment Team") && user.role === "SPOC") return "/rbac/admission-spoc";
   if (user.team === "HR & PayRoll Team" && user.role === "CFO/Head") return "/rbac/hr-head";
   if (user.team === "HR & PayRoll Team" && user.role === "Manager") return "/rbac/hr-manager";
   if (user.team === "Director and Deans" && user.role === "Director") return "/rbac/director";

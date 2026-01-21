@@ -137,3 +137,5 @@ build/Release
 
 # TernJS port file
 .tern-port
+# Local Netlify folder
+.netlify

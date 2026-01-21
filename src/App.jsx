@@ -3,7 +3,7 @@ import React from "react";
 import LandingPage from "./components/LandingPage";
 import CookiePolicy from "./components/CookiePolicy";
 import LoginPage from "./components/LoginPage";
-import UniversityInfo from "./components/UniversityInfo";
+import CorporateInfo from "./components/CorporateInfo";
 import SuperAdminDashboard from "./components/SuperAdminDashboard";
 import RBACUsers from "./components/RBACUsers";
 import RBACTeams from "./components/RBACTeams";
@@ -46,12 +46,9 @@ import AdminHeadLayout from "./features/admin-head/pages/AdminHeadLayout";
 import AdminHeadDashboard from "./features/admin-head/pages/AdminHeadDashboard";
 import ITHeadDashboard from "./components/ITHeadDashboard";
 import HoDDashboard from "./components/HoDDashboard";
-import SeniorProfessorDashboard from "./components/SeniorProfessorDashboard";
-import StudentDashboard from "./components/StudentDashboard";
-import ParentDashboard from "./components/ParentDashboard";
-import ExamHeadDashboard from "./components/ExamHeadDashboard";
-import LibraryHeadDashboard from "./components/LibraryHeadDashboard";
-import TransportHeadDashboard from "./components/TransportHeadDashboard";
+// University-specific roles removed for corporate ERP:
+// SeniorProfessorDashboard, StudentDashboard, ParentDashboard, 
+// ExamHeadDashboard, LibraryHeadDashboard, TransportHeadDashboard
 import DirectorRiskManagement from './features/director/components/DirectorRiskManagement';
 
 import DirectorSettings from './features/director/components/DirectorSettings';
@@ -97,7 +94,7 @@ import AdminComplianceQuality from "./features/admin-head/pages/AdminComplianceQ
 import AdminProcurement from "./features/admin-head/pages/AdminProcurement";
 import AdminWorkspace from "./features/admin-head/pages/AdminWorkspace";
 import AdminSupportTickets from "./features/admin-head/pages/AdminSupportTickets";
-import DeanDashboard from './features/dean/components/DeanDashboard';
+// Dean role removed - replaced with Department Head
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DirectorLayout from './features/director/components/DirectorLayout';
 import DirectorWorkspace from './features/director/components/DirectorWorkspace';
@@ -123,7 +120,7 @@ export default function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/university-info" element={<UniversityInfo />} />
+        <Route path="/corporate-info" element={<CorporateInfo />} />
         <Route path="/rbac" element={<SuperAdminDashboard />} />
         <Route path="/rbac/users" element={<RBACUsers />} />
         <Route path="/rbac/teams" element={<RBACTeams />} />
@@ -207,7 +204,7 @@ export default function App() {
           <Route path="ai-chat" element={<DirectorAIChat />} />
         </Route>
         <Route path="/rbac/marketing-head/support" element={<MarketingHeadSupport />} />
-        <Route path="/rbac/dean" element={<DeanDashboard />} />
+        {/* Dean role removed - use Department Head instead */}
         <Route path="/rbac/admin-head" element={<AdminHeadLayout />}>
           <Route index element={<AdminHeadDashboard />} />
           <Route path="user-role-management" element={<AdminUserRoleManagement />} />
@@ -230,12 +227,7 @@ export default function App() {
         </Route>
         <Route path="/rbac/it-head" element={<ITHeadDashboard />} />
         <Route path="/rbac/hod" element={<HoDDashboard />} />
-        <Route path="/rbac/senior-professor" element={<SeniorProfessorDashboard />} />
-        <Route path="/rbac/student" element={<StudentDashboard />} />
-        <Route path="/rbac/parent" element={<ParentDashboard />} />
-        <Route path="/rbac/exam-head" element={<ExamHeadDashboard />} />
-        <Route path="/rbac/library-head" element={<LibraryHeadDashboard />} />
-        <Route path="/rbac/transport-head" element={<TransportHeadDashboard />} />
+        {/* University-specific routes removed for corporate ERP */}
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
       </Router>

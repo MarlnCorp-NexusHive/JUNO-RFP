@@ -14,12 +14,12 @@ const AdmissionHeadInterviewScheduling = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [scheduledInterviews, setScheduledInterviews] = useState([]);
   const [interviewHistory, setInterviewHistory] = useState([]);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [selectedInterview, setSelectedInterview] = useState(null);
   const [activeTab, setActiveTab] = useState("schedule");
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [newInterview, setNewInterview] = useState({
-    studentName: '',
+    candidateName: '',
     program: '',
     interviewType: '',
     preferredDate: '',
@@ -27,15 +27,15 @@ const AdmissionHeadInterviewScheduling = () => {
     notes: ''
   });
 
-  // Sample students for interview scheduling
-  const sampleStudents = [
+  // Sample candidates for interview scheduling
+  const sampleCandidates = [
     {
       id: 1,
       name: "Ahmed Al-Rashid",
-      program: "Computer Science",
+      program: "Software Developer",
       applicationId: "APP-2026-001",
       status: "pending_interview",
-      gpa: 3.8,
+      experienceYears: 2,
       priority: "high",
       experience: "2 years software development",
       motivation: "Passionate about AI and machine learning"
@@ -43,10 +43,10 @@ const AdmissionHeadInterviewScheduling = () => {
     {
       id: 2,
       name: "Fatima Al-Zahra",
-      program: "Business Administration",
+      program: "Business Analyst",
       applicationId: "APP-2026-002",
       status: "scheduled",
-      gpa: 3.9,
+      experienceYears: 1,
       priority: "high",
       experience: "1 year marketing internship",
       motivation: "Want to start my own business"
@@ -54,10 +54,10 @@ const AdmissionHeadInterviewScheduling = () => {
     {
       id: 3,
       name: "Omar Hassan",
-      program: "Engineering",
+      program: "Project Engineer",
       applicationId: "APP-2026-003",
       status: "completed",
-      gpa: 3.6,
+      experienceYears: 3,
       priority: "medium",
       experience: "3 years engineering projects",
       motivation: "Innovate sustainable technology solutions"
@@ -65,11 +65,11 @@ const AdmissionHeadInterviewScheduling = () => {
   ];
 
   const interviewTypes = [
-    "Academic Interview",
-    "English Proficiency Interview",
+    "HR Interview",
+    "Technical Assessment",
     "Technical Interview",
     "General Assessment",
-    "Scholarship Interview"
+    "Final Round Interview"
   ];
 
   const programs = [
@@ -87,7 +87,7 @@ const AdmissionHeadInterviewScheduling = () => {
   ];
 
   const handleScheduleInterview = async () => {
-    if (!newInterview.studentName || !newInterview.program || !newInterview.interviewType) {
+    if (!newInterview.candidateName || !newInterview.program || !newInterview.interviewType) {
       alert(language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill all required fields');
       return;
     }
@@ -96,7 +96,7 @@ const AdmissionHeadInterviewScheduling = () => {
     try {
       const prompt = `As an AI interview scheduling assistant for university admissions, please help schedule an interview with the following details:
 
-Student Name: ${newInterview.studentName}
+Candidate Name: ${newInterview.candidateName}
 Program: ${newInterview.program}
 Interview Type: ${newInterview.interviewType}
 Preferred Date: ${newInterview.preferredDate}
@@ -105,7 +105,7 @@ Notes: ${newInterview.notes}
 
 Please provide:
 1. Optimal interview scheduling recommendations
-2. Interview preparation suggestions for the student
+2. Interview preparation suggestions for the candidate
 3. Required documents or materials needed
 4. Interview duration estimation
 5. Special considerations based on the program
@@ -146,14 +146,14 @@ try {
    - Technical skills evaluation (if applicable)
 
 6. **Follow-up Actions:**
-   - Send confirmation email to student
+   - Send confirmation email to candidate
    - Prepare interview materials
    - Schedule follow-up meeting if needed`;
       }
 
       const interviewRecord = {
         id: Date.now(),
-        studentName: newInterview.studentName,
+        candidateName: newInterview.candidateName,
         program: newInterview.program,
         interviewType: newInterview.interviewType,
         scheduledDate: newInterview.preferredDate,
@@ -169,7 +169,7 @@ try {
 
       // Reset form
       setNewInterview({
-        studentName: '',
+        candidateName: '',
         program: '',
         interviewType: '',
         preferredDate: '',
@@ -194,7 +194,7 @@ try {
     try {
       const prompt = `As an AI interview analysis assistant, please analyze this scheduled interview:
 
-Student: ${interview.studentName}
+Candidate: ${interview.candidateName}
 Program: ${interview.program}
 Interview Type: ${interview.interviewType}
 Scheduled Date: ${interview.scheduledDate}
@@ -324,7 +324,7 @@ try {
       <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
         {[
           { id: "schedule", label: "New Schedule" },
-          { id: "students", label: "Students" },
+          { id: "candidates", label: "Candidates" },
           { id: "scheduled", label: "Scheduled" },
           { id: "history", label: "History" }
         ].map((tab) => (
@@ -352,12 +352,12 @@ try {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Student Name *
+                  Candidate Name *
                 </label>
                 <Input
-                  value={newInterview.studentName}
-                  onChange={(e) => setNewInterview(prev => ({ ...prev, studentName: e.target.value }))}
-                  placeholder="Enter student name"
+                  value={newInterview.candidateName}
+                  onChange={(e) => setNewInterview(prev => ({ ...prev, candidateName: e.target.value }))}
+                  placeholder="Enter candidate name"
                 />
               </div>
               <div>
@@ -438,40 +438,40 @@ try {
         </Card>
       )}
 
-      {activeTab === "students" && (
+      {activeTab === "candidates" && (
         <Card>
           <CardHeader>
-            <CardTitle>Student List</CardTitle>
+            <CardTitle>Candidate List</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {sampleStudents.map((student) => (
-                <div key={student.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              {sampleCandidates.map((candidate) => (
+                <div key={candidate.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {student.name}
+                        {candidate.name}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {student.program} - {student.applicationId}
+                        {candidate.program} - {candidate.applicationId}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-500">
-                        GPA: {student.gpa}
+                        Experience: {candidate.experienceYears} years
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge className={getPriorityColor(student.priority)}>
-                        {student.priority}
+                      <Badge className={getPriorityColor(candidate.priority)}>
+                        {candidate.priority}
                       </Badge>
-                      <Badge className={getStatusColor(student.status)}>
-                        {getStatusText(student.status)}
+                      <Badge className={getStatusColor(candidate.status)}>
+                        {getStatusText(candidate.status)}
                       </Badge>
                       <Button
                         onClick={() => {
                           setNewInterview(prev => ({ 
                             ...prev, 
-                            studentName: student.name, 
-                            program: student.program 
+                            candidateName: candidate.name, 
+                            program: candidate.program 
                           }));
                           setActiveTab("schedule");
                         }}
@@ -507,7 +507,7 @@ try {
                       <div className="flex justify-between items-start mb-3">
                         <div>
                           <h3 className="font-semibold text-gray-900 dark:text-white">
-                            {interview.studentName}
+                            {interview.candidateName}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {interview.program} - {interview.interviewType}
@@ -610,7 +610,7 @@ try {
                   <div key={item.id} className="flex justify-between items-center p-3 border rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">
-                        {item.studentName} - {item.program}
+                        {item.candidateName} - {item.program}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {item.interviewType} - {item.scheduledDate} {item.scheduledTime}

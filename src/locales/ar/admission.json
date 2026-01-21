@@ -1,7 +1,7 @@
 {
   "dashboard": {
-    "title": "لوحة تحكم رئيس القبول",
-    "subtitle": "تحليلات ورؤى شاملة للقبول",
+    "title": "لوحة تحكم رئيس التوظيف",
+    "subtitle": "تحليلات ورؤى شاملة للتوظيف",
     "filters": {
       "allDepartments": "جميع الأقسام",
       "engineering": "الهندسة",
@@ -13,7 +13,7 @@
       "export": "تصدير"
     },
     "admissionFunnel": {
-      "title": "نظرة عامة على قمع القبول",
+      "title": "نظرة عامة على قمع التوظيف",
       "comparison": "مقارنة سنوية",
       "stages": {
         "totalInquiries": "إجمالي الاستفسارات",
@@ -21,8 +21,8 @@
         "applicationsSubmitted": "الطلبات المقدمة",
         "applicationsApproved": "الطلبات المعتمدة",
         "offersSent": "العروض المرسلة",
-        "admissionsConfirmed": "القبول المؤكد",
-        "enrolledStudents": "الطلاب المسجلين"
+        "admissionsConfirmed": "التوظيف المؤكد",
+        "enrolledStudents": "الموظفون المعينون"
       }
     },
     "leadSources": {
@@ -77,12 +77,12 @@
     "aiInsights": {
       "title": "رؤى مدعومة بالذكاء الاصطناعي",
       "updatedDaily": "تحديث يومي",
-      "enrollmentForecast": "توقعات التسجيل",
+      "enrollmentForecast": "توقعات التوظيف",
       "departmentAlert": "تنبيه القسم",
       "resourcePlanning": "تخطيط الموارد",
-      "forecastText": "بناءً على الاتجاهات الحالية، التسجيل المتوقع للدورة القادمة:",
+      "forecastText": "بناءً على الاتجاهات الحالية، التوظيف المتوقع للدورة القادمة:",
       "alertText": "طلبات قسم التصميم قد تقل بـ",
-      "planningText": "سعة إقامة الطلاب تقترب من"
+      "planningText": "سعة المكتب تقترب من"
     }
   },
   "applications": {
@@ -106,7 +106,7 @@
     "table": {
       "candidate": "المرشح",
       "applicationId": "معرف الطلب",
-      "program": "البرنامج",
+      "program": "المنصب",
       "submissionDate": "تاريخ التقديم",
       "status": "الحالة",
       "reviewer": "المراجع",
@@ -121,7 +121,7 @@
       "pendingVerification": "في انتظار التحقق",
       "paymentPending": "في انتظار الدفع",
       "offersSent": "تم إرسال العروض",
-      "enrollmentsConfirmed": "تم تأكيد التسجيلات"
+      "enrollmentsConfirmed": "تم تأكيد التوظيف"
     },
     "ai": {
       "topPercentile": "أعلى 5%",
@@ -140,7 +140,7 @@
       "title": "رؤى الذكاء الاصطناعي",
       "topApplicants": "أعلى 5% من المتقدمين",
       "possibleDuplicate": "مكرر محتمل:",
-      "highlyLikelyToEnroll": "من المحتمل جداً التسجيل"
+      "highlyLikelyToEnroll": "من المحتمل جداً قبول العرض"
     },
     "sections": {
       "pendingApplicants": "المتقدمون المعلقون:",
@@ -184,7 +184,7 @@
   },
   "leads": {
     "title": "العملاء المحتملون والمتقدمون",
-    "subtitle": "إدارة وتتبع جميع العملاء المحتملين من خلال خط أنابيب القبول",
+    "subtitle": "إدارة وتتبع جميع العملاء المحتملين من خلال خط أنابيب التوظيف",
     "tabs": {
       "pipeline": "خط أنابيب العملاء المحتملين",
       "filters": "الفلاتر والبحث",
@@ -210,7 +210,7 @@
       "contacted": "تم التواصل",
       "qualified": "مؤهل",
       "application": "طلب",
-      "enrolled": "مسجل"
+      "enrolled": "موظف"
     },
     "conversionScore": {
       "high": "عالي",
@@ -270,7 +270,7 @@
       "btech": "بكالوريوس التكنولوجيا"
     },
     "demo": {
-      "description": "(تجريبي) جدول المتقدمين الرسميين، حالة المستندات/الدفع/المقابلة، تنبيهات للمستندات المعلقة.",
+      "description": "(تجريبي) جدول المرشحين الرسميين، حالة المستندات/التحقق/المقابلة، تنبيهات للمستندات المعلقة.",
       "bulkSingle": "(تجريبي) واتساب جماعي/فردي، بريد إلكتروني، رسائل نصية، تلميحات مدعومة بالذكاء الاصطناعي.",
       "officerWorkload": "(تجريبي) عبء عمل الموظف، إعادة تعيين، اقتراحات الذكاء الاصطناعي.",
       "inactiveLeads": "(تجريبي) العملاء المحتملون غير النشطين، الانسحابات، تلميحات إعادة المشاركة.",
@@ -296,9 +296,9 @@
       },
       "table": {
         "headers": {
-          "applicant": "المتقدم",
+          "applicant": "المرشح",
           "applicationId": "معرف الطلب",
-          "program": "البرنامج",
+          "program": "المنصب",
           "status": "الحالة",
           "documents": "المستندات",
           "payment": "الدفع",
@@ -314,7 +314,7 @@
       "applicants": "المتقدمون",
       "shortlisted": "القائمة المختصرة",
       "offersSent": "العروض المرسلة",
-      "enrolled": "المسجلون"
+      "enrolled": "الموظفون"
     },
     "pipelineStages": {
       "inquiry": "استفسار",
@@ -330,7 +330,7 @@
       "placeholder": "البحث بالاسم أو البريد الإلكتروني أو الهاتف..."
     },
     "filters": {
-      "program": "البرنامج",
+      "program": "المنصب",
       "state": "الولاية",
       "officer": "الموظف",
       "status": "الحالة",
@@ -516,12 +516,12 @@
     "audit": {
       "title": "المراجعة والتاريخ",
       "export": "تصدير",
-      "description": "مسار مراجعة التواصل الكامل لكل متقدم. الاحتفاظ بالبيانات: سنتان. قابل للتصدير للامتثال."
+      "description": "مسار مراجعة التواصل الكامل لكل مرشح. الاحتفاظ بالبيانات: سنتان. قابل للتصدير للامتثال."
     }
   },
   "documents": {
     "title": "المستندات",
-    "subtitle": "إدارة المستندات المتقدم، التحقق، وتتبع الامتثال",
+    "subtitle": "إدارة مستندات المرشح، التحقق، وتتبع الامتثال",
     "dashboard": {
       "totalUploaded": "إجمالي المرفوع",
       "pendingVerification": "في انتظار التحقق",
@@ -537,7 +537,7 @@
       "aiCompletion": "الذكاء الاصطناعي: 85% إكمال للمؤكدين"
     },
     "sections": {
-      "applicantDocumentRepository": "مستودع مستندات المتقدم",
+      "applicantDocumentRepository": "مستودع مستندات المرشح",
       "documentUploadPortal": "بوابة رفع المستندات",
       "verificationValidation": "التحقق والتحقق من الصحة",
       "bulkDocumentReview": "مراجعة المستندات الجماعية والإجراءات",
@@ -554,7 +554,7 @@
     },
     "table": {
       "headers": {
-        "applicant": "المتقدم",
+        "applicant": "المرشح",
         "document": "المستند",
         "status": "الحالة",
         "file": "الملف",
@@ -619,12 +619,12 @@
   },
   "leadTransfer": {
     "title": "إدارة نقل العملاء المحتملين",
-    "subtitle": "إدارة ونقل العملاء المحتملين بين المستشارين بكفاءة",
-    "overviewDescription": "تصفية واختيار العملاء المحتملين للنقل بين المستشارين والأقسام.",
-    "bulkTransferDescription": "نقل عدة عملاء محتملين في وقت واحد وتعيينهم لمستشارين محددين.",
+    "subtitle": "إدارة ونقل العملاء المحتملين بين المجندين بكفاءة",
+    "overviewDescription": "تصفية واختيار العملاء المحتملين للنقل بين المجندين والأقسام.",
+    "bulkTransferDescription": "نقل عدة عملاء محتملين في وقت واحد وتعيينهم لمجندين محددين.",
     "historyDescription": "مراجعة تحويلات العملاء المحتملين السابقة وتتبع تغييرات الحالة ومراقبة أنماط النقل.",
-    "conflictsDescription": "حل تعارضات الملكية ومشاكل توزيع عبء العمل بين المستشارين.",
-    "kpiDescription": "تحليل مقاييس النقل وعبء عمل المستشارين ومؤشرات الأداء.",
+    "conflictsDescription": "حل تعارضات الملكية ومشاكل توزيع عبء العمل بين المجندين.",
+    "kpiDescription": "تحليل مقاييس النقل وعبء عمل المجندين ومؤشرات الأداء.",
     "tabs": {
       "overview": "نظرة عامة على العملاء المحتملين",
       "bulkTransfer": "نقل جماعي",
@@ -635,31 +635,31 @@
   },
   "toolsUtilities": {
     "title": "الأدوات والمرافق",
-    "subtitle": "مركز شامل للمرافق الأساسية المتعلقة بالقبول، أدوات الأتمتة، محولات الملفات، الآلات الحاسبة، أدوات الاستيراد/التصدير، ومعززات الإنتاجية — تعزيز الكفاءة، تقليل الأخطاء اليدوية، وتمكين القرارات المدعومة بالبيانات.",
+    "subtitle": "مركز شامل للمرافق الأساسية المتعلقة بالتوظيف، أدوات الأتمتة، محولات الملفات، الآلات الحاسبة، أدوات الاستيراد/التصدير، ومعززات الإنتاجية — تعزيز الكفاءة، تقليل الأخطاء اليدوية، وتمكين القرارات المدعومة بالبيانات.",
     "tools": {
       "bulkUpload": {
         "title": "رفع/استيراد البيانات الجماعية",
         "desc": "تخطيط الأعمدة، التحقق من الصحة، ملخص السجل",
         "button": "رفع Excel/CSV",
-        "example": "مثال: رفع 200 طلب تقديم شخصي تم جمعه خلال المعارض التعليمية"
+        "example": "مثال: رفع 200 طلب تقديم شخصي تم جمعه خلال معارض الوظائف"
       },
       "bulkExport": {
         "title": "تصدير البيانات الجماعية",
         "desc": "XLSX، PDF، CSV، JSON | إخفاء البيانات الحساسة",
         "button": "تصدير البيانات",
-        "useCase": "حالة الاستخدام: مشاركة \"الطلاب الجامعيون المقبولون لعام 2026\" مع فرق المالية أو السكن"
+        "useCase": "حالة الاستخدام: مشاركة \"المرشحون الموظفون لعام 2026\" مع فرق المالية أو الموارد البشرية"
       },
       "documentConverter": {
         "title": "محول المستندات",
         "desc": "الصورة/Word إلى PDF، دمج، ضغط",
         "imageToPdf": "الصورة/Word إلى PDF",
         "mergeCompress": "دمج/ضغط",
-        "ideal": "مثالي للمستندات الممسوحة ضوئياً من الطلاب"
+        "ideal": "مثالي للمستندات الممسوحة ضوئياً من المرشحين"
       },
       "feeEstimator": {
-        "title": "مقدر رسوم القبول",
+        "title": "مقدر حزمة الراتب",
         "desc": "تكوين، اقتراح الذكاء الاصطناعي، طباعة/تحميل",
-        "button": "تقدير الرسوم"
+        "button": "تقدير الحزمة"
       },
       "timelineGenerator": {
         "title": "مولد الجدول الزمني للتطبيق",
@@ -714,7 +714,7 @@
   },
   "schedule": {
     "title": "الجدول الزمني والمواعيد",
-    "subtitle": "نظام جدولة شامل للمقابلات وجلسات الإرشاد والزيارات الجامعية واجتماعات الفريق مع التحسين المدعوم بالذكاء الاصطناعي وحل التعارضات.",
+    "subtitle": "نظام جدولة شامل للمقابلات واجتماعات المرشحين وزيارات المكتب واجتماعات الفريق مع التحسين المدعوم بالذكاء الاصطناعي وحل التعارضات.",
     "dashboard": {
       "today": "اليوم",
       "thisWeek": "هذا الأسبوع",
@@ -722,11 +722,11 @@
       "confirmed": "مؤكد"
     },
     "types": {
-      "studentInterview": "مقابلة الطالب",
-      "parentCounseling": "إرشاد الوالدين",
-      "agentMeeting": "اجتماع الوكيل",
-      "highSchoolOutreach": "outreach المدرسة الثانوية",
-      "campusVisit": "زيارة الحرم الجامعي",
+      "studentInterview": "مقابلة المرشح",
+      "parentCounseling": "التحقق من المراجع",
+      "agentMeeting": "اجتماع المجند",
+      "highSchoolOutreach": "استقطاب المواهب",
+      "campusVisit": "زيارة المكتب",
       "teamSync": "مزامنة الفريق",
       "walkIn": "دخول مباشر"
     },
@@ -749,7 +749,7 @@
       "cancel": "إلغاء"
     },
     "form": {
-      "applicantName": "اسم المتقدم/المنظمة",
+      "applicantName": "اسم المرشح/الشركة",
       "date": "التاريخ",
       "time": "الوقت",
       "mode": "الوضع"
@@ -765,9 +765,9 @@
   },
   "searchFilters": {
     "title": "البحث المتقدم والمرشحات",
-    "subtitle": "قدرات بحث قوية مع اقتراحات الذكاء الاصطناعي والربط العميق والآراء المحفوظة وخيارات التصفية الشاملة لإدارة المتقدمين بكفاءة.",
+    "subtitle": "قدرات بحث قوية مع اقتراحات الذكاء الاصطناعي والربط العميق والآراء المحفوظة وخيارات التصفية الشاملة لإدارة المرشحين بكفاءة.",
     "search": {
-      "placeholder": "البحث عن المتقدمين والمستندات والمدفوعات والتواصل...",
+      "placeholder": "البحث عن المرشحين والمستندات والتحقق والتواصل...",
       "recentSearches": "البحث الأخير",
       "clearAll": "مسح الكل",
       "suggestions": "اقتراحات الذكاء الاصطناعي",
@@ -816,7 +816,7 @@
       "allStatus": "جميع الحالات",
       "allPrograms": "جميع البرامج",
       "tags": "العلامات (مفصولة بفواصل)",
-      "counselor": "المستشار",
+      "counselor": "المجند",
       "dateRange": "نطاق التاريخ",
       "scoreRange": "نطاق النتيجة",
       "cancel": "إلغاء"
@@ -841,13 +841,13 @@
       "title": "الوصول والتحكم",
       "role": "الدور",
       "admin": "المدير: جميع المرشحات",
-      "counselor": "المستشار: المخصص فقط"
+      "counselor": "المجند: المخصص فقط"
     }
   },
 
   "workspace": {
     "title": "مساحة العمل",
-    "subtitle": "لوحة موحدة لإدارة القبول والامتثال والعمليات اليومية.",
+    "subtitle": "لوحة موحدة لإدارة التوظيف والامتثال والعمليات اليومية.",
     "complianceQuality": {
       "title": "الامتثال والجودة",
       "subtitle": "ضمان الامتثال للمعايير المؤسسية والحفاظ على العمليات عالية الجودة",
@@ -891,7 +891,7 @@
       },
       "qualityAssurance": {
         "title": "ضمان الجودة",
-        "admissionQualitySelfAssessment": "التقييم الذاتي لجودة القبول",
+        "admissionQualitySelfAssessment": "التقييم الذاتي لجودة التوظيف",
         "complianceCoverageAnalysis": "تحليل تغطية الامتثال",
         "complianceUploads": "رفع الامتثال",
         "start": "ابدأ",
@@ -900,9 +900,9 @@
       },
       "riskManagement": {
         "title": "إدارة المخاطر",
-        "delayedAdmissionProcess": "تأخر عملية القبول",
+        "delayedAdmissionProcess": "تأخر عملية التوظيف",
         "underperformanceInCompliance": "ضعف الأداء في الامتثال",
-        "increasedDropoutTrend": "زيادة اتجاه الانسحاب",
+        "increasedDropoutTrend": "زيادة اتجاه انسحاب المرشحين",
         "high": "عالي",
         "medium": "متوسط",
         "alert": "تنبيه"
@@ -912,13 +912,13 @@
       "title": "التدريب والتطوير",
       "teamTraining": {
         "title": "تدريب الفريق",
-        "admissionProcess": "تدريب عملية القبول",
+        "admissionProcess": "تدريب عملية التوظيف",
         "complianceTraining": "تدريب الامتثال",
         "digitalTools": "تدريب الأدوات الرقمية"
       },
       "knowledgeManagement": {
         "title": "إدارة المعرفة",
-        "admissionGuidelines": "إرشادات القبول",
+        "admissionGuidelines": "إرشادات التوظيف",
         "complianceProcedures": "إجراءات الامتثال",
         "departmentSOPs": "إجراءات التشغيل القياسية للأقسام"
       }
@@ -945,7 +945,7 @@
         "title": "صندوق المهام",
         "submitDepartmentalBudgetProposal": "إرسال اقتراح ميزانية القسم",
         "conductInternalAuditForLabEquipment": "إجراء تدقيق داخلي لمعدات المختبر",
-        "approveStudentResearchApplications": "الموافقة على طلبات البحث الطلابية"
+        "approveStudentResearchApplications": "الموافقة على طلبات المرشحين"
       },
       "events": {
         "title": "الأحداث",
@@ -985,23 +985,23 @@
     }
   },
   "courseManagement": {
-    "title": "إدارة الدورات",
-    "subtitle": "إدارة وتنسيق البرامج الأكاديمية عبر الكليات والأقسام",
+    "title": "إدارة المناصب",
+    "subtitle": "إدارة وتنسيق الوظائف عبر الأقسام والفرق",
     "tabs": {
-      "courseCatalog": "فهرس الدورات",
-      "addEditCourses": "إضافة/تعديل الدورات",
+      "courseCatalog": "فهرس المناصب",
+      "addEditCourses": "إضافة/تعديل المناصب",
       "visibilitySettings": "إعدادات الرؤية",
-      "seatMonitoring": "مراقبة المقاعد",
+      "seatMonitoring": "مراقبة الشواغر",
       "linkedApplications": "الطلبات المرتبطة",
-      "feeMapping": "تخطيط الرسوم",
+      "feeMapping": "تخطيط الرواتب",
       "documentRequirements": "متطلبات المستندات",
-      "academicMetrics": "المقاييس الأكاديمية",
+      "academicMetrics": "مقاييس التوظيف",
       "bulkActions": "الإجراءات المجمعة",
       "marketingReadiness": "جاهزية التسويق"
     },
     "marketingReadiness": {
-      "title": "جاهزية التسويق",
-      "subtitle": "تتبع حالة الاستعداد التسويقي لجميع الدورات",
+      "title": "جاهزية نشر الوظيفة",
+      "subtitle": "تتبع حالة الاستعداد لنشر الوظيفة لجميع المناصب",
       "readiness": "الجاهزية",
       "brochureReady": "الكتيب جاهز",
       "websiteUpdated": "تم تحديث الموقع",
@@ -1012,17 +1012,17 @@
       "ready": "جاهز"
     },
     "courseCatalog": {
-      "title": "فهرس الدورات",
-      "subtitle": "تصفح وإدارة جميع الدورات المتاحة",
-      "searchPlaceholder": "البحث في الدورات...",
+      "title": "فهرس المناصب",
+      "subtitle": "تصفح وإدارة جميع المناصب المتاحة",
+      "searchPlaceholder": "البحث في المناصب...",
       "filters": "المرشحات",
       "tableHeaders": {
-        "course": "الدورة",
+        "course": "المنصب",
         "department": "القسم",
         "type": "النوع",
         "duration": "المدة",
-        "intake": "الاستيعاب",
-        "fee": "الرسوم",
+        "intake": "الشواغر",
+        "fee": "الراتب",
         "status": "الحالة"
       },
       "status": {
@@ -1032,17 +1032,17 @@
       }
     },
     "courseForm": {
-      "title": "إضافة/تعديل دورة",
-      "subtitle": "إنشاء دورات جديدة أو تعديل الموجودة",
-      "courseName": "اسم الدورة",
-      "courseCode": "رمز الدورة",
+      "title": "إضافة/تعديل منصب",
+      "subtitle": "إنشاء مناصب جديدة أو تعديل الموجودة",
+      "courseName": "اسم المنصب",
+      "courseCode": "رمز المنصب",
       "department": "القسم",
       "type": "النوع",
       "duration": "المدة",
       "intake": "الاستيعاب",
-      "fee": "الرسوم",
+      "fee": "نطاق الراتب",
       "description": "الوصف",
-      "save": "حفظ الدورة",
+      "save": "حفظ المنصب",
       "cancel": "إلغاء"
     },
     "visibilitySettings": {
@@ -1053,41 +1053,41 @@
       "restricted": "مقيد"
     },
     "seatMonitoring": {
-      "title": "مراقبة المقاعد",
-      "subtitle": "تتبع توفر المقاعد وحالة التسجيل",
-      "totalSeats": "إجمالي المقاعد",
-      "availableSeats": "المقاعد المتاحة",
-      "enrolledSeats": "المقاعد المسجلة",
+      "title": "مراقبة الشواغر",
+      "subtitle": "تتبع توفر الشواغر وحالة التوظيف",
+      "totalSeats": "إجمالي الشواغر",
+      "availableSeats": "الشواغر المتاحة",
+      "enrolledSeats": "المناصب المشغولة",
       "waitlist": "قائمة الانتظار"
     },
     "linkedApplications": {
       "title": "الطلبات المرتبطة",
-      "subtitle": "عرض الطلبات المرتبطة بدورات محددة",
-      "applicantName": "اسم مقدم الطلب",
+      "subtitle": "عرض الطلبات المرتبطة بمناصب محددة",
+      "applicantName": "اسم المرشح",
       "applicationId": "معرف الطلب",
       "status": "الحالة",
       "linkedDate": "تاريخ الربط"
     },
     "feeMapping": {
-      "title": "تخطيط الرسوم",
-      "subtitle": "تكوين هياكل الرسوم لدورات مختلفة",
-      "courseFee": "رسوم الدورة",
-      "additionalFees": "رسوم إضافية",
-      "scholarship": "المنحة الدراسية",
-      "paymentPlan": "خطة الدفع",
-      "addCourse": "إضافة دورة",
-      "addNewCourse": "إضافة دورة جديدة",
-      "courseName": "اسم الدورة",
-      "courseCode": "رمز الدورة",
+      "title": "تخطيط الرواتب",
+      "subtitle": "تكوين هياكل الرواتب لمناصب مختلفة",
+      "courseFee": "الراتب الأساسي",
+      "additionalFees": "المزايا الإضافية",
+      "scholarship": "المكافأة",
+      "paymentPlan": "خطة التعويض",
+      "addCourse": "إضافة منصب",
+      "addNewCourse": "إضافة منصب جديد",
+      "courseName": "اسم المنصب",
+      "courseCode": "رمز المنصب",
       "actions": "الإجراءات",
-      "totalCourses": "إجمالي الدورات",
-      "totalFees": "إجمالي الرسوم",
-      "scholarshipCourses": "دورات المنحة الدراسية"
+      "totalCourses": "إجمالي المناصب",
+      "totalFees": "إجمالي الميزانية",
+      "scholarshipCourses": "مناصب المكافأة"
     },
     "documentRequirements": {
       "title": "متطلبات المستندات",
-      "subtitle": "إدارة المستندات المطلوبة لطلبات الدورات",
-      "courseName": "اسم الدورة",
+      "subtitle": "إدارة المستندات المطلوبة لطلبات المناصب",
+      "courseName": "اسم المنصب",
       "documentName": "اسم المستند",
       "documentType": "نوع المستند",
       "status": "الحالة",
@@ -1096,7 +1096,7 @@
       "optionalDocuments": "المستندات الاختيارية",
       "activeDocuments": "المستندات النشطة",
       "totalDocuments": "إجمالي المستندات",
-      "courseNamePlaceholder": "أدخل اسم الدورة",
+      "courseNamePlaceholder": "أدخل اسم المنصب",
       "documentNamePlaceholder": "أدخل اسم المستند",
       "mandatory": "مطلوب",
       "optional": "اختياري",
@@ -1110,15 +1110,15 @@
       "conditional": "مشروط"
     },
     "academicMetrics": {
-      "title": "المقاييس الأكاديمية",
-      "subtitle": "تتبع أداء ومقاييس التسجيل",
-      "enrollmentRate": "معدل التسجيل",
+      "title": "مقاييس التوظيف",
+      "subtitle": "تتبع أداء ومقاييس التوظيف",
+      "enrollmentRate": "معدل التوظيف",
       "completionRate": "معدل الإكمال",
       "satisfactionScore": "درجة الرضا"
     },
     "bulkActions": {
       "title": "الإجراءات المجمعة",
-      "subtitle": "تنفيذ عمليات على دورات متعددة في وقت واحد",
+      "subtitle": "تنفيذ عمليات على مناصب متعددة في وقت واحد",
       "selectAll": "تحديد الكل",
       "bulkUpdate": "تحديث مجمع",
       "bulkDelete": "حذف مجمع",
@@ -1209,7 +1209,7 @@
     "categories": {
       "IT": "تقنية المعلومات",
       "ERP": "تخطيط موارد المؤسسة / إدارة علاقات العملاء",
-      "Admissions": "القبول",
+      "Admissions": "التوظيف",
       "Documents": "المستندات",
       "Payments": "المدفوعات",
       "Facilities": "المرافق"
@@ -1226,7 +1226,7 @@
         "featureRequest": "طلب ميزة"
       },
       "Admissions": {
-        "cycleSetup": "إعداد الدورة",
+        "cycleSetup": "إعداد دورة التوظيف",
         "leadAssignment": "تعيين العملاء المحتملين",
         "applicationReview": "مراجعة الطلبات"
       },
@@ -1270,7 +1270,7 @@
     "knowledgeBase": {
       "title": "قاعدة المعرفة",
       "howToReviewApplications": "كيفية مراجعة الطلبات",
-      "managingAdmissionCycles": "إدارة دورات القبول",
+      "managingAdmissionCycles": "إدارة دورات التوظيف",
       "uploadingAndVerifyingDocuments": "رفع والتحقق من المستندات",
       "views": "مشاهدات",
       "lastUpdated": "آخر تحديث"
@@ -1278,7 +1278,7 @@
   },
   "payments": {
     "title": "إدارة المدفوعات",
-    "subtitle": "إدارة الفواتير وتتبع المدفوعات والتعامل مع الاسترداد",
+    "subtitle": "إدارة حزم الرواتب وتتبع التحقق والتعامل مع التعيين",
     "today": "اليوم",
     "thisMonth": "هذا الشهر",
     "ytd": "منذ بداية العام",
@@ -1297,16 +1297,16 @@
     },
     "paymentHistory": {
       "title": "سجل المدفوعات لكل مقدم طلب",
-      "subtitle": "تتبع سجلات المدفوعات الفردية للمتقدمين"
+      "subtitle": "تتبع سجلات التحقق الفردية للمرشحين"
     },
     "bulkPaymentUpload": {
       "title": "رفع المدفوعات المجمعة / المزامنة غير المتصلة",
-      "subtitle": "ارفع ملف Excel/CSV للمعاملات غير المتصلة. سيقوم الذكاء الاصطناعي بمطابقتها تلقائياً مع الفواتير المعلقة.",
+      "subtitle": "ارفع ملف Excel/CSV للتحقق غير المتصل. سيقوم الذكاء الاصطناعي بمطابقتها تلقائياً مع المرشحين المعلقين.",
       "upload": "رفع"
     },
     "paymentReminders": {
-      "title": "تذكيرات المدفوعات والإشعارات",
-      "subtitle": "تكوين وإرسال تذكيرات المدفوعات",
+      "title": "تذكيرات التحقق والإشعارات",
+      "subtitle": "تكوين وإرسال تذكيرات التحقق",
       "beforeDue": "قبل الاستحقاق",
       "onDue": "في يوم الاستحقاق",
       "afterDue": "بعد الاستحقاق",
@@ -1327,13 +1327,13 @@
     },
     "aiEnhancements": {
       "title": "التحسينات المدعومة بالذكاء الاصطناعي",
-      "feeForecast": "توقعات الرسوم: ₹{amount} متوقع",
-      "smartReminders": "التذكيرات الذكية: مخصصة لـ {count} طالب",
+      "feeForecast": "توقعات التوظيف: {amount} مرشح متوقع",
+      "smartReminders": "التذكيرات الذكية: مخصصة لـ {count} مرشح",
       "fraudDetection": "كشف الاحتيال: لا توجد شذوذات",
       "chatbotHelp": "مساعدة الشات بوت: {count} استفسار تم حلها"
     },
     "table": {
-      "applicant": "مقدم الطلب",
+      "applicant": "المرشح",
       "type": "النوع",
       "amount": "المبلغ",
       "status": "الحالة",
@@ -1350,12 +1350,12 @@
     },
     "types": {
       "applicationFee": "رسوم الطلب",
-      "admissionFee": "رسوم القبول",
-      "securityDeposit": "الوديعة الأمنية",
-      "tuitionFee": "الرسوم الدراسية",
-      "hostelFee": "رسوم السكن",
-      "libraryFee": "رسوم المكتبة",
-      "laboratoryFee": "رسوم المختبر"
+      "admissionFee": "رسوم التعيين",
+      "securityDeposit": "التحقق من الخلفية",
+      "tuitionFee": "رسوم التدريب",
+      "hostelFee": "دعم الانتقال",
+      "libraryFee": "رسوم المعدات",
+      "laboratoryFee": "الأدوات والبرمجيات"
     },
     "status": {
       "paid": "مدفوع",

@@ -1,7 +1,7 @@
 {
   "dashboard": {
-    "title": "Admission Head Dashboard",
-    "subtitle": "Comprehensive admission analytics and insights",
+    "title": "Recruitment Head Dashboard",
+    "subtitle": "Comprehensive recruitment analytics and insights",
     "filters": {
       "allDepartments": "All Departments",
       "engineering": "Engineering",
@@ -13,7 +13,7 @@
       "export": "Export"
     },
     "admissionFunnel": {
-      "title": "Admission Funnel Overview",
+      "title": "Recruitment Funnel Overview",
       "comparison": "YoY Comparison",
       "stages": {
         "totalInquiries": "Total Inquiries",
@@ -21,8 +21,8 @@
         "applicationsSubmitted": "Applications Submitted",
         "applicationsApproved": "Applications Approved",
         "offersSent": "Offers Sent",
-        "admissionsConfirmed": "Admissions Confirmed",
-        "enrolledStudents": "Enrolled Students"
+        "admissionsConfirmed": "Hires Confirmed",
+        "enrolledStudents": "Onboarded Employees"
       }
     },
     "leadSources": {
@@ -77,12 +77,12 @@
     "aiInsights": {
       "title": "AI-Powered Insights",
       "updatedDaily": "Updated Daily",
-      "enrollmentForecast": "Enrollment Forecast",
+      "enrollmentForecast": "Hiring Forecast",
       "departmentAlert": "Department Alert",
       "resourcePlanning": "Resource Planning",
-      "forecastText": "Based on current trends, expected enrollment for next cycle:",
+      "forecastText": "Based on current trends, expected hiring for next cycle:",
       "alertText": "Design department applications may fall short by",
-      "planningText": "Hostel accommodation capacity nearing"
+      "planningText": "Office capacity nearing"
     }
   },
   "applications": {
@@ -106,7 +106,7 @@
     "table": {
       "candidate": "Candidate",
       "applicationId": "Application ID",
-      "program": "Program",
+      "program": "Position",
       "submissionDate": "Submission Date",
       "status": "Status",
       "reviewer": "Reviewer",
@@ -121,7 +121,7 @@
       "pendingVerification": "Pending Verification",
       "paymentPending": "Payment Pending",
       "offersSent": "Offers Sent",
-      "enrollmentsConfirmed": "Enrollments Confirmed"
+      "enrollmentsConfirmed": "Hires Confirmed"
     },
     "ai": {
       "topPercentile": "Top 5%",
@@ -140,7 +140,7 @@
       "title": "AI Insights",
       "topApplicants": "Top 5% Applicants",
       "possibleDuplicate": "Possible duplicate:",
-      "highlyLikelyToEnroll": "Highly Likely to Enroll"
+      "highlyLikelyToEnroll": "Highly Likely to Accept Offer"
     },
     "sections": {
       "pendingApplicants": "Pending Applicants:",
@@ -184,7 +184,7 @@
   },
   "leads": {
     "title": "Leads & Applicants",
-    "subtitle": "Manage and track all leads through the admission pipeline",
+    "subtitle": "Manage and track all leads through the recruitment pipeline",
     "tabs": {
       "pipeline": "Lead Pipeline",
       "filters": "Filters & Search",
@@ -198,7 +198,7 @@
       "insights": "AI Insights"
     },
     "search": {
-      "placeholder": "Search leads by name, program, or ID..."
+      "placeholder": "Search leads by name, position, or ID..."
     },
     "actions": {
       "aiInsights": "AI Insights",
@@ -210,7 +210,7 @@
       "contacted": "Contacted",
       "qualified": "Qualified",
       "application": "Application",
-      "enrolled": "Enrolled"
+      "enrolled": "Hired"
     },
     "conversionScore": {
       "high": "High",
@@ -236,7 +236,7 @@
       "applicants": "Applicants",
       "shortlisted": "Shortlisted",
       "offersSent": "Offers Sent",
-      "enrolled": "Enrolled"
+      "enrolled": "Hired"
     },
     "pipelineStages": {
       "inquiry": "Inquiry",
@@ -252,7 +252,7 @@
       "placeholder": "Search by name, email, phone..."
     },
     "filters": {
-      "program": "Program",
+      "program": "Position",
       "state": "State",
       "officer": "Officer",
       "status": "Status",
@@ -305,7 +305,7 @@
       "btech": "B.Tech"
     },
     "demo": {
-      "description": "(Demo) Table of formal applicants, document/payment/interview status, alerts for pending docs.",
+      "description": "(Demo) Table of formal candidates, document/verification/interview status, alerts for pending docs.",
       "bulkSingle": "(Demo) Bulk/single WhatsApp, Email, SMS, AI-powered nudges.",
       "officerWorkload": "(Demo) Officer workload, reassign, AI suggestions.",
       "inactiveLeads": "(Demo) Inactive leads, drop-offs, re-engagement nudges.",
@@ -331,9 +331,9 @@
       },
       "table": {
         "headers": {
-          "applicant": "Applicant",
+          "applicant": "Candidate",
           "applicationId": "Application ID",
-          "program": "Program",
+          "program": "Position",
           "status": "Status",
           "documents": "Documents",
           "payment": "Payment",
@@ -490,7 +490,7 @@
       "smartReminder": "Smart Reminder",
       "followUpsSuggested": "follow-ups suggested",
       "sentiment": "Sentiment",
-      "parentFrustrated": "Parent is frustrated about delay",
+      "candidateFrustrated": "Candidate is frustrated about delay",
       "botLog": "Bot Log",
       "chatbotInteractions": "chatbot interactions",
       "urgencyDetector": "Urgency Detector",
@@ -513,12 +513,12 @@
     "audit": {
       "title": "Audit & History",
       "export": "Export",
-      "description": "Full communication audit trail per applicant. Data retention: 2 years. Exportable for compliance."
+      "description": "Full communication audit trail per candidate. Data retention: 2 years. Exportable for compliance."
     }
   },
   "documents": {
     "title": "Documents",
-    "subtitle": "Manage applicant documents, verification, and compliance tracking",
+    "subtitle": "Manage candidate documents, verification, and compliance tracking",
     "dashboard": {
       "totalUploaded": "Total Uploaded",
       "pendingVerification": "Pending Verification",
@@ -534,7 +534,7 @@
       "aiCompletion": "AI: 85% completion for confirmed"
     },
     "sections": {
-      "applicantDocumentRepository": "Applicant Document Repository",
+      "applicantDocumentRepository": "Candidate Document Repository",
       "documentUploadPortal": "Document Upload Portal",
       "verificationValidation": "Verification & Validation",
       "bulkDocumentReview": "Bulk Document Review & Actions",
@@ -551,7 +551,7 @@
     },
     "table": {
       "headers": {
-        "applicant": "Applicant",
+        "applicant": "Candidate",
         "document": "Document",
         "status": "Status",
         "file": "File",
@@ -616,11 +616,11 @@
   },
   "leadTransfer": {
     "title": "Lead Transfer Management",
-    "subtitle": "Manage and transfer leads between counselors efficiently",
-    "overviewDescription": "Filter and select leads for transfer between counselors and departments.",
-    "bulkTransferDescription": "Transfer multiple leads at once and assign them to specific counselors.",
+    "subtitle": "Manage and transfer leads between recruiters efficiently",
+    "overviewDescription": "Filter and select leads for transfer between recruiters and departments.",
+    "bulkTransferDescription": "Transfer multiple leads at once and assign them to specific recruiters.",
     "historyDescription": "Review past lead transfers, track status changes, and monitor transfer patterns.",
-    "conflictsDescription": "Resolve ownership conflicts and workload distribution issues between counselors.",
+    "conflictsDescription": "Resolve ownership conflicts and workload distribution issues between recruiters.",
     "kpiDescription": "Analyze transfer metrics, counselor workload, and performance indicators.",
     "tabs": {
       "overview": "Lead Overview",
@@ -632,31 +632,31 @@
   },
   "toolsUtilities": {
     "title": "Tools & Utilities",
-    "subtitle": "Central hub for essential admission-related utilities, automation tools, file converters, calculators, import/export tools, and productivity enhancers — boosting efficiency, reducing manual errors, and enabling data-driven decisions.",
+    "subtitle": "Central hub for essential recruitment-related utilities, automation tools, file converters, calculators, import/export tools, and productivity enhancers — boosting efficiency, reducing manual errors, and enabling data-driven decisions.",
     "tools": {
       "bulkUpload": {
         "title": "Bulk Data Upload / Import",
         "desc": "Map columns, validate, log summary",
         "button": "Upload Excel/CSV",
-        "example": "Example: Upload 200 offline walk-in applications collected during education fairs"
+        "example": "Example: Upload 200 offline walk-in applications collected during job fairs"
       },
       "bulkExport": {
         "title": "Bulk Data Export",
         "desc": "XLSX, PDF, CSV, JSON | Redact sensitive data",
         "button": "Export Data",
-        "useCase": "Use Case: Share \"Admitted UG Students for 2026\" with Finance or Hostel teams"
+        "useCase": "Use Case: Share \"Hired Candidates for 2026\" with Finance or HR teams"
       },
       "documentConverter": {
         "title": "Document Converter",
         "desc": "Image/Word to PDF, merge, compress",
         "imageToPdf": "Image/Word to PDF",
         "mergeCompress": "Merge/Compress",
-        "ideal": "Ideal for scanned documents from students"
+        "ideal": "Ideal for scanned documents from candidates"
       },
       "feeEstimator": {
-        "title": "Admission Fee Estimator",
+        "title": "Salary Package Estimator",
         "desc": "Configure, AI suggest, print/download",
-        "button": "Estimate Fee"
+        "button": "Estimate Package"
       },
       "timelineGenerator": {
         "title": "Application Timeline Generator",
@@ -711,7 +711,7 @@
   },
   "schedule": {
     "title": "Schedule & Appointments",
-    "subtitle": "Comprehensive scheduling system for interviews, counseling sessions, campus visits, and team meetings with AI-powered optimization and conflict resolution.",
+    "subtitle": "Comprehensive scheduling system for interviews, candidate meetings, office visits, and team meetings with AI-powered optimization and conflict resolution.",
     "dashboard": {
       "today": "Today",
       "thisWeek": "This Week",
@@ -719,11 +719,11 @@
       "confirmed": "Confirmed"
     },
     "types": {
-      "studentInterview": "Student Interview",
-      "parentCounseling": "Parent Counseling",
-      "agentMeeting": "Agent Meeting",
-      "highSchoolOutreach": "High School Outreach",
-      "campusVisit": "Campus Visit",
+      "studentInterview": "Candidate Interview",
+      "parentCounseling": "Reference Check",
+      "agentMeeting": "Recruiter Meeting",
+      "highSchoolOutreach": "Talent Sourcing",
+      "campusVisit": "Office Visit",
       "teamSync": "Team Sync",
       "walkIn": "Walk-In"
     },
@@ -746,7 +746,7 @@
       "cancel": "Cancel"
     },
     "form": {
-      "applicantName": "Applicant/Org Name",
+      "applicantName": "Candidate/Company Name",
       "date": "Date",
       "time": "Time",
       "mode": "Mode"
@@ -762,9 +762,9 @@
   },
   "searchFilters": {
     "title": "Advanced Search & Filters",
-    "subtitle": "Powerful search capabilities with AI suggestions, deep linking, saved views, and comprehensive filtering options for efficient applicant management.",
+    "subtitle": "Powerful search capabilities with AI suggestions, deep linking, saved views, and comprehensive filtering options for efficient candidate management.",
     "search": {
-      "placeholder": "Search applicants, documents, payments, communications...",
+      "placeholder": "Search candidates, documents, verifications, communications...",
       "recentSearches": "Recent Searches",
       "clearAll": "Clear All",
       "suggestions": "AI Suggestions",
@@ -813,7 +813,7 @@
       "allStatus": "All Status",
       "allPrograms": "All Programs",
       "tags": "Tags (comma separated)",
-      "counselor": "Counselor",
+      "counselor": "Recruiter",
       "dateRange": "Date Range",
       "scoreRange": "Score Range",
       "cancel": "Cancel"
@@ -838,12 +838,12 @@
       "title": "Access & Control",
       "role": "Role",
       "admin": "Admin: All Filters",
-      "counselor": "Counselor: Assigned Only"
+      "counselor": "Recruiter: Assigned Only"
     }
   },
   "payments": {
     "title": "Payments Management",
-    "subtitle": "Manage invoices, track payments, and handle refunds",
+    "subtitle": "Manage salary packages, track verifications, and handle onboarding",
     "today": "Today",
     "thisMonth": "This Month",
     "ytd": "YTD",
@@ -862,16 +862,16 @@
     },
     "paymentHistory": {
       "title": "Payment History per Applicant",
-      "subtitle": "Track individual applicant payment records"
+      "subtitle": "Track individual candidate verification records"
     },
     "bulkPaymentUpload": {
       "title": "Bulk Payment Upload / Offline Sync",
-      "subtitle": "Upload Excel/CSV of offline transactions. AI will auto-match to pending invoices.",
+      "subtitle": "Upload Excel/CSV of offline verifications. AI will auto-match to pending candidates.",
       "upload": "Upload"
     },
     "paymentReminders": {
-      "title": "Payment Reminders & Notifications",
-      "subtitle": "Configure and send payment reminders",
+      "title": "Verification Reminders & Notifications",
+      "subtitle": "Configure and send verification reminders",
       "beforeDue": "Before Due",
       "onDue": "On Due",
       "afterDue": "After Due",
@@ -892,8 +892,8 @@
     },
     "aiEnhancements": {
       "title": "AI-Powered Enhancements",
-      "feeForecast": "Fee Forecast: ₹{amount} expected",
-      "smartReminders": "Smart Reminders: Personalized for {count} students",
+      "feeForecast": "Hiring Forecast: {amount} candidates expected",
+      "smartReminders": "Smart Reminders: Personalized for {count} candidates",
       "fraudDetection": "Fraud Detection: No anomalies",
       "chatbotHelp": "Chatbot Help: {count} queries resolved"
     },
@@ -915,12 +915,12 @@
     },
     "types": {
       "applicationFee": "Application Fee",
-      "admissionFee": "Admission Fee",
-      "securityDeposit": "Security Deposit",
-      "tuitionFee": "Tuition Fee",
-      "hostelFee": "Hostel Fee",
-      "libraryFee": "Library Fee",
-      "laboratoryFee": "Laboratory Fee"
+      "admissionFee": "Onboarding Fee",
+      "securityDeposit": "Background Check",
+      "tuitionFee": "Training Fee",
+      "hostelFee": "Relocation Support",
+      "libraryFee": "Equipment Fee",
+      "laboratoryFee": "Tools & Software"
     },
     "status": {
       "paid": "Paid",
@@ -960,7 +960,7 @@
   },
   "workspace": {
     "title": "Workspace",
-    "subtitle": "Unified dashboard for managing admissions, compliance, and daily operations.",
+    "subtitle": "Unified dashboard for managing recruitment, compliance, and daily operations.",
     "complianceQuality": {
       "title": "Compliance & Quality",
       "subtitle": "Ensure compliance with institutional standards and maintain high-quality processes",
@@ -1004,7 +1004,7 @@
       },
       "qualityAssurance": {
         "title": "Quality Assurance",
-        "admissionQualitySelfAssessment": "Admission Quality Self-Assessment",
+        "admissionQualitySelfAssessment": "Recruitment Quality Self-Assessment",
         "complianceCoverageAnalysis": "Compliance Coverage Analysis",
         "complianceUploads": "Compliance Uploads",
         "start": "Start",
@@ -1013,9 +1013,9 @@
       },
       "riskManagement": {
         "title": "Risk Management",
-        "delayedAdmissionProcess": "Delayed Admission Process",
+        "delayedAdmissionProcess": "Delayed Recruitment Process",
         "underperformanceInCompliance": "Underperformance in Compliance",
-        "increasedDropoutTrend": "Increased Dropout Trend",
+        "increasedDropoutTrend": "Increased Candidate Dropout Trend",
         "high": "High",
         "medium": "Medium",
         "alert": "Alert"
@@ -1025,13 +1025,13 @@
       "title": "Training & Development",
       "teamTraining": {
         "title": "Team Training",
-        "admissionProcess": "Admission Process Training",
+        "admissionProcess": "Recruitment Process Training",
         "complianceTraining": "Compliance Training",
         "digitalTools": "Digital Tools Training"
       },
       "knowledgeManagement": {
         "title": "Knowledge Management",
-        "admissionGuidelines": "Admission Guidelines",
+        "admissionGuidelines": "Recruitment Guidelines",
         "complianceProcedures": "Compliance Procedures",
         "departmentSOPs": "Department SOPs"
       }
@@ -1058,7 +1058,7 @@
         "title": "Task Box",
         "submitDepartmentalBudgetProposal": "Submit departmental budget proposal",
         "conductInternalAuditForLabEquipment": "Conduct internal audit for lab equipment",
-        "approveStudentResearchApplications": "Approve student research applications"
+        "approveStudentResearchApplications": "Approve candidate applications"
       },
       "events": {
         "title": "Events",
@@ -1098,23 +1098,23 @@
     }
   },
   "courseManagement": {
-    "title": "Course Management",
-    "subtitle": "Manage and coordinate academic programs across colleges and departments",
+    "title": "Position Management",
+    "subtitle": "Manage and coordinate job positions across departments and teams",
     "tabs": {
-      "courseCatalog": "Course Catalog",
-      "addEditCourses": "Add/Edit Courses",
+      "courseCatalog": "Position Catalog",
+      "addEditCourses": "Add/Edit Positions",
       "visibilitySettings": "Visibility Settings",
-      "seatMonitoring": "Seat Monitoring",
+      "seatMonitoring": "Opening Monitoring",
       "linkedApplications": "Linked Applications",
-      "feeMapping": "Fee Mapping",
+      "feeMapping": "Salary Mapping",
       "documentRequirements": "Document Requirements",
       "academicMetrics": "Academic Metrics",
       "bulkActions": "Bulk Actions",
       "marketingReadiness": "Marketing Readiness"
     },
     "marketingReadiness": {
-      "title": "Marketing Readiness",
-      "subtitle": "Track marketing preparation status for all courses",
+      "title": "Job Posting Readiness",
+      "subtitle": "Track job posting preparation status for all positions",
       "readiness": "Readiness",
       "brochureReady": "Brochure Ready",
       "websiteUpdated": "Website Updated",
@@ -1125,17 +1125,17 @@
       "ready": "Ready"
     },
     "courseCatalog": {
-      "title": "Course Catalog",
-      "subtitle": "Browse and manage all available courses",
-      "searchPlaceholder": "Search courses...",
+      "title": "Position Catalog",
+      "subtitle": "Browse and manage all available positions",
+      "searchPlaceholder": "Search positions...",
       "filters": "Filters",
       "tableHeaders": {
-        "course": "COURSE",
+        "course": "POSITION",
         "department": "DEPARTMENT",
         "type": "TYPE",
         "duration": "DURATION",
-        "intake": "INTAKE",
-        "fee": "FEE",
+        "intake": "OPENINGS",
+        "fee": "SALARY",
         "status": "STATUS"
       },
       "status": {
@@ -1145,17 +1145,17 @@
       }
     },
     "courseForm": {
-      "title": "Add/Edit Course",
-      "subtitle": "Create new courses or modify existing ones",
-      "courseName": "Course Name",
-      "courseCode": "Course Code",
+      "title": "Add/Edit Position",
+      "subtitle": "Create new positions or modify existing ones",
+      "courseName": "Position Name",
+      "courseCode": "Position Code",
       "department": "Department",
       "type": "Type",
       "duration": "Duration",
       "intake": "Intake",
-      "fee": "Fee",
+      "fee": "Salary Range",
       "description": "Description",
-      "save": "Save Course",
+      "save": "Save Position",
       "cancel": "Cancel"
     },
     "visibilitySettings": {
@@ -1166,43 +1166,43 @@
       "restricted": "Restricted"
     },
     "seatMonitoring": {
-      "title": "Seat Monitoring",
-      "subtitle": "Track seat availability and enrollment status",
-      "totalSeats": "Total Seats",
-      "availableSeats": "Available Seats",
-      "enrolledSeats": "Enrolled Seats",
+      "title": "Opening Monitoring",
+      "subtitle": "Track position availability and hiring status",
+      "totalSeats": "Total Openings",
+      "availableSeats": "Available Openings",
+      "enrolledSeats": "Filled Positions",
       "waitlist": "Waitlist"
     },
     "linkedApplications": {
       "title": "Linked Applications",
-      "subtitle": "View applications linked to specific courses",
-      "applicantName": "Applicant Name",
+      "subtitle": "View applications linked to specific positions",
+      "applicantName": "Candidate Name",
       "applicationId": "Application ID",
       "status": "Status",
       "linkedDate": "Linked Date"
     },
     "feeMapping": {
-      "title": "Fee Mapping",
-      "subtitle": "Configure fee structures for different courses",
-      "courseFee": "Course Fee",
-      "additionalFees": "Additional Fees",
-      "scholarship": "Scholarship",
-      "paymentPlan": "Payment Plan",
-      "addCourse": "Add Course",
-      "addNewCourse": "Add New Course",
-      "courseName": "Course Name",
-      "courseCode": "Course Code",
+      "title": "Salary Mapping",
+      "subtitle": "Configure salary structures for different positions",
+      "courseFee": "Base Salary",
+      "additionalFees": "Additional Benefits",
+      "scholarship": "Bonus",
+      "paymentPlan": "Compensation Plan",
+      "addCourse": "Add Position",
+      "addNewCourse": "Add New Position",
+      "courseName": "Position Name",
+      "courseCode": "Position Code",
       "actions": "Actions",
-      "totalCourses": "Total Courses",
-      "totalFees": "Total Fees",
-      "scholarshipCourses": "Scholarship Courses"
+      "totalCourses": "Total Positions",
+      "totalFees": "Total Budget",
+      "scholarshipCourses": "Bonus Positions"
     },
     "documentRequirements": {
       "title": "Document Requirements",
-      "subtitle": "Manage required documents for course applications",
+      "subtitle": "Manage required documents for position applications",
       "addDocument": "Add Document",
       "addNewDocument": "Add New Document",
-      "courseName": "Course Name",
+      "courseName": "Position Name",
       "documentName": "Document Name",
       "documentType": "Document Type",
       "status": "Status",
@@ -1211,7 +1211,7 @@
       "optionalDocuments": "Optional Documents",
       "activeDocuments": "Active Documents",
       "totalDocuments": "Total Documents",
-      "courseNamePlaceholder": "Enter course name",
+      "courseNamePlaceholder": "Enter position name",
       "documentNamePlaceholder": "Enter document name",
       "mandatory": "Mandatory",
       "optional": "Optional",
@@ -1225,15 +1225,15 @@
       "conditional": "Conditional"
     },
     "academicMetrics": {
-      "title": "Academic Metrics",
-      "subtitle": "Track performance and enrollment metrics",
-      "enrollmentRate": "Enrollment Rate",
+      "title": "Hiring Metrics",
+      "subtitle": "Track performance and hiring metrics",
+      "enrollmentRate": "Hiring Rate",
       "completionRate": "Completion Rate",
       "satisfactionScore": "Satisfaction Score"
     },
     "bulkActions": {
       "title": "Bulk Actions",
-      "subtitle": "Perform operations on multiple courses at once",
+      "subtitle": "Perform operations on multiple positions at once",
       "selectAll": "Select All",
       "bulkUpdate": "Bulk Update",
       "bulkDelete": "Bulk Delete",
@@ -1324,7 +1324,7 @@
     "categories": {
       "IT": "IT",
       "ERP": "ERP / CRM",
-      "Admissions": "Admissions",
+      "Admissions": "Recruitment",
       "Documents": "Documents",
       "Payments": "Payments",
       "Facilities": "Facilities"
@@ -1341,7 +1341,7 @@
         "featureRequest": "Feature request"
       },
       "Admissions": {
-        "cycleSetup": "Cycle setup",
+        "cycleSetup": "Hiring cycle setup",
         "leadAssignment": "Lead assignment",
         "applicationReview": "Application review"
       },
@@ -1385,7 +1385,7 @@
     "knowledgeBase": {
       "title": "Knowledge Base",
       "howToReviewApplications": "How to Review Applications",
-      "managingAdmissionCycles": "Managing Admission Cycles",
+      "managingAdmissionCycles": "Managing Recruitment Cycles",
       "uploadingAndVerifyingDocuments": "Uploading and Verifying Documents",
       "views": "views",
       "lastUpdated": "Last updated"
