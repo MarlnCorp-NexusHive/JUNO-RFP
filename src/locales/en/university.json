@@ -1,0 +1,288 @@
+{
+  "university": {
+    "name": "MBSC - Prince Mohammed Bin Salman College",
+    "motto": "Excellence in Business Education, Innovation in Leadership",
+    "established": "2018",
+    "type": "Private Business College",
+    "accreditation": "AACSB Accredited",
+    "location": "Riyadh, Kingdom of Saudi Arabia",
+    "website": "www.mbsc.edu.sa",
+    "phone": "+966 11 520 0000",
+    "email": "info@mbsc.edu.sa",
+    "vision2030": "Vision 2030 Initiative",
+    "campusAlt": "MBSC Campus",
+    "campusViewAlt": "MBSC Campus View",
+    "logoAlt": "MBSC Logo",
+    "bannerText": {
+      "excellence": "Excellence in Business Education",
+      "shaping": "Shaping Future Business Leaders of Saudi Arabia"
+    },
+    "navigation": {
+      "back": "Back",
+      "overview": "Overview",
+      "colleges": "Colleges",
+      "achievements": "Achievements",
+      "leadership": "Leadership",
+      "contact": "Contact"
+    },
+    "stats": {
+      "totalStudents": {
+        "label": "Total Students",
+        "value": "2,400+"
+      },
+      "facultyMembers": {
+        "label": "Faculty Members",
+        "value": "180+"
+      },
+      "programsOffered": {
+        "label": "Programs Offered",
+        "value": "25+"
+      },
+      "researchCenters": {
+        "label": "Research Centers",
+        "value": "8+"
+      },
+      "internationalPartners": {
+        "label": "International Partners",
+        "value": "50+"
+      },
+      "employmentRate": {
+        "label": "Employment Rate",
+        "value": "98%"
+      }
+    },
+    "about": {
+      "title": "About MBSC",
+      "description1": "Mohammed Bin Salman College (MBSC) is a premier business institution in the heart of Riyadh, established as part of Saudi Arabia's Vision 2030 initiative. We are committed to developing world-class business leaders who will drive the Kingdom's economic transformation.",
+      "description2": "Our college offers cutting-edge business programs designed to meet the evolving needs of the global business landscape. With state-of-the-art facilities and partnerships with leading international institutions, MBSC provides an exceptional learning environment.",
+      "description3": "Rooted in Saudi Arabian values while embracing global business practices, MBSC prepares students to excel in both local and international markets, contributing to the Kingdom's ambitious economic goals.",
+      "details": {
+        "type": "Type:",
+        "location": "Location:",
+        "accreditation": "Accreditation:",
+        "website": "Website:"
+      }
+    },
+    "colleges": {
+      "title": "Our Colleges & Programs",
+      "list": [
+        {
+          "name": "College of Business Administration",
+          "programs": 12,
+          "students": 1200
+        },
+        {
+          "name": "College of Finance & Economics", 
+          "programs": 8,
+          "students": 600
+        },
+        {
+          "name": "College of Entrepreneurship",
+          "programs": 5,
+          "students": 400
+        },
+        {
+          "name": "College of Digital Business",
+          "programs": 6,
+          "students": 300
+        },
+        {
+          "name": "College of Leadership & Management",
+          "programs": 4,
+          "students": 200
+        }
+      ],
+      "programsLabel": "Programs:",
+      "studentsLabel": "Students:"
+    },
+    "achievements": {
+      "title": "College Achievements",
+      "list": [
+        "Ranked #1 Business College in Saudi Arabia",
+        "AACSB International Accreditation",
+        "Winner of Best Innovation Award 2026",
+        "Partnership with MIT Sloan School of Management",
+        "Accredited by 12 International Bodies",
+        "Research Excellence Award 2026"
+      ]
+    },
+    "leadership": {
+      "title": "College Leadership",
+      "members": [
+        {
+          "name": "Dr. Abdullah Al-Rashid",
+          "position": "Dean"
+        },
+        {
+          "name": "Dr. Noura Al-Zahra",
+          "position": "Associate Dean Academic"
+        },
+        {
+          "name": "Dr. Khalid Al-Sayed",
+          "position": "Associate Dean Research"
+        },
+        {
+          "name": "Dr. Aisha Al-Hassan",
+          "position": "Director of Student Affairs"
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact Information",
+      "getInTouch": "Get in Touch",
+      "labels": {
+        "email": "Email",
+        "phone": "Phone",
+        "website": "Website",
+        "address": "Address"
+      },
+      "officeHours": {
+        "title": "Office Hours",
+        "schedule": {
+          "sundayThursday": "Sunday - Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday"
+        },
+        "times": {
+          "sundayThursday": "8:00 AM - 4:00 PM",
+          "friday": "Closed",
+          "saturday": "9:00 AM - 1:00 PM"
+        },
+        "note": "Note:",
+        "emergencyNote": "For urgent matters outside office hours, please contact our emergency hotline."
+      }
+    }
+  },
+  "marlnCrm": {
+    "title": "NexusHive ERP",
+    "subtitle": "Transform Your marketing and sales organization with AI-Powered Management",
+    "watchDemo": "Watch Demo",
+    "downloadBrochure": "Download Brochure",
+    "trustedBy": "Trusted by 500+ marketing and sales organizations",
+    "aiPowered": "AI-Powered • Cloud-Based • Secure",
+    "globalPresence": "Global Presence",
+    "industryLeader": "Industry Leader",
+    "tabs": {
+      "overview": "Overview",
+      "features": "Features",
+      "testimonials": "Testimonials",
+      "pricing": "Pricing",
+      "contact": "Contact"
+    },
+    "stats": {
+      "activeUsers": "Active Users",
+      "dataProcessed": "Data Processed",
+      "successRate": "Success Rate",
+      "responseTime": "Response Time",
+      "uptime": "Uptime",
+      "clientSatisfaction": "Client Satisfaction"
+    },
+    "overview": {
+      "title": "Why Choose NexusHive ERP?",
+      "description1": "Our comprehensive CRM solution is designed specifically for marketing and sales organizations, providing everything you need to manage clients, teams, and business processes in one unified platform.",
+      "description2": "With advanced AI capabilities, real-time analytics, and seamless integration options, we help organizations streamline operations and enhance client success.",
+      "platformType": "Platform Type",
+      "deployment": "Deployment",
+      "security": "Security",
+      "support": "Support",
+      "platformTypeValue": "Cloud-Based SaaS",
+      "deploymentValue": "Global Cloud Infrastructure",
+      "securityValue": "Enterprise-Grade",
+      "supportValue": "24/7 Expert Support"
+    },
+    "features": {
+      "title": "Powerful Features for Modern Business",
+      "studentManagement": {
+        "title": "Client Management",
+        "description": "Comprehensive client lifecycle management from lead to conversion",
+        "benefits": ["Lead Tracking", "Client Records", "Progress Monitoring", "Communication Hub"]
+      },
+      "academicAnalytics": {
+        "title": "Business Analytics",
+        "description": "Real-time insights and reporting for data-driven decisions",
+        "benefits": ["Performance Metrics", "Trend Analysis", "Custom Reports", "Predictive Analytics"]
+      },
+      "financialManagement": {
+        "title": "Financial Management",
+        "description": "Complete financial tracking and payment management system",
+        "benefits": ["Payment Collection", "Payment Tracking", "Financial Reports", "Budget Planning"]
+      },
+      "communicationHub": {
+        "title": "Communication Hub",
+        "description": "Multi-channel communication platform for all stakeholders",
+        "benefits": ["Email Integration", "SMS Notifications", "Push Alerts", "Bulk Messaging"]
+      },
+      "documentManagement": {
+        "title": "Document Management",
+        "description": "Secure document storage and verification system",
+        "benefits": ["Digital Storage", "Version Control", "Access Control", "Audit Trail"]
+      },
+      "aiInsights": {
+        "title": "AI-Powered Insights",
+        "description": "Advanced AI features for predictive analytics and automation",
+        "benefits": ["Predictive Analytics", "Automated Workflows", "Smart Recommendations", "Chat Support"]
+      }
+    },
+    "testimonials": {
+      "title": "What Our Clients Say",
+      "client1": {
+        "name": "Dr. Sarah Johnson",
+        "role": "Corporate Director",
+        "company": "Tech Corp",
+        "content": "NexusHive ERP has revolutionized our client management process. The AI insights help us make better decisions."
+      },
+      "client2": {
+        "name": "Michael Chen",
+        "role": "IT Director",
+        "company": "Global Solutions",
+        "content": "The system is incredibly user-friendly and the support team is outstanding. Highly recommended!"
+      },
+      "client3": {
+        "name": "Dr. Emily Rodriguez",
+        "role": "Business Director",
+        "company": "Innovation Corp",
+        "content": "The analytics dashboard gives us insights we never had before. It's a game-changer for our organization."
+      }
+    },
+    "pricing": {
+      "title": "Flexible Pricing Plans",
+      "starter": {
+        "name": "Starter",
+        "price": "$99",
+        "period": "/month",
+        "features": ["Up to 1,000 clients", "Basic analytics", "Email support"],
+        "button": "Get Started"
+      },
+      "professional": {
+        "name": "Professional",
+        "price": "$299",
+        "period": "/month",
+        "badge": "Most Popular",
+        "features": ["Up to 5,000 clients", "Advanced analytics", "AI insights", "Priority support"],
+        "button": "Get Started"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Custom",
+        "features": ["Unlimited clients", "Custom integrations", "Dedicated support", "On-premise option"],
+        "button": "Contact Sales"
+      }
+    },
+    "contact": {
+      "title": "Get in Touch",
+      "contactInfo": "Contact Information",
+      "requestDemo": "Request a Demo",
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "address": "Address",
+      "form": {
+        "name": "Your Name",
+        "email": "Email Address",
+        "institution": "Company Name",
+        "message": "Tell us about your needs",
+        "submit": "Request Demo"
+      }
+    }
+  }
+} 

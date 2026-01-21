@@ -1,0 +1,1398 @@
+{
+  "dashboard": {
+    "title": "Admission Head Dashboard",
+    "subtitle": "Comprehensive admission analytics and insights",
+    "filters": {
+      "allDepartments": "All Departments",
+      "engineering": "Engineering",
+      "business": "Business",
+      "arts": "Arts",
+      "currentCycle": "Current Cycle",
+      "lastCycle": "Last Cycle",
+      "yearOverYear": "Year over Year",
+      "export": "Export"
+    },
+    "admissionFunnel": {
+      "title": "Admission Funnel Overview",
+      "comparison": "YoY Comparison",
+      "stages": {
+        "totalInquiries": "Total Inquiries",
+        "applicationsStarted": "Applications Started",
+        "applicationsSubmitted": "Applications Submitted",
+        "applicationsApproved": "Applications Approved",
+        "offersSent": "Offers Sent",
+        "admissionsConfirmed": "Admissions Confirmed",
+        "enrolledStudents": "Enrolled Students"
+      }
+    },
+    "leadSources": {
+      "title": "Lead Source Performance",
+      "period": "Last 30 Days",
+      "conversionRate": "Conversion Rate",
+      "applications": "Applications",
+      "vsLastMonth": "vs Last Month"
+    },
+    "departmentStatus": {
+      "title": "Department-wise Status",
+      "currentCycle": "Current Cycle",
+      "totalSeats": "Total Seats",
+      "applications": "Applications",
+      "filled": "Filled",
+      "waitlisted": "Waitlisted",
+      "fillRate": "Fill Rate"
+    },
+    "demographics": {
+      "title": "Demographics Snapshot",
+      "currentApplicants": "Current Applicants",
+      "regionalDistribution": "Regional Distribution",
+      "genderRatio": "Gender Ratio",
+      "ageDistribution": "Age Distribution",
+      "regions": {
+        "north": "North",
+        "south": "South",
+        "east": "East",
+        "west": "West"
+      },
+      "gender": {
+        "male": "Male",
+        "female": "Female"
+      },
+      "ageGroups": {
+        "age18to20": "18-20",
+        "age21to23": "21-23",
+        "age24plus": "24+"
+      }
+    },
+    "pendingActions": {
+      "title": "Pending Actions & Alerts",
+      "requiresAttention": "Requires Attention",
+      "itemsPending": "items pending",
+      "viewDetails": "View Details"
+    },
+    "alerts": {
+      "applicationSpike": "Application Spike",
+      "capacityAlert": "Capacity Alert",
+      "systemNotice": "System Notice"
+    },
+    "aiInsights": {
+      "title": "AI-Powered Insights",
+      "updatedDaily": "Updated Daily",
+      "enrollmentForecast": "Enrollment Forecast",
+      "departmentAlert": "Department Alert",
+      "resourcePlanning": "Resource Planning",
+      "forecastText": "Based on current trends, expected enrollment for next cycle:",
+      "alertText": "Design department applications may fall short by",
+      "planningText": "Hostel accommodation capacity nearing"
+    }
+  },
+  "applications": {
+    "title": "Applications",
+    "overview": {
+      "totalApplications": "Total Applications",
+      "underReview": "Under Review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "tracker": {
+      "title": "Application Tracker",
+      "tableView": "Table View",
+      "cardView": "Card View",
+      "searchPlaceholder": "Search by name or application ID...",
+      "allStatuses": "All Statuses"
+    },
+    "statusBreakdown": {
+      "title": "Status Breakdown"
+    },
+    "table": {
+      "candidate": "Candidate",
+      "applicationId": "Application ID",
+      "program": "Program",
+      "submissionDate": "Submission Date",
+      "status": "Status",
+      "reviewer": "Reviewer",
+      "ai": "AI",
+      "actions": "Actions",
+      "view": "View"
+    },
+    "status": {
+      "underReview": "Under Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pendingVerification": "Pending Verification",
+      "paymentPending": "Payment Pending",
+      "offersSent": "Offers Sent",
+      "enrollmentsConfirmed": "Enrollments Confirmed"
+    },
+    "ai": {
+      "topPercentile": "Top 5%",
+      "duplicate": "Duplicate",
+      "likelihood": "Likelihood"
+    },
+    "documentVerification": {
+      "title": "Document Verification Hub",
+      "documentsVerified": "Documents Verified:",
+      "verifiedFor": "Verified documents for",
+      "requestedFrom": "Requested missing documents from",
+      "missing": "Missing:",
+      "markAsVerified": "Mark as Verified"
+    },
+    "aiInsights": {
+      "title": "AI Insights",
+      "topApplicants": "Top 5% Applicants",
+      "possibleDuplicate": "Possible duplicate:",
+      "highlyLikelyToEnroll": "Highly Likely to Enroll"
+    },
+    "sections": {
+      "pendingApplicants": "Pending Applicants:",
+      "missingDocs": "Missing Docs",
+      "verify": "Verify",
+      "request": "Request",
+      "reviewWorkflow": "Review Workflow Manager",
+      "reviewerWorkload": "Reviewer Workload:",
+      "topReviewers": "Top Reviewers:",
+      "apps": "apps",
+      "assign": "Assign",
+      "bulkAssign": "Bulk Assign",
+      "interviewManagement": "Interview Management",
+      "interviewsScheduled": "Interviews Scheduled:",
+      "upcomingInterviews": "Upcoming Interviews:",
+      "markCompleted": "Mark Completed",
+      "sendReminder": "Send Reminder",
+      "scheduleInterview": "Schedule Interview",
+      "offerManagement": "Offer Management",
+      "offersAccepted": "Offers Accepted:",
+      "recentOffers": "Recent Offers:",
+      "accepted": "Accepted",
+      "pending": "Pending",
+      "sendOffer": "Send Offer",
+      "download": "Download",
+      "sendOffers": "Send Offers"
+    },
+    "toast": {
+      "bulkOffersSent": "Bulk offers sent!",
+      "verifiedDocumentsFor": "Verified documents for",
+      "requestedMissingDocumentsFrom": "Requested missing documents from",
+      "assignedTo": "Assigned",
+      "to": "to",
+      "interviewScheduledFor": "Interview scheduled for",
+      "at": "at",
+      "reminderSentTo": "Reminder sent to",
+      "interviewMarkedCompleted": "Interview marked as completed for",
+      "offerSentTo": "Offer sent to",
+      "downloadingOfferLetter": "Downloading offer letter for"
+    }
+  },
+  "leads": {
+    "title": "Leads & Applicants",
+    "subtitle": "Manage and track all leads through the admission pipeline",
+    "tabs": {
+      "pipeline": "Lead Pipeline",
+      "filters": "Filters & Search",
+      "profile": "Lead Profile",
+      "workload": "Team Workload",
+      "performance": "Source Performance",
+      "bulkActions": "Bulk Actions",
+      "applications": "Application Manager",
+      "communication": "Communication Triggers",
+      "dropoff": "Dropoff Insights",
+      "insights": "AI Insights"
+    },
+    "search": {
+      "placeholder": "Search leads by name, program, or ID..."
+    },
+    "actions": {
+      "aiInsights": "AI Insights",
+      "bulkActions": "Bulk Actions",
+      "communication": "Communication"
+    },
+    "status": {
+      "inquiry": "Inquiry",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "application": "Application",
+      "enrolled": "Enrolled"
+    },
+    "conversionScore": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "applicationStatus": {
+      "notStarted": "Not Started",
+      "inProgress": "In Progress",
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "paymentStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "partial": "Partial"
+    }
+  },
+  "leadsApplicants": {
+    "tabs": {
+      "leads": "Leads",
+      "applicants": "Applicants",
+      "shortlisted": "Shortlisted",
+      "offersSent": "Offers Sent",
+      "enrolled": "Enrolled"
+    },
+    "pipelineStages": {
+      "inquiry": "Inquiry",
+      "contacted": "Contacted",
+      "applicationStarted": "Application Started",
+      "documentsSubmitted": "Documents Submitted",
+      "verified": "Verified",
+      "offerSent": "Offer Sent",
+      "confirmed": "Confirmed",
+      "withdrawnRejected": "Withdrawn / Rejected"
+    },
+    "search": {
+      "placeholder": "Search by name, email, phone..."
+    },
+    "filters": {
+      "program": "Program",
+      "state": "State",
+      "officer": "Officer",
+      "status": "Status",
+      "source": "Source",
+      "date": "Date"
+    },
+    "actions": {
+      "importCSV": "Import CSV",
+      "addLead": "Add Lead"
+    },
+    "noLeads": "No leads",
+    "engagement": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "sections": {
+      "applicationManager": "Application Manager",
+      "communicationTriggers": "Communication Triggers",
+      "teamAssignmentWorkload": "Team Assignment & Workload",
+      "dropoffInactivityInsights": "Drop-off & Inactivity Insights",
+      "leadSourcePerformance": "Lead Source Performance",
+      "bulkActionsDataImport": "Bulk Actions / Data Import",
+      "aiAutomation": "AI & Automation"
+    },
+    "modal": {
+      "contactInfo": "Contact Info",
+      "location": "Location",
+      "timeline": "Timeline",
+      "documents": "Documents",
+      "internalNotes": "Internal Notes",
+      "assignTaskFollowup": "Assign Task / Follow-up",
+      "stageTransitions": "Stage Transitions",
+      "sourceAttribution": "Source Attribution",
+      "aiConversionPrediction": "AI Conversion Prediction",
+      "communicationLog": "Communication Log",
+      "assigned": "Assigned",
+      "noDocumentsUploaded": "No documents uploaded",
+      "addTaskFollowup": "Add a task or follow-up...",
+      "assign": "Assign",
+      "noRecentMessages": "(Demo) No recent messages",
+      "engagementLikelihood": "Likelihood"
+    },
+    "sources": {
+      "website": "Website",
+      "referral": "Referral"
+    },
+    "programs": {
+      "mba": "MBA",
+      "btech": "B.Tech"
+    },
+    "demo": {
+      "description": "(Demo) Table of formal applicants, document/payment/interview status, alerts for pending docs.",
+      "bulkSingle": "(Demo) Bulk/single WhatsApp, Email, SMS, AI-powered nudges.",
+      "officerWorkload": "(Demo) Officer workload, reassign, AI suggestions.",
+      "inactiveLeads": "(Demo) Inactive leads, drop-offs, re-engagement nudges.",
+      "conversionCost": "(Demo) Conversion %, cost per lead, ROAS, color-coded bars.",
+      "manualEntry": "(Demo) Manual entry, CSV import, API integrations.",
+      "smartDetection": "(Demo) Smart duplicate detection, auto-assignment, predictive scoring, Smart Assistant."
+    },
+    "applicationManager": {
+      "statuses": {
+        "allApplications": "All Applications",
+        "pendingDocuments": "Pending Documents",
+        "pendingPayment": "Pending Payment",
+        "interviewScheduled": "Interview Scheduled",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "search": {
+        "placeholder": "Search applications by name, ID, or program..."
+      },
+      "actions": {
+        "filters": "Filters",
+        "export": "Export"
+      },
+      "table": {
+        "headers": {
+          "applicant": "Applicant",
+          "applicationId": "Application ID",
+          "program": "Program",
+          "status": "Status",
+          "documents": "Documents",
+          "payment": "Payment",
+          "interview": "Interview",
+          "actions": "Actions"
+        }
+      }
+    }
+  },
+  "communication": {
+    "title": "Communication & Logs",
+    "dashboard": {
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "emailsSent": "Emails Sent",
+      "smsSent": "SMS Sent",
+      "whatsapp": "WhatsApp",
+      "callsLogged": "Calls Logged",
+      "pendingReplies": "Pending Replies",
+      "unread": "Unread"
+    },
+    "tabs": {
+      "outgoing": "Outgoing",
+      "incoming": "Incoming",
+      "templates": "Templates",
+      "notes": "Notes",
+      "calls": "Calls",
+      "audit": "Audit"
+    },
+    "status": {
+      "delivered": "Delivered",
+      "sent": "Sent",
+      "read": "Read",
+      "needsFollowup": "Needs Follow-up",
+      "escalated": "Escalated",
+      "replied": "Replied"
+    },
+    "types": {
+      "email": "Email",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "actions": {
+      "compose": "Compose",
+      "send": "Send",
+      "edit": "Edit",
+      "delete": "Delete",
+      "share": "Share",
+      "download": "Download"
+    },
+    "sections": {
+      "outgoingCommunications": "Outgoing Communications",
+      "incomingMessagesLogs": "Incoming Messages / Logs",
+      "bulkCommunicationTools": "Bulk Communication Tools",
+      "templatesManager": "Templates Manager",
+      "internalNotesLogbook": "Internal Notes / Logbook",
+      "callLogsVoiceNotes": "Call Logs & Voice Notes",
+      "integrationChannels": "Integration & Channels",
+      "aiPoweredFeatures": "AI-Powered Features",
+      "auditHistory": "Audit & History"
+    },
+    
+    "table": {
+      "headers": {
+        "recipient": "Recipient",
+        "sender": "Sender",
+        "type": "Type",
+        "subject": "Subject",
+        "preview": "Preview",
+        "dateTime": "Date/Time",
+        "sentBy": "Sent By",
+        "status": "Status",
+        "action": "Action",
+        "tags": "Tags"
+      }
+    },
+    "ai": {
+      "replySuggestions": "AI Reply Suggestions",
+      "emailTemplates": "AI Email Templates",
+      "replySuggestionsTitle": "AI Reply Suggestions",
+      "emailTemplatesTitle": "AI Email Templates",
+      "aiReply": "AI Reply",
+      "emailSentSuccess": "Email sent successfully"
+    },
+    "buttons": {
+      "bulkSend": "Bulk Send",
+      "addNote": "Add Note",
+      "newCampaign": "New Campaign",
+      "sendNow": "Send Now",
+      "schedule": "Schedule",
+      "resend": "Resend",
+      "viewFull": "View Full",
+      "followUp": "Follow-up",
+      "reply": "Reply",
+      "escalate": "Escalate",
+      "assign": "Assign",
+      "compose": "Compose",
+      "send": "Send",
+      "edit": "Edit",
+      "delete": "Delete",
+      "share": "Share",
+      "download": "Download"
+    },
+    "bulkTools": {
+      "target": "Target",
+      "mode": "Mode",
+      "template": "Template",
+      "personalization": "Personalization",
+      "allLeads": "All Leads",
+      "email": "Email",
+      "applicationReminder": "Application Reminder",
+      "openRate": "Open Rate",
+      "clickRate": "Click Rate",
+      "deliveryRate": "Delivery Rate"
+    },
+    "templates": {
+      "title": "Templates Manager",
+      "newTemplate": "New Template",
+      "headers": {
+        "name": "Name",
+        "type": "Type",
+        "content": "Content",
+        "language": "Language",
+        "approved": "Approved",
+        "action": "Action"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "notes": {
+      "title": "Internal Notes / Logbook",
+      "addNote": "Add Note",
+      "private": "Private",
+      "team": "Team"
+    },
+    "calls": {
+      "title": "Call Logs & Voice Notes",
+      "logCall": "Log Call",
+      "completed": "Completed",
+      "aiSummary": "AI Summary"
+    },
+    "integrations": {
+      "title": "Integration & Channels",
+      "on": "ON",
+      "off": "OFF"
+    },
+    "aiFeatures": {
+      "title": "AI-Powered Features",
+      "urgencyDetection": "Urgency Detection",
+      "flagged": "flagged",
+      "replySuggestion": "Reply Suggestion",
+      "smartReminder": "Smart Reminder",
+      "followUpsSuggested": "follow-ups suggested",
+      "sentiment": "Sentiment",
+      "parentFrustrated": "Parent is frustrated about delay",
+      "botLog": "Bot Log",
+      "chatbotInteractions": "chatbot interactions",
+      "urgencyDetector": "Urgency Detector",
+      "aiPrioritization": "AI Prioritization",
+      "dropOffDetector": "Drop-off Detector",
+      "messageQualityAnalyzer": "Message Quality Analyzer",
+      "aiResponseSuggestions": "AI Response Suggestions",
+      "toneOptimizer": "Tone Optimizer",
+      "engagementTracker": "Engagement Tracker",
+      "aiSummarization": "AI Summarization",
+      "smartFileSuggestions": "Smart File Suggestions",
+      "sendTimeOptimization": "Send Time Optimization",
+      "subjectLinePredictor": "Subject Line Predictor",
+      "abTestingInsights": "A/B Testing Insights",
+      "vendorPerformanceSummary": "Vendor Performance Summary",
+      "followUpNudges": "Follow-up Nudges",
+      "smartScheduling": "Smart Scheduling",
+      "missedOpportunityAlerts": "Missed Opportunity Alerts"
+    },
+    "audit": {
+      "title": "Audit & History",
+      "export": "Export",
+      "description": "Full communication audit trail per applicant. Data retention: 2 years. Exportable for compliance."
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "Manage applicant documents, verification, and compliance tracking",
+    "dashboard": {
+      "totalUploaded": "Total Uploaded",
+      "pendingVerification": "Pending Verification",
+      "awaitingUpload": "Awaiting Upload",
+      "expiredInvalid": "Expired/Invalid",
+      "deptWise": "Dept-wise",
+      "completionRate": "Completion Rate"
+    },
+    "quickActions": {
+      "uploadDocument": "Upload Document",
+      "requestMissing": "Request Missing",
+      "viewByStatus": "View by Status",
+      "aiCompletion": "AI: 85% completion for confirmed"
+    },
+    "sections": {
+      "applicantDocumentRepository": "Applicant Document Repository",
+      "documentUploadPortal": "Document Upload Portal",
+      "verificationValidation": "Verification & Validation",
+      "bulkDocumentReview": "Bulk Document Review & Actions",
+      "documentRequestSystem": "Document Request System",
+      "templatesFormsLibrary": "Templates & Forms Library",
+      "archiveRetentionManagement": "Archive & Retention Management",
+      "accessControlPermissions": "Access Control & Permissions",
+      "aiSmartFeatures": "AI & Smart Features"
+    },
+    "search": {
+      "placeholder": "Search by name or ID...",
+      "allDepartments": "All Departments",
+      "allStatus": "All Status"
+    },
+    "table": {
+      "headers": {
+        "applicant": "Applicant",
+        "document": "Document",
+        "status": "Status",
+        "file": "File",
+        "action": "Action",
+        "name": "Name",
+        "version": "Version",
+        "expires": "Expires",
+        "downloads": "Downloads"
+      },
+      "actions": {
+        "download": "Download",
+        "approve": "Approve",
+        "reject": "Reject",
+        "requestReupload": "Request Re-upload",
+        "delete": "Delete"
+      }
+    },
+    "upload": {
+      "title": "Upload",
+      "description": "Drag and drop files. Allowed: PDF, JPEG, PNG, DOCX. AI will auto-detect category and validate.",
+      "bulkUpload": "Bulk Upload",
+      "setDeadline": "Set Deadline"
+    },
+    "verification": {
+      "description": "Assign to validators, checklist approval, comments, audit log, digital signature (mock).",
+      "bulkApprove": "Bulk Approve",
+      "bulkReject": "Bulk Reject",
+      "auditLog": "Audit Log"
+    },
+    "bulkReview": {
+      "description": "Table of unverified/missing docs. Approve/reject in bulk. Export status.",
+      "sendReminders": "Send Reminders",
+      "exportExcel": "Export Excel"
+    },
+    "requestSystem": {
+      "description": "Trigger requests, track fulfillment, deadlines, escalation, secure upload link.",
+      "request": "Request"
+    },
+    "templates": {
+      "upload": "Upload"
+    },
+    "archive": {
+      "retention": "Retention: 5 years. Auto-archive enabled. Access logs tracked.",
+      "access": "Access"
+    },
+    "accessControl": {
+      "view": "View",
+      "upload": "Upload",
+      "approve": "Approve",
+      "delete": "Delete",
+      "download": "Download",
+      "encryption": "Encryption",
+      "accessLogs": "Access Logs"
+    },
+    "aiFeatures": {
+      "ocrAutoTagging": "OCR & Auto-Tagging: 3 docs",
+      "duplicateDetection": "Duplicate Detection: 1 flagged",
+      "smartReminders": "Smart Reminders: 2 pending",
+      "riskFlagging": "Risk Flagging: 1 suspicious",
+      "completionAnalytics": "Completion Analytics: 85% confirmed"
+    }
+  },
+  "leadTransfer": {
+    "title": "Lead Transfer Management",
+    "subtitle": "Manage and transfer leads between counselors efficiently",
+    "overviewDescription": "Filter and select leads for transfer between counselors and departments.",
+    "bulkTransferDescription": "Transfer multiple leads at once and assign them to specific counselors.",
+    "historyDescription": "Review past lead transfers, track status changes, and monitor transfer patterns.",
+    "conflictsDescription": "Resolve ownership conflicts and workload distribution issues between counselors.",
+    "kpiDescription": "Analyze transfer metrics, counselor workload, and performance indicators.",
+    "tabs": {
+      "overview": "Lead Overview",
+      "bulkTransfer": "Bulk Transfer",
+      "history": "Transfer History",
+      "conflicts": "Conflicts",
+      "kpi": "KPI Insights"
+    }
+  },
+  "toolsUtilities": {
+    "title": "Tools & Utilities",
+    "subtitle": "Central hub for essential admission-related utilities, automation tools, file converters, calculators, import/export tools, and productivity enhancers — boosting efficiency, reducing manual errors, and enabling data-driven decisions.",
+    "tools": {
+      "bulkUpload": {
+        "title": "Bulk Data Upload / Import",
+        "desc": "Map columns, validate, log summary",
+        "button": "Upload Excel/CSV",
+        "example": "Example: Upload 200 offline walk-in applications collected during education fairs"
+      },
+      "bulkExport": {
+        "title": "Bulk Data Export",
+        "desc": "XLSX, PDF, CSV, JSON | Redact sensitive data",
+        "button": "Export Data",
+        "useCase": "Use Case: Share \"Admitted UG Students for 2026\" with Finance or Hostel teams"
+      },
+      "documentConverter": {
+        "title": "Document Converter",
+        "desc": "Image/Word to PDF, merge, compress",
+        "imageToPdf": "Image/Word to PDF",
+        "mergeCompress": "Merge/Compress",
+        "ideal": "Ideal for scanned documents from students"
+      },
+      "feeEstimator": {
+        "title": "Admission Fee Estimator",
+        "desc": "Configure, AI suggest, print/download",
+        "button": "Estimate Fee"
+      },
+      "timelineGenerator": {
+        "title": "Application Timeline Generator",
+        "desc": "Visual, alerts, share",
+        "button": "Generate Timeline"
+      },
+      "templatesManager": {
+        "title": "Email & SMS Templates Manager",
+        "desc": "CRUD, merge fields, organize",
+        "button": "Manage Templates"
+      },
+      "taskAssignment": {
+        "title": "Task Assignment Panel",
+        "desc": "Assign, track, workload",
+        "button": "Assign Task"
+      },
+      "geoInsights": {
+        "title": "Geo Insights Tool",
+        "desc": "Filter, export by region",
+        "button": "View Heat Map"
+      },
+      "duplicateChecker": {
+        "title": "Duplicate Checker",
+        "desc": "Scan, fuzzy match, AI suggest",
+        "button": "Scan for Duplicates"
+      },
+      "auditLog": {
+        "title": "Audit Log Viewer",
+        "desc": "Search/filter logs",
+        "button": "View Logs"
+      },
+      "scheduler": {
+        "title": "Scheduler Utility",
+        "desc": "Auto-reminders, sync with appointments",
+        "button": "View Calendar"
+      },
+      "apiIntegration": {
+        "title": "API Integration Panel",
+        "desc": "Status, retry, logs",
+        "button": "Monitor Integrations"
+      },
+      "aiUtilities": {
+        "title": "AI-Powered Utilities",
+        "desc": "Automation, validation, data quality",
+        "smartAutoFill": "Smart Auto-Fill",
+        "predictiveImport": "Predictive Import Mapping",
+        "dataQualityScore": "Data Quality Score",
+        "anomalyDetector": "Anomaly Detector",
+        "bulkDocumentValidator": "Bulk Document Validator (OCR)"
+      }
+    }
+  },
+  "schedule": {
+    "title": "Schedule & Appointments",
+    "subtitle": "Comprehensive scheduling system for interviews, counseling sessions, campus visits, and team meetings with AI-powered optimization and conflict resolution.",
+    "dashboard": {
+      "today": "Today",
+      "thisWeek": "This Week",
+      "pending": "Pending",
+      "confirmed": "Confirmed"
+    },
+    "types": {
+      "studentInterview": "Student Interview",
+      "parentCounseling": "Parent Counseling",
+      "agentMeeting": "Agent Meeting",
+      "highSchoolOutreach": "High School Outreach",
+      "campusVisit": "Campus Visit",
+      "teamSync": "Team Sync",
+      "walkIn": "Walk-In"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "modes": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "actions": {
+      "addAppointment": "Add Appointment",
+      "reschedule": "Reschedule",
+      "assignStaff": "Assign Staff",
+      "markAttended": "Mark Attended",
+      "sendReminder": "Send Reminder",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "applicantName": "Applicant/Org Name",
+      "date": "Date",
+      "time": "Time",
+      "mode": "Mode"
+    },
+    "view": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    },
+    "types": {
+      "title": "Appointment Types"
+    }
+  },
+  "searchFilters": {
+    "title": "Advanced Search & Filters",
+    "subtitle": "Powerful search capabilities with AI suggestions, deep linking, saved views, and comprehensive filtering options for efficient applicant management.",
+    "search": {
+      "placeholder": "Search applicants, documents, payments, communications...",
+      "recentSearches": "Recent Searches",
+      "clearAll": "Clear All",
+      "suggestions": "AI Suggestions",
+      "deepLinks": "Deep Links",
+      "savedViews": "Saved Views"
+    },
+    "filters": {
+      "title": "Filters",
+      "clearAll": "Clear All",
+      "apply": "Apply Filters",
+      "save": "Save View",
+      "share": "Share View"
+    },
+    "results": {
+      "title": "Search Results",
+      "selected": "selected",
+      "export": "Export",
+      "bulkActions": "Bulk Actions"
+    },
+    "status": {
+      "verified": "Verified",
+      "pending": "Pending",
+      "rejected": "Rejected"
+    },
+    "programs": {
+      "engineering": "Engineering",
+      "business": "Business",
+      "arts": "Arts",
+      "medicalSciences": "Medical Sciences",
+      "law": "Law"
+    },
+    "tags": {
+      "scholarship": "Scholarship",
+      "ews": "EWS",
+      "international": "International",
+      "sportsQuota": "Sports Quota",
+      "specialCategory": "Special Category"
+    },
+    "filters": {
+      "mobile": "Filters",
+      "advanced": "Advanced Filters",
+      "applicationId": "Application ID",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "allStatus": "All Status",
+      "allPrograms": "All Programs",
+      "tags": "Tags (comma separated)",
+      "counselor": "Counselor",
+      "dateRange": "Date Range",
+      "scoreRange": "Score Range",
+      "cancel": "Cancel"
+    },
+    "savedViews": {
+      "title": "Saved Views",
+      "saveCurrent": "Save Current",
+      "default": "Default"
+    },
+    "bulkActions": {
+      "bulkEmail": "Bulk Email",
+      "bulkApprove": "Bulk Approve",
+      "bulkReject": "Bulk Reject",
+      "exportCSV": "Export CSV",
+      "addTag": "Add Tag",
+      "schedule": "Schedule"
+    },
+    "aiFilters": {
+      "title": "AI Smart Filters"
+    },
+    "accessControl": {
+      "title": "Access & Control",
+      "role": "Role",
+      "admin": "Admin: All Filters",
+      "counselor": "Counselor: Assigned Only"
+    }
+  },
+  "payments": {
+    "title": "Payments Management",
+    "subtitle": "Manage invoices, track payments, and handle refunds",
+    "today": "Today",
+    "thisMonth": "This Month",
+    "ytd": "YTD",
+    "pendingInvoices": "Pending Invoices",
+    "awaitingConfirmation": "Awaiting Confirmation",
+    "failedTxns": "Failed Transactions",
+    "invoiceManagement": {
+      "title": "Invoice Management",
+      "createInvoice": "Create Invoice",
+      "editInvoice": "Edit Invoice",
+      "deleteInvoice": "Delete Invoice"
+    },
+    "onlinePaymentTracking": {
+      "title": "Online Payment Tracking",
+      "subtitle": "Monitor real-time payment transactions"
+    },
+    "paymentHistory": {
+      "title": "Payment History per Applicant",
+      "subtitle": "Track individual applicant payment records"
+    },
+    "bulkPaymentUpload": {
+      "title": "Bulk Payment Upload / Offline Sync",
+      "subtitle": "Upload Excel/CSV of offline transactions. AI will auto-match to pending invoices.",
+      "upload": "Upload"
+    },
+    "paymentReminders": {
+      "title": "Payment Reminders & Notifications",
+      "subtitle": "Configure and send payment reminders",
+      "beforeDue": "Before Due",
+      "onDue": "On Due",
+      "afterDue": "After Due",
+      "email": "Email",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "sendReminder": "Send Reminder",
+      "configure": "Configure"
+    },
+    "refundManagement": {
+      "title": "Refund Management",
+      "subtitle": "Process and track refund requests"
+    },
+    "reportsReconciliation": {
+      "title": "Reports & Reconciliation",
+      "subtitle": "Generate financial reports and reconcile payments",
+      "export": "Export"
+    },
+    "aiEnhancements": {
+      "title": "AI-Powered Enhancements",
+      "feeForecast": "Fee Forecast: ₹{amount} expected",
+      "smartReminders": "Smart Reminders: Personalized for {count} students",
+      "fraudDetection": "Fraud Detection: No anomalies",
+      "chatbotHelp": "Chatbot Help: {count} queries resolved"
+    },
+    "table": {
+      "applicant": "Applicant",
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status",
+      "dueDate": "Due Date",
+      "mode": "Mode",
+      "actions": "Actions",
+      "invoice": "Invoice",
+      "date": "Date",
+      "ref": "Reference",
+      "receipt": "Receipt",
+      "notes": "Notes",
+      "action": "Action",
+      "reason": "Reason"
+    },
+    "types": {
+      "applicationFee": "Application Fee",
+      "admissionFee": "Admission Fee",
+      "securityDeposit": "Security Deposit",
+      "tuitionFee": "Tuition Fee",
+      "hostelFee": "Hostel Fee",
+      "libraryFee": "Library Fee",
+      "laboratoryFee": "Laboratory Fee"
+    },
+    "status": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "partial": "Partial",
+      "overdue": "Overdue",
+      "success": "Success",
+      "pending": "Pending",
+      "failed": "Failed",
+      "requested": "Requested",
+      "processing": "Processing",
+      "issued": "Issued"
+    },
+    "modes": {
+      "online": "Online",
+      "card": "Card",
+      "bankTransfer": "Bank Transfer",
+      "upi": "UPI",
+      "cash": "Cash",
+      "cheque": "Cheque"
+    },
+    "actions": {
+      "remind": "Remind",
+      "download": "Download",
+      "cancel": "Cancel",
+      "refund": "Refund",
+      "manual": "Manual",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "aiInsights": "AI: No unusual payments flagged.",
+    "reports": {
+      "collected": "Collected",
+      "pending": "Pending",
+      "refunds": "Refunds"
+    }
+  },
+  "workspace": {
+    "title": "Workspace",
+    "subtitle": "Unified dashboard for managing admissions, compliance, and daily operations.",
+    "complianceQuality": {
+      "title": "Compliance & Quality",
+      "subtitle": "Ensure compliance with institutional standards and maintain high-quality processes",
+      "tabs": {
+        "regulatoryDashboard": {
+          "name": "Regulatory Dashboard",
+          "description": "Compliance metrics and alerts"
+        },
+        "documentCompliance": {
+          "name": "Document Compliance",
+          "description": "Document verification and tracking"
+        },
+        "auditTrail": {
+          "name": "Audit Trail",
+          "description": "Action logs and accountability"
+        },
+        "qualityAssessment": {
+          "name": "Quality Assessment",
+          "description": "Internal quality indicators"
+        },
+        "policyCompliance": {
+          "name": "Policy Compliance",
+          "description": "Policy repository and validation"
+        },
+        "feedbackImprovement": {
+          "name": "Feedback & Improvement",
+          "description": "Feedback analysis and improvements"
+        },
+        "riskManagement": {
+          "name": "Risk Management",
+          "description": "Risk identification and mitigation"
+        },
+        "nonComplianceAlerts": {
+          "name": "Non-Compliance Alerts",
+          "description": "Alert management and case handling"
+        },
+        "reportsSubmissions": {
+          "name": "Reports",
+          "description": "Compliance reports and submissions"
+        }
+      },
+      "qualityAssurance": {
+        "title": "Quality Assurance",
+        "admissionQualitySelfAssessment": "Admission Quality Self-Assessment",
+        "complianceCoverageAnalysis": "Compliance Coverage Analysis",
+        "complianceUploads": "Compliance Uploads",
+        "start": "Start",
+        "view": "View",
+        "upload": "Upload"
+      },
+      "riskManagement": {
+        "title": "Risk Management",
+        "delayedAdmissionProcess": "Delayed Admission Process",
+        "underperformanceInCompliance": "Underperformance in Compliance",
+        "increasedDropoutTrend": "Increased Dropout Trend",
+        "high": "High",
+        "medium": "Medium",
+        "alert": "Alert"
+      }
+    },
+    "trainingDevelopment": {
+      "title": "Training & Development",
+      "teamTraining": {
+        "title": "Team Training",
+        "admissionProcess": "Admission Process Training",
+        "complianceTraining": "Compliance Training",
+        "digitalTools": "Digital Tools Training"
+      },
+      "knowledgeManagement": {
+        "title": "Knowledge Management",
+        "admissionGuidelines": "Admission Guidelines",
+        "complianceProcedures": "Compliance Procedures",
+        "departmentSOPs": "Department SOPs"
+      }
+    },
+    "workplace": {
+      "title": "Workplace",
+      "myProfile": {
+        "title": "My Profile",
+        "description": "View and update your personal information, upload documents."
+      },
+      "myHRBoard": {
+        "title": "My HR Board",
+        "monthlySalarySlip": "Monthly Salary Slip",
+        "leaveBalanceTracker": "Leave Balance Tracker",
+        "performanceReviewForm": "Performance Review Form",
+        "download": "Download"
+      },
+      "myReferral": {
+        "title": "My Referral",
+        "submitReferral": "Submit Referral",
+        "trackReferralStatus": "Track Referral Status"
+      },
+      "taskBox": {
+        "title": "Task Box",
+        "submitDepartmentalBudgetProposal": "Submit departmental budget proposal",
+        "conductInternalAuditForLabEquipment": "Conduct internal audit for lab equipment",
+        "approveStudentResearchApplications": "Approve student research applications"
+      },
+      "events": {
+        "title": "Events",
+        "annualTechSymposiumRegistrationOpen": "Annual Tech Symposium – Registration Open",
+        "internalFDPSchedule": "Internal FDP Schedule"
+      },
+      "attendance": {
+        "title": "Attendance",
+        "present": "Present",
+        "days": {
+          "present": "16 days",
+          "leave": "Leave: 2 days",
+          "absent": "Absent: 1 day"
+        },
+        "submitAttendanceCorrection": "Submit attendance correction for 14th March"
+      },
+      "recruitment": {
+        "title": "Recruitment",
+        "internalOpening": "Internal Opening",
+        "role": {
+          "dean": "Dean - School of Management"
+        },
+        "submitSOPForRoleUpgrade": "Submit SOP for role upgrade"
+      },
+      "geoFencing": {
+        "title": "Geo-Fencing",
+        "checkedIn": "Checked in from Main Campus",
+        "time": "@ 9:02 AM",
+        "alert": "Alert",
+        "outOfZoneAttendanceAttempt": "Out-of-zone attendance attempt"
+      }
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "pending": "Pending"
+    }
+  },
+  "courseManagement": {
+    "title": "Course Management",
+    "subtitle": "Manage and coordinate academic programs across colleges and departments",
+    "tabs": {
+      "courseCatalog": "Course Catalog",
+      "addEditCourses": "Add/Edit Courses",
+      "visibilitySettings": "Visibility Settings",
+      "seatMonitoring": "Seat Monitoring",
+      "linkedApplications": "Linked Applications",
+      "feeMapping": "Fee Mapping",
+      "documentRequirements": "Document Requirements",
+      "academicMetrics": "Academic Metrics",
+      "bulkActions": "Bulk Actions",
+      "marketingReadiness": "Marketing Readiness"
+    },
+    "marketingReadiness": {
+      "title": "Marketing Readiness",
+      "subtitle": "Track marketing preparation status for all courses",
+      "readiness": "Readiness",
+      "brochureReady": "Brochure Ready",
+      "websiteUpdated": "Website Updated",
+      "campaignLaunched": "Campaign Launched",
+      "readyForMarketing": "Ready for Marketing!",
+      "needsAttention": "Needs Attention",
+      "markAsReady": "Mark as Ready",
+      "ready": "Ready"
+    },
+    "courseCatalog": {
+      "title": "Course Catalog",
+      "subtitle": "Browse and manage all available courses",
+      "searchPlaceholder": "Search courses...",
+      "filters": "Filters",
+      "tableHeaders": {
+        "course": "COURSE",
+        "department": "DEPARTMENT",
+        "type": "TYPE",
+        "duration": "DURATION",
+        "intake": "INTAKE",
+        "fee": "FEE",
+        "status": "STATUS"
+      },
+      "status": {
+        "active": "Active",
+        "upcoming": "Upcoming",
+        "inactive": "Inactive"
+      }
+    },
+    "courseForm": {
+      "title": "Add/Edit Course",
+      "subtitle": "Create new courses or modify existing ones",
+      "courseName": "Course Name",
+      "courseCode": "Course Code",
+      "department": "Department",
+      "type": "Type",
+      "duration": "Duration",
+      "intake": "Intake",
+      "fee": "Fee",
+      "description": "Description",
+      "save": "Save Course",
+      "cancel": "Cancel"
+    },
+    "visibilitySettings": {
+      "title": "Visibility Settings",
+      "subtitle": "Control course visibility and access permissions",
+      "public": "Public",
+      "private": "Private",
+      "restricted": "Restricted"
+    },
+    "seatMonitoring": {
+      "title": "Seat Monitoring",
+      "subtitle": "Track seat availability and enrollment status",
+      "totalSeats": "Total Seats",
+      "availableSeats": "Available Seats",
+      "enrolledSeats": "Enrolled Seats",
+      "waitlist": "Waitlist"
+    },
+    "linkedApplications": {
+      "title": "Linked Applications",
+      "subtitle": "View applications linked to specific courses",
+      "applicantName": "Applicant Name",
+      "applicationId": "Application ID",
+      "status": "Status",
+      "linkedDate": "Linked Date"
+    },
+    "feeMapping": {
+      "title": "Fee Mapping",
+      "subtitle": "Configure fee structures for different courses",
+      "courseFee": "Course Fee",
+      "additionalFees": "Additional Fees",
+      "scholarship": "Scholarship",
+      "paymentPlan": "Payment Plan",
+      "addCourse": "Add Course",
+      "addNewCourse": "Add New Course",
+      "courseName": "Course Name",
+      "courseCode": "Course Code",
+      "actions": "Actions",
+      "totalCourses": "Total Courses",
+      "totalFees": "Total Fees",
+      "scholarshipCourses": "Scholarship Courses"
+    },
+    "documentRequirements": {
+      "title": "Document Requirements",
+      "subtitle": "Manage required documents for course applications",
+      "addDocument": "Add Document",
+      "addNewDocument": "Add New Document",
+      "courseName": "Course Name",
+      "documentName": "Document Name",
+      "documentType": "Document Type",
+      "status": "Status",
+      "actions": "Actions",
+      "mandatoryDocuments": "Mandatory Documents",
+      "optionalDocuments": "Optional Documents",
+      "activeDocuments": "Active Documents",
+      "totalDocuments": "Total Documents",
+      "courseNamePlaceholder": "Enter course name",
+      "documentNamePlaceholder": "Enter document name",
+      "mandatory": "Mandatory",
+      "optional": "Optional",
+      "active": "Active",
+      "inactive": "Inactive",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "required": "Required",
+      "conditional": "Conditional"
+    },
+    "academicMetrics": {
+      "title": "Academic Metrics",
+      "subtitle": "Track performance and enrollment metrics",
+      "enrollmentRate": "Enrollment Rate",
+      "completionRate": "Completion Rate",
+      "satisfactionScore": "Satisfaction Score"
+    },
+    "bulkActions": {
+      "title": "Bulk Actions",
+      "subtitle": "Perform operations on multiple courses at once",
+      "selectAll": "Select All",
+      "bulkUpdate": "Bulk Update",
+      "bulkDelete": "Bulk Delete",
+      "export": "Export"
+    }
+  },
+  "complianceQuality": {
+    "title": "Compliance & Quality",
+    "subtitle": "Ensure compliance with institutional standards and maintain high-quality processes",
+    "tabs": {
+      "regulatoryDashboard": {
+        "name": "Regulatory Dashboard",
+        "description": "Compliance metrics and alerts"
+      },
+      "documentCompliance": {
+        "name": "Document Compliance",
+        "description": "Document verification and tracking"
+      },
+      "auditTrail": {
+        "name": "Audit Trail",
+        "description": "Action logs and accountability"
+      },
+      "qualityAssessment": {
+        "name": "Quality Assessment",
+        "description": "Internal quality indicators"
+      },
+      "policyCompliance": {
+        "name": "Policy Compliance",
+        "description": "Policy repository and validation"
+      },
+      "feedbackImprovement": {
+        "name": "Feedback & Improvement",
+        "description": "Feedback analysis and improvements"
+      },
+      "riskManagement": {
+        "name": "Risk Management",
+        "description": "Risk identification and mitigation"
+      },
+      "nonComplianceAlerts": {
+        "name": "Non-Compliance Alerts",
+        "description": "Alert management and case handling"
+      },
+      "reportsSubmissions": {
+        "name": "Reports",
+        "description": "Compliance reports and submissions"
+      }
+    }
+  },
+  "trainingDevelopment": {
+    "title": "Training & Development",
+    "subtitle": "Manage and track team training, skills, and development",
+    "aiPoweredInsights": "AI-Powered Insights",
+    "tabs": {
+      "trainingCalendar": "Training Calendar",
+      "trainingModules": "Training Modules",
+      "onboardingPrograms": "Onboarding Programs",
+      "skillGapAnalysis": "Skill Gap Analysis",
+      "progressTracking": "Progress Tracking",
+      "trainerManagement": "Trainer Management",
+      "trainingFeedback": "Training Feedback",
+      "knowledgeHub": "Knowledge Hub",
+      "gamification": "Gamification"
+    }
+  },
+  "helpSupport": {
+    "title": "Help & Support",
+    "subtitle": "Get help, submit tickets, and access knowledge base",
+    "my_tickets": "My Tickets",
+    "tabs": {
+      "supportTickets": "Support Tickets",
+      "knowledgeBase": "Knowledge Base"
+    },
+    "actions": {
+      "raiseTicket": "Raise Ticket",
+      "submitTicket": "Submit Ticket"
+    },
+    "ticketForm": {
+      "title": "Raise a New Ticket",
+      "subject": "Subject",
+      "category": "Category",
+      "subcategory": "Subcategory",
+      "location": "Location",
+      "priority": "Priority",
+      "description": "Description",
+      "select": "Select",
+      "required": "Required"
+    },
+    "categories": {
+      "IT": "IT",
+      "ERP": "ERP / CRM",
+      "Admissions": "Admissions",
+      "Documents": "Documents",
+      "Payments": "Payments",
+      "Facilities": "Facilities"
+    },
+    "subcategories": {
+      "IT": {
+        "systemIssue": "System issue",
+        "emailIssue": "Email issue",
+        "printerIssue": "Printer issue"
+      },
+      "ERP": {
+        "loginIssue": "Login issue",
+        "dataError": "Data error",
+        "featureRequest": "Feature request"
+      },
+      "Admissions": {
+        "cycleSetup": "Cycle setup",
+        "leadAssignment": "Lead assignment",
+        "applicationReview": "Application review"
+      },
+      "Documents": {
+        "uploadIssue": "Upload issue",
+        "verification": "Verification",
+        "downloadError": "Download error"
+      },
+      "Payments": {
+        "paymentLink": "Payment link",
+        "refund": "Refund",
+        "statusUpdate": "Status update"
+      },
+      "Facilities": {
+        "roomIssue": "Room issue",
+        "maintenance": "Maintenance",
+        "cleaning": "Cleaning"
+      }
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "ticketDetails": {
+      "title": "Ticket Details",
+      "category": "Category",
+      "location": "Location",
+      "assignedTo": "Assigned To",
+      "expectedResolution": "Expected Resolution",
+      "description": "Description",
+      "comments": "Comments"
+    },
+    "status": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "resolved": "Resolved"
+    },
+    "knowledgeBase": {
+      "title": "Knowledge Base",
+      "howToReviewApplications": "How to Review Applications",
+      "managingAdmissionCycles": "Managing Admission Cycles",
+      "uploadingAndVerifyingDocuments": "Uploading and Verifying Documents",
+      "views": "views",
+      "lastUpdated": "Last updated"
+    }
+  },
+  "procurement": {
+    "title": "Procurement",
+    "subtitle": "Manage purchase requests and vendor relationships"
+  }
+} 
