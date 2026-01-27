@@ -35,7 +35,7 @@ const years = ["2026", "2026", "2026", "2027", "2028"];
 
 // Demo data for Gantt chart (strategic roadmap) - will be generated dynamically with translations
 
-// Enhanced Academic Planning Tools data - will be generated dynamically with translations
+// Enhanced Business Planning Tools data - will be generated dynamically with translations
 
 // Enhanced SWOT - will be generated dynamically with translations
 
@@ -408,13 +408,13 @@ export default function DirectorStrategicPlanning() {
           </div>
         </section>
 
-        {/* 3. Academic Planning Tools */}
+        {/* 3. Business Planning Tools */}
         <section
           data-tour="4"
-          data-tour-title-en="Academic Planning Tools"
-          data-tour-title-ar="أدوات التخطيط الأكاديمي"
-          data-tour-content-en="Curriculum development matrix and program evaluation cycles."
-          data-tour-content-ar="مصفوفة تطوير المناهج ودورات تقييم البرامج."
+          data-tour-title-en="Business Planning Tools"
+          data-tour-title-ar="أدوات التخطيط التجاري"
+          data-tour-content-en="Project development matrix and team evaluation cycles."
+          data-tour-content-ar="مصفوفة تطوير المشاريع ودورات تقييم الفرق."
           data-tour-position="bottom"
         >
           <div className={`flex items-center gap-3 mb-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
@@ -531,8 +531,8 @@ export default function DirectorStrategicPlanning() {
           data-tour="6"
           data-tour-title-en="Trend Analysis"
           data-tour-title-ar="تحليل الاتجاهات"
-          data-tour-content-en="Analyze trends across enrollment, placements, research funding, and more."
-          data-tour-content-ar="حلل الاتجاهات عبر التسجيلات، التوظيف، تمويل البحث، والمزيد."
+          data-tour-content-en="Analyze trends across onboarding, client success, project funding, and more."
+          data-tour-content-ar="حلل الاتجاهات عبر التوظيف، نجاح العملاء، تمويل المشاريع، والمزيد."
           data-tour-position="bottom"
         >
           <div className={`flex items-center gap-3 mb-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>

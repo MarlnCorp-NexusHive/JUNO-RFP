@@ -61,7 +61,7 @@ export default function DirectorMeetingsCalendar() {
       participantKeys: ["participants.director", "participants.deanScience", "participants.hodEEE"], 
       statusKey: "status.scheduled", 
       agendaKey: "agenda.approveResearch",
-      location: "Research Center",
+      location: "Project Center",
       type: "committee",
       priority: "medium",
       attendees: 5
@@ -75,7 +75,7 @@ export default function DirectorMeetingsCalendar() {
       participantKeys: ["participants.director", "participants.studentReps"], 
       statusKey: "status.completed", 
       agendaKey: "agenda.studentFeedback",
-      location: "Student Center",
+      location: "Corporate Center",
       type: "council",
       priority: "low",
       attendees: 12
@@ -90,7 +90,7 @@ export default function DirectorMeetingsCalendar() {
       statusKey: "status.scheduled", 
       agendaKey: "agenda.quarterlyReview",
       location: "Main Auditorium",
-      type: "faculty",
+      type: "team",
       priority: "high",
       attendees: 45
     },
@@ -129,6 +129,7 @@ export default function DirectorMeetingsCalendar() {
       case 'board': return <FiTarget className="w-4 h-4" />;
       case 'committee': return <FiUsers className="w-4 h-4" />;
       case 'council': return <FiUsers className="w-4 h-4" />;
+      case 'team': return <FiUsers className="w-4 h-4" />;
       case 'faculty': return <FiUsers className="w-4 h-4" />;
       default: return <FiCalendar className="w-4 h-4" />;
     }
@@ -139,6 +140,7 @@ export default function DirectorMeetingsCalendar() {
       case 'board': return 'text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400';
       case 'committee': return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400';
       case 'council': return 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400';
+      case 'team': return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400';
       case 'faculty': return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400';
       default: return 'text-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-gray-400';
     }

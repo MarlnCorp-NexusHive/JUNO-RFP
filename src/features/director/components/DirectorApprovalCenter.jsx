@@ -87,7 +87,7 @@ export default function DirectorApprovalCenter() {
     // Academic Approvals
     {
       id: 1,
-      category: "Academic",
+      category: "Operations",
       type: t('approvalCenter.requestTypes.newCourseProposal'),
       title: t('approvalCenter.demoData.quantumComputing'),
       department: t('approvalCenter.departments.computerScience'),
@@ -110,7 +110,7 @@ export default function DirectorApprovalCenter() {
     },
     {
       id: 2,
-      category: "Academic",
+      category: "Operations",
       type: t('approvalCenter.requestTypes.curriculumRevision'),
       title: t('approvalCenter.demoData.aiSpecialization'),
       department: t('approvalCenter.departments.computerScience'),
@@ -239,7 +239,7 @@ export default function DirectorApprovalCenter() {
 
   const categories = [
     { id: "All", label: t('approvalCenter.categories.allCategories') },
-    { id: "Academic", label: t('approvalCenter.categories.academic') },
+    { id: "Operations", label: t('approvalCenter.categories.academic') },
     { id: "HR", label: t('approvalCenter.categories.facultyHr') },
     { id: "Finance", label: t('approvalCenter.categories.financial') },
     { id: "Admin", label: t('approvalCenter.categories.administrative') },

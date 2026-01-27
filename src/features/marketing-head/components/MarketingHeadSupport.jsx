@@ -70,8 +70,8 @@ const CATEGORY_OPTIONS = [
   { value: "Furniture", label: "Furniture / Infrastructure" },
   { value: "Housekeeping", label: "Housekeeping / Sanitation" },
   { value: "Transport", label: "Transportation" },
-  { value: "Hostel", label: "Hostel or Accommodation" },
-  { value: "Examination", label: "Examination Portal" },
+  { value: "Facilities", label: "Office Space / Facilities" },
+  { value: "System", label: "Business Portal" },
   { value: "ERP", label: "ERP / CRM" },
 ];
 const SUBCATEGORY_MAP = {
@@ -80,8 +80,8 @@ const SUBCATEGORY_MAP = {
   Furniture: ["chairBroken", "tableReplacement", "whiteboardIssue"],
   Housekeeping: ["cleaningRequired", "sanitization", "garbagePickup"],
   Transport: ["busDelay", "routeChange", "driverIssue"],
-  Hostel: ["roomIssue", "waterSupply", "maintenance"],
-  Examination: ["portalAccess", "resultIssue", "examSchedule"],
+  Facilities: ["roomIssue", "waterSupply", "maintenance"],
+  System: ["portalAccess", "dataIssue", "systemSchedule"],
   ERP: ["loginIssue", "dataError", "featureRequest"],
 };
 const PRIORITY_OPTIONS = ["Low", "Medium", "High", "Urgent"];
@@ -89,7 +89,7 @@ const PRIORITY_OPTIONS = ["Low", "Medium", "High", "Urgent"];
 const DEMO_USER = {
   name: "Khalid Al-Sayed",
   role: "Digital Marketing Specialist",
-  email: "khalid.alsayed@mbsc.edu.sa",
+  email: "khalid.alsayed@company.com",
   phone: "+1-234-567-8901",
 };
 
@@ -101,7 +101,7 @@ const DEMO_TICKETS = [
     subcategory: "internetNotWorking",
     location: "Main Office - 2nd Floor",
     priority: "High",
-    description: "No internet connectivity in the Computer Science lab.",
+    description: "No internet connectivity in the IT Department office.",
     status: "In Progress",
     assignedTo: "IT Support Team",
     submittedOn: "2026-06-30",
@@ -114,10 +114,10 @@ const DEMO_TICKETS = [
   },
   {
     id: "TCK-1002",
-    subject: "AC not working in classroom A302",
+    subject: "AC not working in meeting room A302",
     category: "Electrical",
     subcategory: "acNotWorking",
-    location: "Classroom A302",
+    location: "Meeting Room A302",
     priority: "Medium",
     description: "AC is not cooling properly.",
     status: "Pending",
@@ -271,8 +271,8 @@ export default function MarketingHeadSupport() {
       case "Furniture": return "Facilities Management";
       case "Housekeeping": return "Office Maintenance";
       case "Transport": return "Transport Department";
-      case "Hostel": return "Hostel Warden Office";
-      case "Examination": return "Exam Support Team";
+      case "Facilities": return "Facilities Management";
+      case "System": return "System Support Team";
       case "ERP": return "CRM Admin Support";
       default: return "General Support";
     }

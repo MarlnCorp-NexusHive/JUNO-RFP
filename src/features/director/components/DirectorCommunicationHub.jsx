@@ -65,8 +65,8 @@ export default function DirectorCommunicationHub() {
   }
 
   // Demo data using translation keys
-  const groups = ["all", "deans", "hods", "faculty", "students", "parents", "adminUnits"];
-  const stakeholders = ["deansHods", "faculty", "students", "parents", "adminUnits"];
+  const groups = ["all", "deans", "hods", "team", "employees", "clients", "adminUnits"];
+  const stakeholders = ["deansHods", "team", "employees", "clients", "adminUnits"];
   const [stakeTab, setStakeTab] = useState(stakeholders[0]);
 
   const archiveDemo = [
@@ -80,7 +80,7 @@ export default function DirectorCommunicationHub() {
     },
     { 
       date: "2026-03-08", 
-      roleKey: "groups.students", 
+      roleKey: "groups.employees", 
       topicKey: "archiveData.feeUpdate.topic", 
       subjectKey: "archiveData.feeUpdate.subject", 
       attachmentKey: "attachments.feeCircular",
@@ -88,7 +88,7 @@ export default function DirectorCommunicationHub() {
     },
     { 
       date: "2026-03-05", 
-      roleKey: "groups.faculty", 
+      roleKey: "groups.team", 
       topicKey: "archiveData.policy.topic", 
       subjectKey: "archiveData.policy.subject", 
       attachmentKey: "attachments.attendancePolicy",
@@ -129,8 +129,8 @@ export default function DirectorCommunicationHub() {
   const engagement = [
     { roleKey: "groups.deans", value: 90, color: "bg-blue-500" },
     { roleKey: "groups.hods", value: 80, color: "bg-green-500" },
-    { roleKey: "groups.faculty", value: 70, color: "bg-yellow-500" },
-    { roleKey: "groups.students", value: 60, color: "bg-red-500" },
+    { roleKey: "groups.team", value: 70, color: "bg-yellow-500" },
+    { roleKey: "groups.employees", value: 60, color: "bg-red-500" },
   ];
 
   const integrations = [
@@ -378,8 +378,8 @@ export default function DirectorCommunicationHub() {
                 <option>{t('userManagement.allRoles')}</option>
                 <option>{t('communicationHub.groups.deans')}</option>
                 <option>{t('communicationHub.groups.hods')}</option>
-                <option>{t('communicationHub.groups.faculty')}</option>
-                <option>{t('communicationHub.groups.students')}</option>
+                <option>{t('communicationHub.groups.team')}</option>
+                <option>{t('communicationHub.groups.employees')}</option>
               </select>
             </div>
             

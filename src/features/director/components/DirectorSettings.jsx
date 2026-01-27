@@ -47,7 +47,7 @@ export default function DirectorSettings() {
       name: "institutional",
       icon: FiHome, // Changed from FiBuilding to FiHome
       color: "blue",
-      description: "Institutional information and basic configuration",
+      description: "Organization information and basic configuration",
       options: [
         { 
           labelKey: "institutionalSettings.name", 
@@ -61,7 +61,7 @@ export default function DirectorSettings() {
           valueKey: "institutionalSettings.typeValue",
           type: "select",
           editable: true,
-          options: ["University", "College", "Institute", "Academy"]
+          options: ["Corporation", "Company", "Organization", "Enterprise"]
         },
         { 
           labelKey: "institutionalSettings.accreditation", 
@@ -82,14 +82,14 @@ export default function DirectorSettings() {
       name: "academic",
       icon: FiBookOpen,
       color: "green",
-      description: "Academic policies and academic year configuration",
+      description: "Business policies and fiscal year configuration",
       options: [
         { 
           labelKey: "academicConfiguration.semesterSystem", 
           valueKey: "academicConfiguration.semesterSystemValue",
           type: "select",
           editable: true,
-          options: ["Semester", "Trimester", "Quarter", "Annual"]
+          options: ["Quarter", "Monthly", "Annual", "Project-based"]
         },
         { 
           labelKey: "academicConfiguration.creditTransfer", 
@@ -337,8 +337,8 @@ export default function DirectorSettings() {
           data-tour="1"
           data-tour-title-en="Settings Overview"
           data-tour-title-ar="نظرة عامة على الإعدادات"
-          data-tour-content-en="Manage institutional, academic, access, notifications, and data privacy settings."
-          data-tour-content-ar="أدر إعدادات المؤسسة والأكاديمية والوصول والإشعارات وخصوصية البيانات."
+          data-tour-content-en="Manage organizational, business, access, notifications, and data privacy settings."
+          data-tour-content-ar="أدر إعدادات المنظمة والتجارية والوصول والإشعارات وخصوصية البيانات."
           data-tour-position="bottom"
         >
           <div className="flex items-center justify-between">

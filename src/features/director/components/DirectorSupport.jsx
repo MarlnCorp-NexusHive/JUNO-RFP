@@ -130,7 +130,7 @@ export default function DirectorSupport() {
       type: "email",
       icon: FiMail,
       titleKey: "contact.email", // ← Removed "support." prefix
-      value: "support@univ.edu",
+      value: "support@company.com",
       responseTime: "2-4 hours",
       color: "blue"
     },

@@ -17,16 +17,18 @@
     },
     "meetingTitles": {
       "boardMeeting": "اجتماع المجلس",
-      "researchCommittee": "لجنة البحث",
-      "studentCouncil": "مجلس الطلاب"
+      "researchCommittee": "لجنة مراجعة المشاريع",
+      "studentCouncil": "مجلس الموظفين",
+      "facultyMeeting": "اجتماع الفريق"
     },
     "participants": {
       "director": "المدير",
-      "deans": "العمداء",
+      "deans": "المدراء الماليون",
       "hods": "رؤساء الأقسام",
-      "deanScience": "عميد العلوم",
+      "deanScience": "المدير المالي - المالية",
       "hodEEE": "رئيس قسم الهندسة الكهربائية",
-      "studentReps": "ممثلو الطلاب"
+      "studentReps": "ممثلو الموظفين",
+      "allFaculty": "جميع الفريق"
     },
     "status": {
       "scheduled": "مجدول",
@@ -34,11 +36,13 @@
     },
     "agenda": {
       "reviewQ1": "مراجعة أداء الربع الأول",
-      "approveResearch": "الموافقة على مقترحات البحث الجديدة",
-      "studentFeedback": "مناقشة ملاحظات الطلاب"
+      "approveResearch": "الموافقة على مقترحات المشاريع الجديدة",
+      "studentFeedback": "مناقشة ملاحظات الموظفين",
+      "quarterlyReview": "مراجعة ربع سنوية للأعمال"
     },
     "events": {
-      "ncaaaAudit": "تدقيق الهيئة الوطنية"
+      "ncaaaAudit": "تدقيق ISO 27001",
+      "graduationCeremony": "حفل التكريم السنوي"
     }
   },
 "support": {
@@ -75,11 +79,11 @@
     },
     "dataSecurity": {
       "title": "أمان البيانات",
-      "description": "أفضل الممارسات لتأمين البيانات المؤسسية."
+      "description": "أفضل الممارسات لتأمين البيانات التنظيمية."
     },
     "compliance": {
       "title": "الامتثال",
-      "description": "إرشادات الامتثال للهيئة الوطنية والتعليم التقني والتعليم العالي والصحة."
+      "description": "إرشادات الامتثال لـ ISO 27001 و SOC 2 و GDPR و HIPAA."
     },
     "systemSettings": {
       "title": "إعدادات النظام",
@@ -93,7 +97,7 @@
     },
     "itSupport": {
       "question": "كيف يمكنني الاتصال بدعم تكنولوجيا المعلومات؟",
-      "answer": "يمكنك الوصول إلى دعم تكنولوجيا المعلومات عبر البريد الإلكتروني على support@univ.edu أو الاتصال بـ +1 (555) 123-4567 خلال ساعات العمل."
+      "answer": "يمكنك الوصول إلى دعم تكنولوجيا المعلومات عبر البريد الإلكتروني على support@company.com أو الاتصال بـ +1 (555) 123-4567 خلال ساعات العمل."
     },
     "complianceReports": {
       "question": "كيف يمكنني إنشاء تقارير الامتثال؟",
@@ -116,10 +120,10 @@
   },
   "settings": {
     "title": "إعدادات المدير",
-    "subtitle": "تكوين الإعدادات والصلاحيات المؤسسية.",
+    "subtitle": "تكوين الإعدادات والصلاحيات على مستوى المنظمة.",
     "categories": {
-      "institutional": "الإعدادات المؤسسية",
-      "academic": "التكوين الأكاديمي",
+      "institutional": "إعدادات المنظمة",
+      "academic": "التكوين التجاري",
       "access": "صلاحيات الوصول",
       "notifications": "الإشعارات",
       "dataPrivacy": "البيانات والخصوصية",
@@ -132,18 +136,18 @@
     },
     "institutionalSettings": {
       "name": "الاسم",
-      "nameValue": "جامعة نكسس",
+      "nameValue": "نكسس للشركات",
       "type": "النوع",
       "typeValue": "خاصة",
-      "accreditation": "الاعتماد",
-      "accreditationValue": "الهيئة الوطنية أ+",
-      "academicYear": "السنة الأكاديمية",
+      "accreditation": "الشهادة",
+      "accreditationValue": "ISO 27001",
+      "academicYear": "السنة المالية",
       "academicYearValue": "2026-27"
     },
     "academicConfiguration": {
-      "semesterSystem": "نظام الفصول الدراسية",
+      "semesterSystem": "نظام الربع",
       "semesterSystemValue": "مفعل",
-      "creditTransfer": "نقل الاعتمادات",
+      "creditTransfer": "نقل المشاريع",
       "creditTransferValue": "مسموح",
       "attendancePolicy": "سياسة الحضور",
       "attendancePolicyValue": "75% كحد أدنى"
@@ -151,11 +155,11 @@
     "accessPermissions": {
       "director": "المدير",
       "directorValue": "كامل",
-      "dean": "العميد",
+      "dean": "المدير المالي",
       "deanValue": "جزئي",
       "hod": "رئيس القسم",
       "hodValue": "محدود",
-      "faculty": "أعضاء هيئة التدريس",
+      "faculty": "الفريق",
       "facultyValue": "مقيد"
     },
     "notifications": {
@@ -189,14 +193,14 @@
         "items": {
           "leadershipDevelopment": "سلسلة تطوير القيادة",
           "onboardingTraining": "تدريب الاندماج",
-          "digitalTeachingTools": "أدوات التدريس الرقمية"
+          "digitalTeachingTools": "أدوات التعاون الرقمية"
         }
       },
       "knowledgeManagement": {
         "title": "إدارة المعرفة",
         "items": {
-          "publishResearch": "كيفية نشر أوراق البحث",
-          "internationalStudents": "التعامل مع اندماج الطلاب الدوليين",
+          "publishResearch": "كيفية نشر تقارير المشاريع",
+          "internationalStudents": "التعامل مع اندماج الموظفين الدوليين",
           "departmentSops": "إجراءات العمل المعيارية على مستوى القسم"
         }
       }
@@ -205,9 +209,9 @@
       "qualityAssurance": {
         "title": "ضمان الجودة",
         "items": {
-          "semesterAssessment": "تقييم الجودة الذاتي لنهاية الفصل الدراسي",
-          "courseContentAnalysis": "تحليل تغطية محتوى المقرر",
-          "complianceUploads": "رفع ملفات الامتثال للهيئة الوطنية والصحة"
+          "semesterAssessment": "تقييم الجودة الذاتي لنهاية الربع",
+          "courseContentAnalysis": "تحليل تغطية محتوى المشروع",
+          "complianceUploads": "رفع ملفات الامتثال لـ ISO/GDPR"
         }
       },
       "riskManagement": {
@@ -243,15 +247,15 @@
         "title": "صندوق المهام",
         "items": {
           "budgetProposal": "إرسال اقتراح الميزانية القسمية",
-          "internalAudit": "إجراء تدقيق داخلي للمعدات المخبرية",
-          "researchApplications": "الموافقة على طلبات البحث الطلابية"
+          "internalAudit": "إجراء تدقيق داخلي للمعدات",
+          "researchApplications": "الموافقة على طلبات مشاريع الموظفين"
         }
       },
       "events": {
         "title": "الأحداث",
         "items": {
-          "techSymposium": "الندوة التقنية السنوية – التسجيل مفتوح",
-          "fdpSchedule": "جدول التطوير المهني الداخلي"
+          "techSymposium": "المؤتمر التقني السنوي – التسجيل مفتوح",
+          "fdpSchedule": "جدول التدريب الداخلي"
         }
       },
       "attendance": {
@@ -264,14 +268,14 @@
       "recruitment": {
         "title": "التوظيف",
         "items": {
-          "deanOpening": "فرصة داخلية: عميد - كلية الإدارة",
+          "deanOpening": "فرصة داخلية: المدير المالي - قسم المالية",
           "roleUpgrade": "إرسال إجراءات العمل المعيارية لترقية الدور"
         }
       },
       "geoFencing": {
         "title": "الحدود الجغرافية",
         "items": {
-          "checkedIn": "تم تسجيل الدخول من الحرم الرئيسي @ 9:02 صباحاً",
+          "checkedIn": "تم تسجيل الدخول من المكتب الرئيسي @ 9:02 صباحاً",
           "outOfZoneAlert": "تنبيه: محاولة حضور خارج المنطقة"
         }
       }
@@ -357,7 +361,7 @@
   },
   "auditCompliance": {
     "title": "التدقيق والامتثال",
-    "subtitle": "مراقبة سجلات التدقيق وحالة الامتثال والتحليلات المخاطر للمؤسسة.",
+    "subtitle": "مراقبة سجلات التدقيق وحالة الامتثال والتحليلات المخاطر للمنظمة.",
     "complianceStatus": "حالة الامتثال",
     "auditLogs": "سجلات التدقيق",
     "riskAnalytics": "تحليلات المخاطر",
@@ -365,10 +369,10 @@
     "lastAudit": "آخر تدقيق",
     "mitigation": "التخفيف",
     "complianceAreas": {
-      "ncaaa": "الهيئة الوطنية",
-      "etec": "التعليم التقني",
-      "moe": "التعليم العالي",
-      "scfhs": "الصحة"
+      "ncaaa": "ISO 27001",
+      "etec": "SOC 2",
+      "moe": "GDPR",
+      "scfhs": "HIPAA"
     },
     "complianceStatuses": {
       "compliant": "متوافق",
@@ -397,18 +401,20 @@
     },
     "auditUsers": {
       "director": "المدير",
-      "deanScience": "عميد العلوم",
+      "deanScience": "المدير المالي - المالية",
       "hodEEE": "رئيس قسم الهندسة الكهربائية",
       "admin": "المدير",
+      "adminIT": "مدير تكنولوجيا المعلومات",
       "system": "النظام"
     },
     "auditDetails": {
       "ipAddress": "IP: 192.168.1.10",
-      "exportedStudentList": "تم تصدير قائمة الطلاب",
+      "exportedStudentList": "تم تصدير قائمة الموظفين",
       "insufficientPermissions": "صلاحيات غير كافية",
       "loginSuccess": "تم تسجيل الدخول بنجاح",
       "loginFailed": "فشل تسجيل الدخول",
-      "accessDenied": "تم رفض الوصول"
+      "accessDenied": "تم رفض الوصول",
+      "accessedStudentRecords": "تم الوصول إلى سجلات الموظفين"
     },
     "riskTypes": {
       "dataBreach": "خرق البيانات",
@@ -460,12 +466,13 @@
       "admin": "مدير"
     },
     "departments": {
-      "science": "العلوم",
-      "eee": "الهندسة الكهربائية",
-      "math": "الرياضيات",
+      "science": "تكنولوجيا المعلومات",
+      "eee": "الهندسة",
+      "math": "العمليات",
       "engineering": "الهندسة",
-      "business": "الأعمال",
-      "medicine": "الطب"
+      "business": "المبيعات",
+      "computer": "تكنولوجيا المعلومات",
+      "medicine": "المالية"
     },
     "userStatuses": {
       "active": "نشط",
@@ -476,7 +483,9 @@
     "demoUsers": {
       "johnDoe": "جون دو",
       "janeSmith": "جين سميث",
-      "mikeJohnson": "مايك جونسون"
+      "mikeJohnson": "مايك جونسون",
+      "sarahWilson": "سارة ويلسون",
+      "davidBrown": "ديفيد براون"
     }
   },
   "communicationHub": {
@@ -494,18 +503,18 @@
     "send": "إرسال",
     "groups": {
       "all": "الجميع",
-      "deans": "العمداء",
-      "hods": "رؤساء الأقسام",
-      "faculty": "أعضاء هيئة التدريس",
-      "students": "الطلاب",
-      "parents": "الآباء",
+      "deans": "المدراء الماليون",
+      "hods": "قادة الفرق",
+      "team": "الفريق",
+      "employees": "الموظفين",
+      "clients": "العملاء",
       "adminUnits": "الوحدات الإدارية"
     },
     "stakeholders": {
-      "deansHods": "العمداء/رؤساء الأقسام",
-      "faculty": "أعضاء هيئة التدريس",
-      "students": "الطلاب",
-      "parents": "الآباء",
+      "deansHods": "المدراء الماليون/قادة الفرق",
+      "team": "الفريق",
+      "employees": "الموظفين",
+      "clients": "العملاء",
       "adminUnits": "الوحدات الإدارية"
     },
     "placeholders": {
@@ -518,7 +527,7 @@
     "thread": "المحادثة",
     "messages": {
       "directorAnnualReports": "[المدير] يرجى إرسال التقارير السنوية للأقسام قبل 20 مارس.",
-      "deanResponse": "[العميد] ملاحظة، سأشارك بحلول 15 مارس.",
+      "deanResponse": "[المدير المالي] ملاحظة، سأشارك بحلول 15 مارس.",
       "hodTemplate": "[رئيس القسم] طلب قالب لإرسال التقرير."
     },
     "archiveHeaders": {
@@ -534,8 +543,8 @@
         "subject": "إرسال التقارير السنوية بحلول 20 مارس"
       },
       "feeUpdate": {
-        "topic": "تحديث الرسوم",
-        "subject": "تم تمديد موعد الرسوم لـ 3 أقسام"
+        "topic": "تحديث الراتب",
+        "subject": "تم تمديد موعد مراجعة الراتب لـ 3 أقسام"
       },
       "policy": {
         "topic": "السياسة",
@@ -544,7 +553,7 @@
     },
     "attachments": {
       "reportGuidelines": "إرشادات_التقرير.pdf",
-      "feeCircular": "نشرة_الرسوم.pdf",
+      "feeCircular": "نشرة_الراتب.pdf",
       "attendancePolicy": "سياسة_الحضور.pdf"
     },
     "incomingHeaders": {
@@ -554,16 +563,16 @@
     },
     "incomingData": {
       "researchCenter": {
-        "from": "عميد العلوم",
-        "subject": "اقتراح: مركز بحث جديد"
+        "from": "رئيس القسم - العمليات",
+        "subject": "اقتراح: مركز مشروع جديد"
       },
       "labEquipment": {
-        "from": "رئيس قسم الهندسة الكهربائية",
-        "subject": "تصعيد: معدات المختبر"
+        "from": "قائد الفريق - الهندسة",
+        "subject": "تصعيد: طلب معدات"
       },
       "newElective": {
-        "from": "أعضاء هيئة التدريس الرياضيات",
-        "subject": "اقتراح: اختياري جديد"
+        "from": "قائد الفريق - تكنولوجيا المعلومات",
+        "subject": "اقتراح: مبادرة جديدة"
       }
     },
     "statuses": {
@@ -580,7 +589,7 @@
     "engagementHeatmap": "خريطة حرارية للتفاعل",
     "secureMessage": {
       "confidential": "رسالة سرية",
-      "visibleTo": "مرئية فقط لـ: المدير، العميد، رئيس القسم",
+      "visibleTo": "مرئية فقط لـ: المدير، المدير المالي، رئيس القسم",
       "readReceipt": "إيصال القراءة: نعم"
     },
     "aiAssistant": {
@@ -597,8 +606,8 @@
     },
     "integrations": {
       "academicCalendar": {
-        "name": "التقويم الأكاديمي",
-        "description": "مزامنة تواريخ الإعلانات مع الامتحانات والعطلات"
+        "name": "التقويم التجاري",
+        "description": "مزامنة تواريخ الإعلانات مع المشاريع والعطلات"
       },
       "approvalCenter": {
         "name": "مركز الموافقة",
@@ -606,7 +615,7 @@
       },
       "lmsErp": {
         "name": "نظام إدارة التعلم/المؤسسة",
-        "description": "استهداف سلس بناءً على هوية الطالب/الموظف"
+        "description": "استهداف سلس بناءً على هوية الموظف/الموظف"
       },
       "smsGateway": {
         "name": "بوابة الرسائل النصية / واجهات برمجة البريد الإلكتروني",
@@ -1028,35 +1037,35 @@
     "sections": {
       "keyPerformanceIndicators": "مؤشرات الأداء الرئيسية",
       "strategicGoalsRoadmap": "الأهداف الاستراتيجية والخطة",
-      "academicPlanningTools": "أدوات التخطيط الأكاديمي",
+      "academicPlanningTools": "أدوات التخطيط التجاري",
       "swotAnalysis": "تحليل سوات",
       "trendAnalysis": "تحليل الاتجاهات"
     },
     "kpis": {
-      "studentFacultyRatio": "نسبة الطلاب لأعضاء هيئة التدريس",
-      "publicationsFaculty": "المنشورات/عضو هيئة التدريس",
+      "studentFacultyRatio": "نسبة الموظفين للفريق",
+      "publicationsFaculty": "المشاريع/الفريق",
       "retentionRate": "معدل الاحتفاظ",
-      "placementRate": "معدل التوظيف",
+      "placementRate": "معدل نجاح العملاء",
       "target": "الهدف"
     },
     "strategicGoals": {
       "goalProgressTracker": "متتبع تقدم الأهداف",
       "strategicRoadmapTimeline": "الجدول الزمني للخطة الاستراتيجية",
-      "researchOutput": "المخرجات البحثية",
-      "accreditationStatus": "حالة الاعتماد",
-      "placements": "التوظيف",
-      "facultyHiring": "توظيف أعضاء هيئة التدريس"
+      "researchOutput": "مخرجات المشاريع",
+      "accreditationStatus": "حالة الشهادة",
+      "placements": "نجاح العملاء",
+      "facultyHiring": "توظيف الفريق"
     },
     "roadmap": {
-      "ncaaaPrep": "التحضير لاعتماد الهيئة الوطنية",
-      "newBscAiProgram": "برنامج بكالوريوس الذكاء الاصطناعي الجديد",
+      "ncaaaPrep": "التحضير للامتثال",
+      "newBscAiProgram": "مبادرة فريق الذكاء الاصطناعي الجديد",
       "campusExpansion": "توسيع المكتب",
       "greenCampusInitiative": "مبادرة المكتب الأخضر"
     },
     "academicPlanning": {
-      "curriculumDevelopmentMatrix": "مصفوفة تطوير المناهج",
-      "programEvaluationCycle": "دورة تقييم البرامج",
-      "course": "المقرر",
+      "curriculumDevelopmentMatrix": "مصفوفة تطوير المشاريع",
+      "programEvaluationCycle": "دورة تقييم الفرق",
+      "course": "المشروع",
       "status": "الحالة",
       "lead": "المشرف",
       "startDate": "تاريخ البدء",
@@ -1071,13 +1080,13 @@
       "accredited": "معتمد"
     },
     "programs": {
-      "bscAi": "بكالوريوس الذكاء الاصطناعي",
-      "mbaFintech": "ماجستير التكنولوجيا المالية",
-      "btechEee": "بكالوريوس الهندسة الكهربائية",
-      "mscDataSci": "ماجستير علوم البيانات",
-      "bbaMarketing": "بكالوريوس التسويق",
-      "bscCs": "بكالوريوس علوم الحاسوب",
-      "mba": "ماجستير إدارة الأعمال"
+      "bscAi": "فريق الذكاء الاصطناعي",
+      "mbaFintech": "فريق التكنولوجيا المالية",
+      "btechEee": "فريق الهندسة",
+      "mscDataSci": "فريق علوم البيانات",
+      "bbaMarketing": "فريق التسويق",
+      "bscCs": "فريق تكنولوجيا المعلومات",
+      "mba": "فريق الأعمال"
     },
     "faculty": {
       "drChen": "د. تشين",
@@ -1092,28 +1101,28 @@
       "opportunities": "الفرص",
       "threats": "التهديدات",
       "items": {
-        "strongFacultyBase": "قاعدة قوية من أعضاء هيئة التدريس",
-        "modernLabs": "مختبرات حديثة",
-        "highResearchOutput": "مخرجات بحثية عالية",
+        "strongFacultyBase": "قاعدة قوية من الفريق",
+        "modernLabs": "بنية تحتية حديثة",
+        "highResearchOutput": "مخرجات مشاريع عالية",
         "internationalPartnerships": "شراكات دولية",
-        "limitedHostelCapacity": "سعة محدودة للسكن الطلابي",
-        "outdatedLibraryResources": "موارد مكتبة قديمة",
-        "lowAlumniEngagement": "انخراط منخفض للخريجين",
-        "aiMlProgramDemand": "طلب على برامج الذكاء الاصطناعي",
+        "limitedHostelCapacity": "سعة مكتب محدودة",
+        "outdatedLibraryResources": "موارد قديمة",
+        "lowAlumniEngagement": "انخراط منخفض للعملاء",
+        "aiMlProgramDemand": "طلب على فرق الذكاء الاصطناعي",
         "industryTieUps": "روابط مع الصناعة",
         "governmentGrants": "منح حكومية",
-        "onlineCourseExpansion": "توسيع المقررات عبر الإنترنت",
+        "onlineCourseExpansion": "توسيع الخدمات عبر الإنترنت",
         "risingCompetition": "منافسة متزايدة",
         "changingRegulations": "لوائح متغيرة",
-        "decliningEnrollment": "انخفاض التسجيل في بعض البرامج",
+        "decliningEnrollment": "انخفاض التوظيف في بعض الفرق",
         "economicDownturn": "انكماش اقتصادي"
       }
     },
     "trends": {
-      "enrollment": "التسجيل",
-      "placements": "التوظيف",
-      "researchFunding": "تمويل البحث (ألف دولار)",
-      "facultyPublications": "منشورات أعضاء هيئة التدريس",
+      "enrollment": "التوظيف",
+      "placements": "نجاح العملاء",
+      "researchFunding": "تمويل المشاريع (ألف دولار)",
+      "facultyPublications": "منشورات الفريق",
       "internationalCollaborations": "التعاونات الدولية"
     }
   },

@@ -12,31 +12,31 @@ import { directorFeatures } from '../../../components/directorFeatures';
 const departments = [
   {
     id: 1,
-    name: "Computer Science",
-    enrollments: 1200,
-    passRate: 82,
+    name: "IT Team",
+    employees: 1200,
+    completionRate: 82,
     revenue: 4200000,
-    facultyStrength: 35,
-    researchOutput: 12,
-    gpa: 3.4,
-    dropoutRate: 4.2,
-    completionRate: 92,
+    teamSize: 35,
+    projectOutput: 12,
+    performanceScore: 3.4,
+    retentionRate: 95.8,
+    projectCompletionRate: 92,
     satisfactionScore: 4.2,
-    facultyStudentRatio: 34,
+    teamEmployeeRatio: 34,
     vacancies: 3,
     attritionRate: 5.2,
     budgetAllocated: 5000000,
     budgetSpent: 4200000,
-    costPerStudent: 3500,
+    costPerEmployee: 3500,
     roiLabs: 85,
     publications: 45,
     grantsSecured: 1200000,
     patentsFiled: 8,
     collaborations: 12,
-    placementRate: 92,
-    avgPackage: 85000,
-    higherStudiesRate: 15,
-    internships: 280,
+    clientSuccessRate: 92,
+    avgRevenue: 85000,
+    careerAdvancementRate: 15,
+    projects: 280,
     awards: 8,
     guestLectures: 24,
     industryMoUs: 6,
@@ -44,31 +44,31 @@ const departments = [
   },
   {
     id: 2,
-    name: "Electronics & Communication",
-    enrollments: 890,
-    passRate: 78,
+    name: "Engineering Team",
+    employees: 890,
+    completionRate: 78,
     revenue: 3100000,
-    facultyStrength: 28,
-    researchOutput: 9,
-    gpa: 3.2,
-    dropoutRate: 5.1,
-    completionRate: 88,
+    teamSize: 28,
+    projectOutput: 9,
+    performanceScore: 3.2,
+    retentionRate: 94.9,
+    projectCompletionRate: 88,
     satisfactionScore: 3.9,
-    facultyStudentRatio: 32,
+    teamEmployeeRatio: 32,
     vacancies: 4,
     attritionRate: 6.1,
     budgetAllocated: 3800000,
     budgetSpent: 3100000,
-    costPerStudent: 3800,
+    costPerEmployee: 3800,
     roiLabs: 78,
     publications: 32,
     grantsSecured: 850000,
     patentsFiled: 5,
     collaborations: 8,
-    placementRate: 88,
-    avgPackage: 72000,
-    higherStudiesRate: 12,
-    internships: 210,
+    clientSuccessRate: 88,
+    avgRevenue: 72000,
+    careerAdvancementRate: 12,
+    projects: 210,
     awards: 6,
     guestLectures: 18,
     industryMoUs: 4,
@@ -76,31 +76,31 @@ const departments = [
   },
   {
     id: 3,
-    name: "Business Administration",
-    enrollments: 460,
-    passRate: 91,
+    name: "Sales Team",
+    employees: 460,
+    completionRate: 91,
     revenue: 2800000,
-    facultyStrength: 18,
-    researchOutput: 6,
-    gpa: 3.6,
-    dropoutRate: 3.2,
-    completionRate: 95,
+    teamSize: 18,
+    projectOutput: 6,
+    performanceScore: 3.6,
+    retentionRate: 96.8,
+    projectCompletionRate: 95,
     satisfactionScore: 4.4,
-    facultyStudentRatio: 26,
+    teamEmployeeRatio: 26,
     vacancies: 2,
     attritionRate: 4.8,
     budgetAllocated: 3200000,
     budgetSpent: 2800000,
-    costPerStudent: 4200,
+    costPerEmployee: 4200,
     roiLabs: 82,
     publications: 28,
     grantsSecured: 950000,
     patentsFiled: 3,
     collaborations: 10,
-    placementRate: 95,
-    avgPackage: 92000,
-    higherStudiesRate: 18,
-    internships: 180,
+    clientSuccessRate: 95,
+    avgRevenue: 92000,
+    careerAdvancementRate: 18,
+    projects: 180,
     awards: 9,
     guestLectures: 30,
     industryMoUs: 8,
@@ -139,11 +139,11 @@ export default function DirectorDepartments() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.enrollments')}</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.enrollments}</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.employees}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.passRate')}</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.passRate}%</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.completionRate}%</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.revenue')}</p>
@@ -151,11 +151,7 @@ export default function DirectorDepartments() {
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.faculty')}</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.facultyStrength}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.research')}</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.researchOutput} {t('departments.metrics.papers')}</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.teamSize}</p>
               </div>
             </div>
           </motion.div>
@@ -174,7 +170,7 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" interval={0} angle={-10} dy={20} />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="passRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="completionRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -183,10 +179,10 @@ export default function DirectorDepartments() {
             <ResponsiveContainer width="100%" height={240}>
               <RadarChart data={departments.map(dept => ({
                 name: dept.name,
-                GPA: dept.gpa,
+                Performance: dept.performanceScore,
                 Satisfaction: dept.satisfactionScore,
-                Completion: dept.completionRate,
-                Dropout: 100 - dept.dropoutRate
+                Completion: dept.projectCompletionRate,
+                Retention: dept.retentionRate
               }))} outerRadius={100} margin={{ left: 30, right: 30 }}>
                 <PolarGrid />
                 <PolarAngleAxis dataKey="name" />
@@ -204,8 +200,8 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" interval={0} angle={-10} dy={20} />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="completionRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="dropoutRate" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="projectCompletionRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="attritionRate" fill="#ef4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -225,7 +221,7 @@ export default function DirectorDepartments() {
                   <div className="space-y-2">
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.facultyStudentRatio')}</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">1:{dept.facultyStudentRatio}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">1:{dept.teamEmployeeRatio}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.vacancies')}</p>
@@ -248,8 +244,8 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="facultyStrength" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="researchOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="teamSize" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="projectOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -282,7 +278,7 @@ export default function DirectorDepartments() {
                   <div className="space-y-2">
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.costPerStudent')}</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.costPerStudent}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.costPerEmployee}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.roiLabs')}</p>
@@ -357,8 +353,8 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="placementRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="higherStudiesRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="clientSuccessRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="careerAdvancementRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -371,11 +367,11 @@ export default function DirectorDepartments() {
                   <div className="space-y-2">
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.avgPackage')}</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.avgPackage.toLocaleString()}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.avgRevenue.toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.internships')}</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{dept.internships}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{dept.projects}</p>
                     </div>
                   </div>
                 </div>
@@ -485,11 +481,11 @@ export default function DirectorDepartments() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.enrollments')}</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.enrollments}</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.employees}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.passRate')}</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.passRate}%</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.completionRate}%</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.revenue')}</p>
@@ -497,11 +493,7 @@ export default function DirectorDepartments() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.faculty')}</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.facultyStrength}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.research')}</p>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.researchOutput} {t('departments.metrics.papers')}</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.teamSize}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -528,7 +520,7 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" interval={0} angle={-10} dy={20} />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="passRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="completionRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -537,15 +529,15 @@ export default function DirectorDepartments() {
                     <ResponsiveContainer width="100%" height={240}>
                       <RadarChart data={departments.map(dept => ({
                         name: dept.name,
-                        GPA: dept.gpa,
+                        Performance: dept.performanceScore,
                         Satisfaction: dept.satisfactionScore,
-                        Completion: dept.completionRate,
-                        Dropout: 100 - dept.dropoutRate
+                        Completion: dept.projectCompletionRate,
+                        Retention: dept.retentionRate
                       }))} outerRadius={100} margin={{ left: 30, right: 30 }}>
                         <PolarGrid />
                         <PolarAngleAxis dataKey="name" />
                         <PolarRadiusAxis />
-                        <Radar name="Metrics" dataKey="GPA" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+                        <Radar name="Metrics" dataKey="Performance" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
                         <Radar name="Metrics" dataKey="Satisfaction" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -558,8 +550,8 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" interval={0} angle={-10} dy={20} />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="completionRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="dropoutRate" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="projectCompletionRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="attritionRate" fill="#ef4444" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -587,7 +579,7 @@ export default function DirectorDepartments() {
                           <div className="space-y-2">
                             <div>
                               <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.facultyStudentRatio')}</p>
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">1:{dept.facultyStudentRatio}</p>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">1:{dept.teamEmployeeRatio}</p>
                             </div>
                             <div>
                               <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.vacancies')}</p>
@@ -610,8 +602,8 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="facultyStrength" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="researchOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="teamSize" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="projectOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -652,7 +644,7 @@ export default function DirectorDepartments() {
                           <div className="space-y-2">
                             <div>
                               <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.costPerStudent')}</p>
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.costPerStudent}</p>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.costPerEmployee}</p>
                             </div>
                             <div>
                               <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.roiLabs')}</p>
@@ -743,8 +735,8 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="placementRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="higherStudiesRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="clientSuccessRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="careerAdvancementRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -757,11 +749,11 @@ export default function DirectorDepartments() {
                           <div className="space-y-2">
                             <div>
                               <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.avgPackage')}</p>
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.avgPackage.toLocaleString()}</p>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.avgRevenue.toLocaleString()}</p>
                             </div>
                             <div>
                               <p className="text-xs text-gray-600 dark:text-gray-300">{t('departments.metrics.internships')}</p>
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">{dept.internships}</p>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">{dept.projects}</p>
                             </div>
                           </div>
                         </div>

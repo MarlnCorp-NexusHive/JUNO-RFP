@@ -15,18 +15,18 @@ const meetingTypes = [
 ];
 const demoMeetings = [
   { title: "Quarterly Vision Planning", type: "Strategic Review", date: "2026-05-10", time: "10:00", host: "Director", category: "Strategic", color: "#6366f1" },
-  { title: "Academic Council", type: "Academic Meetings", date: "2026-05-12", time: "14:00", host: "Dean Science", category: "Academic", color: "#22c55e" },
+  { title: "Financial Council", type: "Financial Meetings", date: "2026-05-12", time: "14:00", host: "CFO Finance", category: "Finance", color: "#22c55e" },
   { title: "Budget Planning", type: "Financial Meetings", date: "2026-05-15", time: "11:00", host: "Finance Admin", category: "Finance", color: "#f59e42" },
   { title: "HR Policy Review", type: "HR/Admin Meetings", date: "2026-05-18", time: "16:00", host: "HR Head", category: "HR", color: "#a21caf" },
 ];
 const rsvpDemo = [
-  { name: "Dean Science", status: "Accepted" },
+  { name: "CFO Finance", status: "Accepted" },
   { name: "HoD EEE", status: "Pending" },
   { name: "Finance Admin", status: "Accepted" },
   { name: "HR Head", status: "Declined" },
 ];
 const actionItems = [
-  { task: "Submit department reports", assigned: "Dean Science", due: "2026-05-20", status: "Open" },
+  { task: "Submit department reports", assigned: "CFO Finance", due: "2026-05-20", status: "Open" },
   { task: "Update fee structure", assigned: "Finance Admin", due: "2026-05-25", status: "In Progress" },
 ];
 const analytics = [
@@ -178,8 +178,8 @@ export default function MeetingsCalendar() {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow mb-4">
             <h3 className="font-semibold mb-2">Audit Trail</h3>
             <ul className="text-xs">
-              <li>2026-05-10: Quarterly Vision Planning – Director, Deans</li>
-              <li>2026-05-12: Academic Council – Dean Science, HoDs</li>
+              <li>2026-05-10: Quarterly Vision Planning – Director, CFOs</li>
+              <li>2026-05-12: Financial Council – CFO Finance, HoDs</li>
               <li>2026-05-15: Budget Planning – Finance Admin, Director</li>
             </ul>
           </div>
@@ -230,7 +230,7 @@ export default function MeetingsCalendar() {
               <div className="text-xs text-gray-500 dark:text-gray-300 mb-2">{selectedMeeting.date} {selectedMeeting.time} • Host: {selectedMeeting.host}</div>
               <div className="mb-2"><span className="font-semibold">Type:</span> {selectedMeeting.type}</div>
               <div className="mb-2"><span className="font-semibold">Agenda:</span> <ul className="list-disc ml-6 text-xs"><li>Review last quarter's outcomes</li><li>Set new goals</li><li>Discuss challenges</li></ul></div>
-              <div className="mb-2"><span className="font-semibold">Participants:</span> Director, Deans, HoDs, Finance Admin</div>
+              <div className="mb-2"><span className="font-semibold">Participants:</span> Director, CFOs, HoDs, Finance Admin</div>
               <div className="mb-2"><span className="font-semibold">Documents:</span> <a href="#" className="text-blue-600 underline">Agenda.pdf</a>, <a href="#" className="text-blue-600 underline">Report.xlsx</a></div>
               <div className="mb-2"><span className="font-semibold">Director's Notes:</span> <textarea className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs" rows={2} placeholder="Private notes..." /></div>
               <div className="mb-2"><span className="font-semibold">Linked Analytics:</span> <span className="text-xs">Revenue up 12% QoQ</span></div>

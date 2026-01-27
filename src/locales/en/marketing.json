@@ -78,8 +78,8 @@
       "Furniture": "Furniture / Infrastructure",
       "Housekeeping": "Housekeeping / Sanitation",
       "Transport": "Transportation",
-      "Hostel": "Hostel or Accommodation",
-      "Examination": "Examination Portal",
+      "Facilities": "Office Space / Facilities",
+      "System": "Business Portal",
       "ERP": "ERP / CRM"
     },
     "subcategories": {
@@ -103,8 +103,8 @@
       "waterSupply": "Water supply",
       "maintenance": "Maintenance",
       "portalAccess": "Portal access",
-      "resultIssue": "Result issue",
-      "examSchedule": "Exam schedule",
+      "dataIssue": "Data issue",
+      "systemSchedule": "System schedule",
       "loginIssue": "Login issue",
       "dataError": "Data error",
       "featureRequest": "Feature request"
@@ -112,11 +112,11 @@
     "demoData": {
       "tickets": [
         {
-          "subject": "WiFi not working on 2nd floor, Main Campus",
-          "description": "No internet connectivity in the Computer Science lab."
+          "subject": "WiFi not working on 2nd floor, Main Office",
+          "description": "No internet connectivity in the IT Department office."
         },
         {
-          "subject": "AC not working in classroom A302",
+          "subject": "AC not working in meeting room A302",
           "description": "AC is not cooling properly."
         }
       ],

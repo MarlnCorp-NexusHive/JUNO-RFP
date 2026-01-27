@@ -65,7 +65,7 @@ export default function DirectorUserManagement() {
       roleKey: "roles.dean", 
       departmentKey: "departments.science", 
       statusKey: "userStatuses.active", 
-      email: "john.doe@univ.edu",
+      email: "john.doe@company.com",
       lastLogin: "2026-03-10",
       avatar: "JD",
       permissions: 12,
@@ -77,7 +77,7 @@ export default function DirectorUserManagement() {
       roleKey: "roles.hod", 
       departmentKey: "departments.eee", 
       statusKey: "userStatuses.active", 
-      email: "jane.smith@univ.edu",
+      email: "jane.smith@company.com",
       lastLogin: "2026-03-09",
       avatar: "JS",
       permissions: 8,
@@ -89,7 +89,7 @@ export default function DirectorUserManagement() {
       roleKey: "roles.faculty", 
       departmentKey: "departments.math", 
       statusKey: "userStatuses.inactive", 
-      email: "mike.johnson@univ.edu",
+      email: "mike.johnson@company.com",
       lastLogin: "2026-02-28",
       avatar: "MJ",
       permissions: 5,
@@ -101,7 +101,7 @@ export default function DirectorUserManagement() {
       roleKey: "roles.faculty", 
       departmentKey: "departments.computer", 
       statusKey: "userStatuses.active", 
-      email: "sarah.wilson@univ.edu",
+      email: "sarah.wilson@company.com",
       lastLogin: "2026-03-11",
       avatar: "SW",
       permissions: 6,
@@ -113,7 +113,7 @@ export default function DirectorUserManagement() {
       roleKey: "roles.student", 
       departmentKey: "departments.engineering", 
       statusKey: "userStatuses.active", 
-      email: "david.brown@univ.edu",
+      email: "david.brown@company.com",
       lastLogin: "2026-03-12",
       avatar: "DB",
       permissions: 3,
@@ -121,7 +121,7 @@ export default function DirectorUserManagement() {
     },
   ];
 
-  const roles = ["director", "dean", "hod", "faculty", "student", "admin"];
+  const roles = ["director", "dean", "hod", "team", "employee", "admin"];
 
   // Demo data for user metrics using translation keys
   const userMetrics = [
@@ -178,7 +178,9 @@ export default function DirectorUserManagement() {
       case 'director': return <FiAward className="w-4 h-4" />; // Changed from FiCrown to FiAward
       case 'dean': return <FiAward className="w-4 h-4" />;
       case 'hod': return <FiShield className="w-4 h-4" />;
+      case 'team': return <FiBookOpen className="w-4 h-4" />;
       case 'faculty': return <FiBookOpen className="w-4 h-4" />;
+      case 'employee': return <FiUser className="w-4 h-4" />;
       case 'student': return <FiUser className="w-4 h-4" />;
       case 'admin': return <FiSettings className="w-4 h-4" />;
       default: return <FiUser className="w-4 h-4" />;
@@ -190,7 +192,9 @@ export default function DirectorUserManagement() {
       case 'director': return 'text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400';
       case 'dean': return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400';
       case 'hod': return 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400';
+      case 'team': return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400';
       case 'faculty': return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'employee': return 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400';
       case 'student': return 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400';
       case 'admin': return 'text-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-gray-400';
       default: return 'text-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-gray-400';

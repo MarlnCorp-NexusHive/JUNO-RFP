@@ -14,9 +14,9 @@ import DirectorUserManagement from '../features/director/components/DirectorUser
 import DirectorCommunicationHub from '../features/director/components/DirectorCommunicationHub';
 
 const features = [
-  { label: "Dashboard", icon: "📊", route: "/rbac/director", description: "University Performance Overview, KPI Summary, Alerts & Notices" },
+  { label: "Dashboard", icon: "📊", route: "/rbac/director", description: "Corporate Performance Overview, KPI Summary, Alerts & Notices" },
   { label: "Analytics & Reports", icon: "📈", route: "/rbac/director/analytics", description: "Department-wise Reports, Statistics, Finance, Trends, HR Insights" },
-  { label: "Departments", icon: "🏢", route: "/rbac/director/departments", description: "Academic Affairs, HR, Finance, Admissions, IT, R&D" },
+  { label: "Departments", icon: "🏢", route: "/rbac/director/departments", description: "Business Operations, HR, Finance, Recruitment, IT, R&D" },
   { label: "Approval Center", icon: "✅", route: "/rbac/director/approvals", description: "Budget, Policy, Recruitment, Procurement Approvals" },
   { label: "Strategic Planning", icon: "🗺️", route: "/rbac/director/strategic-planning", description: "Annual Plans, Accreditation, Risk Management" },
   { label: "Communication", icon: "📢", route: "/rbac/director/communication", description: "Notices, Circulars, External Comms" },
@@ -36,16 +36,16 @@ const features = [
 // Demo data for KPI cards - will be generated dynamically with translations
 
 // Demo data for charts
-const admissionsTrend = [
-  { month: "Jan", Applications: 200, Admitted: 120 },
-  { month: "Feb", Applications: 250, Admitted: 140 },
-  { month: "Mar", Applications: 300, Admitted: 180 },
-  { month: "Apr", Applications: 350, Admitted: 200 },
-  { month: "May", Applications: 400, Admitted: 220 },
-  { month: "Jun", Applications: 420, Admitted: 240 },
+const recruitmentTrend = [
+  { month: "Jan", Applications: 200, Hired: 120 },
+  { month: "Feb", Applications: 250, Hired: 140 },
+  { month: "Mar", Applications: 300, Hired: 180 },
+  { month: "Apr", Applications: 350, Hired: 200 },
+  { month: "May", Applications: 400, Hired: 220 },
+  { month: "Jun", Applications: 420, Hired: 240 },
 ];
 const financeData = [
-  { name: "Academics", value: 40 },
+  { name: "Operations", value: 40 },
   { name: "HR", value: 20 },
   { name: "Infra", value: 15 },
   { name: "R&D", value: 10 },
@@ -53,30 +53,30 @@ const financeData = [
 ];
 const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 const deptPerformance = [
-  { dept: "Academics", KPI: 85 },
+  { dept: "Operations", KPI: 85 },
   { dept: "HR", KPI: 78 },
   { dept: "Finance", KPI: 90 },
-  { dept: "Admissions", KPI: 82 },
+  { dept: "Recruitment", KPI: 82 },
   { dept: "IT", KPI: 75 },
   { dept: "R&D", KPI: 88 },
 ];
 
 // Slim, colorful summary cards data - will be generated dynamically with translations
 
-// Academic Insights demo data
-const academicTrends = [
-  { year: '2019', Enrolled: 11000, Graduated: 9500 },
-  { year: '2020', Enrolled: 11500, Graduated: 9800 },
-  { year: '2026', Enrolled: 12000, Graduated: 10200 },
-  { year: '2026', Enrolled: 12200, Graduated: 11000 },
-  { year: '2026', Enrolled: 12400, Graduated: 11500 },
+// Business Operations Insights demo data
+const businessTrends = [
+  { year: '2019', Onboarded: 11000, Completed: 9500 },
+  { year: '2020', Onboarded: 11500, Completed: 9800 },
+  { year: '2026', Onboarded: 12000, Completed: 10200 },
+  { year: '2026', Onboarded: 12200, Completed: 11000 },
+  { year: '2026', Onboarded: 12400, Completed: 11500 },
 ];
 const deptLeaderboard = [
-  { dept: 'Engineering', GPA: 8.7 },
-  { dept: 'Science', GPA: 8.5 },
-  { dept: 'Business', GPA: 8.3 },
-  { dept: 'Arts', GPA: 8.1 },
-  { dept: 'Law', GPA: 7.9 },
+  { dept: 'Engineering Team', Performance: 8.7 },
+  { dept: 'IT Team', Performance: 8.5 },
+  { dept: 'Sales Team', Performance: 8.3 },
+  { dept: 'Operations Team', Performance: 8.1 },
+  { dept: 'Marketing Team', Performance: 7.9 },
 ];
 // Financial Overview demo data
 const monthlyFees = [
@@ -88,18 +88,18 @@ const monthlyFees = [
   { month: 'Jun', Fees: 155000 },
 ];
 const budgetUsage = [
-  { dept: 'Engineering', budget: 500000, used: 420000 },
-  { dept: 'Science', budget: 300000, used: 250000 },
-  { dept: 'Business', budget: 200000, used: 180000 },
-  { dept: 'Arts', budget: 150000, used: 120000 },
+  { dept: 'Engineering Team', budget: 500000, used: 420000 },
+  { dept: 'IT Team', budget: 300000, used: 250000 },
+  { dept: 'Sales Team', budget: 200000, used: 180000 },
+  { dept: 'Operations Team', budget: 150000, used: 120000 },
 ];
-// HR & Staff Analytics demo data
-const staffTypes = [
-  { year: '2019', Teaching: 400, NonTeaching: 200, Contract: 50 },
-  { year: '2020', Teaching: 420, NonTeaching: 210, Contract: 60 },
-  { year: '2026', Teaching: 430, NonTeaching: 220, Contract: 70 },
-  { year: '2026', Teaching: 440, NonTeaching: 230, Contract: 80 },
-  { year: '2026', Teaching: 450, NonTeaching: 240, Contract: 90 },
+// HR & Team Analytics demo data
+const teamTypes = [
+  { year: '2019', FullTime: 400, PartTime: 200, Contract: 50 },
+  { year: '2020', FullTime: 420, PartTime: 210, Contract: 60 },
+  { year: '2026', FullTime: 430, PartTime: 220, Contract: 70 },
+  { year: '2026', FullTime: 440, PartTime: 230, Contract: 80 },
+  { year: '2026', FullTime: 450, PartTime: 240, Contract: 90 },
 ];
 const attritionTrend = [
   { year: '2019', Attrition: 4.2 },
@@ -110,7 +110,7 @@ const attritionTrend = [
 ];
 // Alerts & Notifications demo data - will be generated dynamically with translations
 
-// Predictive Admission Forecast demo data
+// Predictive Recruitment Forecast demo data
 const forecastData = [
   { month: 'Jan', Actual: 200, Forecast: 210 },
   { month: 'Feb', Actual: 250, Forecast: 260 },
@@ -122,13 +122,13 @@ const forecastData = [
   { month: 'Aug', Actual: null, Forecast: 500 },
 ];
 
-// Dropout Risk Forecast demo data
-const dropoutForecast = [
-  { semester: '2026-Fall', Actual: 3.8, Forecast: 3.8 },
-  { semester: '2026-Spring', Actual: 3.5, Forecast: 3.5 },
-  { semester: '2026-Fall', Actual: null, Forecast: 3.3 },
-  { semester: '2026-Spring', Actual: null, Forecast: 3.1 },
-  { semester: '2026-Fall', Actual: null, Forecast: 3.0 },
+// Employee Retention Risk Forecast demo data
+const retentionForecast = [
+  { quarter: '2026-Q1', Actual: 3.8, Forecast: 3.8 },
+  { quarter: '2026-Q2', Actual: 3.5, Forecast: 3.5 },
+  { quarter: '2026-Q3', Actual: null, Forecast: 3.3 },
+  { quarter: '2026-Q4', Actual: null, Forecast: 3.1 },
+  { quarter: '2027-Q1', Actual: null, Forecast: 3.0 },
 ];
 // Financial Surplus/Deficit Forecast demo data
 const surplusForecast = [
@@ -151,31 +151,31 @@ const leadConversionData = [
 ];
 
 const applicationFeeData = [
-  { month: 'Jan', Revenue: 100000, Waivers: 10000 },
-  { month: 'Feb', Revenue: 105000, Waivers: 10500 },
-  { month: 'Mar', Revenue: 110000, Waivers: 11000 },
-  { month: 'Apr', Revenue: 115000, Waivers: 11500 },
-  { month: 'May', Revenue: 120000, Waivers: 12000 },
-  { month: 'Jun', Revenue: 125000, Waivers: 12500 },
+  { month: 'Jan', Revenue: 100000, Discounts: 10000 },
+  { month: 'Feb', Revenue: 105000, Discounts: 10500 },
+  { month: 'Mar', Revenue: 110000, Discounts: 11000 },
+  { month: 'Apr', Revenue: 115000, Discounts: 11500 },
+  { month: 'May', Revenue: 120000, Discounts: 12000 },
+  { month: 'Jun', Revenue: 125000, Discounts: 12500 },
 ];
 
 const deptRevenueData = [
-  { dept: 'Academics', Revenue: 500000, Projected: 550000 },
+  { dept: 'Operations', Revenue: 500000, Projected: 550000 },
   { dept: 'HR', Revenue: 200000, Projected: 220000 },
   { dept: 'Finance', Revenue: 150000, Projected: 165000 },
-  { dept: 'Admissions', Revenue: 300000, Projected: 330000 },
+  { dept: 'Recruitment', Revenue: 300000, Projected: 330000 },
   { dept: 'IT', Revenue: 100000, Projected: 110000 },
   { dept: 'R&D', Revenue: 100000, Projected: 115000 },
 ];
 
-const subjectProfitData = [
-  { subject: 'Computer Science', Profit: 100000 },
-  { subject: 'Business', Profit: 75000 },
-  { subject: 'Engineering', Profit: 120000 },
-  { subject: 'Arts', Profit: 50000 },
+const departmentProfitData = [
+  { department: 'IT Team', Profit: 100000 },
+  { department: 'Sales Team', Profit: 75000 },
+  { department: 'Engineering Team', Profit: 120000 },
+  { department: 'Operations Team', Profit: 50000 },
 ];
 
-const studentDemographicsData = {
+const employeeDemographicsData = {
   regions: [
     { name: 'North', value: 35 },
     { name: 'South', value: 25 },
@@ -183,10 +183,10 @@ const studentDemographicsData = {
     { name: 'West', value: 20 },
   ],
   ageGroups: [
-    { name: '18-20', value: 45 },
-    { name: '21-25', value: 30 },
-    { name: '26-30', value: 15 },
-    { name: '31-35', value: 10 },
+    { name: '25-30', value: 45 },
+    { name: '31-35', value: 30 },
+    { name: '36-40', value: 15 },
+    { name: '41-45', value: 10 },
   ],
 };
 
@@ -317,46 +317,46 @@ export default function DirectorDashboard() {
     // Example extra details for each card type
     let extraDetails = null;
     let insight = null;
-    if (card.label.includes('Student')) {
+    if (card.label.includes('Employee') || card.label.includes('Team')) {
       extraDetails = (
         <table className="w-full text-sm mb-2">
           <tbody>
-            <tr><td className="font-medium">Undergraduates</td><td className="text-right">8,200</td></tr>
-            <tr><td className="font-medium">Postgraduates</td><td className="text-right">3,100</td></tr>
-            <tr><td className="font-medium">International</td><td className="text-right">1,100</td></tr>
+            <tr><td className="font-medium">Full-Time</td><td className="text-right">8,200</td></tr>
+            <tr><td className="font-medium">Part-Time</td><td className="text-right">3,100</td></tr>
+            <tr><td className="font-medium">Contract</td><td className="text-right">1,100</td></tr>
           </tbody>
         </table>
       );
-      insight = <div className="text-xs text-blue-600 dark:text-blue-300 mb-2">Steady growth in student population, with a 2.5% increase this month. International student ratio is 8.9%.</div>;
-    } else if (card.label.includes('Faculty') || card.label.includes('Staff')) {
+      insight = <div className="text-xs text-blue-600 dark:text-blue-300 mb-2">Steady growth in employee population, with a 2.5% increase this month. Contract employee ratio is 8.9%.</div>;
+    } else if (card.label.includes('Team') || card.label.includes('Member')) {
       extraDetails = (
         <table className="w-full text-sm mb-2">
           <tbody>
-            <tr><td className="font-medium">Teaching</td><td className="text-right">650</td></tr>
-            <tr><td className="font-medium">Non-Teaching</td><td className="text-right">200</td></tr>
+            <tr><td className="font-medium">Full-Time</td><td className="text-right">650</td></tr>
+            <tr><td className="font-medium">Part-Time</td><td className="text-right">200</td></tr>
             <tr><td className="font-medium">Contractual</td><td className="text-right">40</td></tr>
           </tbody>
         </table>
       );
       insight = <div className="text-xs text-purple-600 dark:text-purple-300 mb-2">Vacancy rate is low. Recruitment drive ongoing for 12 open positions.</div>;
-    } else if (card.label.includes('Colleges')) {
+    } else if (card.label.includes('Department') || card.label.includes('Division')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
-          <li>New: School of Data Science</li>
-          <li>Largest: Engineering (3,200 students)</li>
-          <li>Smallest: Law (400 students)</li>
+          <li>New: Data Analytics Division</li>
+          <li>Largest: Engineering Team (3,200 employees)</li>
+          <li>Smallest: Legal Team (400 employees)</li>
         </ul>
       );
-      insight = <div className="text-xs text-pink-600 dark:text-pink-300 mb-2">1 new department added this year. Most growth in STEM fields.</div>;
-    } else if (card.label.includes('Courses')) {
+      insight = <div className="text-xs text-pink-600 dark:text-pink-300 mb-2">1 new department added this year. Most growth in Technology and Operations fields.</div>;
+    } else if (card.label.includes('Project') || card.label.includes('Position')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
-          <li>UG Courses: 180</li>
-          <li>PG Courses: 110</li>
-          <li>PhD/Research: 30</li>
+          <li>Active Projects: 180</li>
+          <li>Ongoing Positions: 110</li>
+          <li>R&D Initiatives: 30</li>
         </ul>
       );
-      insight = <div className="text-xs text-yellow-600 dark:text-yellow-300 mb-2">8 new courses launched this year, mostly in AI, Data Science, and Business Analytics.</div>;
+      insight = <div className="text-xs text-yellow-600 dark:text-yellow-300 mb-2">8 new projects launched this year, mostly in AI, Data Science, and Business Intelligence.</div>;
     } else if (card.label.includes('Vehicles')) {
       extraDetails = (
         <table className="w-full text-sm mb-2">
@@ -453,48 +453,48 @@ export default function DirectorDashboard() {
     if (!kpi) return null;
     let extraDetails = null;
     let insight = null;
-    if (kpi.label.includes('Admissions')) {
+    if (kpi.label.includes('Recruitment') || kpi.label.includes('Hiring')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
           <li>Applications this month: 1,500</li>
-          <li>Acceptance rate: 82%</li>
-          <li>Top program: B.Tech CSE</li>
+          <li>Hiring rate: 82%</li>
+          <li>Top position: Software Engineer</li>
         </ul>
       );
-      insight = <div className="text-xs text-blue-600 dark:text-blue-300 mb-2">Admissions are up 5% compared to last month. Most applications from Riyadh and Jeddah.</div>;
+      insight = <div className="text-xs text-blue-600 dark:text-blue-300 mb-2">Recruitment is up 5% compared to last month. Most applications from major cities.</div>;
     } else if (kpi.label.includes('Finance')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
-          <li>Fee Collection (YTD): $600,000</li>
-          <li>Outstanding Fees: $12,000</li>
-          <li>Scholarships Granted: $45,000</li>
+          <li>Revenue Collection (YTD): $600,000</li>
+          <li>Outstanding Payments: $12,000</li>
+          <li>Employee Benefits: $45,000</li>
         </ul>
       );
-      insight = <div className="text-xs text-green-600 dark:text-green-300 mb-2">Finance is healthy. Outstanding fees are at a record low. Scholarship disbursal up 10%.</div>;
+      insight = <div className="text-xs text-green-600 dark:text-green-300 mb-2">Finance is healthy. Outstanding payments are at a record low. Employee benefits allocation up 10%.</div>;
     } else if (kpi.label.includes('HR')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
-          <li>Teaching Staff: 650</li>
-          <li>Non-Teaching: 200</li>
+          <li>Full-Time Staff: 650</li>
+          <li>Part-Time: 200</li>
           <li>Open Positions: 12</li>
         </ul>
       );
-      insight = <div className="text-xs text-purple-600 dark:text-purple-300 mb-2">Staff attrition is at 3.5%. Recruitment drive for new faculty ongoing.</div>;
-    } else if (kpi.label.includes('Academics')) {
+      insight = <div className="text-xs text-purple-600 dark:text-purple-300 mb-2">Staff attrition is at 3.5%. Recruitment drive for new team members ongoing.</div>;
+    } else if (kpi.label.includes('Operations') || kpi.label.includes('Business')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
-          <li>Avg GPA (UG): 8.2</li>
-          <li>Avg GPA (PG): 8.5</li>
-          <li>Top Department: Engineering (8.7)</li>
+          <li>Avg Performance Score: 8.2</li>
+          <li>Project Completion Rate: 8.5</li>
+          <li>Top Department: Engineering Team (8.7)</li>
         </ul>
       );
-      insight = <div className="text-xs text-yellow-600 dark:text-yellow-300 mb-2">Academic performance is stable. Engineering leads in GPA.</div>;
+      insight = <div className="text-xs text-yellow-600 dark:text-yellow-300 mb-2">Operational performance is stable. Engineering Team leads in project completion.</div>;
     } else if (kpi.label.includes('Attendance')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
-          <li>Student Attendance: 92%</li>
-          <li>Staff Attendance: 95%</li>
-          <li>Lowest: Law Dept (88%)</li>
+          <li>Employee Attendance: 92%</li>
+          <li>Management Attendance: 95%</li>
+          <li>Lowest: Legal Team (88%)</li>
         </ul>
       );
       insight = <div className="text-xs text-pink-600 dark:text-pink-300 mb-2">Attendance is above target. Law department needs improvement.</div>;
@@ -538,7 +538,7 @@ export default function DirectorDashboard() {
     if (chartId === 'admission') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">Predictive Admission Forecast</h3>
+          <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">Predictive Recruitment Forecast</h3>
           <ResponsiveContainer width="100%" height="90%">
             <LineChart data={forecastData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -555,11 +555,11 @@ export default function DirectorDashboard() {
     } else if (chartId === 'dropout') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-pink-700 dark:text-pink-300">Dropout Risk Forecast</h3>
+          <h3 className="text-lg font-bold mb-2 text-pink-700 dark:text-pink-300">Employee Retention Risk Forecast</h3>
           <ResponsiveContainer width="100%" height="90%">
-            <LineChart data={dropoutForecast} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
+            <LineChart data={retentionForecast} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="semester" />
+              <XAxis dataKey="quarter" />
               <YAxis domain={[2.5, 5]} tickFormatter={v => `${v}%`} />
               <Tooltip formatter={v => `${v}%`} />
               <Legend />
@@ -609,7 +609,7 @@ export default function DirectorDashboard() {
     } else if (chartId === 'sentiment') {
       content = (
         <div className="w-[90vw] max-w-2xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center">
-          <h3 className="text-lg font-bold mb-2 text-yellow-700 dark:text-yellow-300">Student Sentiment Analysis</h3>
+          <h3 className="text-lg font-bold mb-2 text-yellow-700 dark:text-yellow-300">Employee Sentiment Analysis</h3>
           <ResponsiveContainer width="60%" height="80%">
             <PieChart>
               <Pie data={[
@@ -635,8 +635,8 @@ export default function DirectorDashboard() {
             <RadarChart cx="50%" cy="50%" outerRadius={120} data={[
               { kpi: 'Research', You: 90, Peer: 80 },
               { kpi: 'Placements', You: 85, Peer: 88 },
-              { kpi: 'Int. Admissions', You: 70, Peer: 80 },
-              { kpi: 'Faculty', You: 88, Peer: 85 },
+              { kpi: 'Int. Recruitment', You: 70, Peer: 80 },
+              { kpi: 'Team Size', You: 88, Peer: 85 },
               { kpi: 'Infra', You: 80, Peer: 78 },
             ]}>
               <PolarGrid />
@@ -676,8 +676,8 @@ export default function DirectorDashboard() {
                 {t('dashboard.aiLabels.highestGrowth')}: <span className="font-semibold">Engineering, Business</span>.
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">92%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Marketing Spend, Placement Rate, Fee Waivers</span></div>
-              <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +10% marketing budget → +3% admissions</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Marketing Spend, Conversion Rate, Discounts</span></div>
+              <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +10% marketing budget → +3% recruitment</div>
             </div>
             <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
               <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -710,10 +710,10 @@ export default function DirectorDashboard() {
               </div>
               <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
                 Expected revenue: <span className="font-bold text-blue-600 dark:text-blue-400">$180,000</span> (+5%).<br />
-                Waivers impact: <span className="font-semibold">10% of revenue</span>.
+                Discounts impact: <span className="font-semibold">10% of revenue</span>.
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">89%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Applications, Fee Structure, Waivers</span></div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Applications, Pricing Structure, Discounts</span></div>
               <div className="text-xs text-green-600 dark:text-green-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +15% fee waivers → -$25k revenue</div>
             </div>
             <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
@@ -765,9 +765,9 @@ export default function DirectorDashboard() {
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
           <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('subjectProfit')} title={t('dashboard.aiLabels.clickToEnlarge')}>
             <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={subjectProfitData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <BarChart data={departmentProfitData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="subject" />
+                <XAxis dataKey="department" />
                 <YAxis tickFormatter={v => `$${v.toLocaleString()}`} />
                 <Tooltip formatter={v => `$${v.toLocaleString()}`} />
                 <Bar dataKey="Profit" fill="#22c55e" radius={[8, 8, 0, 0]} />
@@ -801,7 +801,7 @@ export default function DirectorDashboard() {
           <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('demographics')} title={t('dashboard.aiLabels.clickToEnlarge')}>
             <ResponsiveContainer width="100%" height={140}>
               <PieChart>
-                <Pie data={studentDemographicsData.regions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={40} label>
+                <Pie data={employeeDemographicsData.regions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={40} label>
                   <Cell fill="#6366f1" />
                   <Cell fill="#22c55e" />
                   <Cell fill="#f59e42" />
@@ -873,9 +873,9 @@ export default function DirectorDashboard() {
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
           <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('subjectProfitRadar')} title={t('dashboard.aiLabels.clickToEnlarge')}>
             <ResponsiveContainer width="100%" height={140}>
-              <RadarChart cx="50%" cy="50%" outerRadius={50} data={subjectProfitData.map(s => ({ subject: s.subject, Profit: s.Profit }))}>
+              <RadarChart cx="50%" cy="50%" outerRadius={50} data={departmentProfitData.map(s => ({ department: s.department, Profit: s.Profit }))}>
                 <PolarGrid />
-                <PolarAngleAxis dataKey="subject" />
+                <PolarAngleAxis dataKey="department" />
                 <PolarRadiusAxis angle={30} />
                 <Radar name="Profit" dataKey="Profit" stroke="#22c55e" fill="#22c55e" fillOpacity={0.5} />
                 <Legend />
@@ -939,7 +939,7 @@ export default function DirectorDashboard() {
             {t('dashboard.title') || 'Director Dashboard'}
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            {t('dashboard.subtitle') || 'University Performance Overview & Analytics'}
+            {t('dashboard.subtitle') || 'Corporate Performance Overview & Analytics'}
           </p>
         </div>
         
@@ -1058,13 +1058,13 @@ export default function DirectorDashboard() {
         <div
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
           data-tour="4"
-          data-tour-title-en="Admissions & Finance Charts"
-          data-tour-content-en="Visualize admissions trends and finance distribution."
+          data-tour-title-en="Recruitment & Finance Charts"
+          data-tour-content-en="Visualize recruitment trends and finance distribution."
           data-tour-title-ar="مخططات القبول والمالية"
           data-tour-content-ar="عرض اتجاهات القبول وتوزيع المالية."
           data-tour-position="top"
         >
-          {/* Admissions Trend */}
+          {/* Recruitment Trend */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1073,14 +1073,14 @@ export default function DirectorDashboard() {
           >
             <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('dashboard.charts.admissionsTrend')}</h3>
             <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={admissionsTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+              <LineChart data={recruitmentTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
                 <Line type="monotone" dataKey="Applications" stroke="#6366f1" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="Admitted" stroke="#22c55e" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+                <Line type="monotone" dataKey="Hired" stroke="#22c55e" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
               </LineChart>
             </ResponsiveContainer>
           </motion.div>
@@ -1152,14 +1152,14 @@ export default function DirectorDashboard() {
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-2">
               <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('dashboard.charts.enrollmentGraduation')}</h3>
               <ResponsiveContainer width="100%" height={180}>
-                <LineChart data={academicTrends} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <LineChart data={businessTrends} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="Enrolled" stroke="#6366f1" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="Graduated" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="Onboarded" stroke="#6366f1" strokeWidth={2} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="Completed" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1171,7 +1171,7 @@ export default function DirectorDashboard() {
                   <li key={d.dept} className="flex items-center gap-2">
                     <span className="text-lg font-bold text-blue-500">#{idx + 1}</span>
                     <span className="flex-1 font-medium">{d.dept}</span>
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{d.GPA}</span>
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{d.Performance}</span>
                   </li>
                 ))}
               </ul>
@@ -1249,14 +1249,14 @@ export default function DirectorDashboard() {
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-2">
               <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('dashboard.charts.staffStrengthByType')}</h3>
               <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={staffTypes} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <BarChart data={teamTypes} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="Teaching" stackId="a" fill="#6366f1" />
-                  <Bar dataKey="NonTeaching" stackId="a" fill="#a3a3a3" />
+                  <Bar dataKey="FullTime" stackId="a" fill="#6366f1" />
+                  <Bar dataKey="PartTime" stackId="a" fill="#a3a3a3" />
                   <Bar dataKey="Contract" stackId="a" fill="#f59e42" />
                 </BarChart>
               </ResponsiveContainer>
@@ -1308,7 +1308,7 @@ export default function DirectorDashboard() {
           className="mt-8"
           data-tour="10"
           data-tour-title-en="AI-Powered Forecasts"
-          data-tour-content-en="Predictive insights: admissions, dropout risk, surplus forecasts."
+          data-tour-content-en="Predictive insights: recruitment, retention risk, surplus forecasts."
           data-tour-title-ar="توقعات مدعومة بالذكاء الاصطناعي"
           data-tour-content-ar="رؤى تنبؤية: القبول، مخاطر الانسحاب، الفائض."
           data-tour-position="bottom"
@@ -1347,8 +1347,8 @@ export default function DirectorDashboard() {
                     {t('dashboard.aiLabels.highestGrowth')}: <span className="font-semibold">Engineering, Business</span>.
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">92%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Marketing Spend, Placement Rate, Fee Waivers</span></div>
-                  <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +10% marketing budget → +3% admissions</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Marketing Spend, Conversion Rate, Discounts</span></div>
+                  <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +10% marketing budget → +3% recruitment</div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                   <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -1360,9 +1360,9 @@ export default function DirectorDashboard() {
             <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
               <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('dropout')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                 <ResponsiveContainer width="100%" height={140}>
-                  <LineChart data={dropoutForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <LineChart data={retentionForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="semester" />
+                    <XAxis dataKey="quarter" />
                     <YAxis domain={[2.5, 5]} tickFormatter={v => `${v}%`} />
                     <Tooltip formatter={v => `${v}%`} />
                     <Line type="monotone" dataKey="Actual" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 4 }} />
@@ -1473,7 +1473,7 @@ export default function DirectorDashboard() {
                     <YAxis tickFormatter={v => `$${v.toLocaleString()}`} />
                     <Tooltip formatter={v => `$${v.toLocaleString()}`} />
                     <Bar dataKey="Revenue" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                    <Bar dataKey="Waivers" fill="#ef4444" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="Discounts" fill="#ef4444" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
                 <span className="hidden group-hover:block absolute text-xs text-green-500 bg-white dark:bg-gray-900 px-2 py-1 rounded shadow top-2 left-2">{t('dashboard.aiLabels.clickToEnlarge')}</span>
@@ -1486,10 +1486,10 @@ export default function DirectorDashboard() {
                   </div>
                   <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
                     Expected revenue: <span className="font-bold text-blue-600 dark:text-blue-400">$180,000</span> (+5%).<br />
-                    Waivers impact: <span className="font-semibold">10% of revenue</span>.
+                    Discounts impact: <span className="font-semibold">10% of revenue</span>.
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">89%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Applications, Fee Structure, Waivers</span></div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Applications, Pricing Structure, Discounts</span></div>
                   <div className="text-xs text-green-600 dark:text-green-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +15% fee waivers → -$25k revenue</div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
@@ -1602,7 +1602,7 @@ export default function DirectorDashboard() {
                     <YAxis tickFormatter={v => `$${v.toLocaleString()}`} />
                     <Tooltip formatter={v => `$${v.toLocaleString()}`} />
                     <Bar dataKey="Revenue" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                    <Bar dataKey="Waivers" fill="#ef4444" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="Discounts" fill="#ef4444" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -1614,10 +1614,10 @@ export default function DirectorDashboard() {
                   </div>
                   <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
                     Expected revenue: <span className="font-bold text-blue-600 dark:text-blue-400">$180,000</span> (+5%).<br />
-                    Waivers impact: <span className="font-semibold">10% of revenue</span>.
+                    Discounts impact: <span className="font-semibold">10% of revenue</span>.
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">89%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Applications, Fee Structure, Waivers</span></div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Applications, Pricing Structure, Discounts</span></div>
                   <div className="text-xs text-green-600 dark:text-green-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +15% fee waivers → -$25k revenue</div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
@@ -1666,9 +1666,9 @@ export default function DirectorDashboard() {
             <div className="flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 min-h-[260px] border border-gray-100 dark:border-gray-800">
               <div className="flex-1 flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('subjectProfitRadar')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                 <ResponsiveContainer width="100%" height={120}>
-                  <RadarChart cx="50%" cy="50%" outerRadius={50} data={subjectProfitData.map(s => ({ subject: s.subject, Profit: s.Profit }))}>
+                  <RadarChart cx="50%" cy="50%" outerRadius={50} data={departmentProfitData.map(s => ({ department: s.department, Profit: s.Profit }))}>
                     <PolarGrid />
-                    <PolarAngleAxis dataKey="subject" />
+                    <PolarAngleAxis dataKey="department" />
                     <PolarRadiusAxis angle={30} />
                     <Radar name="Profit" dataKey="Profit" stroke="#22c55e" fill="#22c55e" fillOpacity={0.5} />
                     <Legend />
@@ -1731,12 +1731,12 @@ export default function DirectorDashboard() {
               </div>
             </div>
 
-            {/* Student Demographics Analytics */}
+            {/* Employee Demographics Analytics */}
             <div className="flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 min-h-[260px] border border-gray-100 dark:border-gray-800">
               <div className="flex-1 flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('demographics')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                 <ResponsiveContainer width="100%" height={120}>
                   <PieChart>
-                    <Pie data={studentDemographicsData.regions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={40} label>
+                    <Pie data={employeeDemographicsData.regions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={40} label>
                       <Cell fill="#6366f1" />
                       <Cell fill="#22c55e" />
                       <Cell fill="#f59e42" />

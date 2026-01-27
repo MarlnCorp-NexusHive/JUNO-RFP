@@ -262,8 +262,8 @@ export default function DirectorAuditCompliance() {
           data-tour="2"
           data-tour-title-en="Compliance Status"
           data-tour-title-ar="حالة الامتثال"
-          data-tour-content-en="Snapshot of accreditation and regulatory compliance across areas."
-          data-tour-content-ar="لمحة عن الاعتماد والامتثال التنظيمي عبر المجالات."
+          data-tour-content-en="Snapshot of certification and regulatory compliance across areas."
+          data-tour-content-ar="لمحة عن الشهادة والامتثال التنظيمي عبر المجالات."
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-3 mb-6">

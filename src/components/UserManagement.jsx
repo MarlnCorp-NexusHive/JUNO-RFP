@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import { directorFeatures } from './directorFeatures';
 
 const roles = [
-  { name: "Dean", count: 5, permissions: ["Academic Oversight", "Department Management", "Budget Approval"], color: "#6366f1", description: "Senior academic leadership role responsible for faculty and department oversight" },
+  { name: "CFO", count: 5, permissions: ["Financial Oversight", "Department Management", "Budget Approval"], color: "#6366f1", description: "Senior financial leadership role responsible for finance and budget oversight" },
   { name: "HoD", count: 12, permissions: ["Department Operations", "Faculty Management", "Course Planning"], color: "#22c55e", description: "Department head managing academic and administrative operations" },
   { name: "Professor", count: 45, permissions: ["Course Management", "Student Evaluation", "Research Oversight"], color: "#f59e42", description: "Senior faculty member responsible for teaching and research" },
   { name: "Admin Staff", count: 20, permissions: ["Administrative Tasks", "Document Management", "Student Support"], color: "#a21caf", description: "Support staff handling administrative and operational tasks" },
@@ -12,7 +12,7 @@ const roles = [
 ];
 
 const departments = [
-  { name: "Science", count: 15, roles: ["Dean", "HoD", "Professor", "Admin Staff"] },
+  { name: "Science", count: 15, roles: ["CFO", "HoD", "Professor", "Admin Staff"] },
   { name: "Engineering", count: 20, roles: ["HoD", "Professor", "Admin Staff", "IT Staff"] },
   { name: "Business", count: 12, roles: ["HoD", "Professor", "Admin Staff"] },
   { name: "IT", count: 10, roles: ["HoD", "Professor", "IT Staff"] },
@@ -20,7 +20,7 @@ const departments = [
 ];
 
 const users = [
-  { id: 1, name: "Dr. Sarah Ahmed", role: "Dean", department: "Science", email: "sarah.ahmed@university.edu", status: "Active", lastActive: "2026-03-15 14:30" },
+  { id: 1, name: "Dr. Sarah Ahmed", role: "CFO", department: "Finance", email: "sarah.ahmed@university.edu", status: "Active", lastActive: "2026-03-15 14:30" },
   { id: 2, name: "Prof. Mohammed Ali", role: "HoD", department: "Engineering", email: "mohammed.ali@university.edu", status: "Active", lastActive: "2026-03-15 13:45" },
   { id: 3, name: "Dr. Fatima Khan", role: "Professor", department: "Business", email: "fatima.khan@university.edu", status: "Inactive", lastActive: "2026-03-14 16:20" },
   { id: 4, name: "Ahmed Hassan", role: "Admin Staff", department: "Admissions", email: "ahmed.hassan@university.edu", status: "Active", lastActive: "2026-03-15 15:10" },

@@ -24,12 +24,12 @@ const riskAlerts = [
   { alert: "Late fee policy update overdue", severity: "Medium" },
 ];
 const auditLogs = [
-  { date: "2026-04-10", user: "Dean Science", action: "Grade change approved" },
+  { date: "2026-04-10", user: "CFO Finance", action: "Budget change approved" },
   { date: "2026-04-09", user: "Finance Admin", action: "Fund disbursement approved" },
 ];
 const accessLogs = [
   { date: "2026-04-10", user: "HoD EEE", module: "Finance" },
-  { date: "2026-04-09", user: "Dean HR", module: "HR" },
+  { date: "2026-04-09", user: "CFO Finance", module: "Finance" },
 ];
 const configChanges = [
   { date: "2026-04-08", user: "Director", change: "Updated attendance policy" },
@@ -58,15 +58,15 @@ const scores = [
 ];
 const aiSuggestions = [
   "SCFHS renewal overdue – prioritize documentation.",
-  "Library fire safety non-compliance – escalate to Dean Infra.",
+  "Library fire safety non-compliance – escalate to CFO Infrastructure.",
 ];
 const accessMatrix = [
   { role: "Director", access: "All" },
-  { role: "Dean", access: "Academic, HR, Finance" },
+  { role: "CFO", access: "Finance, HR, Budget" },
   { role: "Finance Admin", access: "Finance" },
 ];
 const escalations = [
-  { area: "Library", issue: "Fire safety", escalatedTo: "Dean Infra" },
+  { area: "Library", issue: "Fire safety", escalatedTo: "CFO Infrastructure" },
 ];
 const integrations = [
   { name: "LMS", desc: "Academic policy audit" },
@@ -276,7 +276,7 @@ export default function AuditCompliance() {
               <h3 className="font-semibold">Root Cause & Corrective Actions</h3>
               <ViewAllBtn />
             </div>
-            <ul className="text-xs"><li>Library: Fire safety – Corrective action assigned to Dean Infra</li></ul>
+            <ul className="text-xs"><li>Library: Fire safety – Corrective action assigned to CFO Infrastructure</li></ul>
           </div>
         </section>
 
