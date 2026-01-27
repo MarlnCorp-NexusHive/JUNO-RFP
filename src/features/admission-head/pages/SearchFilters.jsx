@@ -35,11 +35,10 @@ const mockResults = [
     email: 'abdullah.rashid@email.com',
     phone: '+966 50 123 4567',
     status: 'Verified',
-    program: 'Engineering',
-    tags: ['Scholarship', 'EWS'],
+    program: 'Engineering Team',
+    tags: ['High Priority', 'Technical'],
     assigned: 'Noura Al-Zahra',
     lastFollowUp: '2026-06-10',
-    score: 92,
     avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
   },
   {
@@ -48,11 +47,10 @@ const mockResults = [
     email: 'layla.mansour@email.com',
     phone: '+966 50 234 5678',
     status: 'Pending',
-    program: 'Business',
-    tags: ['International'],
+    program: 'Sales Team',
+    tags: ['Enterprise Client'],
     assigned: 'Khalid Al-Sayed',
     lastFollowUp: '2026-06-09',
-    score: 78,
     avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
   },
   {
@@ -61,11 +59,10 @@ const mockResults = [
     email: 'omar.mutairi@email.com',
     phone: '+966 50 345 6789',
     status: 'Rejected',
-    program: 'Arts',
-    tags: ['Sports Quota'],
+    program: 'Operations Team',
+    tags: ['Internal Referral'],
     assigned: 'Aisha Al-Hassan',
     lastFollowUp: '2026-06-08',
-    score: 60,
     avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
   },
   {
@@ -74,11 +71,10 @@ const mockResults = [
     email: 'aisha.hassan@email.com',
     phone: '+966 50 456 7890',
     status: 'Verified',
-    program: 'Medical Sciences',
-    tags: ['Scholarship'],
+    program: 'Product Team',
+    tags: ['VIP Candidate'],
     assigned: 'Fatima Al-Rashid',
     lastFollowUp: '2026-06-07',
-    score: 88,
     avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
   },
   {
@@ -87,11 +83,10 @@ const mockResults = [
     email: 'yousef.harbi@email.com',
     phone: '+966 50 567 8901',
     status: 'Pending',
-    program: 'Law',
-    tags: ['EWS', 'Special Category'],
+    program: 'Marketing Team',
+    tags: ['Fast Track', 'Priority'],
     assigned: 'Noura Al-Zahra',
     lastFollowUp: '2026-06-06',
-    score: 74,
     avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
   },
   {
@@ -100,11 +95,10 @@ const mockResults = [
     email: 'maha.shehri@email.com',
     phone: '+966 50 678 9012',
     status: 'Verified',
-    program: 'Computer Science',
-    tags: ['International', 'Scholarship'],
+    program: 'IT Team',
+    tags: ['Remote', 'Senior Level'],
     assigned: 'Khalid Al-Sayed',
     lastFollowUp: '2026-06-05',
-    score: 95,
     avatar: 'https://randomuser.me/api/portraits/women/6.jpg',
   },
   {
@@ -113,11 +107,10 @@ const mockResults = [
     email: 'sami.shammari@email.com',
     phone: '+966 50 789 0123',
     status: 'Pending',
-    program: 'Engineering',
-    tags: ['Transfer'],
+    program: 'Engineering Team',
+    tags: ['Internal Transfer'],
     assigned: 'Aisha Al-Hassan',
     lastFollowUp: '2026-06-04',
-    score: 81,
     avatar: 'https://randomuser.me/api/portraits/men/7.jpg',
   },
   {
@@ -126,11 +119,10 @@ const mockResults = [
     email: 'fatima.rashid@email.com',
     phone: '+966 50 890 1234',
     status: 'Verified',
-    program: 'Business',
-    tags: ['Scholarship', 'Sports Quota'],
+    program: 'Sales Team',
+    tags: ['Executive', 'Premium'],
     assigned: 'Fatima Al-Rashid',
     lastFollowUp: '2026-06-03',
-    score: 90,
     avatar: 'https://randomuser.me/api/portraits/women/8.jpg',
   },
   {
@@ -139,11 +131,10 @@ const mockResults = [
     email: 'bader.farhan@email.com',
     phone: '+966 50 901 2345',
     status: 'Rejected',
-    program: 'Arts',
-    tags: ['Special Category'],
+    program: 'Operations Team',
+    tags: ['Standard'],
     assigned: 'Noura Al-Zahra',
     lastFollowUp: '2026-06-02',
-    score: 55,
     avatar: 'https://randomuser.me/api/portraits/men/9.jpg',
   },
   {
@@ -152,11 +143,10 @@ const mockResults = [
     email: 'huda.mutlaq@email.com',
     phone: '+966 50 012 3456',
     status: 'Pending',
-    program: 'Medical Sciences',
+    program: 'Product Team',
     tags: ['International'],
     assigned: 'Khalid Al-Sayed',
     lastFollowUp: '2026-06-01',
-    score: 77,
     avatar: 'https://randomuser.me/api/portraits/women/10.jpg',
   },
 ];
@@ -190,11 +180,10 @@ function ResultsTable({ results, onRowClick, selected, setSelected }) {
               />
             </th>
             <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Applicant</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Program</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Team</th>
             <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Status</th>
             <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Tags</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Assigned</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Score</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Mentor</th>
             <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white">Actions</th>
           </tr>
         </thead>
@@ -228,7 +217,6 @@ function ResultsTable({ results, onRowClick, selected, setSelected }) {
                 </div>
               </td>
               <td className="px-4 py-3 text-gray-900 dark:text-white">{r.assigned}</td>
-              <td className="px-4 py-3 text-gray-900 dark:text-white">{r.score}</td>
               <td className="px-4 py-3">
                 <div className="flex gap-2">
                   <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-xs font-medium" onClick={e => { e.stopPropagation(); onRowClick(r); }}>View</button>
@@ -268,7 +256,7 @@ function ProfileDrawer({ open, onClose, profile }) {
             <span className="text-gray-900 dark:text-white">{profile.phone}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-700 dark:text-gray-300">Program:</span>
+            <span className="font-semibold text-gray-700 dark:text-gray-300">Team:</span>
             <span className="text-gray-900 dark:text-white">{profile.program}</span>
           </div>
           <div className="flex justify-between">
@@ -282,16 +270,12 @@ function ProfileDrawer({ open, onClose, profile }) {
             </div>
           </div>
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-700 dark:text-gray-300">Assigned:</span>
+            <span className="font-semibold text-gray-700 dark:text-gray-300">Mentor:</span>
             <span className="text-gray-900 dark:text-white">{profile.assigned}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700 dark:text-gray-300">Last Follow-Up:</span>
             <span className="text-gray-900 dark:text-white">{profile.lastFollowUp}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-semibold text-gray-700 dark:text-gray-300">Score:</span>
-            <span className="text-gray-900 dark:text-white">{profile.score}</span>
           </div>
         </div>
         <div className="flex gap-2 mt-6">
@@ -552,7 +536,7 @@ export default function SearchFilters() {
                     <option>{t('searchFilters.filters.allStatus')}</option>
                   </select>
                   <select className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    <option>{t('searchFilters.filters.allPrograms')}</option>
+                    <option>All Teams</option>
                   </select>
                   <input 
                     className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" 

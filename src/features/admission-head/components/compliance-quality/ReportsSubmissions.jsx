@@ -11,7 +11,7 @@ import {
 const reports = [
   {
     id: 'REP001',
-    title: 'Monthly Admission Report',
+    title: 'Monthly Recruitment Report',
     type: 'Monthly',
     status: 'Submitted',
     dueDate: '2026-06-30',

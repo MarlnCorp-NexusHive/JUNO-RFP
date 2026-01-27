@@ -302,7 +302,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            ₹{forecast.currentPeriod.collected.toLocaleString()}
+            ${forecast.currentPeriod.collected.toLocaleString()}
           </div>
           <div className="text-sm text-blue-800 dark:text-blue-200">
             {isRTLMode ? 'محصل هذا الشهر' : 'This Month Collected'}
@@ -310,7 +310,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
         </div>
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
           <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-            ₹{forecast.currentPeriod.pending.toLocaleString()}
+            ${forecast.currentPeriod.pending.toLocaleString()}
           </div>
           <div className="text-sm text-yellow-800 dark:text-yellow-200">
             {isRTLMode ? 'معلق' : 'Pending'}
@@ -318,7 +318,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
         </div>
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
           <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-            ₹{forecast.currentPeriod.refunds.toLocaleString()}
+            ${forecast.currentPeriod.refunds.toLocaleString()}
           </div>
           <div className="text-sm text-red-800 dark:text-red-200">
             {isRTLMode ? 'مسترد' : 'Refunds'}
@@ -401,7 +401,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                    ₹{forecast.forecasts[selectedPeriod].nextMonth?.toLocaleString() || 
+                    ${forecast.forecasts[selectedPeriod].nextMonth?.toLocaleString() || 
                       forecast.forecasts[selectedPeriod].nextQuarter?.toLocaleString() || 
                       forecast.forecasts[selectedPeriod].nextYear?.toLocaleString()}
                   </div>
@@ -482,7 +482,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">
-                      ₹{data.monthly.toLocaleString()}
+                      ${data.monthly.toLocaleString()}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-300">
                       {isRTLMode ? 'شهري' : 'Monthly'}
@@ -490,7 +490,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">
-                      ₹{data.quarterly.toLocaleString()}
+                      ${data.quarterly.toLocaleString()}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-300">
                       {isRTLMode ? 'ربعي' : 'Quarterly'}
@@ -498,7 +498,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">
-                      ₹{data.yearly.toLocaleString()}
+                      ${data.yearly.toLocaleString()}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-300">
                       {isRTLMode ? 'سنوي' : 'Yearly'}

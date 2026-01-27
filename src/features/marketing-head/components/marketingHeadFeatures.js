@@ -7,7 +7,7 @@ export const marketingHeadFeatures = [
   { label: "Social Media", icon: "📱", route: "/rbac/marketing-head/social", description: "Social Media Management and Analytics" },
   { label: "Events", icon: "🎪", route: "/rbac/marketing-head/events", description: "Event Planning and Management" },
   { label: "Budget", icon: "💰", route: "/rbac/marketing-head/budget", description: "Marketing Budget and Expense Management" },
-  { label: "Procurement", icon: "🛒", route: "/rbac/marketing-head/procurement", description: "Purchase Requests, Vendor Management, Procurement Tracking" },
+  { label: "Procurement", icon: "📦", route: "/rbac/marketing-head/procurement", description: "Purchase Requests, Vendor Management, Procurement Tracking" },
   { label: "Team", icon: "👥", route: "/rbac/marketing-head/team", description: "Team Management and Collaboration" },
   { label: "Settings", icon: "⚙️", route: "/rbac/marketing-head/settings", description: "Profile, Preferences, Notifications" },
   { label: "Workspace", icon: "🗂️", route: "/rbac/marketing-head/workspace", description: "Marketing Workspace, Quick Access, Tools" },

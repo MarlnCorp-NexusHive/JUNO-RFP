@@ -13,7 +13,7 @@ import {
 const assessments = [
   {
     id: 'QA001',
-    title: 'Quarterly Admission Process Audit',
+    title: 'Quarterly Recruitment Process Audit',
     type: 'Process',
     date: '2026-06-15',
     status: 'Completed',
@@ -49,7 +49,7 @@ const assessments = [
   },
   {
     id: 'QA004',
-    title: 'Random Application Quality Review',
+    title: 'Random Candidate Application Quality Review',
     type: 'Application',
     date: '2026-07-18',
     status: 'Completed',

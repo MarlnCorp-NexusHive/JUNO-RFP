@@ -97,24 +97,24 @@ const pendingVerifications = [
     type: 'Income Certificate',
     status: 'Expired',
     daysLeft: -5,
-    student: 'Abdullah Al-Rashid',
-    department: 'Computer Science'
+    candidate: 'Abdullah Al-Rashid',
+    department: 'IT Team'
   },
   {
     id: 'ADM3422',
     type: 'Transfer Certificate',
     status: 'Missing',
     daysLeft: 0,
-    student: 'Noura Al-Zahra',
-    department: 'Business Administration'
+    candidate: 'Noura Al-Zahra',
+    department: 'Sales Team'
   },
   {
     id: 'ADM3423',
     type: 'Caste Certificate',
     status: 'Pending',
     daysLeft: 2,
-    student: 'Khalid Al-Sayed',
-    department: 'Islamic Studies'
+    candidate: 'Khalid Al-Sayed',
+    department: 'Operations Team'
   }
 ];
 
@@ -279,7 +279,7 @@ const RegulatoryDashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Candidate</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Department</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days Left</th>
                 </tr>
@@ -300,7 +300,7 @@ const RegulatoryDashboard = () => {
                         {verification.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{verification.student}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{verification.candidate}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{verification.department}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`${

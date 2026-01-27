@@ -20,8 +20,8 @@ const mockDocs = [
   { id: 4, applicant: mockApplicants[2], type: 'Photo', status: 'Rejected', file: 'photo_a003.jpg', uploaded: true, verified: false, rejected: true },
 ];
 const mockTemplates = [
-  { id: 1, name: 'Admission Form', file: 'admission_form.pdf', version: 'v2', expires: '2026-06-01', downloads: 120 },
-  { id: 2, name: 'Hostel Form', file: 'hostel_form.pdf', version: 'v1', expires: '2026-06-01', downloads: 80 },
+  { id: 1, name: 'onboarding', file: 'onboarding.pdf', version: 'v2', expires: '2026-06-01', downloads: 120 },
+  { id: 2, name: 'SOP', file: 'SOP.pdf', version: 'v1', expires: '2026-06-01', downloads: 80 },
 ];
 const mockArchive = [
   { id: 1, applicant: mockApplicants[0], doc: 'form_a001.pdf', date: '2026-06-10', access: 2 },

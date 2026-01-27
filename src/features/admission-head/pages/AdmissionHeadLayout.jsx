@@ -23,8 +23,6 @@ function AutoStartTour({ role }) {
       if (segments.includes('search')) return 'search';
       if (segments.includes('tools')) return 'tools';
       if (segments.includes('workspace')) return 'workspace';
-      if (segments.includes('lead-transfer')) return 'lead-transfer';
-      if (segments.includes('courses')) return 'courses';
       if (segments.includes('training')) return 'training';
       if (segments.includes('compliance')) return 'compliance';
       if (segments.includes('support')) return 'support';

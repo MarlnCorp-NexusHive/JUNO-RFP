@@ -25,9 +25,9 @@ const auditLogs = [
   {
     id: 'AUD002',
     action: 'Application Review',
-    details: 'Updated application status to "Under Review"',
+    details: 'Updated candidate application status to "Under Review"',
     user: 'Khalid Al-Sayed',
-    role: 'Admission Counselor',
+    role: 'Recruitment Specialist',
     timestamp: '2026-07-21 14:30:12',
     category: 'Application',
     status: 'Completed'
@@ -37,7 +37,7 @@ const auditLogs = [
     action: 'Document Upload',
     details: 'Uploaded new income certificate',
     user: 'Aisha Al-Hassan',
-    role: 'Student',
+    role: 'Candidate',
     timestamp: '2026-07-21 13:15:45',
     category: 'Document',
     status: 'Pending Review'
@@ -45,9 +45,9 @@ const auditLogs = [
   {
     id: 'AUD004',
     action: 'Policy Update',
-    details: 'Updated admission criteria for Engineering',
+    details: 'Updated recruitment criteria for Engineering Team',
     user: 'Omar Al-Mutairi',
-    role: 'Admission Head',
+    role: 'Recruitment Head',
     timestamp: '2026-07-21 11:20:33',
     category: 'Policy',
     status: 'Completed'
@@ -55,7 +55,7 @@ const auditLogs = [
   {
     id: 'AUD005',
     action: 'Fee Payment',
-    details: 'Processed application fee payment',
+    details: 'Processed recruitment processing fee payment',
     user: 'Fatima Al-Rashid',
     role: 'Finance Officer',
     timestamp: '2026-07-21 10:45:18',

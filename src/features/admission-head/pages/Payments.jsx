@@ -236,17 +236,17 @@ export default function Payments() {
         <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 flex flex-col items-center gap-1">
           <FiDollarSign className="text-blue-500 mb-1" size={22} />
           <span className="text-xs text-gray-500 dark:text-gray-400">{isRTLMode ? 'اليوم' : t('payments.today')}</span>
-          <span className="text-2xl font-bold text-blue-700 dark:text-blue-300">₹{todayCollected}</span>
+          <span className="text-2xl font-bold text-blue-700 dark:text-blue-300">${todayCollected}</span>
         </div>
         <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 flex flex-col items-center gap-1">
           <FiDollarSign className="text-purple-500 mb-1" size={22} />
           <span className="text-xs text-gray-500 dark:text-gray-400">{isRTLMode ? 'هذا الشهر' : t('payments.thisMonth')}</span>
-          <span className="text-2xl font-bold text-purple-700 dark:text-purple-300">₹{monthCollected}</span>
+          <span className="text-2xl font-bold text-purple-700 dark:text-purple-300">${monthCollected}</span>
         </div>
         <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 flex flex-col items-center gap-1">
           <FiDollarSign className="text-green-500 mb-1" size={22} />
           <span className="text-xs text-gray-500 dark:text-gray-400">{isRTLMode ? 'منذ بداية العام' : t('payments.ytd')}</span>
-          <span className="text-2xl font-bold text-green-700 dark:text-green-300">₹{ytdCollected}</span>
+          <span className="text-2xl font-bold text-green-700 dark:text-green-300">${ytdCollected}</span>
         </div>
         <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 flex flex-col items-center gap-1">
           <FiCreditCard className="text-yellow-500 mb-1" size={22} />
@@ -349,7 +349,7 @@ export default function Payments() {
                 <tr key={i.id} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                   <td className="px-4 py-2">{i.applicant.name} <span className="text-xs text-gray-400">({i.applicant.id})</span></td>
                   <td className="px-4 py-2">{i.type}</td>
-                  <td className="px-4 py-2">₹{i.amount - i.discount} {i.discount > 0 && <span className="text-xs text-green-600">(-₹{i.discount})</span>}</td>
+                  <td className="px-4 py-2">${i.amount - i.discount} {i.discount > 0 && <span className="text-xs text-green-600">(-${i.discount})</span>}</td>
                   <td className="px-4 py-2"><span className={`px-2 py-1 rounded-full text-xs font-semibold ${i.status === 'Paid' ? 'bg-green-100 text-green-700' : i.status === 'Unpaid' ? 'bg-yellow-100 text-yellow-700' : i.status === 'Partial' ? 'bg-blue-100 text-blue-700' : i.status === 'Overdue' ? 'bg-red-100 text-red-700' : ''}`}>{i.status}</span></td>
                   <td className="px-4 py-2">{i.date}</td>
                   <td className="px-4 py-2">{i.due}</td>
@@ -392,7 +392,7 @@ export default function Payments() {
                   <td className="px-4 py-2">{p.invoice}</td>
                   <td className="px-4 py-2">{p.applicant.name}</td>
                   <td className="px-4 py-2">{p.type}</td>
-                  <td className="px-4 py-2">₹{p.amount}</td>
+                  <td className="px-4 py-2">${p.amount}</td>
                   <td className="px-4 py-2"><span className={`px-2 py-1 rounded-full text-xs font-semibold ${p.status === 'Success' ? 'bg-green-100 text-green-700' : p.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' : p.status === 'Failed' ? 'bg-red-100 text-red-700' : ''}`}>{p.status}</span></td>
                   <td className="px-4 py-2">{p.date}</td>
                   <td className="px-4 py-2">{p.mode}</td>
@@ -432,7 +432,7 @@ export default function Payments() {
                   <td className="px-4 py-2">{p.applicant.name}</td>
                   <td className="px-4 py-2">{p.invoice}</td>
                   <td className="px-4 py-2">{p.type}</td>
-                  <td className="px-4 py-2">₹{p.amount}</td>
+                  <td className="px-4 py-2">${p.amount}</td>
                   <td className="px-4 py-2"><span className={`px-2 py-1 rounded-full text-xs font-semibold ${p.status === 'Success' ? 'bg-green-100 text-green-700' : p.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' : p.status === 'Failed' ? 'bg-red-100 text-red-700' : ''}`}>{p.status}</span></td>
                   <td className="px-4 py-2">{p.date}</td>
                   <td className="px-4 py-2">{p.mode}</td>
@@ -499,7 +499,7 @@ export default function Payments() {
               {refunds.map(r => (
                 <tr key={r.id} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                   <td className="px-4 py-2">{r.applicant.name}</td>
-                  <td className="px-4 py-2">₹{r.amount}</td>
+                  <td className="px-4 py-2">${r.amount}</td>
                   <td className="px-4 py-2"><span className={`px-2 py-1 rounded-full text-xs font-semibold ${r.status === 'Requested' ? 'bg-yellow-100 text-yellow-700' : r.status === 'Processing' ? 'bg-blue-100 text-blue-700' : r.status === 'Issued' ? 'bg-green-100 text-green-700' : ''}`}>{r.status}</span></td>
                   <td className="px-4 py-2">{r.mode}</td>
                   <td className="px-4 py-2">{r.date}</td>
@@ -525,9 +525,9 @@ export default function Payments() {
           {reports.map(r => (
             <div key={r.id} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
               <span className="font-semibold text-gray-700 dark:text-gray-200">{r.label}</span>
-              <span className="text-xs text-green-600">{isRTLMode ? 'محصل' : t('payments.reports.collected')}: ₹{r.collected}</span>
-              <span className="text-xs text-yellow-600">{isRTLMode ? 'معلق' : t('payments.reports.pending')}: ₹{r.pending}</span>
-              <span className="text-xs text-red-600">{isRTLMode ? 'مسترد' : t('payments.reports.refunds')}: ₹{r.refunds}</span>
+              <span className="text-xs text-green-600">{isRTLMode ? 'محصل' : t('payments.reports.collected')}: ${r.collected}</span>
+              <span className="text-xs text-yellow-600">{isRTLMode ? 'معلق' : t('payments.reports.pending')}: ${r.pending}</span>
+              <span className="text-xs text-red-600">{isRTLMode ? 'مسترد' : t('payments.reports.refunds')}: ${r.refunds}</span>
             </div>
           ))}
         </div>
@@ -543,7 +543,7 @@ export default function Payments() {
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 px-3 py-2 rounded-lg">
             <FiPieChart className="text-blue-500" />
-            <span className="font-medium text-blue-800 dark:text-blue-200">{isRTLMode ? `توقع الرسوم: ₹${ytdCollected + 50000}` : t('payments.aiEnhancements.feeForecast', { amount: ytdCollected + 50000 })}</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200">{isRTLMode ? `توقع الرسوم: $${ytdCollected + 50000}` : t('payments.aiEnhancements.feeForecast', { amount: ytdCollected + 50000 })}</span>
           </div>
           <div className="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/30 px-3 py-2 rounded-lg">
             <FiClock className="text-yellow-500" />

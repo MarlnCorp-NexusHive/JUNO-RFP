@@ -12,7 +12,7 @@ import {
 const feedbacks = [
   {
     id: 'FB001',
-    source: 'Student',
+    source: 'Candidate',
     date: '2026-07-10',
     feedback: 'The document upload process was confusing.',
     status: 'Addressed',
@@ -22,7 +22,7 @@ const feedbacks = [
   },
   {
     id: 'FB002',
-    source: 'Counselor',
+    source: 'Recruiter',
     date: '2026-07-08',
     feedback: 'Need more training on new policy changes.',
     status: 'In Progress',
@@ -32,7 +32,7 @@ const feedbacks = [
   },
   {
     id: 'FB003',
-    source: 'Parent',
+    source: 'Client',
     date: '2026-07-05',
     feedback: 'Application status updates are not timely.',
     status: 'Pending',

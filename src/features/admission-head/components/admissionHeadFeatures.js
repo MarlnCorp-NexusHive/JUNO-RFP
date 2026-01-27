@@ -8,11 +8,9 @@ export const admissionHeadFeatures = [
   { label: "admissionHead.documents", icon: "📄", route: "/rbac/admission-head/documents", description: "Uploaded docs, checklist, download/preview" },
   { label: "admissionHead.searchFilters", icon: "🔍", route: "/rbac/admission-head/search", description: "Powerful lead/applicant search" },
   { label: "admissionHead.toolsUtilities", icon: "🛠️", route: "/rbac/admission-head/tools", description: "Bulk import/export, forms, reports" },
-  { label: "admissionHead.leadTransfer", icon: "🔄", route: "/rbac/admission-head/lead-transfer", description: "Reassign leads between team members" },
-  { label: "admissionHead.courseManagement", icon: "📚", route: "/rbac/admission-head/courses", description: "View positions and requirements" },
   { label: "admissionHead.trainingDevelopment", icon: "🎓", route: "/rbac/admission-head/training", description: "Team training, knowledge management" },
   { label: "admissionHead.complianceQuality", icon: "✅", route: "/rbac/admission-head/compliance", description: "Quality assurance, risk management" },
-  { label: "admissionHead.procurement", icon: "🛒", route: "/rbac/admission-head/procurement", description: "Purchase Requests, Vendor Management, Procurement Tracking" },
+  { label: "Procurement", icon: "📦", route: "/rbac/admission-head/procurement", description: "Purchase Requests, Vendor Management, Procurement Tracking" },
   { label: "admissionHead.accountManagement", icon: "👤", route: "/rbac/admission-head/account", description: "Profile, HR, referral, tasks, events, attendance, recruitment, helpdesk" },
   { label: "admissionHead.helpSupport", icon: "🆘", route: "/rbac/admission-head/help", description: "Help, support, and documentation" }
 ]; 

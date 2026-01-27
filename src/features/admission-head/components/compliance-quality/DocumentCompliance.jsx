@@ -32,7 +32,7 @@ const documentTypes = [
   },
   {
     id: 3,
-    name: 'Academic Documents',
+    name: 'Professional Documents',
     total: 200,
     verified: 180,
     pending: 20,
@@ -54,32 +54,32 @@ const documentTypes = [
 const pendingDocuments = [
   {
     id: 'DOC001',
-    student: 'John Doe',
+    candidate: 'John Doe',
     documentType: 'Nationality Proof',
     status: 'Pending',
     uploadedDate: '2026-07-15',
     expiryDate: '2026-12-31',
-    department: 'Engineering',
+    department: 'Engineering Team',
     priority: 'High'
   },
   {
     id: 'DOC002',
-    student: 'Jane Smith',
+    candidate: 'Jane Smith',
     documentType: 'Caste Certificate',
     status: 'Expired',
     uploadedDate: '2026-06-20',
     expiryDate: '2026-07-01',
-    department: 'Business',
+    department: 'Sales Team',
     priority: 'Critical'
   },
   {
     id: 'DOC003',
-    student: 'Mike Johnson',
+    candidate: 'Mike Johnson',
     documentType: 'Transfer Certificate',
     status: 'Missing',
     uploadedDate: null,
     expiryDate: null,
-    department: 'Arts',
+    department: 'Operations Team',
     priority: 'Medium'
   }
 ];
@@ -97,7 +97,7 @@ const DocumentCompliance = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search by student name or document ID..."
+              placeholder="Search by candidate name or document ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -178,7 +178,7 @@ const DocumentCompliance = () => {
               <thead>
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Document ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Candidate</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Document Type</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Uploaded Date</th>
@@ -192,7 +192,7 @@ const DocumentCompliance = () => {
                 {pendingDocuments.map((doc) => (
                   <tr key={doc.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{doc.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{doc.student}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{doc.candidate}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{doc.documentType}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${

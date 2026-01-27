@@ -109,7 +109,7 @@ export const adminHeadFeatures = [
     label: 'Procurement',
     path: 'procurement',
     route: 'procurement',
-    icon: '🛒'
+    icon: '📦'
   },
   {
     id: 'workspace',

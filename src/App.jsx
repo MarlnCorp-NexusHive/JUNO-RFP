@@ -67,8 +67,6 @@ import Payments from './features/admission-head/pages/Payments';
 import Documents from './features/admission-head/pages/Documents';
 import SearchFilters from './features/admission-head/pages/SearchFilters';
 import ToolsUtilities from './features/admission-head/pages/ToolsUtilities';
-import LeadTransfer from './features/admission-head/pages/LeadTransfer';
-import CourseManagementPage from './features/admission-head/pages/CourseManagement';
 import TrainingDevelopmentPage from './features/admission-head/pages/TrainingDevelopment';
 import ComplianceQualityPage from './features/admission-head/pages/ComplianceQuality';
 import PayrollOverview from "./features/hr-head/pages/PayrollOverview";
@@ -160,8 +158,6 @@ export default function App() {
           <Route path="documents" element={<Documents />} />
           <Route path="search" element={<SearchFilters />} />
           <Route path="tools" element={<ToolsUtilities />} />
-          <Route path="lead-transfer" element={<LeadTransfer />} />
-          <Route path="courses" element={<CourseManagementPage />} />
           <Route path="training" element={<TrainingDevelopmentPage />} />
           <Route path="compliance" element={<ComplianceQualityPage />} />
           <Route path="procurement" element={<AdmissionHeadProcurement />} />

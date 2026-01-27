@@ -48,7 +48,7 @@ const departmentStatus = [
     fillRate: 93
   },
   { 
-    department: "Arts", 
+    department: "Operations", 
     totalSeats: 200, 
     applications: 600, 
     filled: 180, 
@@ -88,7 +88,7 @@ const getPendingActions = (t) => [
 // Demo data for alerts
 const getAlerts = (t) => [
   { type: t('dashboard.alerts.applicationSpike'), message: "Unusual increase in applications from Telangana region", severity: "info" },
-  { type: t('dashboard.alerts.capacityAlert'), message: "Law Department admissions nearing capacity", severity: "warning" },
+  { type: t('dashboard.alerts.capacityAlert'), message: "Back end team nearing full capacity", severity: "warning" },
   { type: t('dashboard.alerts.systemNotice'), message: "New admission policy update from Director", severity: "info" },
 ];
 

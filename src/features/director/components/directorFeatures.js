@@ -3,7 +3,7 @@ export const directorFeatures = [
   { label: "director.analyticsReports", icon: "📈", route: "/rbac/director/analytics", description: "Department-wise Reports, Statistics, Finance, Trends, HR Insights" },
   { label: "director.departments", icon: "🏢", route: "/rbac/director/departments", description: "Academic Affairs, HR, Finance, Admissions, IT, R&D" },
   { label: "director.approvalCenter", icon: "✅", route: "/rbac/director/approvals", description: "Budget, Policy, Recruitment, Procurement Approvals" },
-  { label: "director.procurement", icon: "🛒", route: "/rbac/director/procurement", description: "Purchase Orders, Vendor Management, Procurement Analytics" },
+  { label: "Procurement", icon: "📦", route: "/rbac/director/procurement", description: "Purchase Orders, Vendor Management, Procurement Analytics" },
   { label: "director.strategicPlanning", icon: "🗺️", route: "/rbac/director/strategic-planning", description: "Annual Plans, Accreditation, Risk Management" },
   { label: "director.communication", icon: "📢", route: "/rbac/director/communication", description: "Notices, Circulars, External Comms" },
   { label: "director.auditCompliance", icon: "🕵️", route: "/rbac/director/audit", description: "Audit Reports, Accreditation, Legal Docs" },
