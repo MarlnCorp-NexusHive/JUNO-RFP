@@ -5,10 +5,10 @@ export function preloadDemoUsers() {
     // Superadmin
     { id: 1, username: "superadmin", password: "superadmin123", displayName: "Super Admin", team: null, role: "Super Admin", permissions: ["*"], createdAt: Date.now() },
     // Marketing Team
-    { id: 2, username: "marketing_head", password: "marketing123", displayName: "Marketing Head", team: "Marketing Team", role: "Head", createdAt: Date.now() },
+    { id: 2, username: "marketing_head", password: "Marketing@2026", displayName: "Marketing Head", team: "Marketing Team", role: "Head", createdAt: Date.now() },
     { id: 3, username: "marketing_manager", password: "marketing123", displayName: "Marketing Manager", team: "Marketing Team", role: "Manager", createdAt: Date.now() },
     // Recruitment Team
-    { id: 4, username: "recruitment_head", password: "recruitment123", displayName: "Recruitment Head", team: "Recruitment Team", role: "Head", createdAt: Date.now() },
+    { id: 4, username: "recruitment_head", password: "Recruitment@2026", displayName: "Recruitment Head", team: "Recruitment Team", role: "Head", createdAt: Date.now() },
     { id: 5, username: "admission_spoc", password: "admission123", displayName: "Admission SPOC", team: "Admission Team", role: "SPOC", createdAt: Date.now() },
     // HR & Payroll Team
     { id: 6, username: "hr_head", password: "hr123", displayName: "HR Head", team: "HR & PayRoll Team", role: "CFO/Head", createdAt: Date.now() },
@@ -19,7 +19,7 @@ export function preloadDemoUsers() {
     // IT & Support Team
     { id: 10, username: "it_head", password: "it123", displayName: "IT Head", team: "IT & Support Team", role: "Head", createdAt: Date.now() },
     // Director and Deans
-    { id: 11, username: "director", password: "director123", displayName: "Director", team: "Director and Deans", role: "Director", createdAt: Date.now() },
+    { id: 11, username: "director", password: "Director@2026", displayName: "Director", team: "Director and Deans", role: "Director", createdAt: Date.now() },
     { id: 12, username: "dean", password: "dean123", displayName: "Dean", team: "Director and Deans", role: "Dean", createdAt: Date.now() },
     // HoD
     { id: 13, username: "hod", password: "hod123", displayName: "HoD", team: "HoD", role: "HoD", createdAt: Date.now() },
