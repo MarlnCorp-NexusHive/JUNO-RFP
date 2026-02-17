@@ -9,7 +9,7 @@ import {
   FiCalendar, FiFileText, FiDollarSign, FiHeadphones, FiMail, FiPhone,
   FiArrowRight, FiPlay, FiDownload, FiEye, FiCpu, FiDatabase
 } from 'react-icons/fi';
-import nexushiveLogo from '../assets/nexushivelogo.png';
+import marlnLogo from '../assets/MARLN logo.png';
 
 export default function CorporateInfo() {
   const navigate = useNavigate();
@@ -203,8 +203,8 @@ export default function CorporateInfo() {
               </button>
               <div className={`flex items-center space-x-4 ${isRTLMode ? 'space-x-reverse' : ''}`}>
                 <img
-                  src={nexushiveLogo}
-                  alt="NexusHive ERP Logo"
+                  src={marlnLogo}
+                  alt="MARLN ERP Logo"
                   className="w-16 h-16"
                 />
                 <div>

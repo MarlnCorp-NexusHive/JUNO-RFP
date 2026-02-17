@@ -2,7 +2,7 @@
 
 ##  **Overview**
 
-This document provides a comprehensive guide for integrating AI-enhanced features into existing role-specific pages in the NexusHive CRM system. The integration follows a **non-breaking approach** to ensure existing functionality remains intact while adding powerful AI capabilities.
+This document provides a comprehensive guide for integrating AI-enhanced features into existing role-specific pages in the MARLN ERP system. The integration follows a **non-breaking approach** to ensure existing functionality remains intact while adding powerful AI capabilities.
 
 ---
 

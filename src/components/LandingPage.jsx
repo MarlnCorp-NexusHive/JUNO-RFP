@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import nexushiveLogo from "../assets/nexushivelogo.png";
+import marlnLogo from "../assets/MARLN logo.png";
 
 export default function LandingPage() {
   const [showBanner, setShowBanner] = useState(true);
@@ -50,7 +50,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="w-full text-center text-xs text-[#3B2175] opacity-80 pb-2">
-            By messaging NexusHive, you agree to our <a href="#" className="underline">Terms</a> and have read our <a href="#" className="underline">Privacy Policy</a>.
+            By messaging MARLN, you agree to our <a href="#" className="underline">Terms</a> and have read our <a href="#" className="underline">Privacy Policy</a>.
           </div>
         </div>
       )}
@@ -59,7 +59,7 @@ export default function LandingPage() {
       {showBanner && (
         <div className="w-full bg-[#3B5B7C] text-white text-center px-4 py-2 flex items-center justify-center relative text-sm">
           <span>
-            Introducing NexusHive CRM with AI for meetings + Seal every deal with confidence—everything you need, all in one place. <a href="#" className="underline ml-1">Learn more.</a>
+            Introducing MARLN ERP with AI for meetings + Seal every deal with confidence—everything you need, all in one place. <a href="#" className="underline ml-1">Learn more.</a>
           </span>
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-200 text-lg"
@@ -77,12 +77,12 @@ export default function LandingPage() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <img
-              src={nexushiveLogo}
-              alt="NexusHive Logo"
+              src={marlnLogo}
+              alt="MARLN ERP Logo"
               className="h-12 w-12 object-contain"
             />
             <div>
-              <div className="text-2xl font-bold text-[#3B2175] leading-none">NexusHive</div>
+              <div className="text-2xl font-bold text-[#3B2175] leading-none">MARLN</div>
               <div className="text-xs tracking-wide text-[#3B2175] font-medium">KEEP LEARNING, KEEP BUZZING</div>
             </div>
           </div>
@@ -227,7 +227,7 @@ export default function LandingPage() {
           <div className="border-2 border-[#B388FF] rounded-lg overflow-hidden shadow-sm w-full max-w-lg">
             <video
               controls
-              poster={nexushiveLogo}
+              poster={marlnLogo}
               className="w-full h-[300px] object-cover bg-black"
               src="https://lms-frontend-resources.s3.ap-south-1.amazonaws.com/NexusHiveCRM/CollaborativeLearningwithNexusHive.mp4"
             />
@@ -315,7 +315,7 @@ export default function LandingPage() {
       <section className="container mx-auto px-6 py-20">
         <div className="bg-primary text-primary-foreground rounded-2xl p-12 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Transform Your University?</h2>
-          <p className="text-lg mb-8">Join leading universities that trust NexusHiveCRM</p>
+          <p className="text-lg mb-8">Join leading organizations that trust MARLN ERP</p>
           <Button size="lg" variant="secondary">Get Started Now</Button>
         </div>
       </section>
@@ -325,7 +325,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">NexusHiveCRM</h3>
+              <h3 className="text-lg font-semibold mb-4">MARLN ERP</h3>
               <p className="text-muted-foreground">Empowering universities with modern management solutions.</p>
             </div>
             <div>
@@ -354,7 +354,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} NexusHiveCRM. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} MARLN ERP. All rights reserved.</p>
           </div>
         </div>
       </footer>

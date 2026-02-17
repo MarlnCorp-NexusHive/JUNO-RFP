@@ -111,7 +111,7 @@ import AdmissionHeadAIChat from "./features/admission-head/pages/AdmissionHeadAI
 export default function App() {
   return (
     <LocalizationProvider>
-      {/* <Router basename="/NexusHiveCRM-frontend"> */}
+      {/* <Router basename="/marln-erp-frontend"> */}
       <Router basename="/">
         <Routes>
         {/* <Route path="/" element={<LandingPage />} /> */}

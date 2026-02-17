@@ -6,7 +6,7 @@ import { LocalizationProvider } from "../hooks/useLocalization.jsx";
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
 import RTLWrapper from "./localization/RTLWrapper";
-import nexushiveLogo from "../assets/nexushivelogo.png";
+import marlnLogo from "../assets/MARLN logo.png";
 import "../utils/i18n"; // Initialize i18n
 
 // Map team/role to dashboard route
@@ -157,12 +157,12 @@ function LoginPageContent() {
         {/* Left Side - Logo & Tagline */}
         <div className={`hidden md:flex flex-col items-center justify-center w-1/2 bg-white/10 p-10 ${isRTL ? 'rounded-r-3xl' : 'rounded-l-3xl'}`}>
           <img
-            src={nexushiveLogo}
-            alt="NexusHiveCRM Logo"
-            className="w-full max-w-sm mb-4 object-contain"
+            src={marlnLogo}
+            alt="MARLN ERP Logo"
+            className="w-full max-w-48 mb-4 object-contain"
           />
           <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-lg text-center">
-            NexusHive ERP
+            MARLN ERP
           </h2>
         </div>
         {/* Right Side - Login Form */}

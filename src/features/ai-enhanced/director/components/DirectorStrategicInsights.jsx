@@ -27,7 +27,7 @@ const DirectorStrategicInsights = ({ onInsightsGenerated }) => {
         period: selectedPeriod,
         focus: selectedFocus,
         context: {
-          university: 'NexusHive University',
+          university: 'MARLN Corporation',
           location: 'Saudi Arabia',
           type: 'Higher Education'
         }
