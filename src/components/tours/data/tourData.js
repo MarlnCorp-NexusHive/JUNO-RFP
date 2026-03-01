@@ -541,8 +541,9 @@ export const tourData = {
 };
 
 // Helper function to get tour data for a specific role and page
+// Proposal Manager reuses Director tour content (same cloned UI)
 export const getTourData = (role, page) => {
-  return tourData[role]?.[page] || null;
+  return tourData[role]?.[page] || (role === 'proposal-manager' ? tourData.director?.[page] : null);
 };
 
 // Helper function to get tour steps for a specific role and page

@@ -42,6 +42,7 @@ import AdmissionHeadProcurement from './features/admission-head/components/Admis
 import DirectorProcurement from './features/director/components/DirectorProcurement';
 import MarketingHeadTickets from "./features/marketing-head/components/MarketingHeadTickets";
 import AdmissionHeadLayout from "./features/admission-head/pages/AdmissionHeadLayout";
+import TeamManagement from "./components/TeamManagement";
 import AdminHeadLayout from "./features/admin-head/pages/AdminHeadLayout";
 import AdminHeadDashboard from "./features/admin-head/pages/AdminHeadDashboard";
 import ITHeadDashboard from "./components/ITHeadDashboard";
@@ -54,6 +55,7 @@ import DirectorRiskManagement from './features/director/components/DirectorRiskM
 import DirectorSettings from './features/director/components/DirectorSettings';
 import Workspace from './features/hr-head/pages/Workspace';
 import MarketingHeadWorkspace from './features/marketing-head/components/MarketingHeadWorkspace';
+import RFPPage from './features/marketing-head/components/RFPPage';
 import AdmissionHeadSupport from './features/admission-head/components/AdmissionHeadSupport';
 import MarketingHeadSupport from './features/marketing-head/components/MarketingHeadSupport';
 import AdmissionHeadDashboardComponent from "./features/admission-head/components/AdmissionHeadDashboard";
@@ -97,6 +99,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DirectorLayout from './features/director/components/DirectorLayout';
 import DirectorWorkspace from './features/director/components/DirectorWorkspace';
 import DirectorSupport from './features/director/components/DirectorSupport';
+import ProposalManagerLayout from './features/proposal-manager/components/ProposalManagerLayout';
+import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
+import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import { LocalizationProvider } from './hooks/useLocalization.jsx';
 import './utils/i18n'; // Initialize i18n
 // Add this line with other imports (around line 100)
@@ -139,6 +144,7 @@ export default function App() {
           <Route path="procurement" element={<MarketingHeadProcurement />} />
           <Route path="workspace" element={<MarketingHeadWorkspace />} />
           <Route path="support" element={<MarketingHeadSupport />} />
+          <Route path="rfp" element={<RFPPage />} />
           <Route path="ai-chat" element={<MarketingHeadAIChat />} />
         </Route>
 {/* ADD THE TEST ROUTE HERE */}
@@ -151,6 +157,7 @@ export default function App() {
         <Route path="/rbac/admission-head" element={<AdmissionHeadLayout />}>
           <Route index element={<AdmissionHeadDashboardComponent />} />
           <Route path="leads" element={<AdmissionHeadLeadsApplicants />} />
+          <Route path="team" element={<TeamManagement />} />
           <Route path="applications" element={<Applications />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="communication" element={<Communication />} />
@@ -197,6 +204,24 @@ export default function App() {
           <Route path="settings" element={<DirectorSettings />} />
           <Route path="workspace" element={<DirectorWorkspace />} />
           <Route path="support" element={<DirectorSupport />} />
+          <Route path="ai-chat" element={<DirectorAIChat />} />
+        </Route>
+        {/* Proposal Manager - cloned Director UI */}
+        <Route path="/rbac/proposal-manager" element={<ProposalManagerLayout />}>
+          <Route index element={<DirectorDashboard basePath="/rbac/proposal-manager" dashboardTitle="Proposal Risk & Compliance Dashboard" welcomeMessage="Welcome Proposal Manager to your Proposal Console - Audit-Ready. Submission-Ready. Win-Ready Console" />} />
+          <Route path="source-docs" element={<SourceDocsPage />} />
+          <Route path="team" element={<MarketingHeadTeamManagement />} />
+          <Route path="bid-vault" element={<DirectorAnalyticsReports />} />
+          <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
+          <Route path="content-hub" element={<DirectorAnalyticsReports />} />
+          <Route path="pricing" element={<ProposalPricingPage />} />
+          <Route path="communication" element={<MarketingHeadCommunicationHub />} />
+          <Route path="compliance" element={<DirectorAuditCompliance />} />
+          <Route path="meetings-calendar" element={<DirectorMeetingsCalendar />} />
+          <Route path="user-management" element={<DirectorUserManagement />} />
+          <Route path="workspace" element={<DirectorWorkspace />} />
+          <Route path="help-support" element={<DirectorSupport />} />
+          <Route path="settings" element={<DirectorSettings />} />
           <Route path="ai-chat" element={<DirectorAIChat />} />
         </Route>
         <Route path="/rbac/marketing-head/support" element={<MarketingHeadSupport />} />

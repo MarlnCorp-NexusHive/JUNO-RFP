@@ -6,6 +6,8 @@ import { FiBell, FiSearch, FiDownload, FiCalendar, FiExternalLink, FiInfo } from
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
+const getWelcomeKey = (user) => user?.username || 'marketing_head';
+
 // Demo/mock data for all sections
 const funnelData = [
   { stage: 'Inquiries', value: 1200 },
@@ -86,10 +88,13 @@ const recentActivity = [
   { actionKey: 'dashboard.activity.reportGenerated', time: '1 day ago', user: 'Khalid Al-Sayed' },
   { actionKey: 'dashboard.activity.budgetRequestApproved', time: '2 days ago', user: 'Aisha Al-Hassan' },
 ];
-const user = { displayName: 'Omar Al-Mutairi', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', role: 'Marketing Head' };
+const defaultUser = { displayName: 'Omar Al-Mutairi', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', role: 'Marketing Head' };
 
 export default function Dashboard() {
-  const { t, ready, i18n } = useTranslation(['dashboard', 'common']);
+  const { t, ready, i18n } = useTranslation(['dashboard', 'common', 'welcome']);
+  const currentUser = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
+  const user = { ...defaultUser, ...currentUser };
+  const welcomeMessage = t(`welcome:${getWelcomeKey(user)}`);
   const [search, setSearch] = useState('');
   const [dateRange, setDateRange] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
@@ -137,8 +142,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           <img src={user.avatar} alt="avatar" className="w-14 h-14 rounded-full border-2 border-blue-400 shadow" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dashboard.user.welcome')} {user.displayName}</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.user.role')}: {user.role}</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.displayName}</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{welcomeMessage}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('dashboard.user.role')}: {user.role}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-3 items-center">

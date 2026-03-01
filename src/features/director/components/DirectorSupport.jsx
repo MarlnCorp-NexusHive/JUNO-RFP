@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -31,6 +32,8 @@ import {
 } from "react-icons/fi";
 
 export default function DirectorSupport() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/help-support");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [expanded, setExpanded] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
@@ -200,10 +203,10 @@ export default function DirectorSupport() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiHelpCircle className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {t('support.title')}
+                {isPM ? "Proposal & RFP Support" : t('support.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {t('support.subtitle')}
+                {isPM ? "FAQs, how-tos, and contacts for proposal and RFP processes." : t('support.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">

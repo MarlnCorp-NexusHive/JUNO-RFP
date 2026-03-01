@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -28,16 +29,25 @@ import {
 } from "react-icons/fi";
 
 export default function DirectorMeetingsCalendar() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/meetings-calendar");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [viewMode, setViewMode] = useState("list"); // list or calendar
+  const [viewMode, setViewMode] = useState("list");
   const { t } = useTranslation('director');
   const { isRTLMode } = useLocalization();
 
+  const pmMeetings = [
+    { id: 1, date: "2026-03-15", time: "10:00", duration: "2h", title: "Water Wastewater RFP – Kickoff", participants: "Capture Manager, Proposal Manager, Writers", statusKey: "status.scheduled", agenda: "RFP review, assignments, schedule", location: "Conference Room A", type: "kickoff", priority: "high", attendees: 8 },
+    { id: 2, date: "2026-03-17", time: "14:00", duration: "1.5h", title: "Landscape Maintenance – Color Team Review", participants: "Proposal Manager, Technical Lead, Pricing", statusKey: "status.scheduled", agenda: "Draft review, compliance check", location: "Project Center", type: "review", priority: "medium", attendees: 5 },
+    { id: 3, date: "2026-03-20", time: "09:30", duration: "1h", title: "Airport Restaurant – Red Team", participants: "Proposal Manager, Compliance, Graphics", statusKey: "status.completed", agenda: "Final review before submission", location: "Main Conference", type: "red-team", priority: "high", attendees: 6 },
+    { id: 4, date: "2026-03-22", time: "11:00", duration: "3h", title: "Submission Deadline – Balsitis Playground", participants: "Full proposal team", statusKey: "status.scheduled", agenda: "Final packaging, upload, sign-off", location: "War Room", type: "deadline", priority: "high", attendees: 12 },
+  ];
+
   // Meetings data using translation keys
-  const meetings = [
+  const directorMeetings = [
     { 
       id: 1, 
       date: "2026-03-15", 
@@ -95,15 +105,23 @@ export default function DirectorMeetingsCalendar() {
       attendees: 45
     },
   ];
+  const meetings = isPM ? pmMeetings : directorMeetings;
 
-  // Calendar events using translation keys
-  const calendarEvents = [
+  const pmCalendarEvents = [
+    { date: "2026-03-15", label: "Water Wastewater Kickoff", type: "meeting" },
+    { date: "2026-03-17", label: "Landscape Color Team", type: "meeting" },
+    { date: "2026-03-20", label: "Airport Restaurant Red Team", type: "meeting" },
+    { date: "2026-03-22", label: "Balsitis Submission Deadline", type: "event" },
+    { date: "2026-03-25", label: "Surplus Tanks Go/No-Go", type: "event" },
+  ];
+  const directorCalendarEvents = [
     { date: "2026-03-15", labelKey: "meetingTitles.boardMeeting", type: "meeting" },
     { date: "2026-03-17", labelKey: "meetingTitles.researchCommittee", type: "meeting" },
     { date: "2026-03-20", labelKey: "meetingTitles.studentCouncil", type: "meeting" },
     { date: "2026-03-22", labelKey: "events.ncaaaAudit", type: "event" },
     { date: "2026-03-25", labelKey: "events.graduationCeremony", type: "event" },
   ];
+  const calendarEvents = isPM ? pmCalendarEvents : directorCalendarEvents;
 
   const getStatusColor = (status) => {
     switch(status) {
@@ -176,10 +194,10 @@ export default function DirectorMeetingsCalendar() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiCalendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {t('meetingsCalendar.title')}
+                {isPM ? "Proposal Meetings & Calendar" : t('meetingsCalendar.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {t('meetingsCalendar.subtitle')}
+                {isPM ? "Kickoffs, color team reviews, red team, and submission deadlines." : t('meetingsCalendar.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -304,7 +322,7 @@ export default function DirectorMeetingsCalendar() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {t(`meetingsCalendar.${meeting.titleKey}`)}
+                          {isPM ? meeting.title : t(`meetingsCalendar.${meeting.titleKey}`)}
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mt-1">
                           <div className="flex items-center gap-1">
@@ -338,17 +356,21 @@ export default function DirectorMeetingsCalendar() {
                     
                     <div className="text-sm text-gray-600 dark:text-gray-300">
                       <div className="font-medium mb-1">Agenda:</div>
-                      <div>{t(`meetingsCalendar.${meeting.agendaKey}`)}</div>
+                      <div>{isPM ? meeting.agenda : t(`meetingsCalendar.${meeting.agendaKey}`)}</div>
                     </div>
                     
                     <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                       <div className="font-medium mb-1">Participants:</div>
                       <div className="flex flex-wrap gap-1">
-                        {meeting.participantKeys.map((key, i) => (
-                          <span key={i} className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded-md text-xs">
-                            {t(`meetingsCalendar.${key}`)}
-                          </span>
-                        ))}
+                        {isPM ? (
+                          <span className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded-md text-xs">{meeting.participants}</span>
+                        ) : (
+                          meeting.participantKeys.map((key, i) => (
+                            <span key={i} className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded-md text-xs">
+                              {t(`meetingsCalendar.${key}`)}
+                            </span>
+                          ))
+                        )}
                       </div>
                     </div>
                   </div>
@@ -414,7 +436,7 @@ export default function DirectorMeetingsCalendar() {
                     </div>
                     <div>
                       <div className="font-semibold text-gray-900 dark:text-white">
-                        {t(`meetingsCalendar.${ev.labelKey}`)}
+                        {isPM ? ev.label : t(`meetingsCalendar.${ev.labelKey}`)}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-300">
                         {ev.date} • {ev.type === 'meeting' ? 'Meeting' : 'Event'}

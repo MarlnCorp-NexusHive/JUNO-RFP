@@ -204,7 +204,7 @@ export default function CorporateInfo() {
               <div className={`flex items-center space-x-4 ${isRTLMode ? 'space-x-reverse' : ''}`}>
                 <img
                   src={nexushiveLogo}
-                  alt="NexusHive ERP Logo"
+                  alt="NexusHive eProcure Logo"
                   className="w-16 h-16"
                 />
                 <div>

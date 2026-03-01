@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { localStorageService } from "../services/localStorageService";
+import { preloadDemoUsers } from "../data/preloadDemoUsers";
 import { LocalizationProvider } from "../hooks/useLocalization.jsx";
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
@@ -29,6 +30,9 @@ const dashboardRoute = (user) => {
   if (user.team === "Exam Team" && user.role === "Head") return "/rbac/exam-head";
   if (user.team === "Library Team" && user.role === "Head") return "/rbac/library-head";
   if (user.team === "Transport Team" && user.role === "Head") return "/rbac/transport-head";
+  if (user.team === "Procurement Team" && user.role === "Manager") return "/rbac/marketing-head";
+  if (user.team === "Sales Enablement Team" && user.role === "Manager") return "/rbac/marketing-head";
+  if (user.team === "Proposal Team" && user.role === "Proposal Manager") return "/rbac/proposal-manager";
   // Add more as you build more dashboards
   // Default fallback
   return "/unauthorized";
@@ -40,6 +44,7 @@ function LoginPageContent() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [darkTheme, setDarkTheme] = useState(false);
+  const [demoReloaded, setDemoReloaded] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation(['auth', 'common']);
   const { isRTL, flexDirection, textAlign, margin, padding } = useRTL();
@@ -86,7 +91,7 @@ function LoginPageContent() {
       
       const users = localStorageService.getUsers();
       const user = users.find(
-        (u) => u.username === username && u.password === password
+        (u) => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password
       );
       if (user) {
         localStorage.setItem("rbac_current_user", JSON.stringify(user));
@@ -99,6 +104,13 @@ function LoginPageContent() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleReloadDemoUsers = () => {
+    preloadDemoUsers();
+    setDemoReloaded(true);
+    setError("");
+    setTimeout(() => setDemoReloaded(false), 3000);
   };
 
   return (
@@ -162,7 +174,7 @@ function LoginPageContent() {
             className="w-full max-w-sm mb-4 object-contain"
           />
           <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-lg text-center">
-            NexusHive ERP
+            NexusHive RFP Manager
           </h2>
         </div>
         {/* Right Side - Login Form */}
@@ -219,6 +231,11 @@ function LoginPageContent() {
                   {error}
                 </div>
               )}
+              {demoReloaded && (
+                <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-green-400 bg-green-900/20' : 'text-green-600 bg-green-50'}`}>
+                  Demo credentials reloaded. Try logging in again.
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -237,6 +254,13 @@ function LoginPageContent() {
                     <path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 )}
+              </button>
+              <button
+                type="button"
+                onClick={handleReloadDemoUsers}
+                className="w-full mt-3 py-2 text-sm text-[#4f3cc9] hover:underline"
+              >
+                Reload demo credentials
               </button>
             </form>
           </div>

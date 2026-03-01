@@ -1,5 +1,10 @@
 {
   "title": "لوحة التحكم",
+  "roleTitles": {
+    "marketing_head": "إدارة التسويق",
+    "procurement_manager": "إدارة المشتريات",
+    "sales_enablement_manager": "تمكين المبيعات"
+  },
   "welcome": "مرحباً بك في لوحة التحكم",
   "stats": "الإحصائيات",
   "overview": "نظرة عامة",
@@ -16,6 +21,22 @@
     "totalLeads": "إجمالي العملاء المحتملين",
     "campaignROI": "عائد الاستثمار للحملة",
     "followers": "المتابعون"
+  },
+  "kpisByRole": {
+    "procurement_manager": {
+      "totalQualifiedLeads": "طلبات الشراء المفتوحة",
+      "conversionRate": "معدل الموافقة",
+      "activeCampaigns": "الموردون النشطون",
+      "teamMembers": "أعضاء الفريق",
+      "roi": "نسبة التوفير %"
+    },
+    "sales_enablement_manager": {
+      "totalQualifiedLeads": "عناصر المحتوى",
+      "conversionRate": "معدل الإكمال",
+      "activeCampaigns": "أدلة المبيعات النشطة",
+      "teamMembers": "أعضاء الفريق",
+      "roi": "نسبة الاعتماد %"
+    }
   },
   "charts": {
     "leadGenerationActionable": "توليد العملاء المحتملين القابل للتنفيذ",
@@ -107,5 +128,42 @@
     "apr": "أبر",
     "may": "ماي",
     "jun": "يون"
+  },
+  "procurement": {
+    "spendOverTime": "الإنفاق عبر الزمن",
+    "spendByCategory": "الإنفاق حسب الفئة",
+    "poStatusBreakdown": "توزيع حالة أوامر الشراء",
+    "supplierMatrix": "مصفوفة أداء الموردين",
+    "savingsVsBudget": "التوفير مقابل الميزانية",
+    "spend": "الإنفاق",
+    "budget": "الميزانية",
+    "savings": "التوفير",
+    "vendor": "المورد",
+    "onTimeDelivery": "التسليم في الوقت %",
+    "qualityScore": "درجة الجودة",
+    "totalSpend": "إجمالي الإنفاق",
+    "status": "الحالة",
+    "pending": "قيد الانتظار",
+    "approved": "معتمد",
+    "inProgress": "قيد التنفيذ",
+    "delivered": "تم التسليم",
+    "categories": {
+      "it": "تقنية المعلومات والبرمجيات",
+      "facilities": "المرافق",
+      "marketing": "التسويق",
+      "office": "مستلزمات المكتب",
+      "services": "الخدمات المهنية"
+    },
+    "spendByCategoryOverTime": "الإنفاق حسب الفئة عبر الزمن",
+    "topVendorsBySpend": "أفضل الموردين حسب الإنفاق",
+    "savingsTrend": "اتجاه التوفير الشهري",
+    "budgetVsActualByCategory": "الميزانية مقابل الفعلي حسب الفئة",
+    "poCountByCategory": "عدد أوامر الشراء حسب الفئة",
+    "vendorQuadrant": "رباعية أداء الموردين",
+    "contractRenewals": "تجديدات العقود القادمة",
+    "budgetUtilization": "استخدام الميزانية",
+    "actual": "الفعلي",
+    "expires": "ينتهي",
+    "valueK": "القيمة (ألف)"
   }
 } 

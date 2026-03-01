@@ -1,44 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-// Demo data for team members
-const teamMembers = [
-  {
-    id: 1,
-    name: "John Doe",
-    role: "Senior Marketing Executive",
-    email: "john.doe@example.com",
-    phone: "+1 234 567 890",
-    performance: 92,
-    status: "Active",
-    avatar: "👨‍💼",
-    skills: ["Digital Marketing", "Content Strategy", "Social Media"],
-    projects: ["Q2 Campaign", "Brand Refresh"],
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    role: "Content Strategist",
-    email: "jane.smith@example.com",
-    phone: "+1 234 567 891",
-    performance: 88,
-    status: "Active",
-    avatar: "👩‍💼",
-    skills: ["Content Creation", "SEO", "Copywriting"],
-    projects: ["Blog Series", "Email Campaign"],
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    role: "Social Media Manager",
-    email: "mike.johnson@example.com",
-    phone: "+1 234 567 892",
-    performance: 85,
-    status: "On Leave",
-    avatar: "👨‍💼",
-    skills: ["Social Media", "Community Management", "Analytics"],
-    projects: ["Social Campaign", "Influencer Outreach"],
-  },
+// Initial demo data for team members
+const initialTeamMembers = [
+  { id: 1, name: "John Doe", role: "Senior Marketing Executive", email: "john.doe@example.com", phone: "+1 234 567 890", performance: 92, status: "Active", avatar: "👨‍💼", skills: ["Digital Marketing", "Content Strategy", "Social Media"], projects: ["Q2 Campaign", "Brand Refresh"] },
+  { id: 2, name: "Jane Smith", role: "Content Strategist", email: "jane.smith@example.com", phone: "+1 234 567 891", performance: 88, status: "Active", avatar: "👩‍💼", skills: ["Content Creation", "SEO", "Copywriting"], projects: ["Blog Series", "Email Campaign"] },
+  { id: 3, name: "Mike Johnson", role: "Social Media Manager", email: "mike.johnson@example.com", phone: "+1 234 567 892", performance: 85, status: "On Leave", avatar: "👨‍💼", skills: ["Social Media", "Community Management", "Analytics"], projects: ["Social Campaign", "Influencer Outreach"] },
 ];
 
 // Demo data for performance metrics
@@ -51,12 +18,44 @@ const performanceMetrics = [
 
 export default function TeamManagement() {
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const [members, setMembers] = useState(initialTeamMembers);
   const [selectedMember, setSelectedMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newMember, setNewMember] = useState({ name: "", role: "Team Member", email: "", phone: "", skills: "", projects: "", status: "Active" });
 
   const handleMemberClick = (member) => {
     setSelectedMember(member);
     setShowModal(true);
+  };
+
+  const openAddModal = () => {
+    setNewMember({ name: "", role: "Team Member", email: "", phone: "", skills: "", projects: "", status: "Active" });
+    setShowAddModal(true);
+  };
+
+  const handleAddMemberSubmit = (e) => {
+    e.preventDefault();
+    const name = newMember.name.trim();
+    const email = newMember.email.trim();
+    if (!name || !email) return;
+    const nextId = Math.max(0, ...members.map((m) => m.id)) + 1;
+    setMembers((prev) => [
+      ...prev,
+      {
+        id: nextId,
+        name,
+        role: newMember.role.trim() || "Team Member",
+        email,
+        phone: newMember.phone.trim() || "",
+        performance: 80,
+        status: newMember.status,
+        avatar: "👤",
+        skills: newMember.skills ? newMember.skills.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        projects: newMember.projects ? newMember.projects.split(",").map((p) => p.trim()).filter(Boolean) : [],
+      },
+    ]);
+    setShowAddModal(false);
   };
 
   const Modal = ({ member, onClose }) => {
@@ -65,13 +64,7 @@ export default function TeamManagement() {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="absolute inset-0" onClick={onClose} />
         <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-2xl w-full mx-4">
-          <button
-            onClick={onClose}
-            className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl font-bold"
-            aria-label="Close"
-          >
-            &times;
-          </button>
+          <button type="button" onClick={onClose} className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl font-bold" aria-label="Close">&times;</button>
           <div className="mb-6">
             <div className="flex items-center gap-4">
               <span className="text-4xl">{member.avatar}</span>
@@ -85,26 +78,22 @@ export default function TeamManagement() {
             <div>
               <h3 className="font-semibold mb-2">Contact Information</h3>
               <p className="text-sm">{member.email}</p>
-              <p className="text-sm">{member.phone}</p>
+              <p className="text-sm">{member.phone || "—"}</p>
             </div>
             <div>
               <h3 className="font-semibold mb-2">Skills</h3>
               <div className="flex flex-wrap gap-2">
-                {member.skills.map((skill, index) => (
-                  <span key={index} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">
-                    {skill}
-                  </span>
-                ))}
+                {(member.skills || []).length > 0 ? member.skills.map((skill, index) => (
+                  <span key={index} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">{skill}</span>
+                )) : <span className="text-sm text-gray-500">—</span>}
               </div>
             </div>
             <div>
               <h3 className="font-semibold mb-2">Current Projects</h3>
               <div className="space-y-2">
-                {member.projects.map((project, index) => (
-                  <div key={index} className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    {project}
-                  </div>
-                ))}
+                {(member.projects || []).length > 0 ? member.projects.map((project, index) => (
+                  <div key={index} className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">{project}</div>
+                )) : <span className="text-sm text-gray-500">—</span>}
               </div>
             </div>
           </div>
@@ -122,7 +111,7 @@ export default function TeamManagement() {
           <p className="text-sm text-gray-600 dark:text-gray-300">Manage your marketing team and track performance</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button type="button" onClick={openAddModal} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Add Team Member
           </button>
           <button className="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
@@ -174,7 +163,7 @@ export default function TeamManagement() {
                 </tr>
               </thead>
               <tbody>
-                {teamMembers.map((member) => (
+                {members.map((member) => (
                   <tr key={member.id} className="border-b dark:border-gray-700">
                     <td className="py-4">
                       <div className="flex items-center gap-3">
@@ -221,6 +210,61 @@ export default function TeamManagement() {
       </div>
 
       {showModal && <Modal member={selectedMember} onClose={() => setShowModal(false)} />}
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="absolute inset-0" onClick={() => setShowAddModal(false)} />
+          <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add Team Member</h2>
+              <button type="button" onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold" aria-label="Close">&times;</button>
+            </div>
+            <form onSubmit={handleAddMemberSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+                <input type="text" required value={newMember.name} onChange={(e) => setNewMember((p) => ({ ...p, name: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Full name" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                <select value={newMember.role} onChange={(e) => setNewMember((p) => ({ ...p, role: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                  <option>Senior Marketing Executive</option>
+                  <option>Content Strategist</option>
+                  <option>Social Media Manager</option>
+                  <option>Team Member</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                <input type="email" required value={newMember.email} onChange={(e) => setNewMember((p) => ({ ...p, email: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="email@example.com" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                <input type="tel" value={newMember.phone} onChange={(e) => setNewMember((p) => ({ ...p, phone: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="+1 234 567 890" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills (comma-separated)</label>
+                <input type="text" value={newMember.skills} onChange={(e) => setNewMember((p) => ({ ...p, skills: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="e.g. SEO, Social Media" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Projects (comma-separated)</label>
+                <input type="text" value={newMember.projects} onChange={(e) => setNewMember((p) => ({ ...p, projects: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="e.g. Q3 Campaign" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                <select value={newMember.status} onChange={(e) => setNewMember((p) => ({ ...p, status: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                  <option>Active</option>
+                  <option>On Leave</option>
+                  <option>Pending</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Member</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

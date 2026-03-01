@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar, Legend
+  PieChart, Pie, Cell, BarChart, Bar, Legend, AreaChart, Area, ScatterChart, Scatter, ZAxis
 } from "recharts";
 import { useTranslation } from 'react-i18next';
 import { useLocalization } from '/src/hooks/useLocalization.jsx';
@@ -10,14 +10,19 @@ import { FiTarget, FiSearch, FiTrendingUp, FiZap } from 'react-icons/fi';
 import MarketingAISearch from '../components/ai/MarketingAISearch';
 import MarketingLeadBehaviorAnalysis from '../components/ai/MarketingLeadBehaviorAnalysis';
 
-// Demo data for KPI cards
-const getKPIs = (t) => [
-  { label: t('kpis.totalQualifiedLeads'), value: 1240, icon: "🎯", color: "bg-blue-100 text-blue-700" },
-  { label: t('kpis.conversionRate'), value: "32%", icon: "📈", color: "bg-green-100 text-green-700" },
-  { label: t('kpis.activeCampaigns'), value: 8, icon: "📢", color: "bg-purple-100 text-purple-700" },
-  { label: t('kpis.teamMembers'), value: 15, icon: "👥", color: "bg-yellow-100 text-yellow-700" },
-  { label: t('kpis.roi'), value: "285%", icon: "💰", color: "bg-pink-100 text-pink-700" },
-];
+// Demo data for KPI cards - uses role-specific labels when variant is procurement or sales enablement
+const getKPIs = (t, variant) => {
+  const kpiNs = variant && ['procurement_manager', 'sales_enablement_manager'].includes(variant)
+    ? `kpisByRole.${variant}`
+    : 'kpis';
+  return [
+    { label: t(`${kpiNs}.totalQualifiedLeads`), value: 1240, icon: "🎯", color: "bg-blue-100 text-blue-700" },
+    { label: t(`${kpiNs}.conversionRate`), value: "32%", icon: "📈", color: "bg-green-100 text-green-700" },
+    { label: t(`${kpiNs}.activeCampaigns`), value: 8, icon: "📢", color: "bg-purple-100 text-purple-700" },
+    { label: t(`${kpiNs}.teamMembers`), value: 15, icon: "👥", color: "bg-yellow-100 text-yellow-700" },
+    { label: t(`${kpiNs}.roi`), value: "285%", icon: "💰", color: "bg-pink-100 text-pink-700" },
+  ];
+};
 
 // Demo data for charts
 const getLeadTrend = (t) => [
@@ -39,8 +44,95 @@ const getCampaignPerformance = (t) => [
 
 const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
+// Procurement-specific demo data
+const getProcurementSpendTrend = (t) => [
+  { month: t('months.jan'), [t('procurement.spend')]: 42, budget: 50 },
+  { month: t('months.feb'), [t('procurement.spend')]: 48, budget: 50 },
+  { month: t('months.mar'), [t('procurement.spend')]: 45, budget: 52 },
+  { month: t('months.apr'), [t('procurement.spend')]: 55, budget: 55 },
+  { month: t('months.may'), [t('procurement.spend')]: 52, budget: 55 },
+  { month: t('months.jun'), [t('procurement.spend')]: 58, budget: 58 },
+];
+const getProcurementSpendByCategory = (t) => [
+  { name: t('procurement.categories.it'), value: 85 },
+  { name: t('procurement.categories.facilities'), value: 45 },
+  { name: t('procurement.categories.marketing'), value: 62 },
+  { name: t('procurement.categories.office'), value: 18 },
+  { name: t('procurement.categories.services'), value: 40 },
+];
+const getProcurementPOStatus = (t) => [
+  { name: t('procurement.pending'), count: 12, fill: '#94a3b8' },
+  { name: t('procurement.approved'), count: 28, fill: '#6366f1' },
+  { name: t('procurement.inProgress'), count: 19, fill: '#f59e0b' },
+  { name: t('procurement.delivered'), count: 41, fill: '#22c55e' },
+];
+const getProcurementSavingsData = (t) => [
+  { name: t('procurement.budget'), value: 320, fill: '#e2e8f0' },
+  { name: t('procurement.spend'), value: 300, fill: '#6366f1' },
+  { name: t('procurement.savings'), value: 20, fill: '#22c55e' },
+];
+const getSupplierMatrixData = (t) => [
+  { vendor: 'Tech Solutions Inc.', onTime: 98, quality: 4.8, spend: 125 },
+  { vendor: 'Print Services Co.', onTime: 92, quality: 4.5, spend: 89 },
+  { vendor: 'Event Equipment Ltd.', onTime: 85, quality: 4.2, spend: 67 },
+  { vendor: 'Office Supplies Pro', onTime: 78, quality: 4.0, spend: 34 },
+  { vendor: 'Consulting Partners', onTime: 95, quality: 4.7, spend: 105 },
+];
+
+// Additional detailed procurement data
+const getSpendByCategoryOverTime = (t) => [
+  { month: t('months.jan'), it: 14, facilities: 8, marketing: 10, office: 4, services: 6 },
+  { month: t('months.feb'), it: 16, facilities: 9, marketing: 11, office: 4, services: 8 },
+  { month: t('months.mar'), it: 15, facilities: 9, marketing: 10, office: 5, services: 6 },
+  { month: t('months.apr'), it: 18, facilities: 10, marketing: 12, office: 5, services: 10 },
+  { month: t('months.may'), it: 17, facilities: 10, marketing: 11, office: 6, services: 8 },
+  { month: t('months.jun'), it: 20, facilities: 11, marketing: 13, office: 6, services: 8 },
+];
+const getTopVendorsBySpend = (t) => [
+  { name: 'Tech Solutions Inc.', spend: 125 },
+  { name: 'Consulting Partners', spend: 105 },
+  { name: 'Print Services Co.', spend: 89 },
+  { name: 'Event Equipment Ltd.', spend: 67 },
+  { name: 'Office Supplies Pro', spend: 34 },
+];
+const getSavingsTrend = (t) => [
+  { month: t('months.jan'), [t('procurement.savings')]: 2 },
+  { month: t('months.feb'), [t('procurement.savings')]: 1 },
+  { month: t('months.mar'), [t('procurement.savings')]: 4 },
+  { month: t('months.apr'), [t('procurement.savings')]: 0 },
+  { month: t('months.may'), [t('procurement.savings')]: 3 },
+  { month: t('months.jun'), [t('procurement.savings')]: 5 },
+];
+const getBudgetVsActualByCategory = (t) => [
+  { category: t('procurement.categories.it'), budget: 95, actual: 85 },
+  { category: t('procurement.categories.facilities'), budget: 50, actual: 45 },
+  { category: t('procurement.categories.marketing'), budget: 70, actual: 62 },
+  { category: t('procurement.categories.office'), budget: 25, actual: 18 },
+  { category: t('procurement.categories.services'), budget: 80, actual: 40 },
+];
+const getPOCountByCategory = (t) => [
+  { category: t('procurement.categories.it'), count: 24 },
+  { category: t('procurement.categories.facilities'), count: 18 },
+  { category: t('procurement.categories.marketing'), count: 22 },
+  { category: t('procurement.categories.office'), count: 31 },
+  { category: t('procurement.categories.services'), count: 15 },
+];
+const getVendorQuadrantData = () => [
+  { vendor: 'Tech Solutions', quality: 4.8, onTime: 98, spend: 125 },
+  { vendor: 'Print Services', quality: 4.5, onTime: 92, spend: 89 },
+  { vendor: 'Event Equipment', quality: 4.2, onTime: 85, spend: 67 },
+  { vendor: 'Office Supplies', quality: 4.0, onTime: 78, spend: 34 },
+  { vendor: 'Consulting', quality: 4.7, onTime: 95, spend: 105 },
+];
+const getContractRenewals = (t) => [
+  { vendor: 'Tech Solutions Inc.', expires: t('months.mar'), value: 45 },
+  { vendor: 'Print Services Co.', expires: t('months.apr'), value: 22 },
+  { vendor: 'Consulting Partners', expires: t('months.may'), value: 38 },
+  { vendor: 'Event Equipment Ltd.', expires: t('months.jun'), value: 18 },
+];
+
 export default function MarketingHeadDashboard() {
-  const { t, ready, i18n } = useTranslation('dashboard');
+  const { t, ready, i18n } = useTranslation(['dashboard', 'welcome']);
   const { isRTLMode } = useLocalization();
   const [languageVersion, setLanguageVersion] = useState(0);
   
@@ -53,6 +145,9 @@ export default function MarketingHeadDashboard() {
   }
 
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const dashboardVariant = ['marketing_head', 'procurement_manager', 'sales_enablement_manager'].includes(user?.username) ? user.username : 'marketing_head';
+  const pageTitle = t(`roleTitles.${dashboardVariant}`);
+  const welcomeMessage = t(`welcome:${user?.username || 'marketing_head'}`);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   
@@ -138,8 +233,8 @@ export default function MarketingHeadDashboard() {
         data-tour-position="bottom"
       >
         <div className={isRTLMode ? 'text-right' : 'text-left'}>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{t('welcome')}</p> 
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{pageTitle}</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{welcomeMessage}</p> 
         </div>
         
         <div className={`flex gap-3 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
@@ -290,7 +385,7 @@ export default function MarketingHeadDashboard() {
         data-tour-content-ar="تتبع العملاء المحتملين المؤهلين، معدل التحويل، الحملات النشطة، حجم الفريق، والعائد على الاستثمار."
         data-tour-position="bottom"
       >
-        {getKPIs(t).map((kpi, index) => (
+        {getKPIs(t, dashboardVariant).map((kpi, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
@@ -307,7 +402,274 @@ export default function MarketingHeadDashboard() {
         ))}
       </div>
 
-      {/* Charts Section */}
+      {/* Procurement-specific: Matrices, Graphs & Visuals */}
+      {dashboardVariant === 'procurement_manager' && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('procurement.spendOverTime')} &amp; {t('procurement.spendByCategory')}</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.spendOverTime')} (USD K)</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={getProcurementSpendTrend(t)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey={t('procurement.spend')} stroke="#6366f1" strokeWidth={2} />
+                    <Line type="monotone" dataKey="budget" stroke="#94a3b8" strokeDasharray="5 5" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.spendByCategory')}</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={getProcurementSpendByCategory(t)}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {getProcurementSpendByCategory(t).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.poStatusBreakdown')}</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={getProcurementPOStatus(t)} layout="vertical" margin={{ left: 80 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={70} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]}>
+                      {getProcurementPOStatus(t).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.savingsVsBudget')}</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={getProcurementSavingsData(t)} layout="vertical" margin={{ left: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={80} />
+                    <Tooltip />
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">{t('procurement.supplierMatrix')}</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-600">
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.vendor')}</th>
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.onTimeDelivery')}</th>
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.qualityScore')}</th>
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.totalSpend')} (K)</th>
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.status')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getSupplierMatrixData(t).map((row, i) => (
+                    <tr key={i} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{row.vendor}</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${row.onTime >= 95 ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : row.onTime >= 85 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'}`}>
+                          {row.onTime}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">{row.quality}/5</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-300">${row.spend}</td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex px-2 py-1 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
+                          {t('procurement.approved')}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Row: Spend by category over time + Budget utilization */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.spendByCategoryOverTime')} (USD K)</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={getSpendByCategoryOverTime(t)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Area type="monotone" dataKey="it" stackId="1" stroke={COLORS[0]} fill={COLORS[0]} fillOpacity={0.7} name={t('procurement.categories.it')} />
+                    <Area type="monotone" dataKey="facilities" stackId="1" stroke={COLORS[1]} fill={COLORS[1]} fillOpacity={0.7} name={t('procurement.categories.facilities')} />
+                    <Area type="monotone" dataKey="marketing" stackId="1" stroke={COLORS[2]} fill={COLORS[2]} fillOpacity={0.7} name={t('procurement.categories.marketing')} />
+                    <Area type="monotone" dataKey="office" stackId="1" stroke={COLORS[3]} fill={COLORS[3]} fillOpacity={0.7} name={t('procurement.categories.office')} />
+                    <Area type="monotone" dataKey="services" stackId="1" stroke={COLORS[4]} fill={COLORS[4]} fillOpacity={0.7} name={t('procurement.categories.services')} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.budgetUtilization')}</h3>
+              <div className="relative w-40 h-40">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                  <path className="text-gray-200 dark:text-gray-600" stroke="currentColor" strokeWidth="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path className="text-emerald-500" stroke="currentColor" strokeWidth="3" strokeDasharray="94 6" strokeLinecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">94%</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{t('procurement.spend')} vs {t('procurement.budget')}</p>
+            </div>
+          </div>
+
+          {/* Row: Top vendors + Savings trend */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.topVendorsBySpend')} (USD K)</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={getTopVendorsBySpend(t)} layout="vertical" margin={{ left: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Bar dataKey="spend" fill="#6366f1" radius={[0, 4, 4, 0]} name={t('procurement.totalSpend')} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.savingsTrend')} (USD K)</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={getSavingsTrend(t)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey={t('procurement.savings')} stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Row: Budget vs actual + PO count by category */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.budgetVsActualByCategory')} (USD K)</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={getBudgetVsActualByCategory(t)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category" tick={{ fontSize: 10 }} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="budget" fill="#94a3b8" radius={[4, 4, 0, 0]} name={t('procurement.budget')} />
+                    <Bar dataKey="actual" fill="#6366f1" radius={[4, 4, 0, 0]} name={t('procurement.actual')} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">{t('procurement.poCountByCategory')}</h3>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={getPOCountByCategory(t)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category" tick={{ fontSize: 10 }} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} name={t('procurement.status')} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Vendor performance quadrant (scatter) */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">{t('procurement.vendorQuadrant')} — {t('procurement.qualityScore')} vs {t('procurement.onTimeDelivery')}</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" dataKey="quality" name={t('procurement.qualityScore')} domain={[3.5, 5]} />
+                  <YAxis type="number" dataKey="onTime" name={t('procurement.onTimeDelivery')} domain={[70, 100]} />
+                  <ZAxis type="number" dataKey="spend" range={[100, 600]} name={t('procurement.totalSpend')} />
+                  <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => [name === t('procurement.totalSpend') ? `$${value}K` : value, name]} />
+                  <Scatter name={t('procurement.vendor')} data={getVendorQuadrantData()} fill="#6366f1" />
+                </ScatterChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Bubble size = {t('procurement.totalSpend')}. Top-right = high quality & on-time.</p>
+          </div>
+
+          {/* Contract renewals */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">{t('procurement.contractRenewals')}</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-600">
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.vendor')}</th>
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.expires')}</th>
+                    <th className="py-3 px-4 font-semibold text-gray-900 dark:text-white">{t('procurement.valueK')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getContractRenewals(t).map((row, i) => (
+                    <tr key={i} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{row.vendor}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{row.expires}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-300">${row.value}K</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Charts Section (marketing / sales enablement only) */}
+      {dashboardVariant !== 'procurement_manager' && (
       <div
         className="grid grid-cols-1 lg:grid-cols-2 gap-6"
         data-tour="3"
@@ -361,6 +723,7 @@ export default function MarketingHeadDashboard() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Recent Activity and Tasks */}
       <div

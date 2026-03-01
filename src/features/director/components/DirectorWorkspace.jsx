@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { 
@@ -23,6 +24,8 @@ import DirectorOperationalExcellence from './ai/DirectorOperationalExcellence';
 import { directorFeatures } from './directorFeatures';
 
 export default function DirectorWorkspace() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/workspace");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [expanded, setExpanded] = useState(false);
   const { t, ready } = useTranslation('director');
@@ -100,10 +103,10 @@ export default function DirectorWorkspace() {
         >
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
             <h1 className="text-2xl font-bold !text-gray-900 dark:!text-white">
-              {t('workspace.title')}
+              {isPM ? "Proposal Workspace" : t('workspace.title')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              {t('workspace.subtitle')}
+              {isPM ? "Section drafts, reviews, compliance checks, and proposal tasks." : t('workspace.subtitle')}
             </p>
           </div>
           

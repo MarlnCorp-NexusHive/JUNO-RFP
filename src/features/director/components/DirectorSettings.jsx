@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -32,6 +33,8 @@ import {
 
 
 export default function DirectorSettings() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/settings");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [activeCategory, setActiveCategory] = useState("institutional");
   const [expandedSections, setExpandedSections] = useState({});
@@ -345,10 +348,10 @@ export default function DirectorSettings() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiSettings className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {t('settings.title')}
+                {isPM ? "Proposal Manager Settings" : t('settings.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {t('settings.subtitle')}
+                {isPM ? "Profile, notifications, and proposal preferences." : t('settings.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-3">

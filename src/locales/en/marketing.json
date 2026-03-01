@@ -1227,6 +1227,11 @@
   },
   "dashboard": {
     "title": "Overview",
+    "roleTitles": {
+      "marketing_head": "Marketing Management",
+      "procurement_manager": "Procurement Management",
+      "sales_enablement_manager": "Sales Enablement"
+    },
     "welcome": "Welcome back, Head of Marketing Operations",
     "newCampaignLaunch": "New Campaign Launch",
     "exportReport": "Export Report",

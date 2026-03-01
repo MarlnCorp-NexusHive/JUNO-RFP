@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -42,6 +43,8 @@ const years = ["2026", "2026", "2026", "2027", "2028"];
 // Enhanced Trend Analysis - will be generated dynamically with translations
 
 export default function DirectorStrategicPlanning() {
+  const location = useLocation();
+  const isCaptureStrategy = location.pathname.includes("/rbac/proposal-manager/capture-strategy");
   const { t, ready } = useTranslation('director');
   const { isRTLMode } = useLocalization();
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
@@ -82,28 +85,53 @@ export default function DirectorStrategicPlanning() {
   // Generate translated data
   const departments = [t('strategicPlanning.filters.allDepartments'), t('strategicPlanning.filters.departments.computerScience'), t('strategicPlanning.filters.departments.eee'), t('strategicPlanning.filters.departments.mechanical'), t('strategicPlanning.filters.departments.business'), t('strategicPlanning.filters.departments.biotech')];
   
-  const kpis = [
+  const captureKpis = [
+    { label: "Win Rate", value: 32, target: 35, unit: "%", trend: "up", icon: FiAward },
+    { label: "Pipeline Value", value: 43, target: 50, unit: " $M", trend: "up", icon: FiDollarSign },
+    { label: "Capture Ratio", value: 67, target: 70, unit: "%", trend: "up", icon: FiTarget },
+    { label: "Proposals Submitted (YTD)", value: 22, target: 28, unit: "", trend: "down", icon: FiBookOpen },
+  ];
+  const kpis = isCaptureStrategy ? captureKpis : [
     { label: t('strategicPlanning.kpis.studentFacultyRatio'), value: 18, target: 15, unit: ":1", trend: "up", icon: FiUsers },
     { label: t('strategicPlanning.kpis.publicationsFaculty'), value: 2.8, target: 3.5, trend: "down", icon: FiBookOpen },
     { label: t('strategicPlanning.kpis.retentionRate'), value: 92, target: 95, unit: "%", trend: "up", icon: FiCheckCircle },
     { label: t('strategicPlanning.kpis.placementRate'), value: 81, target: 90, unit: "%", trend: "down", icon: FiAward },
   ];
 
-  const goals = [
+  const captureGoals = [
+    { label: "Pipeline growth", progress: 72, icon: FiTrendingUp, color: "blue" },
+    { label: "Win rate target", progress: 85, icon: FiAward, color: "green" },
+    { label: "Capture plan completion", progress: 68, icon: FiTarget, color: "purple" },
+    { label: "Teaming agreements", progress: 55, icon: FiUsers, color: "orange" },
+  ];
+  const goals = isCaptureStrategy ? captureGoals : [
     { label: t('strategicPlanning.strategicGoals.researchOutput'), progress: 70, icon: FiBookOpen, color: "blue" },
     { label: t('strategicPlanning.strategicGoals.accreditationStatus'), progress: 85, icon: FiAward, color: "green" },
     { label: t('strategicPlanning.strategicGoals.placements'), progress: 81, icon: FiUsers, color: "purple" },
     { label: t('strategicPlanning.strategicGoals.facultyHiring'), progress: 60, icon: FiUsers, color: "orange" },
   ];
 
-  const roadmap = [
+  const captureRoadmap = [
+    { name: "Water Wastewater RFP – Capture", start: "2026", end: "2026", status: "in-progress", priority: "high" },
+    { name: "Landscape Maintenance – Proposal", start: "2026", end: "2026", status: "planned", priority: "medium" },
+    { name: "Airport Restaurant Lease – Pricing", start: "2026", end: "2026", status: "planned", priority: "low" },
+    { name: "Surplus Tanks – Go/No-Go", start: "2026", end: "2026", status: "in-progress", priority: "medium" },
+  ];
+  const roadmap = isCaptureStrategy ? captureRoadmap : [
     { name: t('strategicPlanning.roadmap.ncaaaPrep'), start: "2026", end: "2026", status: "in-progress", priority: "high" },
     { name: t('strategicPlanning.roadmap.newBscAiProgram'), start: "2026", end: "2026", status: "planned", priority: "medium" },
     { name: t('strategicPlanning.roadmap.campusExpansion'), start: "2026", end: "2028", status: "planned", priority: "low" },
     { name: t('strategicPlanning.roadmap.greenCampusInitiative'), start: "2026", end: "2027", status: "in-progress", priority: "medium" },
   ];
 
-  const curriculumMatrix = [
+  const captureOpportunities = [
+    { course: "Water Wastewater Study", status: "Capture", lead: "Capture Manager", start: "2026-02", end: "2026-04", priority: "high" },
+    { course: "Landscape Maintenance", status: "Proposal", lead: "Proposal Manager", start: "2026-03", end: "2026-05", priority: "medium" },
+    { course: "Airport Restaurant Lease", status: "Pricing", lead: "Pricing Lead", start: "2026-03", end: "2026-05", priority: "low" },
+    { course: "Balsitis Playground", status: "Submitted", lead: "Proposal Manager", start: "2026-01", end: "2026-03", priority: "high" },
+    { course: "Surplus Tanks", status: "Go/No-Go", lead: "Capture Manager", start: "2026-04", end: "2026-06", priority: "medium" },
+  ];
+  const curriculumMatrix = isCaptureStrategy ? captureOpportunities : [
     { course: t('strategicPlanning.programs.bscAi'), status: t('strategicPlanning.curriculumStatus.proposal'), lead: t('strategicPlanning.faculty.drChen'), start: "2026-06", end: "2026-05", priority: "high" },
     { course: t('strategicPlanning.programs.mbaFintech'), status: t('strategicPlanning.curriculumStatus.review'), lead: t('strategicPlanning.faculty.drRao'), start: "2026-09", end: "2026-08", priority: "medium" },
     { course: t('strategicPlanning.programs.btechEee'), status: t('strategicPlanning.curriculumStatus.ongoing'), lead: t('strategicPlanning.faculty.drSingh'), start: "2026-07", end: "2026-06", priority: "low" },
@@ -111,7 +139,14 @@ export default function DirectorStrategicPlanning() {
     { course: t('strategicPlanning.programs.bbaMarketing'), status: t('strategicPlanning.curriculumStatus.accredited'), lead: t('strategicPlanning.faculty.drMehra'), start: "2026-08", end: "2026-07", priority: "low" },
   ];
 
-  const programEvaluation = [
+  const captureBidReviews = [
+    { program: "Federal – IT Services", next: "2026", last: "2025", status: "upcoming" },
+    { program: "State – Professional Services", next: "2026", last: "2024", status: "upcoming" },
+    { program: "Commercial – Maintenance", next: "2026", last: "2026", status: "upcoming" },
+    { program: "International – Research", next: "2027", last: "New", status: "new" },
+    { program: "GSA Schedule", next: "2026", last: "2023", status: "urgent" },
+  ];
+  const programEvaluation = isCaptureStrategy ? captureBidReviews : [
     { program: t('strategicPlanning.programs.bscCs'), next: "2026", last: "2020", status: "upcoming" },
     { program: t('strategicPlanning.programs.mba'), next: "2026", last: "2026", status: "upcoming" },
     { program: t('strategicPlanning.programs.btechEee'), next: "2027", last: "2026", status: "upcoming" },
@@ -119,7 +154,13 @@ export default function DirectorStrategicPlanning() {
     { program: t('strategicPlanning.programs.bbaMarketing'), next: "2026", last: "2019", status: "urgent" },
   ];
 
-  const swot = {
+  const captureSwot = {
+    "Strengths": ["Strong past performance in IT/services", "Experienced capture team", "High win rate in recompetes", "Solid teaming partners"],
+    "Weaknesses": ["Limited bandwidth for new captures", "Some boilerplate outdated", "Pricing templates need refresh"],
+    "Opportunities": ["Growing federal IT budget", "State/Local RFPs increasing", "IDIQ recompetes in pipeline"],
+    "Threats": ["Competitor price undercutting", "Tight RFP deadlines", "Resource constraints"],
+  };
+  const swot = isCaptureStrategy ? captureSwot : {
     [t('strategicPlanning.swot.strengths')]: [
       t('strategicPlanning.swot.items.strongFacultyBase'),
       t('strategicPlanning.swot.items.modernLabs'),
@@ -145,7 +186,12 @@ export default function DirectorStrategicPlanning() {
     ],
   };
 
-  const trends = [
+  const captureTrends = [
+    { label: "Pipeline ($M)", values: [35, 38, 40, 42, 43], years: ["2022", "2023", "2024", "2025", "2026"], color: "#3b82f6" },
+    { label: "Win Rate %", values: [28, 30, 31, 32, 32], years: ["2022", "2023", "2024", "2025", "2026"], color: "#10b981" },
+    { label: "Submissions", values: [18, 20, 21, 22, 22], years: ["2022", "2023", "2024", "2025", "2026"], color: "#f59e0b" },
+  ];
+  const trends = isCaptureStrategy ? captureTrends : [
     { label: t('strategicPlanning.trends.enrollment'), values: [1200, 1300, 1400, 1550, 1700], years: ["2020","2026","2026","2026","2026"], color: "#3b82f6" },
     { label: t('strategicPlanning.trends.placements'), values: [800, 900, 950, 1100, 1200], years: ["2020","2026","2026","2026","2026"], color: "#10b981" },
     { label: t('strategicPlanning.trends.researchFunding'), values: [200, 250, 300, 350, 400], years: ["2020","2026","2026","2026","2026"], color: "#f59e0b" },
@@ -193,8 +239,12 @@ export default function DirectorStrategicPlanning() {
         {/* Header Section */}
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('strategicPlanning.title')}</h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg">{t('strategicPlanning.subtitle')}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              {isCaptureStrategy ? "Capture Strategy" : t('strategicPlanning.title')}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
+              {isCaptureStrategy ? "Capture planning, win strategy, and pipeline management." : t('strategicPlanning.subtitle')}
+            </p>
           </div>
           
           <div className={`flex flex-col sm:flex-row gap-4 ${isRTLMode ? 'flex-row-reverse' : ''}`}>

@@ -1,0 +1,16 @@
+export const proposalManagerFeatures = [
+  { label: "director.dashboard", icon: "📊", route: "/rbac/proposal-manager", description: "Performance Overview, KPI Summary, Alerts & Notices" },
+  { label: "Source Docs", icon: "📄", route: "/rbac/proposal-manager/source-docs", description: "Source documents and reference materials" },
+  { label: "Manage Team", icon: "👥", route: "/rbac/proposal-manager/team", description: "Team Management and Collaboration" },
+  { label: "Bid Vault", icon: "📦", route: "/rbac/proposal-manager/bid-vault", description: "Bid repository and submissions" },
+  { label: "Capture Strategy", icon: "🗺️", route: "/rbac/proposal-manager/capture-strategy", description: "Capture strategy and planning" },
+  { label: "Content Hub", icon: "📝", route: "/rbac/proposal-manager/content-hub", description: "Content library and assets" },
+  { label: "Pricing", icon: "💰", route: "/rbac/proposal-manager/pricing", description: "Pricing and cost proposals" },
+  { label: "Communication", icon: "💬", route: "/rbac/proposal-manager/communication", description: "Internal Communication Hub" },
+  { label: "Compliance", icon: "🕵️", route: "/rbac/proposal-manager/compliance", description: "Audit, Compliance, Legal Docs" },
+  { label: "Meetings and Calendar", icon: "🗓️", route: "/rbac/proposal-manager/meetings-calendar", description: "Scheduler, Minutes, Events" },
+  { label: "director.userManagement", icon: "👤", route: "/rbac/proposal-manager/user-management", description: "Roles, Permissions, Admin Controls" },
+  { label: "director.workspace", icon: "📁", route: "/rbac/proposal-manager/workspace", description: "Workspace and tasks" },
+  { label: "director.helpSupport", icon: "🆘", route: "/rbac/proposal-manager/help-support", description: "Technical Support, Handbook" },
+  { label: "director.settings", icon: "⚙️", route: "/rbac/proposal-manager/settings", description: "Profile, Branding, Notifications" },
+];

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -34,12 +35,14 @@ import {
 
 
 export default function DirectorUserManagement() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/user-management");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [viewMode, setViewMode] = useState("grid"); // grid or list
+  const [viewMode, setViewMode] = useState("grid");
   const { t, ready } = useTranslation('director');
   const { isRTLMode } = useLocalization();
 
@@ -57,71 +60,61 @@ export default function DirectorUserManagement() {
     );
   }
 
-  // Demo data using translation keys
-  const users = [
-    { 
-      id: 1, 
-      nameKey: "demoUsers.johnDoe", 
-      roleKey: "roles.dean", 
-      departmentKey: "departments.science", 
-      statusKey: "userStatuses.active", 
-      email: "john.doe@company.com",
-      lastLogin: "2026-03-10",
-      avatar: "JD",
-      permissions: 12,
-      joinDate: "2026-01-15"
-    },
-    { 
-      id: 2, 
-      nameKey: "demoUsers.janeSmith", 
-      roleKey: "roles.hod", 
-      departmentKey: "departments.eee", 
-      statusKey: "userStatuses.active", 
-      email: "jane.smith@company.com",
-      lastLogin: "2026-03-09",
-      avatar: "JS",
-      permissions: 8,
-      joinDate: "2026-03-20"
-    },
-    { 
-      id: 3, 
-      nameKey: "demoUsers.mikeJohnson", 
-      roleKey: "roles.faculty", 
-      departmentKey: "departments.math", 
-      statusKey: "userStatuses.inactive", 
-      email: "mike.johnson@company.com",
-      lastLogin: "2026-02-28",
-      avatar: "MJ",
-      permissions: 5,
-      joinDate: "2026-06-10"
-    },
-    { 
-      id: 4, 
-      nameKey: "demoUsers.sarahWilson", 
-      roleKey: "roles.faculty", 
-      departmentKey: "departments.computer", 
-      statusKey: "userStatuses.active", 
-      email: "sarah.wilson@company.com",
-      lastLogin: "2026-03-11",
-      avatar: "SW",
-      permissions: 6,
-      joinDate: "2026-08-15"
-    },
-    { 
-      id: 5, 
-      nameKey: "demoUsers.davidBrown", 
-      roleKey: "roles.student", 
-      departmentKey: "departments.engineering", 
-      statusKey: "userStatuses.active", 
-      email: "david.brown@company.com",
-      lastLogin: "2026-03-12",
-      avatar: "DB",
-      permissions: 3,
-      joinDate: "2026-09-01"
-    },
+  const pmInitialUsers = [
+    { id: 1, name: "Michael Anderson", role: "Proposal Manager", department: "Proposals", statusKey: "userStatuses.active", email: "michael.anderson@company.com", lastLogin: "2026-03-10", avatar: "MA", permissions: 12, joinDate: "2026-01-15" },
+    { id: 2, name: "David Reynolds", role: "Capture Manager", department: "Capture", statusKey: "userStatuses.active", email: "david.reynolds@company.com", lastLogin: "2026-03-09", avatar: "DR", permissions: 10, joinDate: "2025-11-20" },
+    { id: 3, name: "Sarah Chen", role: "Proposal Writer", department: "Proposals", statusKey: "userStatuses.active", email: "sarah.chen@company.com", lastLogin: "2026-03-11", avatar: "SC", permissions: 6, joinDate: "2026-02-01" },
+    { id: 4, name: "James Wilson", role: "Technical Lead", department: "Proposals", statusKey: "userStatuses.active", email: "james.wilson@company.com", lastLogin: "2026-03-08", avatar: "JW", permissions: 8, joinDate: "2025-09-15" },
+    { id: 5, name: "Emily Martinez", role: "Pricing Lead", department: "Proposals", statusKey: "userStatuses.inactive", email: "emily.martinez@company.com", lastLogin: "2026-02-28", avatar: "EM", permissions: 7, joinDate: "2025-06-10" },
   ];
+  const directorInitialUsers = [
+    { id: 1, nameKey: "demoUsers.johnDoe", roleKey: "roles.dean", departmentKey: "departments.science", statusKey: "userStatuses.active", email: "john.doe@company.com", lastLogin: "2026-03-10", avatar: "JD", permissions: 12, joinDate: "2026-01-15" },
+    { id: 2, nameKey: "demoUsers.janeSmith", roleKey: "roles.hod", departmentKey: "departments.eee", statusKey: "userStatuses.active", email: "jane.smith@company.com", lastLogin: "2026-03-09", avatar: "JS", permissions: 8, joinDate: "2026-03-20" },
+    { id: 3, nameKey: "demoUsers.mikeJohnson", roleKey: "roles.faculty", departmentKey: "departments.math", statusKey: "userStatuses.inactive", email: "mike.johnson@company.com", lastLogin: "2026-02-28", avatar: "MJ", permissions: 5, joinDate: "2026-06-10" },
+    { id: 4, nameKey: "demoUsers.sarahWilson", roleKey: "roles.faculty", departmentKey: "departments.computer", statusKey: "userStatuses.active", email: "sarah.wilson@company.com", lastLogin: "2026-03-11", avatar: "SW", permissions: 6, joinDate: "2026-08-15" },
+    { id: 5, nameKey: "demoUsers.davidBrown", roleKey: "roles.student", departmentKey: "departments.engineering", statusKey: "userStatuses.active", email: "david.brown@company.com", lastLogin: "2026-03-12", avatar: "DB", permissions: 3, joinDate: "2026-09-01" },
+  ];
+  const initialUsers = isPM ? pmInitialUsers : directorInitialUsers;
+  const [users, setUsers] = useState(initialUsers);
+  React.useEffect(() => { setUsers(initialUsers); }, [isPM]);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    displayName: "",
+    email: "",
+    roleKey: "roles.employee",
+    departmentKey: "departments.engineering",
+    statusKey: "userStatuses.active",
+  });
 
-  const roles = ["director", "dean", "hod", "team", "employee", "admin"];
+  const handleAddUserSubmit = (e) => {
+    e.preventDefault();
+    const name = newUser.displayName.trim();
+    const email = newUser.email.trim();
+    if (!name || !email) return;
+    const nextId = Math.max(0, ...users.map((u) => u.id)) + 1;
+    const initials = name.split(/\s+/).map((s) => s[0]).join("").toUpperCase().slice(0, 2);
+    const joinDate = new Date().toISOString().slice(0, 10);
+    setUsers((prev) => [
+      ...prev,
+      {
+        id: nextId,
+        nameKey: "demoUsers.newUser",
+        displayName: name,
+        roleKey: newUser.roleKey,
+        departmentKey: newUser.departmentKey,
+        statusKey: newUser.statusKey,
+        email,
+        lastLogin: "—",
+        avatar: initials,
+        permissions: 3,
+        joinDate,
+      },
+    ]);
+    setShowAddUserModal(false);
+    setNewUser({ displayName: "", email: "", roleKey: "roles.employee", departmentKey: "departments.engineering", statusKey: "userStatuses.active" });
+  };
+
+  const roles = isPM ? ["Proposal Manager", "Capture Manager", "Proposal Writer", "Technical Lead", "Pricing Lead", "Compliance Specialist"] : ["director", "dean", "hod", "team", "employee", "admin"];
 
   // Demo data for user metrics using translation keys
   const userMetrics = [
@@ -209,11 +202,12 @@ export default function DirectorUserManagement() {
     }
   };
 
+  const getUserDisplayName = (u) => (isPM && u.name) ? u.name : (u.displayName ?? t(`userManagement.${u.nameKey}`));
   const filteredUsers = users.filter(u => {
-    const roleMatch = !roleFilter || u.roleKey === `roles.${roleFilter}`;
+    const roleMatch = !roleFilter || (isPM ? u.role === roleFilter : u.roleKey === `roles.${roleFilter}`);
     const statusMatch = statusFilter === "all" || u.statusKey === `userStatuses.${statusFilter}`;
-    const searchMatch = t(`userManagement.${u.nameKey}`).toLowerCase().includes(search.toLowerCase()) || 
-                      u.email.toLowerCase().includes(search.toLowerCase());
+    const searchMatch = getUserDisplayName(u).toLowerCase().includes(search.toLowerCase()) ||
+                      (u.email || "").toLowerCase().includes(search.toLowerCase());
     return roleMatch && statusMatch && searchMatch;
   });
 
@@ -253,10 +247,10 @@ export default function DirectorUserManagement() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiUsers className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {t('userManagement.title')}
+                {isPM ? "Proposal Team Access" : t('userManagement.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {t('userManagement.subtitle')}
+                {isPM ? "Roles, permissions, and access for proposal and capture team." : t('userManagement.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -356,7 +350,11 @@ export default function DirectorUserManagement() {
               <option value="pending">Pending</option>
             </select>
             <div className="flex items-center gap-2">
-              <button className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowAddUserModal(true)}
+                className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+              >
                 <FiUserPlus className="w-4 h-4" />
                 {t('userManagement.addUser')}
               </button>
@@ -421,7 +419,7 @@ export default function DirectorUserManagement() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {t(`userManagement.${u.nameKey}`)}
+                          {getUserDisplayName(u)}
                         </h3>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(u.statusKey.split('.').pop())}`}>
                           {t(`userManagement.${u.statusKey}`)}
@@ -429,9 +427,9 @@ export default function DirectorUserManagement() {
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-2">
                         <div className="flex items-center gap-1">
-                          {getRoleIcon(u.roleKey.split('.').pop())}
-                          <span className={`px-2 py-1 rounded-md text-xs font-medium ${getRoleColor(u.roleKey.split('.').pop())}`}>
-                            {t(`userManagement.${u.roleKey}`)}
+                          {getRoleIcon(isPM ? u.role?.replace(/\s+/g, '') : u.roleKey?.split('.').pop())}
+                          <span className={`px-2 py-1 rounded-md text-xs font-medium ${getRoleColor(isPM ? (u.role?.replace(/\s+/g, '').toLowerCase()) : u.roleKey?.split('.').pop())}`}>
+                            {isPM ? u.role : t(`userManagement.${u.roleKey}`)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
@@ -444,7 +442,7 @@ export default function DirectorUserManagement() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                        <span>Department: {t(`userManagement.${u.departmentKey}`)}</span>
+                        <span>Department: {isPM ? u.department : (u.displayDepartment ?? t(`userManagement.${u.departmentKey}`))}</span>
                         <span>Permissions: {u.permissions}</span>
                         <span>Joined: {u.joinDate}</span>
                       </div>
@@ -467,6 +465,56 @@ export default function DirectorUserManagement() {
             ))}
           </div>
         </motion.section>
+
+        {showAddUserModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="absolute inset-0" onClick={() => setShowAddUserModal(false)} />
+            <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('userManagement.addUser')}</h2>
+                <button type="button" onClick={() => setShowAddUserModal(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold" aria-label="Close">&times;</button>
+              </div>
+              <form onSubmit={handleAddUserSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+                  <input type="text" required value={newUser.displayName} onChange={(e) => setNewUser((p) => ({ ...p, displayName: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Full name" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                  <input type="email" required value={newUser.email} onChange={(e) => setNewUser((p) => ({ ...p, email: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="email@company.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                  <select value={newUser.roleKey} onChange={(e) => setNewUser((p) => ({ ...p, roleKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    {roles.map((r) => <option key={r} value={`roles.${r}`}>{t(`userManagement.roles.${r}`)}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+                  <select value={newUser.departmentKey} onChange={(e) => setNewUser((p) => ({ ...p, departmentKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <option value="departments.engineering">{t('userManagement.departments.engineering')}</option>
+                    <option value="departments.science">{t('userManagement.departments.science')}</option>
+                    <option value="departments.math">{t('userManagement.departments.math')}</option>
+                    <option value="departments.computer">{t('userManagement.departments.computer')}</option>
+                    <option value="departments.eee">{t('userManagement.departments.eee')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                  <select value={newUser.statusKey} onChange={(e) => setNewUser((p) => ({ ...p, statusKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <option value="userStatuses.active">{t('userManagement.userStatuses.active')}</option>
+                    <option value="userStatuses.inactive">{t('userManagement.userStatuses.inactive')}</option>
+                    <option value="userStatuses.pending">{t('userManagement.userStatuses.pending')}</option>
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button type="button" onClick={() => setShowAddUserModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add User</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

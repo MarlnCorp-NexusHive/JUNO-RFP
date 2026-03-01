@@ -565,6 +565,11 @@
     },
     "dashboard": {
       "title": "نظرة عامة",
+      "roleTitles": {
+        "marketing_head": "إدارة التسويق",
+        "procurement_manager": "إدارة المشتريات",
+        "sales_enablement_manager": "تمكين المبيعات"
+      },
       "welcome": "مرحباً بعودتك، رئيس عمليات التسويق",
       "newCampaignLaunch": "إطلاق حملة جديدة",
       "exportReport": "تصدير التقرير",

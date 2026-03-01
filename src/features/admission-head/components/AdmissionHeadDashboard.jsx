@@ -93,8 +93,9 @@ const getAlerts = (t) => [
 ];
 
 export default function AdmissionHeadDashboard() {
-  const { t, i18n, ready } = useTranslation(['admission', 'common']);
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const { t, i18n, ready } = useTranslation(['admission', 'common', 'welcome']);
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
+  const welcomeMessage = t(`welcome:${user?.username || 'recruitment_head'}`);
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedDepartment, setSelectedDepartment] = useState("all");
@@ -122,6 +123,7 @@ export default function AdmissionHeadDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50/60 to-purple-50/40 dark:from-gray-900 dark:to-gray-800 rounded-xl px-4 py-6" data-tour="2" data-tour-title-en="Header & Filters" data-tour-title-ar="الرأس والمرشحات" data-tour-content-en="Change department, time range, or export data." data-tour-content-ar="غيّر القسم، النطاق الزمني، أو صدّر البيانات.">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{welcomeMessage}</p>
           <p className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.subtitle')}</p>
         </div>
         <div className="flex gap-4">

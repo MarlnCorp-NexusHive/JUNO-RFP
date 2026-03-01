@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   UserGroupIcon,
   CurrencyDollarIcon,
@@ -40,10 +41,16 @@ const QuickAccessCard = ({ title, description, icon: Icon, path, color }) => (
 );
 
 const Dashboard = () => {
+  const { t } = useTranslation('welcome');
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
+  const welcomeMessage = t(user?.username || 'hr_head');
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">HR Head Dashboard</h1>
+      <div className="flex justify-between items-center flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome, {user?.displayName || 'HR Head'}!</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{welcomeMessage}</p>
+        </div>
         <div className="flex space-x-4">
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Generate Report

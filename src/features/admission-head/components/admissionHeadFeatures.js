@@ -1,6 +1,7 @@
 export const admissionHeadFeatures = [
   { label: "admissionHead.dashboard", icon: "🏠", route: "/rbac/admission-head", description: "Overview, metrics, and new lead details" },
   { label: "admissionHead.leadsApplicants", icon: "👥", route: "/rbac/admission-head/leads", description: "All leads, confirmed, follow-ups, assigned to me" },
+  { label: "admissionHead.team", icon: "👤", route: "/rbac/admission-head/team", description: "Team members, add counselors and admission officers" },
   { label: "admissionHead.applications", icon: "📝", route: "/rbac/admission-head/applications", description: "In progress, under review, interview scheduled, approved/rejected, confirmed" },
   { label: "admissionHead.scheduleAppointments", icon: "📅", route: "/rbac/admission-head/schedule", description: "Calendar, interview/test/callback booking" },
   { label: "admissionHead.communicationHub", icon: "💬", route: "/rbac/admission-head/communication", description: "Message center, templates, communication history" },

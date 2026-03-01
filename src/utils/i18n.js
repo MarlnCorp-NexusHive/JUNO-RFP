@@ -22,6 +22,7 @@ import enParent from '../locales/en/parent.json';
 import enSettings from '../locales/en/settings.json';
 import enAuth from '../locales/en/auth.json';
 import enUniversity from '../locales/en/university.json';
+import enWelcome from '../locales/en/welcome.json';
 
 import arCommon from '../locales/ar/common.json';
 import arNavigation from '../locales/ar/navigation.json';
@@ -42,6 +43,7 @@ import arParent from '../locales/ar/parent.json';
 import arSettings from '../locales/ar/settings.json';
 import arAuth from '../locales/ar/auth.json';
 import arUniversity from '../locales/ar/university.json';
+import arWelcome from '../locales/ar/welcome.json';
 
 const resources = {
   en: {
@@ -64,6 +66,7 @@ const resources = {
     settings: enSettings,
     auth: enAuth,
     university: enUniversity,
+    welcome: enWelcome,
   },
   ar: {
     common: arCommon,
@@ -85,6 +88,7 @@ const resources = {
     settings: arSettings,
     auth: arAuth,
     university: arUniversity,
+    welcome: arWelcome,
   },
 };
 
@@ -108,7 +112,7 @@ i18n
     ns: [
       'common', 'navigation', 'forms', 'messages', 'validation',
                     'dashboard', 'admission', 'marketing', 'hr', 'director', 'admin',
-      'student', 'professor', 'parent', 'settings', 'auth', 'university'
+      'student', 'professor', 'parent', 'settings', 'auth', 'university', 'welcome'
     ],
     defaultNS: 'common',
   });

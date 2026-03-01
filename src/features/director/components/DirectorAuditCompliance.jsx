@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -26,6 +27,8 @@ import {
 } from "react-icons/fi";
 
 export default function DirectorAuditCompliance() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/compliance");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [logFilter, setLogFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -47,8 +50,13 @@ export default function DirectorAuditCompliance() {
     );
   }
 
-  // Demo data using translation keys
-  const auditLogs = [
+  const pmAuditLogs = [
+    { id: 1, date: "2026-03-10", time: "14:30", action: "Proposal section updated", user: "Proposal Writer", statusKey: "auditStatuses.success", details: "Technical Approach – Water Wastewater RFP", priority: "low" },
+    { id: 2, date: "2026-03-09", time: "09:15", action: "Compliance checklist signed", user: "Compliance Specialist", statusKey: "auditStatuses.success", details: "FAR 52.219-9 – Landscape RFP", priority: "medium" },
+    { id: 3, date: "2026-03-08", time: "16:45", action: "Pricing export attempted", user: "Pricing Lead", statusKey: "auditStatuses.failed", details: "Insufficient permissions", priority: "high" },
+    { id: 4, date: "2026-03-07", time: "11:20", action: "Source document accessed", user: "Proposal Manager", statusKey: "auditStatuses.success", details: "Airport Restaurant RFP – Source Docs", priority: "medium" },
+  ];
+  const directorAuditLogs = [
     { 
       id: 1, 
       date: "2026-03-10", 
@@ -94,8 +102,15 @@ export default function DirectorAuditCompliance() {
       priority: "medium"
     },
   ];
+  const auditLogs = isPM ? pmAuditLogs : directorAuditLogs;
 
-  const complianceStatus = [
+  const pmComplianceStatus = [
+    { areaKey: "FAR Conformance", statusKey: "complianceStatuses.compliant", lastAudit: "2026-02-01", score: 95, icon: FiCheckCircle, color: "green" },
+    { areaKey: "RFP Requirements Matrix", statusKey: "complianceStatuses.pending", lastAudit: "2026-02-15", score: 78, icon: FiClock, color: "yellow" },
+    { areaKey: "Proposal Audit Trail", statusKey: "complianceStatuses.compliant", lastAudit: "2026-01-20", score: 92, icon: FiCheckCircle, color: "green" },
+    { areaKey: "Past Performance Refs", statusKey: "complianceStatuses.compliant", lastAudit: "2026-02-10", score: 88, icon: FiCheckCircle, color: "green" },
+  ];
+  const directorComplianceStatus = [
     { 
       areaKey: "complianceAreas.ncaaa", 
       statusKey: "complianceStatuses.compliant", 
@@ -129,6 +144,7 @@ export default function DirectorAuditCompliance() {
       color: "green"
     },
   ];
+  const complianceStatus = isPM ? pmComplianceStatus : directorComplianceStatus;
 
   const riskAnalytics = [
     { 
@@ -196,14 +212,13 @@ export default function DirectorAuditCompliance() {
   };
 
   const filteredLogs = auditLogs.filter(log => {
-    const matchesFilter = logFilter === "" || 
-      t(`auditCompliance.${log.userKey}`).toLowerCase().includes(logFilter.toLowerCase()) || 
-      t(`auditCompliance.${log.actionKey}`).toLowerCase().includes(logFilter.toLowerCase());
-    
+    const searchable = isPM
+      ? [(log.user || ""), (log.action || ""), (log.details || "")].join(" ").toLowerCase()
+      : [t(`auditCompliance.${log.userKey || ""}`), t(`auditCompliance.${log.actionKey || ""}`)].join(" ").toLowerCase();
+    const matchesFilter = logFilter === "" || searchable.includes(logFilter.toLowerCase());
     const matchesStatus = selectedStatus === "all" || 
       (selectedStatus === "success" && log.statusKey === "auditStatuses.success") ||
       (selectedStatus === "failed" && log.statusKey === "auditStatuses.failed");
-    
     return matchesFilter && matchesStatus;
   });
 
@@ -234,10 +249,10 @@ export default function DirectorAuditCompliance() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiShield className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {t('auditCompliance.title')}
+                {isPM ? "Proposal & RFP Compliance" : t('auditCompliance.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {t('auditCompliance.subtitle')}
+                {isPM ? "FAR conformance, RFP requirements, proposal audit trail, and past performance." : t('auditCompliance.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -284,7 +299,7 @@ export default function DirectorAuditCompliance() {
                 </div>
                 <div className="space-y-2">
                   <div className="font-semibold text-sm text-gray-900 dark:text-white">
-                    {t(`auditCompliance.${c.areaKey}`)}
+                    {isPM ? c.areaKey : t(`auditCompliance.${c.areaKey}`)}
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{c.score}%</div>
@@ -371,13 +386,13 @@ export default function DirectorAuditCompliance() {
                     <tr key={idx} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                       <td className="py-3 px-2 text-gray-600 dark:text-gray-400">{log.date}</td>
                       <td className="py-3 px-2 text-gray-600 dark:text-gray-400">{log.time}</td>
-                      <td className="py-3 px-2 text-gray-900 dark:text-white">{t(`auditCompliance.${log.actionKey}`)}</td>
+                      <td className="py-3 px-2 text-gray-900 dark:text-white">{isPM ? log.action : t(`auditCompliance.${log.actionKey}`)}</td>
                       <td className="py-3 px-2 text-gray-900 dark:text-white flex items-center gap-2">
                         <FiUser className="w-4 h-4 text-gray-400" />
-                        {t(`auditCompliance.${log.userKey}`)}
+                        {isPM ? log.user : t(`auditCompliance.${log.userKey}`)}
                       </td>
                       <td className="py-3 px-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(log.statusKey.split('.').pop())}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(log.statusKey?.split('.').pop() || '')}`}>
                           {t(`auditCompliance.${log.statusKey}`)}
                         </span>
                       </td>
@@ -389,11 +404,13 @@ export default function DirectorAuditCompliance() {
                       <td className="py-3 px-2 text-gray-600 dark:text-gray-400">
                         <div className="flex items-center gap-1">
                           <FiActivity className="w-3 h-3" />
-                          {t(`auditCompliance.${log.detailsKey}`)}
+                          {isPM ? log.details : t(`auditCompliance.${log.detailsKey}`)}
                         </div>
+                        {!isPM && log.ipAddress && (
                         <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                           IP: {log.ipAddress}
                         </div>
+                        )}
                       </td>
                       <td className="py-3 px-2">
                         <button className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">

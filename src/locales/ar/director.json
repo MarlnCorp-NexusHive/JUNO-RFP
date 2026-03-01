@@ -1139,6 +1139,7 @@
       "auditCompliance": "التدقيق والامتثال",
       "meetingsCalendar": "الاجتماعات والتقويم",
       "userManagement": "إدارة المستخدمين",
+      "workspace": "مساحة العمل",
       "settings": "الإعدادات",
       "helpSupport": "المساعدة والدعم",
       "communicationHub": "مركز الاتصالات",
@@ -1193,6 +1194,7 @@
       "financialOverview": "نظرة عامة مالية",
       "hrStaffAnalytics": "تحليلات الموارد البشرية والموظفين",
       "alertsNotifications": "التنبيهات والإشعارات",
+      "alertsNotificationsProposalManager": "تنبيهات وعروض RFP والإشعارات",
       "aiPoweredForecasts": "التوقعات المدعومة بالذكاء الاصطناعي",
       "aiPoweredRevenue": "تحليلات الإيرادات والتحويل المدعومة بالذكاء الاصطناعي"
     },
@@ -1250,7 +1252,15 @@
       "pendingBudgetApprovals": "موافقات الميزانية المعلقة: 3",
       "complianceAlert": "تنبيه الامتثال: تقرير الهيئة الوطنية مستحق",
       "upcomingExamDeadline": "موعد الامتحان القادم: 15 يوليو",
-      "newFeedbackStudents": "تعليقات جديدة من الطلاب"
+      "newFeedbackStudents": "تعليقات جديدة من الطلاب",
+      "proposalManager": {
+        "rfpSubmissionDeadline": "موعد تقديم RFP خلال 3 أيام: خدمات DoD IT (المناقصة #2025-084)",
+        "complianceReviewDue": "مراجعة الامتثال مستحقة: بندان إلزاميان يحتاجان موافقة قبل التقديم",
+        "bidApprovalPending": "قرار تقديم/عدم تقديم معلق: فرصة واحدة بانتظار موافقتك",
+        "teamAssignmentNeeded": "تعيين الفريق مطلوب: قائد استراتيجية الاستحواذ غير معين لـ GSA BPA",
+        "pastPerformanceUpdate": "تحديث الأداء السابق: استبيان PP جديد لإكماله لمتابعة NASA",
+        "pricingReviewRequired": "مراجعة التسعير مطلوبة: أسعار العمالة تحتاج تحقق لإعادة منافسة DHS"
+      }
     },
     "modalContent": {
       "undergraduates": "طلاب البكالوريوس",

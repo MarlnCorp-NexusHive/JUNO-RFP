@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLocalization } from "/src/hooks/useLocalization";
 import { FiTarget } from 'react-icons/fi';
 import MarketingReplySuggestions from './ai/MarketingReplySuggestions';
@@ -110,9 +111,24 @@ const commLogs = [
 
 
 export default function MarketingHeadCommunicationHub() {
+  const location = useLocation();
+  const isPM = location.pathname.includes("/rbac/proposal-manager/communication");
   const { t, ready, i18n } = useTranslation('marketing');
   const [languageVersion, setLanguageVersion] = useState(0);
   const { isRTLMode } = useLocalization();
+
+  const pmChannels = [
+    { id: 1, name: 'Proposal Kickoffs', type: 'Internal', lastMessage: 'Water Wastewater RFP – Kickoff tomorrow 10 AM', participants: 8, unread: 2, status: 'Active' },
+    { id: 2, name: 'Color Team Reviews', type: 'Project', lastMessage: 'Landscape Maintenance draft ready for review', participants: 5, unread: 1, status: 'Active' },
+    { id: 3, name: 'Pricing & Compliance', type: 'Internal', lastMessage: 'FAR 52.219-9 checklist due Friday', participants: 4, unread: 0, status: 'Active' },
+  ];
+  const pmRecentMessages = [
+    { id: 1, sender: 'Michael Anderson', content: 'Section assignments for Water Wastewater are in the workspace', timestamp: '10:30 AM', channel: 'Proposal Kickoffs' },
+    { id: 2, sender: 'David Reynolds', content: 'Go/No-Go for Surplus Tanks – 2 PM today', timestamp: '09:45 AM', channel: 'Proposal Kickoffs' },
+    { id: 3, sender: 'Sarah Chen', content: 'Technical approach draft uploaded for review', timestamp: 'Yesterday', channel: 'Color Team Reviews' },
+  ];
+  const channelsToUse = isPM ? pmChannels : communicationChannels;
+  const recentMessagesToUse = isPM ? pmRecentMessages : recentMessages;
   
   // AI Features State
 const [showReplySuggestions, setShowReplySuggestions] = useState(false);
@@ -208,7 +224,7 @@ const handleShowReplySuggestions = () => {
             <div>
               <h3 className="font-semibold mb-2">{t('communication.modal.recentMessages')}</h3>
               <div className="space-y-2">
-                {recentMessages.map((message) => (
+                {recentMessagesToUse.map((message) => (
                   <div key={message.id} className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex justify-between items-start">
                       <div>
@@ -246,10 +262,10 @@ const handleShowReplySuggestions = () => {
   <div className={isRTLMode ? 'text-right' : 'text-left'}>
     <h1 className={`text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
       {isRTLMode && <FiMessageCircle className="text-blue-500" />}
-      {t('communication.title')}
+      {isPM ? "Proposal Communication" : t('communication.title')}
       {!isRTLMode && <FiMessageCircle className="text-blue-500" />}
     </h1>
-    <p className="text-sm text-gray-600 dark:text-gray-300">{t('communication.subtitle')}</p>
+    <p className="text-sm text-gray-600 dark:text-gray-300">{isPM ? "Kickoffs, reviews, and team messaging for proposals and RFPs." : t('communication.subtitle')}</p>
   </div>
   
   {/* AI Features Button */}

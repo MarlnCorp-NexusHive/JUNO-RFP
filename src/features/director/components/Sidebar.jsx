@@ -8,7 +8,7 @@ import SageAIButton from "../../../components/ui/SageAIButton";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
 import nexushiveLogo from "../../../assets/nexushivelogo.png";
 
-export default function Sidebar({ features, userLabel, expanded, setExpanded }) {
+export default function Sidebar({ features, userLabel, expanded, setExpanded, role = "director" }) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,16 +77,16 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
               <button
                 key={f.label}
                 onClick={() => navigate(f.route)}
-                className={`group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-lg font-medium relative
+                className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 text-sm font-medium relative
                   ${isActive ? (darkTheme ? 'bg-gray-700 shadow-lg' : 'bg-white/20 shadow-lg') : ''}
-                  ${expanded ? 'justify-start' : 'justify-center'}
+                  ${expanded ? 'justify-start min-w-0 w-full' : 'justify-center'}
                   ${!isActive ? (darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/10') : ''}
                   ${isRTLMode ? 'text-right' : 'text-left'}
                 `}
                 title={!expanded ? t(f.label) : undefined}
               >
-                <span className="text-2xl">{f.icon}</span>
-                {expanded && <span className="whitespace-nowrap text-white">{t(f.label)}</span>}
+                <span className="text-2xl flex-shrink-0">{f.icon}</span>
+                {expanded && <span className="text-white break-words min-w-0">{t(f.label)}</span>}
                 {/* Tooltip for collapsed */}
                 {!expanded && (
                   <span className={`absolute top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg ${
@@ -106,7 +106,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
         darkTheme ? 'border-gray-700' : 'border-white/20'
       }`}>
         {/* Enhanced Sage AI Button */}
-        <SageAIButton expanded={expanded} darkTheme={darkTheme} isRTLMode={isRTLMode} role="director" />
+        <SageAIButton expanded={expanded} darkTheme={darkTheme} isRTLMode={isRTLMode} role={role} />
         
         {/* Language Switcher */}
         <SidebarLanguageSwitcher expanded={expanded} darkTheme={darkTheme} />
@@ -121,7 +121,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
         
         {/* Smart Tour Button */}
         <SmartTourButton
-          role="director"
+          role={role}
           expanded={expanded}
           darkTheme={darkTheme}
           onTourStart={(role, page) => console.log(`Tour started for ${role}/${page}`)}
@@ -142,7 +142,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
               <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
             </svg>
           </span>
-          {expanded && <span className="text-white whitespace-nowrap">{t('sidebar.logout')}</span>}
+          {expanded && <span className="text-white break-words min-w-0">{t('sidebar.logout')}</span>}
         </button>
         <button
           onClick={() => setExpanded((e) => !e)}

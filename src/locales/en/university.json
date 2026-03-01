@@ -154,7 +154,7 @@
     }
   },
   "marlnCrm": {
-    "title": "NexusHive ERP",
+    "title": "NexusHive eProcure",
       "subtitle": "Transform Your corporate organization with AI-Powered ERP Management",
       "watchDemo": "Watch Demo",
       "downloadBrochure": "Download Brochure",
@@ -178,7 +178,7 @@
       "clientSatisfaction": "Client Satisfaction"
     },
     "overview": {
-      "title": "Why Choose NexusHive ERP?",
+      "title": "Why Choose NexusHive eProcure?",
       "description1": "Our comprehensive ERP solution is designed specifically for corporate organizations, providing everything you need to manage employees, teams, and business processes in one unified platform.",
       "description2": "With advanced AI capabilities, real-time analytics, and seamless integration options, we help organizations streamline operations and enhance business success.",
       "platformType": "Platform Type",
@@ -229,7 +229,7 @@
         "name": "Dr. Sarah Johnson",
         "role": "Corporate Director",
         "company": "Tech Corp",
-        "content": "NexusHive ERP has revolutionized our client management process. The AI insights help us make better decisions."
+        "content": "NexusHive eProcure has revolutionized our client management process. The AI insights help us make better decisions."
       },
       "client2": {
         "name": "Michael Chen",

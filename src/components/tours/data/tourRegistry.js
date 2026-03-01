@@ -37,6 +37,22 @@ export const tourRegistry = {
     support: true              // ✅ Has tour
   },
 
+  // PROPOSAL MANAGER ROLE - same pages as Director (cloned UI)
+  'proposal-manager': {
+    dashboard: true,
+    analytics: true,
+    departments: true,
+    approvals: true,
+    'strategic-planning': true,
+    communication: true,
+    audit: true,
+    calendar: true,
+    users: true,
+    settings: true,
+    workspace: true,
+    support: true
+  },
+
   // ADMISSION HEAD ROLE - 13 pages
   'admission-head': {
     dashboard: true,           // ✅ Has tour

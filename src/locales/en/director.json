@@ -1141,6 +1141,7 @@
       "auditCompliance": "Audit & Compliance",
       "meetingsCalendar": "Meetings & Calendar",
       "userManagement": "User Management",
+      "workspace": "Workspace",
       "settings": "Settings",
       "helpSupport": "Help & Support",
       "communicationHub": "Communication Hub",
@@ -1195,6 +1196,7 @@
       "financialOverview": "Financial Overview",
       "hrStaffAnalytics": "HR & Team Analytics",
       "alertsNotifications": "Alerts & Notifications",
+      "alertsNotificationsProposalManager": "RFP Alerts & Notifications",
       "aiPoweredForecasts": "AI-Powered Forecasts",
       "aiPoweredRevenue": "AI-Powered Revenue & Conversion Analytics"
     },
@@ -1252,7 +1254,15 @@
       "pendingBudgetApprovals": "Pending Budget Approvals: 3",
       "complianceAlert": "Compliance Alert: NCAAA Report Due",
       "upcomingExamDeadline": "Upcoming Project Deadline: 15th July",
-      "newFeedbackStudents": "New Feedback from Employees"
+      "newFeedbackStudents": "New Feedback from Employees",
+      "proposalManager": {
+        "rfpSubmissionDeadline": "RFP submission deadline in 3 days: DoD IT Services (Solicitation #2025-084)",
+        "complianceReviewDue": "Compliance review due: 2 mandatory clauses need sign-off before submission",
+        "bidApprovalPending": "Bid/No-Bid decision pending: 1 opportunity awaiting your approval",
+        "teamAssignmentNeeded": "Team assignment needed: Capture Strategy lead not assigned for GSA BPA",
+        "pastPerformanceUpdate": "Past performance update: 1 new PP questionnaire to complete for NASA follow-on",
+        "pricingReviewRequired": "Pricing review required: Labor rates need validation for DHS recompete"
+      }
     },
     "modalContent": {
       "undergraduates": "Full-Time",

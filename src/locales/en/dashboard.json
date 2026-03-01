@@ -1,5 +1,10 @@
 {
   "title": "Dashboard",
+  "roleTitles": {
+    "marketing_head": "Marketing Management",
+    "procurement_manager": "Procurement Management",
+    "sales_enablement_manager": "Sales Enablement"
+  },
   "welcome": "Welcome to your dashboard",
   "stats": "Statistics",
   "overview": "Overview",
@@ -16,6 +21,22 @@
     "totalLeads": "Total Leads",
     "campaignROI": "Campaign ROI",
     "followers": "Followers"
+  },
+  "kpisByRole": {
+    "procurement_manager": {
+      "totalQualifiedLeads": "Open Purchase Requests",
+      "conversionRate": "Approval Rate",
+      "activeCampaigns": "Active Vendors",
+      "teamMembers": "Team Members",
+      "roi": "Savings %"
+    },
+    "sales_enablement_manager": {
+      "totalQualifiedLeads": "Content Items",
+      "conversionRate": "Completion Rate",
+      "activeCampaigns": "Active Playbooks",
+      "teamMembers": "Team Members",
+      "roi": "Adoption %"
+    }
   },
   "charts": {
     "leadGenerationActionable": "Lead Generation Actionable",
@@ -107,5 +128,42 @@
     "apr": "Apr",
     "may": "May",
     "jun": "Jun"
+  },
+  "procurement": {
+    "spendOverTime": "Spend Over Time",
+    "spendByCategory": "Spend by Category",
+    "poStatusBreakdown": "PO Status Breakdown",
+    "supplierMatrix": "Supplier Performance Matrix",
+    "savingsVsBudget": "Savings vs Budget",
+    "spend": "Spend",
+    "budget": "Budget",
+    "savings": "Savings",
+    "vendor": "Vendor",
+    "onTimeDelivery": "On-Time %",
+    "qualityScore": "Quality Score",
+    "totalSpend": "Total Spend",
+    "status": "Status",
+    "pending": "Pending",
+    "approved": "Approved",
+    "inProgress": "In Progress",
+    "delivered": "Delivered",
+    "categories": {
+      "it": "IT & Software",
+      "facilities": "Facilities",
+      "marketing": "Marketing",
+      "office": "Office Supplies",
+      "services": "Professional Services"
+    },
+    "spendByCategoryOverTime": "Spend by Category Over Time",
+    "topVendorsBySpend": "Top Vendors by Spend",
+    "savingsTrend": "Monthly Savings Trend",
+    "budgetVsActualByCategory": "Budget vs Actual by Category",
+    "poCountByCategory": "PO Count by Category",
+    "vendorQuadrant": "Vendor Performance Quadrant",
+    "contractRenewals": "Upcoming Contract Renewals",
+    "budgetUtilization": "Budget Utilization",
+    "actual": "Actual",
+    "expires": "Expires",
+    "valueK": "Value (K)"
   }
 } 

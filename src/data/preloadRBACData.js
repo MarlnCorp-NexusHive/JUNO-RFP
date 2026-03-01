@@ -15,6 +15,7 @@ export const preloadTeams = [
   { name: 'Exam Team', roles: ['Head', 'Executive'] },
   { name: 'Library Team', roles: ['Head', 'Executive'] },
   { name: 'Transport Team', roles: ['Head', 'Driver', 'Helper'] },
+  { name: 'Proposal Team', roles: ['Proposal Manager'] },
 ];
 
 export const preloadRoleTemplates = [

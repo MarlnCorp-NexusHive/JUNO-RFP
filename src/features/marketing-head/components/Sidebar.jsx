@@ -62,7 +62,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
             className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'}`}
           />
           {expanded && (
-            <span className="ml-3 text-2xl font-bold tracking-wide text-white">{t('roles.marketingHead')}</span>
+            <span className="ml-3 text-2xl font-bold tracking-wide text-white">{userLabel || t('roles.marketingHead')}</span>
           )}
         </button>
       </div>

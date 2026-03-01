@@ -1,5 +1,6 @@
 import React from "react";
 import Sidebar from "./Sidebar";
+import { useTranslation } from "react-i18next";
 
 const features = [
   { label: "Dashboard", icon: "🏠", route: "/rbac/hr-head" },
@@ -10,11 +11,15 @@ const features = [
 ];
 
 export default function HRHeadDashboard() {
+  const { t } = useTranslation('welcome');
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
+  const welcomeMessage = t(user?.username || 'hr_head');
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#ede7f6] to-[#e3f0ff]">
       <Sidebar features={features} />
       <main className="flex-1 p-10 flex flex-col gap-8">
-        <h1 className="text-3xl font-bold text-[#4f3cc9] mb-4">Welcome, HR Head!</h1>
+        <h1 className="text-3xl font-bold text-[#4f3cc9] mb-2">Welcome, {user?.displayName || 'HR Head'}!</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">{welcomeMessage}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-start">
             <span className="text-2xl mb-2">👥</span>

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
@@ -297,12 +298,82 @@ const complianceMetrics = {
 
 const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
+// Proposal Manager – Bid Vault (RFP submissions, win/loss, pipeline)
+const bidVaultData = {
+  submissionFunnel: [
+    { stage: "RFPs Identified", count: 48, conversion: 100 },
+    { stage: "Go/No-Go", count: 32, conversion: 67 },
+    { stage: "Proposal Submitted", count: 22, conversion: 46 },
+    { stage: "Shortlisted", count: 12, conversion: 25 },
+    { stage: "Won", count: 7, conversion: 15 },
+  ],
+  winLossBySegment: [
+    { segment: "Federal", won: 4, lost: 6, pending: 2 },
+    { segment: "State/Local", won: 2, lost: 5, pending: 1 },
+    { segment: "Commercial", won: 1, lost: 3, pending: 2 },
+    { segment: "International", won: 0, lost: 2, pending: 1 },
+  ],
+  pipelineByStage: [
+    { stage: "Qualification", value: 12, count: 8 },
+    { stage: "Capture", value: 18, count: 6 },
+    { stage: "Proposal", value: 8, count: 4 },
+    { stage: "Submitted", value: 5, count: 3 },
+  ],
+  submissionsTrend: [
+    { month: "Jan", submitted: 4, won: 1 },
+    { month: "Feb", submitted: 5, won: 2 },
+    { month: "Mar", submitted: 6, won: 1 },
+    { month: "Apr", submitted: 3, won: 2 },
+    { month: "May", submitted: 7, won: 1 },
+    { month: "Jun", submitted: 5, won: 0 },
+  ],
+  winRateByFiscal: [
+    { year: "FY24", rate: 28, submissions: 18 },
+    { year: "FY25", rate: 32, submissions: 22 },
+    { year: "FY26", rate: 35, submissions: 24 },
+  ],
+};
+
+// Proposal Manager – Content Hub (past performance, boilerplate, library)
+const contentHubData = {
+  pastPerformanceByCategory: [
+    { category: "IT/Software", projects: 12, reuseRate: 85 },
+    { category: "Professional Services", projects: 8, reuseRate: 72 },
+    { category: "Construction", projects: 5, reuseRate: 60 },
+    { category: "Research", projects: 6, reuseRate: 78 },
+  ],
+  boilerplateUsage: [
+    { section: "Technical Approach", uses: 45, lastUpdated: "2026-02" },
+    { section: "Management", uses: 38, lastUpdated: "2026-01" },
+    { section: "Past Performance", uses: 52, lastUpdated: "2026-02" },
+    { section: "Pricing", uses: 28, lastUpdated: "2025-12" },
+  ],
+  contentLibrary: [
+    { type: "Resumes", count: 120, updated: 35 },
+    { type: "Project Summaries", count: 48, updated: 12 },
+    { type: "Case Studies", count: 24, updated: 8 },
+    { type: "Certifications", count: 18, updated: 5 },
+  ],
+  reuseTrend: [
+    { month: "Jan", reuseCount: 85 },
+    { month: "Feb", reuseCount: 92 },
+    { month: "Mar", reuseCount: 88 },
+    { month: "Apr", reuseCount: 95 },
+    { month: "May", reuseCount: 102 },
+    { month: "Jun", reuseCount: 98 },
+  ],
+};
+
 export default function DirectorAnalyticsReports() {
+  const location = useLocation();
   const { t, ready } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isBidVault = location.pathname.includes("/rbac/proposal-manager/bid-vault");
+  const isContentHub = location.pathname.includes("/rbac/proposal-manager/content-hub");
+  const isPM = isBidVault || isContentHub;
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [timeRange, setTimeRange] = useState("6M");
-  const [activeTab, setActiveTab] = useState("recruitment");
+  const [activeTab, setActiveTab] = useState(isBidVault ? "submissions" : isContentHub ? "pastPerformance" : "recruitment");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
 
   // AI Features State
@@ -1096,18 +1167,238 @@ export default function DirectorAnalyticsReports() {
     </>
   );
 
+  const renderBidVaultSubmissions = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Proposal Submission Funnel</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={bidVaultData.submissionFunnel} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="stage" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="conversion" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Submissions vs Wins (6M)</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={bidVaultData.submissionsTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="submitted" stroke="#6366f1" strokeWidth={2} name="Submitted" />
+              <Line type="monotone" dataKey="won" stroke="#22c55e" strokeWidth={2} name="Won" />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Win Rate by Fiscal Year</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={bidVaultData.winRateByFiscal} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="rate" fill="#10b981" radius={[4, 4, 0, 0]} name="Win %" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
+    </>
+  );
+  const renderBidVaultWinLoss = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Win/Loss by Segment</h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={bidVaultData.winLossBySegment} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="segment" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="won" fill="#22c55e" radius={[4, 4, 0, 0]} name="Won" />
+              <Bar dataKey="lost" fill="#ef4444" radius={[4, 4, 0, 0]} name="Lost" />
+              <Bar dataKey="pending" fill="#eab308" radius={[4, 4, 0, 0]} name="Pending" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Pipeline by Stage ($M)</h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={bidVaultData.pipelineByStage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} name="Value ($M)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
+    </>
+  );
+  const renderBidVaultPipeline = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Pipeline Value by Stage</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={bidVaultData.pipelineByStage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Submission Funnel</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={bidVaultData.submissionFunnel} dataKey="count" nameKey="stage" cx="50%" cy="50%" outerRadius={80} label>
+                {bidVaultData.submissionFunnel.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
+    </>
+  );
+  const renderContentHubPastPerformance = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Past Performance by Category</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={contentHubData.pastPerformanceByCategory} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="projects" fill="#6366f1" radius={[4, 4, 0, 0]} name="Projects" />
+              <Bar dataKey="reuseRate" fill="#22c55e" radius={[4, 4, 0, 0]} name="Reuse %" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Content Reuse Trend</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={contentHubData.reuseTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="reuseCount" stroke="#6366f1" strokeWidth={2} name="Reuses" />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Content Library Overview</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={contentHubData.contentLibrary} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="type" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} name="Total" />
+              <Bar dataKey="updated" fill="#22c55e" radius={[4, 4, 0, 0]} name="Updated (6M)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
+    </>
+  );
+  const renderContentHubBoilerplate = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Boilerplate Usage by Section</h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={contentHubData.boilerplateUsage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="section" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="uses" fill="#6366f1" radius={[4, 4, 0, 0]} name="Uses (6M)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Content Library by Type</h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={contentHubData.contentLibrary} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="type" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Count" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
+    </>
+  );
+  const renderContentHubLibrary = () => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Resumes & Project Summaries</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={contentHubData.contentLibrary} dataKey="count" nameKey="type" cx="50%" cy="50%" outerRadius={60} label>
+                {contentHubData.contentLibrary.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Boilerplate Last Updated</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={contentHubData.boilerplateUsage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <XAxis dataKey="section" tick={{ fontSize: 9 }} />
+              <YAxis hide />
+              <Tooltip />
+              <Bar dataKey="uses" fill="#22c55e" radius={[4, 4, 0, 0]} name="Uses" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
+    </>
+  );
+
   return (
     <div className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? 'rtl' : 'ltr'}`}>
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {/* Header Section */}
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 ${isRTLMode ? 'flex-row-reverse' : ''}`} data-tour="1">
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('analyticsReports.title')}</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t('analyticsReports.subtitle')}</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {isBidVault ? "Bid Vault" : isContentHub ? "Content Hub" : t('analyticsReports.title')}
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {isBidVault ? "Bid repository, submission tracking, and win/loss analytics." : isContentHub ? "Past performance library, boilerplate, and reusable content." : t('analyticsReports.subtitle')}
+            </p>
           </div>
           
           <div className={`flex flex-col sm:flex-row gap-3 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
-            {/* AI Features Button */}
+            {/* AI Features Button – hidden for Proposal Manager */}
+            {!isPM && (
             <div className={`flex-shrink-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
               <button 
                 className={`px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 transition-colors whitespace-nowrap ${isRTLMode ? 'flex-row-reverse' : ''}`}
@@ -1122,8 +1413,10 @@ export default function DirectorAnalyticsReports() {
                 </span>
               </button>
             </div>
+            )}
 
-            {/* Filter Controls */}
+            {/* Filter Controls – hide for PM or show segment/time */}
+            {!isPM && (
             <div className={`flex flex-wrap gap-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
               <select
                 value={selectedDepartment}
@@ -1148,11 +1441,24 @@ export default function DirectorAnalyticsReports() {
                 <option value="1Y">{t('analyticsReports.lastYear')}</option>
               </select>
             </div>
+            )}
+            {isPM && (
+            <div className={`flex flex-wrap gap-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              >
+                <option value="6M">Last 6 months</option>
+                <option value="1Y">Last year</option>
+              </select>
+            </div>
+            )}
           </div>
         </div>
 
-        {/* AI Financial Intelligence Section */}
-        {showFinancialIntelligence && (
+        {/* AI Financial Intelligence Section – hidden for Proposal Manager */}
+        {!isPM && showFinancialIntelligence && (
           <section 
             ref={financialRef}
             className="bg-white dark:bg-gray-800 rounded-xl shadow p-6"
@@ -1183,14 +1489,34 @@ export default function DirectorAnalyticsReports() {
 
         {/* Navigation Tabs */}
         <div className={`flex flex-wrap gap-2 ${isRTLMode ? 'flex-row-reverse' : ''}`} data-tour="2">
-          {["recruitment", "financial", "operations", "engagement", "clients", "compliance"].map((tab) => (
+          {isBidVault && ["submissions", "winLoss", "pipeline"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === tab
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900"
+                activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900"
+              }`}
+            >
+              {tab === "submissions" ? "Submissions" : tab === "winLoss" ? "Win/Loss" : "Pipeline"}
+            </button>
+          ))}
+          {isContentHub && ["pastPerformance", "boilerplate", "library"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900"
+              }`}
+            >
+              {tab === "pastPerformance" ? "Past Performance" : tab === "boilerplate" ? "Boilerplate" : "Library"}
+            </button>
+          ))}
+          {!isPM && ["recruitment", "financial", "operations", "engagement", "clients", "compliance"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900"
               }`}
             >
               {t(`analyticsReports.tabs.${tab}`)}
@@ -1199,12 +1525,18 @@ export default function DirectorAnalyticsReports() {
         </div>
 
         {/* Content Sections */}
-        {activeTab === "recruitment" && renderRecruitmentSection()}
-        {activeTab === "financial" && renderFinancialSection()}
-        {activeTab === "operations" && renderOperationsSection()}
-        {activeTab === "engagement" && renderEmployeeEngagementSection()}
-        {activeTab === "clients" && renderClientSection()}
-        {activeTab === "compliance" && renderComplianceSection()}
+        {isBidVault && activeTab === "submissions" && renderBidVaultSubmissions()}
+        {isBidVault && activeTab === "winLoss" && renderBidVaultWinLoss()}
+        {isBidVault && activeTab === "pipeline" && renderBidVaultPipeline()}
+        {isContentHub && activeTab === "pastPerformance" && renderContentHubPastPerformance()}
+        {isContentHub && activeTab === "boilerplate" && renderContentHubBoilerplate()}
+        {isContentHub && activeTab === "library" && renderContentHubLibrary()}
+        {!isPM && activeTab === "recruitment" && renderRecruitmentSection()}
+        {!isPM && activeTab === "financial" && renderFinancialSection()}
+        {!isPM && activeTab === "operations" && renderOperationsSection()}
+        {!isPM && activeTab === "engagement" && renderEmployeeEngagementSection()}
+        {!isPM && activeTab === "clients" && renderClientSection()}
+        {!isPM && activeTab === "compliance" && renderComplianceSection()}
       </main>
     </div>
   );
