@@ -102,6 +102,8 @@ import DirectorSupport from './features/director/components/DirectorSupport';
 import ProposalManagerLayout from './features/proposal-manager/components/ProposalManagerLayout';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
+import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
+import ProposalManagerContentHub from './features/proposal-manager/components/ProposalManagerContentHub';
 import { LocalizationProvider } from './hooks/useLocalization.jsx';
 import './utils/i18n'; // Initialize i18n
 // Add this line with other imports (around line 100)
@@ -213,13 +215,13 @@ export default function App() {
           <Route path="team" element={<MarketingHeadTeamManagement />} />
           <Route path="bid-vault" element={<DirectorAnalyticsReports />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
-          <Route path="content-hub" element={<DirectorAnalyticsReports />} />
+          <Route path="content-hub" element={<ProposalManagerContentHub />} />
           <Route path="pricing" element={<ProposalPricingPage />} />
           <Route path="communication" element={<MarketingHeadCommunicationHub />} />
           <Route path="compliance" element={<DirectorAuditCompliance />} />
           <Route path="meetings-calendar" element={<DirectorMeetingsCalendar />} />
           <Route path="user-management" element={<DirectorUserManagement />} />
-          <Route path="workspace" element={<DirectorWorkspace />} />
+          <Route path="workspace" element={<ProposalManagerWorkspace />} />
           <Route path="help-support" element={<DirectorSupport />} />
           <Route path="settings" element={<DirectorSettings />} />
           <Route path="ai-chat" element={<DirectorAIChat />} />
