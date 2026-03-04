@@ -10,7 +10,7 @@ export default function CookiePolicy() {
         </h1>
         <section className="mb-6">
           <h2 className="text-xl font-semibold text-[#3B2175] mb-2">Introduction</h2>
-          <p className="text-gray-700">This Cookie Policy explains how NexusHive uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are, why we use them, and your rights to control our use of them.</p>
+          <p className="text-gray-700">This Cookie Policy explains how MARLN ERP uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are, why we use them, and your rights to control our use of them.</p>
         </section>
         <section className="mb-6">
           <h2 className="text-xl font-semibold text-[#3B2175] mb-2">What Are Cookies?</h2>
@@ -45,7 +45,7 @@ export default function CookiePolicy() {
         </section>
         <section>
           <h2 className="text-xl font-semibold text-[#3B2175] mb-2">Contact Us</h2>
-          <p className="text-gray-700">If you have any questions about our use of cookies, please contact us at <a href="mailto:support@nexushive.com" className="text-[#7C3AED] underline">support@nexushive.com</a>.</p>
+          <p className="text-gray-700">If you have any questions about our use of cookies, please contact us at <a href="mailto:support@marln.com" className="text-[#7C3AED] underline">support@marln.com</a>.</p>
         </section>
       </div>
     </div>

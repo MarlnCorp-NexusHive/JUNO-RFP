@@ -1,18 +1,18 @@
 {
   "university": {
-    "name": "NexusHive Corporation",
+    "name": "MARLN Corporation",
     "motto": "Excellence in Business Operations, Innovation in Corporate Leadership",
     "established": "2018",
     "type": "Enterprise Business Corporation",
     "accreditation": "ISO 9001 Certified",
     "location": "Riyadh, Kingdom of Saudi Arabia",
-    "website": "www.nexushive.com",
+    "website": "www.marln.com",
     "phone": "+966 11 520 0000",
-    "email": "info@nexushive.com",
+    "email": "info@marln.com",
     "vision2030": "Vision 2030 Initiative",
-    "campusAlt": "NexusHive Headquarters",
-    "campusViewAlt": "NexusHive Corporate Office",
-    "logoAlt": "NexusHive Logo",
+    "campusAlt": "MARLN Headquarters",
+    "campusViewAlt": "MARLN Corporate Office",
+    "logoAlt": "MARLN Logo",
     "bannerText": {
       "excellence": "Excellence in Business Operations",
       "shaping": "Shaping Future Business Leaders of Saudi Arabia"
@@ -52,10 +52,10 @@
       }
     },
     "about": {
-      "title": "About NexusHive",
-      "description1": "NexusHive Corporation is a premier business organization in the heart of Riyadh, established as part of Saudi Arabia's Vision 2030 initiative. We are committed to developing world-class business leaders who will drive the Kingdom's economic transformation.",
-      "description2": "Our corporation offers cutting-edge business solutions designed to meet the evolving needs of the global business landscape. With state-of-the-art facilities and partnerships with leading international organizations, NexusHive provides an exceptional business environment.",
-      "description3": "Rooted in Saudi Arabian values while embracing global business practices, NexusHive prepares employees to excel in both local and international markets, contributing to the Kingdom's ambitious economic goals.",
+      "title": "About MARLN",
+      "description1": "MARLN Corporation is a premier business organization in the heart of Riyadh, established as part of Saudi Arabia's Vision 2030 initiative. We are committed to developing world-class business leaders who will drive the Kingdom's economic transformation.",
+      "description2": "Our corporation offers cutting-edge business solutions designed to meet the evolving needs of the global business landscape. With state-of-the-art facilities and partnerships with leading international organizations, MARLN provides an exceptional business environment.",
+      "description3": "Rooted in Saudi Arabian values while embracing global business practices, MARLN prepares employees to excel in both local and international markets, contributing to the Kingdom's ambitious economic goals.",
       "details": {
         "type": "Type:",
         "location": "Location:",
@@ -154,7 +154,7 @@
     }
   },
   "marlnCrm": {
-    "title": "NexusHive eProcure",
+    "title": "NexusHive RFP Manager",
       "subtitle": "Transform Your corporate organization with AI-Powered ERP Management",
       "watchDemo": "Watch Demo",
       "downloadBrochure": "Download Brochure",
@@ -178,7 +178,7 @@
       "clientSatisfaction": "Client Satisfaction"
     },
     "overview": {
-      "title": "Why Choose NexusHive eProcure?",
+      "title": "Why Choose NexusHive RFP Manager?",
       "description1": "Our comprehensive ERP solution is designed specifically for corporate organizations, providing everything you need to manage employees, teams, and business processes in one unified platform.",
       "description2": "With advanced AI capabilities, real-time analytics, and seamless integration options, we help organizations streamline operations and enhance business success.",
       "platformType": "Platform Type",
@@ -229,7 +229,7 @@
         "name": "Dr. Sarah Johnson",
         "role": "Corporate Director",
         "company": "Tech Corp",
-        "content": "NexusHive eProcure has revolutionized our client management process. The AI insights help us make better decisions."
+        "content": "NexusHive RFP Manager has revolutionized our client management process. The AI insights help us make better decisions."
       },
       "client2": {
         "name": "Michael Chen",

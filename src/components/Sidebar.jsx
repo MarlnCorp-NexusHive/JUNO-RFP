@@ -6,7 +6,7 @@ import SidebarLanguageSwitcher from "./localization/SidebarLanguageSwitcher";
 import SmartTourButton from '../components/tours/SmartTourButton';
 import SageAIButton from './ui/SageAIButton';
 import ThemeToggleButton from './ui/ThemeToggleButton';
-import nexushiveLogo from "../assets/nexushivelogo.png";
+import marlnLogo from "../assets/MARLN logo.png";
 
 export default function Sidebar({ features, userLabel }) {
   const location = useLocation();
@@ -58,7 +58,7 @@ export default function Sidebar({ features, userLabel }) {
           className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
         >
           <img
-            src={nexushiveLogo}
+            src={marlnLogo}
             alt={t('sidebar.mbscLogo')}
             className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'}`}
           />

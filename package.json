@@ -1,5 +1,5 @@
 {
-  "name": "nexushive-crm-frontend",
+  "name": "marln-erp-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -62,5 +62,5 @@
     "terser": "^5.44.0",
     "vite": "^6.3.5"
   },
-  "homepage": "https://NexusHiveCRM.github.io/NexusHiveCRM-frontend"
+  "homepage": "https://nexushive-rfp-manager.netlify.app"
 }

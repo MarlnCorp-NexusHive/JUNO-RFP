@@ -242,7 +242,7 @@ export default function MarketingHeadTrainingDevelopment() {
         </div>
       </div>
 
-      {/* NexusHiveAI Promotion */}
+      {/* MARLN AI Promotion */}
       <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
           <FiZap className="text-yellow-500 animate-pulse" />
@@ -690,7 +690,7 @@ export default function MarketingHeadTrainingDevelopment() {
         </div>
       </section>
 
-      {/* 10. NexusHiveAI Recommended Courses */}
+      {/* 10. MARLN AI Recommended Courses */}
       <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-6">
         <div className="flex items-center gap-2 mb-4">
           <FiZap className="text-yellow-500 animate-pulse" />

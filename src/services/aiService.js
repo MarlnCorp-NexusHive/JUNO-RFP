@@ -19,7 +19,7 @@ const apiClient = axios.create({
     'Authorization': `Bearer ${OPENROUTE_CONFIG.apiKey}`,
     'Content-Type': 'application/json',
     'HTTP-Referer': window.location.origin,
-    'X-Title': 'NexusHive CRM - Sage AI'
+    'X-Title': 'MARLN ERP - Sage AI'
   }
 });
 
@@ -290,7 +290,7 @@ class AIService {
           'Authorization': `Bearer ${OPENROUTE_CONFIG.apiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': window.location.origin,
-          'X-Title': 'NexusHive CRM - Sage AI'
+          'X-Title': 'MARLN ERP - Sage AI'
         },
         body: JSON.stringify(requestData)
       });
