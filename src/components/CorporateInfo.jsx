@@ -9,7 +9,6 @@ import {
   FiCalendar, FiFileText, FiDollarSign, FiHeadphones, FiMail, FiPhone,
   FiArrowRight, FiPlay, FiDownload, FiEye, FiCpu, FiDatabase
 } from 'react-icons/fi';
-import marlnLogo from '../assets/MARLN logo.png';
 
 export default function CorporateInfo() {
   const navigate = useNavigate();
@@ -203,8 +202,8 @@ export default function CorporateInfo() {
               </button>
               <div className={`flex items-center space-x-4 ${isRTLMode ? 'space-x-reverse' : ''}`}>
                 <img
-                  src={marlnLogo}
-                  alt="NexusHive RFP Manager"
+                  src="/marlncorplogo.png"
+                  alt="JUNO RFP"
                   className="w-16 h-16"
                 />
                 <div>

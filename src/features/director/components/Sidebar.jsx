@@ -6,7 +6,6 @@ import SidebarLanguageSwitcher from "../../../components/localization/SidebarLan
 import SmartTourButton from "../../../components/tours/SmartTourButton";
 import SageAIButton from "../../../components/ui/SageAIButton";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
-import marlnLogo from "../../../assets/MARLN logo.png";
 
 export default function Sidebar({ features, userLabel, expanded, setExpanded, role = "director" }) {
   const { t } = useTranslation();
@@ -58,7 +57,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
           className={`flex items-center hover:opacity-80 transition-opacity ${isRTLMode ? 'space-x-reverse space-x-3' : 'space-x-3'}`}
         >
           <img
-            src={marlnLogo}
+            src="/marlncorplogo.png"
             alt={t('sidebar.mbscLogo')}
             className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'}`}
           />

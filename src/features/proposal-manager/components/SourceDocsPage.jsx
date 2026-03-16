@@ -208,12 +208,12 @@ export default function SourceDocsPage() {
     const fileName = getSafeFileName(doc);
     const subject = encodeURIComponent(`Document: ${fileName}`);
     let body = encodeURIComponent(
-      `Please find the attached document: ${fileName}\n\n(Sent from NexusHive RFP Manager Source Docs)`
+      `Please find the attached document: ${fileName}\n\n(Sent from JUNO RFP Source Docs)`
     );
     if (!doc.dataUrl && doc.url) {
       const fullUrl = window.location.origin + doc.url;
       body = encodeURIComponent(
-        `Document: ${fileName}\nDownload: ${fullUrl}\n\n(Sent from NexusHive RFP Manager Source Docs)`
+        `Document: ${fileName}\nDownload: ${fullUrl}\n\n(Sent from JUNO RFP Source Docs)`
       );
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
       return;

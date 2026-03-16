@@ -210,7 +210,7 @@ export default function App() {
         </Route>
         {/* Proposal Manager - cloned Director UI */}
         <Route path="/rbac/proposal-manager" element={<ProposalManagerLayout />}>
-          <Route index element={<DirectorDashboard basePath="/rbac/proposal-manager" dashboardTitle="Proposal Risk & Compliance Dashboard" welcomeMessage="Welcome Proposal Manager to your Proposal Console - Audit-Ready. Submission-Ready. Win-Ready Console" />} />
+          <Route index element={<DirectorDashboard basePath="/rbac/proposal-manager" dashboardTitle="JUNO RFP Dashboard" welcomeMessage="Welcome to JUNO RFP - Audit-Ready. Submission-Ready. Win-Ready." />} />
           <Route path="source-docs" element={<SourceDocsPage />} />
           <Route path="team" element={<MarketingHeadTeamManagement />} />
           <Route path="bid-vault" element={<DirectorAnalyticsReports />} />
