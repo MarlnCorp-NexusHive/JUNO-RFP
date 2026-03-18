@@ -1,6 +1,7 @@
 export const proposalManagerFeatures = [
   { label: "director.dashboard", icon: "📊", route: "/rbac/proposal-manager", description: "Performance Overview, KPI Summary, Alerts & Notices" },
   { label: "Source Docs", icon: "📄", route: "/rbac/proposal-manager/source-docs", description: "Source documents and reference materials" },
+  { label: "Company Intelligence", icon: "🌐", route: "/rbac/proposal-manager/company-intelligence", description: "RFP issuer financials, trends, and customers from public sources" },
   { label: "Manage Team", icon: "👥", route: "/rbac/proposal-manager/team", description: "Team Management and Collaboration" },
   { label: "Bid Vault", icon: "📦", route: "/rbac/proposal-manager/bid-vault", description: "Bid repository and submissions" },
   { label: "Capture Strategy", icon: "🗺️", route: "/rbac/proposal-manager/capture-strategy", description: "Capture strategy and planning" },

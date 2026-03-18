@@ -15,7 +15,7 @@ import { extractFromFile, extractFromText } from "../services/extractFromDocumen
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
 import { FiFolder, FiFile, FiUpload, FiTrash2, FiEdit2, FiChevronDown, FiChevronRight } from "react-icons/fi";
 
-const ACCEPT = ".pdf,.doc,.docx,.txt";
+const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
 
 function formatDate(iso) {
@@ -81,7 +81,10 @@ export default function ProposalManagerWorkspace() {
       const ext = (file.name.split(".").pop() || "").toLowerCase();
       const isPdf = file.type?.includes("pdf") || ext === "pdf";
       const isTxt = file.type?.includes("text") || ext === "txt";
-      if (!isPdf && !isTxt) continue;
+      const isDocx = file.type?.includes("word") || ext === "docx" || ext === "doc";
+      const isXlsx = file.type?.includes("sheet") || file.type?.includes("excel") || ext === "xlsx" || ext === "xls";
+      const supported = isPdf || isTxt || isDocx || isXlsx;
+      if (!supported) continue;
       if (file.size > MAX_FILE_MB * 1024 * 1024) continue;
 
       const uploadedAt = new Date().toISOString();

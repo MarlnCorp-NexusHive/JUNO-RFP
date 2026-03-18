@@ -1,10 +1,12 @@
 /**
- * Extract text from PDF (native text layer + OCR for scanned/image pages), then extract facts and Q&As.
- * Used by Proposal Manager Workspace when user uploads/scans a document.
+ * Extract text from PDF (native text layer + OCR), DOCX, XLSX, and plain text; then extract facts and Q&As.
+ * Used by Proposal Manager Workspace only.
  */
 
 import * as pdfjsLib from "pdfjs-dist";
 import { createWorker } from "tesseract.js";
+import * as mammoth from "mammoth";
+import * as XLSX from "xlsx";
 
 // PDF.js worker: same version as pdfjs-dist package (must match for compatibility)
 const PDFJS_VERSION = "5.5.207";
@@ -287,7 +289,7 @@ export async function extractFromPdfFile(file, onProgress = null) {
 }
 
 /**
- * For non-PDF (e.g. .txt): use file text and same heuristics.
+ * For plain text (.txt): use file text and same heuristics.
  */
 export async function extractFromTextFile(file) {
   const text = await file.text();
@@ -297,12 +299,49 @@ export async function extractFromTextFile(file) {
 }
 
 /**
+ * DOCX: extract raw text via mammoth, then facts and Q&As.
+ */
+export async function extractFromDocxFile(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  const text = (result?.value) ? result.value : "";
+  const facts = extractFacts(text);
+  const qas = extractQAs(text);
+  return { text, facts, qas };
+}
+
+/**
+ * XLSX/XLS: all sheets to text (CSV), then facts and Q&As.
+ */
+export async function extractFromXlsxFile(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const workbook = XLSX.read(arrayBuffer, { type: "array", cellDates: true });
+  const parts = [];
+  for (const sheetName of workbook.SheetNames) {
+    const sheet = workbook.Sheets[sheetName];
+    const csv = XLSX.utils.sheet_to_csv(sheet, { blankrows: false, strip: true });
+    if (csv.trim()) parts.push(csv);
+  }
+  const text = parts.join("\n\n");
+  const facts = extractFacts(text);
+  const qas = extractQAs(text);
+  return { text, facts, qas };
+}
+
+/**
  * @param {File} file
- * @param {((e: { page: number, totalPages: number, phase: 'text'|'ocr' }) => void)|null} onProgress - only used for PDFs
+ * @param {((e: { page: number, totalPages: number, phase: 'text'|'ocr' }) => void)|null} onProgress - only for PDFs
  */
 export async function extractFromFile(file, onProgress = null) {
-  const isPdf = (file.type || "").toLowerCase().includes("pdf") || (file.name || "").toLowerCase().endsWith(".pdf");
+  const type = (file.type || "").toLowerCase();
+  const name = (file.name || "").toLowerCase();
+  const isPdf = type.includes("pdf") || name.endsWith(".pdf");
+  const isDocx = type.includes("wordprocessingml") || type.includes("msword") || name.endsWith(".docx") || name.endsWith(".doc");
+  const isXlsx = type.includes("spreadsheet") || type.includes("excel") || name.endsWith(".xlsx") || name.endsWith(".xls");
+
   if (isPdf) return extractFromPdfFile(file, onProgress);
+  if (isDocx) return extractFromDocxFile(file);
+  if (isXlsx) return extractFromXlsxFile(file);
   return extractFromTextFile(file);
 }
 

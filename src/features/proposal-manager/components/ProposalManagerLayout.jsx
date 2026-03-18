@@ -17,6 +17,7 @@ function AutoStartTour({ role }) {
     const segments = pathname.split('/');
     if (segments.includes('proposal-manager')) {
       if (segments.includes('source-docs')) return 'source-docs';
+      if (segments.includes('company-intelligence')) return 'company-intelligence';
       if (segments.includes('team')) return 'team';
       if (segments.includes('bid-vault')) return 'bid-vault';
       if (segments.includes('capture-strategy')) return 'capture-strategy';

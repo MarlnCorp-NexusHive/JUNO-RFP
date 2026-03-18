@@ -103,6 +103,7 @@ import ProposalManagerLayout from './features/proposal-manager/components/Propos
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
+import CompanyIntelligencePage from './features/proposal-manager/components/CompanyIntelligencePage';
 import ProposalManagerContentHub from './features/proposal-manager/components/ProposalManagerContentHub';
 import { LocalizationProvider } from './hooks/useLocalization.jsx';
 import './utils/i18n'; // Initialize i18n
@@ -212,6 +213,7 @@ export default function App() {
         <Route path="/rbac/proposal-manager" element={<ProposalManagerLayout />}>
           <Route index element={<DirectorDashboard basePath="/rbac/proposal-manager" dashboardTitle="JUNO RFP Dashboard" welcomeMessage="Welcome to JUNO RFP - Audit-Ready. Submission-Ready. Win-Ready." />} />
           <Route path="source-docs" element={<SourceDocsPage />} />
+          <Route path="company-intelligence" element={<CompanyIntelligencePage />} />
           <Route path="team" element={<MarketingHeadTeamManagement />} />
           <Route path="bid-vault" element={<DirectorAnalyticsReports />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
