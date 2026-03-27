@@ -122,39 +122,26 @@ describe("Company Intelligence Service", () => {
   });
 
   describe("fetchCompanyIntelligence", () => {
-    it("returns error when no data source works and no FMP key", async () => {
-      vi.mocked(fetch).mockResolvedValue({ ok: false });
+    it("returns sample dataset error when company is not found", async () => {
       vi.resetModules();
       const { fetchCompanyIntelligence: fetchCI } = await import("./companyIntelligenceService.js");
       const result = await fetchCI({ companyName: "UnknownXYZ123" });
       expect(result.financials).toBeNull();
       expect(result.error).toBeTruthy();
       expect(result.name).toBe("UnknownXYZ123");
+      expect(result.source).toBe("Sample Dataset");
     });
 
-    it("returns SEC data when tickers and company facts are available", async () => {
-      const tickers = [{ cik_str: 320193, ticker: "AAPL", title: "Apple Inc." }];
-      const companyFacts = {
-        entityName: "Apple Inc.",
-        facts: {
-          "us-gaap": {
-            Revenue: { units: { USD: [{ end: "2024-09-30", val: 383285000000 }] } },
-            NetIncomeLoss: { units: { USD: [{ end: "2024-09-30", val: 96995000000 }] } },
-            Assets: { units: { USD: [{ end: "2024-09-30", val: 352755000000 }] } },
-          },
-        },
-      };
-      vi.mocked(fetch)
-        .mockResolvedValueOnce({ ok: true, json: async () => tickers })
-        .mockResolvedValueOnce({ ok: true, json: async () => companyFacts });
+    it("returns sample company data for a known ticker", async () => {
       vi.resetModules();
       const { fetchCompanyIntelligence: fetchCI } = await import("./companyIntelligenceService.js");
       const result = await fetchCI({ ticker: "AAPL" });
       expect(result.error).toBeNull();
-      expect(result.source).toBe("SEC EDGAR");
+      expect(result.source).toBe("Sample Dataset");
       expect(result.name).toBe("Apple Inc.");
       expect(result.region).toBe("US");
-      expect(result.financials.revenue[0].value).toBe(383285000000);
+      expect(result.sector).toBeTruthy();
+      expect(result.financials.revenue[0].value).toBeGreaterThan(0);
       expect(result.trends.revenue).toBeDefined();
       expect(result.customers).toBeTruthy();
     });

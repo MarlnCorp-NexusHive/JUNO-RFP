@@ -1,7 +1,19 @@
 /**
- * Company Intelligence: fetch financials, trends, and customer/segment info from public sources.
+ * Company Intelligence: returns sample company data (no external APIs).
  * Used by Proposal Manager only (RFP issuer / bid target research).
  */
+
+import { SAMPLE_COMPANIES } from "../features/proposal-manager/data/companyIntelligenceSamples";
+
+function getSampleCompany(query) {
+  const q = (query || "").trim().toLowerCase();
+  if (!q) return null;
+  const exactTicker = SAMPLE_COMPANIES.find((c) => c.ticker.toLowerCase() === q);
+  if (exactTicker) return exactTicker;
+  const byName = SAMPLE_COMPANIES.find((c) => c.name.toLowerCase().includes(q));
+  if (byName) return byName;
+  return null;
+}
 
 const SEC_BASE = "https://data.sec.gov";
 const SEC_COMPANY_TICKERS = "https://www.sec.gov/files/company_tickers.json";
@@ -155,6 +167,20 @@ export async function fetchFmpIncomeStatement(symbol, limit = 5) {
   }
 }
 
+export async function fetchFmpBalanceSheet(symbol, limit = 5) {
+  const key = (import.meta.env?.VITE_FMP_API_KEY || "").trim();
+  if (!key) return null;
+  try {
+    const res = await fetch(`${FMP_BASE}/balance-sheet-statement/${encodeURIComponent(symbol)}?limit=${limit}&apikey=${key}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (isFmpError(data)) return null;
+    return Array.isArray(data) ? data : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function searchFmpSymbol(query) {
   const key = (import.meta.env?.VITE_FMP_API_KEY || "").trim();
   if (!key || !(query || "").trim()) return [];
@@ -169,7 +195,14 @@ export async function searchFmpSymbol(query) {
   }
 }
 
-export function normalizeFmpFinancials(profile, incomeStatements) {
+function toNum(val) {
+  if (val == null) return 0;
+  if (typeof val === "number" && !Number.isNaN(val)) return val;
+  const n = Number(val);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+export function normalizeFmpFinancials(profile, incomeStatements, balanceSheets) {
   const out = {
     revenue: [],
     netIncome: [],
@@ -180,68 +213,55 @@ export function normalizeFmpFinancials(profile, incomeStatements) {
     industry: profile?.industry,
     sector: profile?.sector,
   };
-  if (!Array.isArray(incomeStatements) || incomeStatements.length === 0) return out;
-  out.revenue = incomeStatements.map((s) => ({ period: s.date || s.calendarYear || "", value: s.revenue ?? 0 }));
-  out.netIncome = incomeStatements.map((s) => ({ period: s.date || s.calendarYear || "", value: s.netIncome ?? 0 }));
+  if (Array.isArray(incomeStatements) && incomeStatements.length > 0) {
+    out.revenue = incomeStatements.map((s) => ({ period: s.date || s.calendarYear || "", value: toNum(s.revenue ?? s.Revenue) }));
+    out.netIncome = incomeStatements.map((s) => ({ period: s.date || s.calendarYear || "", value: toNum(s.netIncome ?? s.NetIncome) }));
+  }
+  if (Array.isArray(balanceSheets) && balanceSheets.length > 0) {
+    out.assets = balanceSheets.map((s) => ({ period: s.date || s.calendarYear || "", value: toNum(s.totalAssets ?? s.total_assets) }));
+  }
   return out;
 }
 
 export async function fetchCompanyIntelligence(options = {}) {
   const { companyName, ticker } = options;
-  const result = {
-    name: companyName || ticker || "Unknown",
-    ticker: ticker || null,
-    region: null,
-    financials: null,
-    trends: null,
-    customers: null,
-    source: null,
+  const match = getSampleCompany(ticker || companyName);
+  if (!match) {
+    return {
+      name: companyName || ticker || "Unknown",
+      ticker: ticker || null,
+      region: null,
+      financials: null,
+      trends: null,
+      customers: null,
+      source: "Sample Dataset",
+      error: `No sample data found for "${companyName || ticker}". Try: AAPL, MSFT, GOOGL, or AMZN.`,
+    };
+  }
+
+  const financials = {
+    revenue: match.revenue,
+    netIncome: match.netIncome,
+    assets: match.assets,
+    source: match.source,
+    region: match.region,
+    sector: match.sector,
+    companyName: match.name,
+  };
+
+  return {
+    name: match.name,
+    ticker: match.ticker,
+    region: match.region,
+    sector: match.sector,
+    financials,
+    trends: {
+      revenue: match.revenue,
+      netIncome: match.netIncome,
+      assets: match.assets,
+    },
+    customers: match.customers,
+    source: match.source,
     error: null,
   };
-  const hasFmp = !!(import.meta.env?.VITE_FMP_API_KEY ?? "").trim();
-  const secCik = await resolveSecCik(ticker || companyName);
-  if (secCik) {
-    try {
-      const facts = await fetchSecCompanyFacts(secCik);
-      const normalized = normalizeSecFinancials(facts);
-      result.financials = normalized;
-      result.trends = { revenue: normalized.revenue, netIncome: normalized.netIncome, assets: normalized.assets };
-      result.source = "SEC EDGAR";
-      result.region = "US";
-      if (facts.entityName) result.name = facts.entityName;
-      result.customers = "See 10-K filing (Item 1A Risk Factors, Customer Concentration).";
-      return result;
-    } catch (e) {
-      result.error = e.message || "SEC fetch failed";
-      if (!hasFmp) return result;
-    }
-  }
-  if (hasFmp) {
-    let symbol = ticker;
-    if (!symbol && companyName) {
-      const search = await searchFmpSymbol(companyName);
-      symbol = search[0]?.symbol || search[0]?.name;
-    }
-    if (symbol) {
-      try {
-        const [profile, income] = await Promise.all([fetchFmpProfile(symbol), fetchFmpIncomeStatement(symbol)]);
-        if (profile) result.name = profile.companyName || result.name;
-        result.ticker = symbol;
-        result.region = profile?.country || result.region;
-        const normalized = normalizeFmpFinancials(profile, income || []);
-        result.financials = normalized;
-        result.trends = { revenue: normalized.revenue, netIncome: normalized.netIncome, assets: normalized.assets };
-        result.source = "Financial Modeling Prep";
-        result.customers = profile?.description ? "See company description and annual reports for customer/segment info." : null;
-        result.error = null;
-        return result;
-      } catch (e) {
-        if (!result.error) result.error = e.message || "FMP fetch failed";
-      }
-    }
-  }
-  if (!result.financials) {
-    result.error = result.error || "Could not load company data. Try: (1) Use exact US ticker e.g. AAPL for Apple, (2) Add VITE_FMP_API_KEY in .env for global data (free key at financialmodelingprep.com).";
-  }
-  return result;
 }

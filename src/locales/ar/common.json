@@ -148,7 +148,8 @@
     "startTour": "ابدأ الجولة",
     "tourComingSoon": "الجولة قادمة قريباً",
     "sageAIDescription": "مساعدة ورؤى مدعومة بالذكاء الاصطناعي",
-    "startTourDescription": "ابدأ جولة موجهة للتطبيق"
+    "startTourDescription": "ابدأ جولة موجهة للتطبيق",
+    "companyIntelligence": "ذكاء الشركات"
   },
   "roles": {
     "adminHead": "رئيس الإدارة",

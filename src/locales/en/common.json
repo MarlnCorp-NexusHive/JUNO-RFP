@@ -148,7 +148,8 @@
     "startTour": "Start Tour",
     "tourComingSoon": "Tour Coming Soon",
     "sageAIDescription": "AI-powered assistance and insights",
-    "startTourDescription": "Begin guided tour of the application"
+    "startTourDescription": "Begin guided tour of the application",
+    "companyIntelligence": "Company Intelligence"
   },
   "roles": {
     "adminHead": "Admin Head",
