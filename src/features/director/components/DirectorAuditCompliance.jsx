@@ -33,8 +33,52 @@ export default function DirectorAuditCompliance() {
   const [logFilter, setLogFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedRisk, setSelectedRisk] = useState("all");
-  const { t, ready } = useTranslation('director');
+  const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
+  const pmText = (en, ar) => (isPM ? (isArabic ? ar : en) : en);
+  const pmLabel = (value) => {
+    if (!isPM || !isArabic) return value;
+    const map = {
+      low: "منخفض",
+      medium: "متوسط",
+      high: "مرتفع",
+      "Proposal section updated": "تم تحديث قسم العرض",
+      "Compliance checklist signed": "تم توقيع قائمة التحقق للامتثال",
+      "Pricing export attempted": "تمت محاولة تصدير التسعير",
+      "Source document accessed": "تم الوصول إلى المستند المصدر",
+      "Proposal Writer": "كاتب العروض",
+      "Compliance Specialist": "أخصائي الامتثال",
+      "Pricing Lead": "قائد التسعير",
+      "Proposal Manager": "مدير العروض",
+      "Technical Approach – Water Wastewater RFP": "النهج الفني - طلب عروض المياه والصرف الصحي",
+      "FAR 52.219-9 – Landscape RFP": "FAR 52.219-9 - طلب عروض تنسيق الحدائق",
+      "Insufficient permissions": "صلاحيات غير كافية",
+      "Airport Restaurant RFP – Source Docs": "طلب عروض مطعم المطار - المستندات المصدرية",
+      "FAR Conformance": "التوافق مع FAR",
+      "RFP Requirements Matrix": "مصفوفة متطلبات طلب العروض",
+      "Proposal Audit Trail": "سجل تدقيق العرض",
+      "Past Performance Refs": "مراجع الأداء السابق",
+      "All Status": "كل الحالات",
+      Success: "ناجح",
+      Failed: "فشل",
+      Export: "تصدير",
+      Time: "الوقت",
+      Priority: "الأولوية",
+      Actions: "الإجراءات",
+      "Compliance Score": "درجة الامتثال",
+      "Active Risks": "المخاطر النشطة",
+      "All Risks": "كل المخاطر",
+      "High Risk": "مخاطر مرتفعة",
+      "Medium Risk": "مخاطر متوسطة",
+      "Low Risk": "مخاطر منخفضة",
+      "Risk Score": "درجة المخاطر",
+      "Proposal & RFP Compliance": "امتثال العروض وطلبات تقديم العروض",
+      "FAR conformance, RFP requirements, proposal audit trail, and past performance.": "التوافق مع FAR، متطلبات طلبات العروض، سجل تدقيق العرض، والأداء السابق.",
+      "Loading...": "جارٍ التحميل...",
+    };
+    return map[value] || value;
+  };
 
   // Show loading state if i18n is not ready
   if (!ready) {
@@ -43,7 +87,7 @@ export default function DirectorAuditCompliance() {
         <main className="flex-1 p-6 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Loading...</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{pmLabel("Loading...")}</h1>
           </div>
         </main>
       </div>
@@ -249,19 +293,19 @@ export default function DirectorAuditCompliance() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiShield className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? "Proposal & RFP Compliance" : t('auditCompliance.title')}
+                {isPM ? pmLabel("Proposal & RFP Compliance") : t('auditCompliance.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {isPM ? "FAR conformance, RFP requirements, proposal audit trail, and past performance." : t('auditCompliance.subtitle')}
+                {isPM ? pmLabel("FAR conformance, RFP requirements, proposal audit trail, and past performance.") : t('auditCompliance.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Compliance Score</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{pmLabel("Compliance Score")}</div>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">88%</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Active Risks</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{pmLabel("Active Risks")}</div>
                 <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">3</div>
               </div>
             </div>
@@ -299,7 +343,7 @@ export default function DirectorAuditCompliance() {
                 </div>
                 <div className="space-y-2">
                   <div className="font-semibold text-sm text-gray-900 dark:text-white">
-                    {isPM ? c.areaKey : t(`auditCompliance.${c.areaKey}`)}
+                    {isPM ? pmLabel(c.areaKey) : t(`auditCompliance.${c.areaKey}`)}
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{c.score}%</div>
@@ -356,13 +400,13 @@ export default function DirectorAuditCompliance() {
                 onChange={e => setSelectedStatus(e.target.value)}
                 className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
-                <option value="all">All Status</option>
-                <option value="success">Success</option>
-                <option value="failed">Failed</option>
+                <option value="all">{pmLabel("All Status")}</option>
+                <option value="success">{pmLabel("Success")}</option>
+                <option value="failed">{pmLabel("Failed")}</option>
               </select>
               <button className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
                 <FiDownload className="w-4 h-4" />
-                Export
+                {pmLabel("Export")}
               </button>
             </div>
             
@@ -372,13 +416,13 @@ export default function DirectorAuditCompliance() {
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-600">
                     <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{t('auditCompliance.auditLogHeaders.date')}</th>
-                    <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Time</th>
+                    <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{pmLabel("Time")}</th>
                     <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{t('auditCompliance.auditLogHeaders.action')}</th>
                     <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{t('auditCompliance.auditLogHeaders.user')}</th>
                     <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{t('auditCompliance.auditLogHeaders.status')}</th>
-                    <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Priority</th>
+                    <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{pmLabel("Priority")}</th>
                     <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{t('auditCompliance.auditLogHeaders.details')}</th>
-                    <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                    <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-gray-300">{pmLabel("Actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -386,10 +430,10 @@ export default function DirectorAuditCompliance() {
                     <tr key={idx} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                       <td className="py-3 px-2 text-gray-600 dark:text-gray-400">{log.date}</td>
                       <td className="py-3 px-2 text-gray-600 dark:text-gray-400">{log.time}</td>
-                      <td className="py-3 px-2 text-gray-900 dark:text-white">{isPM ? log.action : t(`auditCompliance.${log.actionKey}`)}</td>
+                      <td className="py-3 px-2 text-gray-900 dark:text-white">{isPM ? pmLabel(log.action) : t(`auditCompliance.${log.actionKey}`)}</td>
                       <td className="py-3 px-2 text-gray-900 dark:text-white flex items-center gap-2">
                         <FiUser className="w-4 h-4 text-gray-400" />
-                        {isPM ? log.user : t(`auditCompliance.${log.userKey}`)}
+                        {isPM ? pmLabel(log.user) : t(`auditCompliance.${log.userKey}`)}
                       </td>
                       <td className="py-3 px-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(log.statusKey?.split('.').pop() || '')}`}>
@@ -398,13 +442,13 @@ export default function DirectorAuditCompliance() {
                       </td>
                       <td className="py-3 px-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(log.priority)}`}>
-                          {log.priority}
+                          {pmLabel(log.priority)}
                         </span>
                       </td>
                       <td className="py-3 px-2 text-gray-600 dark:text-gray-400">
                         <div className="flex items-center gap-1">
                           <FiActivity className="w-3 h-3" />
-                          {isPM ? log.details : t(`auditCompliance.${log.detailsKey}`)}
+                          {isPM ? pmLabel(log.details) : t(`auditCompliance.${log.detailsKey}`)}
                         </div>
                         {!isPM && log.ipAddress && (
                         <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
@@ -450,10 +494,10 @@ export default function DirectorAuditCompliance() {
               onChange={e => setSelectedRisk(e.target.value)}
               className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
             >
-              <option value="all">All Risks</option>
-              <option value="high">High Risk</option>
-              <option value="medium">Medium Risk</option>
-              <option value="low">Low Risk</option>
+              <option value="all">{pmLabel("All Risks")}</option>
+              <option value="high">{pmLabel("High Risk")}</option>
+              <option value="medium">{pmLabel("Medium Risk")}</option>
+              <option value="low">{pmLabel("Low Risk")}</option>
             </select>
           </div>
           
@@ -475,7 +519,7 @@ export default function DirectorAuditCompliance() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{r.score}%</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Risk Score</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{pmLabel("Risk Score")}</div>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                     <div 

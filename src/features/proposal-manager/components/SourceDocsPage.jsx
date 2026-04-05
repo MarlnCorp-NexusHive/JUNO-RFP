@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useProposalIssuer } from "./ProposalIssuerContext";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
@@ -30,6 +32,7 @@ function getDocIcon(type) {
 }
 
 function DocPreview({ doc }) {
+  const { t } = useTranslation();
   const { dataUrl, url, type, name } = doc;
   const previewSrc = url || (dataUrl ? (dataUrl.startsWith("data:") ? dataUrl : null) : null);
   const isUrl = !!url;
@@ -37,13 +40,13 @@ function DocPreview({ doc }) {
   if (!previewSrc) {
     return (
       <div className="mt-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 h-32 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-        Preview not available
+        {t("proposalManagerSourceDocs.previewNotAvailable")}
       </div>
     );
   }
-  const t = (type || "").toLowerCase();
-  const isPdf = t.includes("pdf");
-  const isText = t.includes("text/plain") || t.includes("text/") || (name && name.toLowerCase().endsWith(".txt"));
+  const typeStr = (type || "").toLowerCase();
+  const isPdf = typeStr.includes("pdf");
+  const isText = typeStr.includes("text/plain") || typeStr.includes("text/") || (name && name.toLowerCase().endsWith(".txt"));
 
   if (isPdf || (isUrl && isText)) {
     return (
@@ -65,14 +68,14 @@ function DocPreview({ doc }) {
     } catch {
       return (
         <div className="mt-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 h-32 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-          Preview not available
+          {t("proposalManagerSourceDocs.previewNotAvailable")}
         </div>
       );
     }
   }
   return (
     <div className="mt-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 h-32 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-      Preview not available for this file type
+      {t("proposalManagerSourceDocs.previewNotAvailableFileType")}
     </div>
   );
 }
@@ -104,12 +107,14 @@ function saveStored(list) {
 }
 
 const SORT_OPTIONS = [
-  { value: "name", label: "Name" },
-  { value: "date", label: "Date uploaded" },
-  { value: "size", label: "File size" },
+  { value: "name", translationKey: "proposalManagerSourceDocs.sort.name" },
+  { value: "date", translationKey: "proposalManagerSourceDocs.sort.dateUploaded" },
+  { value: "size", translationKey: "proposalManagerSourceDocs.sort.fileSize" },
 ];
 
 export default function SourceDocsPage() {
+  const { t } = useTranslation();
+  const { issuer } = useProposalIssuer();
   const [docs, setDocs] = useState(() => [...PREUPLOADED_DOCS, ...loadStored().filter((d) => !PREUPLOADED_IDS.has(d.id))]);
   const [uploadError, setUploadError] = useState("");
   const [dragging, setDragging] = useState(false);
@@ -155,11 +160,20 @@ export default function SourceDocsPage() {
     for (const file of Array.from(files)) {
       const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
       if (!allowed.includes(ext)) {
-        setUploadError(`"${file.name}" has an unsupported type. Use PDF, DOC, DOCX, TXT, or XLS/XLSX.`);
+        setUploadError(
+          t("proposalManagerSourceDocs.errorUnsupportedType", {
+            fileName: file.name,
+          }),
+        );
         continue;
       }
       if (file.size > MAX_FILE_MB * 1024 * 1024) {
-        setUploadError(`"${file.name}" is larger than ${MAX_FILE_MB} MB.`);
+        setUploadError(
+          t("proposalManagerSourceDocs.errorFileTooLarge", {
+            fileName: file.name,
+            maxMb: MAX_FILE_MB,
+          }),
+        );
         continue;
       }
       let dataUrl = null;
@@ -264,11 +278,18 @@ export default function SourceDocsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Source Docs</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Upload and manage RFP source documents. All uploaded files are listed below.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("proposalManagerSourceDocs.title")}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">{t("proposalManagerSourceDocs.subtitle")}</p>
       </div>
+
+      {issuer && (
+        <div className="rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50/90 dark:bg-emerald-900/25 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+          {t("proposalManagerSourceDocs.linkedIssuerText", {
+            issuerName: issuer.name,
+            issuerTicker: issuer.ticker ? ` (${issuer.ticker})` : "",
+          })}
+        </div>
+      )}
 
       <div
         onDragOver={onDragOver}
@@ -288,16 +309,14 @@ export default function SourceDocsPage() {
           onChange={handleInputChange}
           className="hidden"
         />
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          Drag and drop RFP documents here, or click the button below.
-        </p>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">{t("proposalManagerSourceDocs.dragAndDrop")}</p>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-colors"
         >
           <span className="text-lg">📤</span>
-          Upload RFP documents
+          {t("proposalManagerSourceDocs.uploadButton")}
         </button>
         {uploadError && (
           <p className="mt-3 text-sm text-red-600 dark:text-red-400">{uploadError}</p>
@@ -306,10 +325,10 @@ export default function SourceDocsPage() {
 
       <section>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Uploaded Documents</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerSourceDocs.uploadedDocumentsTitle")}</h2>
           {docs.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
-              <label className="text-sm text-gray-600 dark:text-gray-400">Sort by</label>
+              <label className="text-sm text-gray-600 dark:text-gray-400">{t("proposalManagerSourceDocs.sortBy")}</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -317,7 +336,7 @@ export default function SourceDocsPage() {
               >
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                    {t(opt.translationKey)}
                   </option>
                 ))}
               </select>
@@ -326,15 +345,15 @@ export default function SourceDocsPage() {
                 onChange={(e) => setSortOrder(e.target.value)}
                 className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
+                <option value="asc">{t("proposalManagerSourceDocs.ascending")}</option>
+                <option value="desc">{t("proposalManagerSourceDocs.descending")}</option>
               </select>
             </div>
           )}
         </div>
         {docs.length === 0 ? (
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-8 text-center text-gray-500 dark:text-gray-400">
-            No documents yet. Upload PDF, Word, Excel, or text files above.
+            {t("proposalManagerSourceDocs.emptyState")}
           </div>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -358,8 +377,8 @@ export default function SourceDocsPage() {
                       type="button"
                       onClick={() => handleEmail(doc)}
                       className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-                      title="Email this document"
-                      aria-label="Email document"
+                      title={t("proposalManagerSourceDocs.emailTitle")}
+                      aria-label={t("proposalManagerSourceDocs.emailAriaLabel")}
                     >
                       <span className="text-lg">✉️</span>
                     </button>
@@ -367,8 +386,8 @@ export default function SourceDocsPage() {
                       type="button"
                       onClick={() => removeDoc(doc.id)}
                       className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      title="Remove"
-                      aria-label="Remove document"
+                      title={t("proposalManagerSourceDocs.removeTitle")}
+                      aria-label={t("proposalManagerSourceDocs.removeAriaLabel")}
                     >
                       <span className="text-lg">🗑️</span>
                     </button>

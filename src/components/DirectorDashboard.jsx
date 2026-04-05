@@ -368,12 +368,96 @@ const employeeDemographicsData = {
 };
 
 export default function DirectorDashboard({ basePath = "/rbac/director", dashboardTitle, welcomeMessage: welcomeMessageProp }) {
-  const { t, ready } = useTranslation(['director', 'welcome']);
+  const { t, ready, i18n } = useTranslation(['director', 'welcome']);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const welcomeMessage = welcomeMessageProp ?? t(`welcome:${user?.username || 'director'}`);
   const [modalCard, setModalCard] = useState(null);
   const [modalChart, setModalChart] = useState(null);
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
+  const pmText = (en, ar) => (isArabic ? ar : en);
+  const pmLabel = (text) => {
+    const map = {
+      "Pending": "معلّق",
+      "In Progress": "قيد التنفيذ",
+      "Approved": "معتمد",
+      "Delivered": "مسلّم",
+      "Win Rate": "معدل الفوز",
+      "Win Rate %": "معدل الفوز %",
+      "Score": "النتيجة",
+      "Readiness": "الجاهزية",
+      "Velocity": "السرعة",
+      "Position": "المركز",
+      "Actual": "الفعلي",
+      "Forecast": "التوقع",
+      "Revenue": "الإيرادات",
+      "Projected": "المتوقع",
+      "Discounts": "الخصومات",
+      "Rate": "المعدل",
+      "Trend": "الاتجاه",
+      "Stable": "مستقر",
+    };
+    if (!isArabic) return text;
+    return map[text] || text;
+  };
+  const pmGraphLabel = (value) => {
+    if (!isArabic) return value;
+    const key = String(value ?? "");
+    const map = {
+      Jan: "يناير",
+      Feb: "فبراير",
+      Mar: "مارس",
+      Apr: "أبريل",
+      May: "مايو",
+      Jun: "يونيو",
+      Jul: "يوليو",
+      Aug: "أغسطس",
+      Sep: "سبتمبر",
+      Oct: "أكتوبر",
+      Nov: "نوفمبر",
+      Dec: "ديسمبر",
+      "Sole Source": "مصدر وحيد",
+      "Full & Open": "مفتوح بالكامل",
+      "FAR Part 15 (Best Value)": "FAR الجزء 15 (أفضل قيمة)",
+      "FAR Part 15 (LPTA)": "FAR الجزء 15 (أقل سعر مقبول فنيًا)",
+      "FAR Part 16 (Task Orders)": "FAR الجزء 16 (أوامر المهام)",
+      Pending: "معلّق",
+      InProgress: "قيد التنفيذ",
+      Approved: "معتمد",
+      Delivered: "مسلّم",
+      WinRate: "معدل الفوز",
+      Actual: "الفعلي",
+      Forecast: "التوقع",
+      Revenue: "الإيرادات",
+      Projected: "المتوقع",
+      Current: "الحالي",
+      Pipeline: "خط الأنابيب",
+      Wins: "الفوز",
+      DoD: "وزارة الدفاع",
+      DHS: "الأمن الداخلي",
+      GSA: "إدارة الخدمات العامة",
+      NASA: "ناسا",
+      Civilian: "المدني",
+      "FAR 15 Best Value": "FAR 15 أفضل قيمة",
+      "FAR 15 LPTA": "FAR 15 أقل سعر مقبول فنيًا",
+      "FAR 16 Task": "FAR 16 أوامر المهام",
+    };
+    if (map[key]) return map[key];
+    if (/^Q\d$/i.test(key)) return `الربع ${key.slice(1)}`;
+    return key;
+  };
+  const displayWelcomeMessage =
+    basePath === "/rbac/proposal-manager"
+      ? pmText(
+          welcomeMessage,
+          "مرحبًا بك في JUNO RFP - جاهز للتدقيق. جاهز للتسليم. جاهز للفوز."
+        )
+      : welcomeMessage;
+
+  const displayDashboardTitle =
+    basePath === "/rbac/proposal-manager"
+      ? pmText(dashboardTitle ?? "JUNO RFP Dashboard", "لوحة JUNO RFP")
+      : dashboardTitle ?? (t('dashboard.title') || 'Director Dashboard');
 
   if (!ready) {
     return <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 items-center justify-center">
@@ -411,22 +495,22 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: t('dashboard.kpis.attendance'), value: 92, icon: "📅", color: "bg-pink-100 text-pink-700" },
   ];
   const proposalManagerKpis = [
-    { label: "Bid/No-Bid Ratio", value: 2.1, icon: "⚖️", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" },
-    { label: "Compliance Coverage %", value: 94, icon: "✅", color: "bg-green-100 text-green-700" },
-    { label: "Unaddressed Mandatory Clauses", value: 2, icon: "⚠️", color: "bg-amber-100 text-amber-700" },
-    { label: "FAR / Regulatory Risk Flag (if federal)", value: "Low", icon: "🚩", color: "bg-purple-100 text-purple-700" },
-    { label: "Past Performance Alignment Score", value: 87, icon: "🎯", color: "bg-pink-100 text-pink-700" },
+    { label: pmText("Bid/No-Bid Ratio", "نسبة تقديم/عدم تقديم العطاء"), value: 2.1, formatType: "ratio", icon: "⚖️", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" },
+    { label: pmText("Compliance Coverage %", "نسبة تغطية الامتثال"), value: 94, formatType: "percent", icon: "✅", color: "bg-green-100 text-green-700" },
+    { label: pmText("Unaddressed Mandatory Clauses", "البنود الإلزامية غير المعالجة"), value: 2, formatType: "number", icon: "⚠️", color: "bg-amber-100 text-amber-700" },
+    { label: pmText("FAR / Regulatory Risk Flag (if federal)", "مؤشر مخاطر FAR / المخاطر التنظيمية"), value: pmText("Low", "منخفض"), formatType: "text", icon: "🚩", color: "bg-purple-100 text-purple-700" },
+    { label: pmText("Past Performance Alignment Score", "درجة توافق الأداء السابق"), value: 87, formatType: "percent", icon: "🎯", color: "bg-pink-100 text-pink-700" },
   ];
   const kpis = basePath === "/rbac/proposal-manager" ? proposalManagerKpis : directorKpis;
 
   // Proposal Manager dashboard: RFP-focused summary cards; Director: translated summary cards
   const proposalManagerSummaryCards = [
-    { label: "Active RFPs in Pipeline", value: 18, icon: "📋", color: "from-blue-400 to-blue-600", trend: "", trendColor: "", sub: "In progress", spark: [12, 14, 15, 16, 17, 18], sparkColor: { light: "#3b82f6", dark: "#fff" } },
-    { label: "Total Pipeline Value ($)", value: 8450000, icon: "💰", color: "from-green-400 to-green-600", trend: "", trendColor: "", sub: "Combined opportunity value", spark: [6200000, 6800000, 7200000, 7800000, 8100000, 8450000], sparkColor: { light: "#22c55e", dark: "#fff" } },
-    { label: "Average Deal Size", value: 425000, icon: "📊", color: "from-purple-400 to-purple-600", trend: "", trendColor: "", sub: "Per RFP", spark: [380000, 392000, 398000, 405000, 412000, 425000], sparkColor: { light: "#a78bfa", dark: "#fff" } },
-    { label: "Win Rate (Trailing 6–12 Months)", value: 31, icon: "🏆", color: "from-pink-400 to-pink-600", trend: "", trendColor: "", sub: "Percentage", spark: [26, 27, 28, 29, 30, 31], sparkColor: { light: "#ec4899", dark: "#fff" } },
-    { label: "Bid/No-Bid Ratio", value: 2.1, icon: "⚖️", color: "from-teal-400 to-teal-600", trend: "", trendColor: "", sub: "Bids per no-bid", spark: [1.7, 1.8, 1.9, 2.0, 2.05, 2.1], sparkColor: { light: "#2dd4bf", dark: "#fff" } },
-    { label: "Weighted Win Probability (%)", value: 64, icon: "📈", color: "from-orange-400 to-orange-600", trend: "", trendColor: "", sub: "Across pipeline", spark: [52, 55, 58, 60, 62, 64], sparkColor: { light: "#fb923c", dark: "#fff" } },
+    { label: pmText("Active RFPs in Pipeline", "طلبات العروض النشطة في خط الأنابيب"), value: 18, formatType: "number", icon: "📋", color: "from-blue-400 to-blue-600", trend: "", trendColor: "", sub: pmText("In progress", "قيد التنفيذ"), spark: [12, 14, 15, 16, 17, 18], sparkColor: { light: "#3b82f6", dark: "#fff" } },
+    { label: pmText("Total Pipeline Value ($)", "إجمالي قيمة خط الأنابيب ($)"), value: 8450000, formatType: "currency", icon: "💰", color: "from-green-400 to-green-600", trend: "", trendColor: "", sub: pmText("Combined opportunity value", "القيمة الإجمالية للفرص"), spark: [6200000, 6800000, 7200000, 7800000, 8100000, 8450000], sparkColor: { light: "#22c55e", dark: "#fff" } },
+    { label: pmText("Average Deal Size", "متوسط حجم الصفقة"), value: 425000, formatType: "currency", icon: "📊", color: "from-purple-400 to-purple-600", trend: "", trendColor: "", sub: pmText("Per RFP", "لكل طلب عروض"), spark: [380000, 392000, 398000, 405000, 412000, 425000], sparkColor: { light: "#a78bfa", dark: "#fff" } },
+    { label: pmText("Win Rate (Trailing 6–12 Months)", "معدل الفوز (آخر 6-12 شهراً)"), value: 31, formatType: "percent", icon: "🏆", color: "from-pink-400 to-pink-600", trend: "", trendColor: "", sub: pmText("Percentage", "نسبة مئوية"), spark: [26, 27, 28, 29, 30, 31], sparkColor: { light: "#ec4899", dark: "#fff" } },
+    { label: pmText("Bid/No-Bid Ratio", "نسبة تقديم/عدم تقديم العطاء"), value: 2.1, formatType: "ratio", icon: "⚖️", color: "from-teal-400 to-teal-600", trend: "", trendColor: "", sub: pmText("Bids per no-bid", "عدد العطاءات لكل عدم تقديم"), spark: [1.7, 1.8, 1.9, 2.0, 2.05, 2.1], sparkColor: { light: "#2dd4bf", dark: "#fff" } },
+    { label: pmText("Weighted Win Probability (%)", "احتمالية الفوز الموزونة (%)"), value: 64, formatType: "percent", icon: "📈", color: "from-orange-400 to-orange-600", trend: "", trendColor: "", sub: pmText("Across pipeline", "عبر خط الأنابيب"), spark: [52, 55, 58, 60, 62, 64], sparkColor: { light: "#fb923c", dark: "#fff" } },
   ];
   const directorSummaryCards = [
     { label: t('dashboard.summaryCards.totalStudents'), value: 12400, icon: "👨‍🎓", color: "from-blue-400 to-blue-600", trend: "", trendColor: "", sub: t('dashboard.summaryCards.changeFromLastMonth'), spark: [11000, 11200, 11500, 12000, 12200, 12400], sparkColor: { light: "#3b82f6", dark: "#fff" } },
@@ -530,7 +614,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <span className="text-lg font-bold uppercase tracking-wide">{card.label}</span>
         </div>
         <div className="text-2xl font-bold mb-2">
-          {card.label.includes('Finance') || card.label.includes('Pipeline Value') || card.label.includes('Deal Size') ? `$${Number(card.value).toLocaleString()}` : card.label.includes('Win Rate') || card.label.includes('Win Probability') ? `${card.value}%` : card.value}
+          {card.formatType === 'currency'
+            ? `$${Number(card.value).toLocaleString()}`
+            : card.formatType === 'percent'
+              ? `${card.value}%`
+              : card.value}
         </div>
         <div className="mb-2 text-sm text-gray-400 dark:text-gray-300">{card.sub}</div>
         {/* Modal sparkline */}
@@ -569,8 +657,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         {extraDetails}
         <div className="text-sm text-gray-700 dark:text-gray-200">
           <ul className="list-disc ml-5">
-            <li>Trend: <span className={card.trendColor}>{card.trend || 'Stable'}</span></li>
-            <li>Last 6 periods: {card.spark.map((v, i) => <span key={i} className="inline-block mx-1">{card.label.includes('Finance') || card.label.includes('Pipeline Value') || card.label.includes('Deal Size') ? `$${Number(v).toLocaleString()}` : v}</span>)}</li>
+            <li>{pmText("Trend", "الاتجاه")}: <span className={card.trendColor}>{card.trend || pmText('Stable', 'مستقر')}</span></li>
+            <li>{pmText("Last 6 periods", "آخر 6 فترات")}: {card.spark.map((v, i) => <span key={i} className="inline-block mx-1">{card.formatType === 'currency' ? `$${Number(v).toLocaleString()}` : v}</span>)}</li>
           </ul>
         </div>
       </div>
@@ -651,7 +739,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <span className="text-lg font-bold uppercase tracking-wide">{kpi.label}</span>
         </div>
         <div className="text-2xl font-bold mb-2">
-          {typeof kpi.value === 'string' ? kpi.value : kpi.label.includes('Finance') ? `$${Number(kpi.value).toLocaleString()}` : kpi.label.includes('Compliance Coverage') || kpi.label.includes('Alignment Score') ? `${kpi.value}%` : kpi.value}
+          {typeof kpi.value === 'string'
+            ? kpi.value
+            : kpi.formatType === 'currency'
+              ? `$${Number(kpi.value).toLocaleString()}`
+              : kpi.formatType === 'percent'
+                ? `${kpi.value}%`
+                : kpi.value}
         </div>
         <div className="mb-2 text-sm text-gray-400 dark:text-gray-300">{kpi.label}</div>
         {insight}
@@ -684,16 +778,16 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     if (chartId === 'admission') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">{isPM ? 'Submission Forecast' : 'Predictive Recruitment Forecast'}</h3>
+          <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">{isPM ? pmText('Submission Forecast', 'توقعات التقديم') : 'Predictive Recruitment Forecast'}</h3>
           <ResponsiveContainer width="100%" height="90%">
             <LineChart data={isPM ? proposalSubmissionForecast : forecastData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tickFormatter={isPM ? pmGraphLabel : undefined} />
               <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="Actual" stroke="#6366f1" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
-              <Line type="monotone" dataKey="Forecast" stroke="#22c55e" strokeDasharray="5 5" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
+              <Tooltip formatter={isPM ? ((value, name) => [value, pmGraphLabel(name)]) : undefined} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
+              <Line type="monotone" dataKey="Actual" name={isPM ? pmGraphLabel("Actual") : undefined} stroke="#6366f1" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
+              <Line type="monotone" dataKey="Forecast" name={isPM ? pmGraphLabel("Forecast") : undefined} stroke="#22c55e" strokeDasharray="5 5" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -701,16 +795,16 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     } else if (chartId === 'dropout') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-pink-700 dark:text-pink-300">{isPM ? 'Elimination Risk Forecast' : 'Employee Retention Risk Forecast'}</h3>
+          <h3 className="text-lg font-bold mb-2 text-pink-700 dark:text-pink-300">{isPM ? pmText('Elimination Risk Forecast', 'توقعات مخاطر الإقصاء') : 'Employee Retention Risk Forecast'}</h3>
           <ResponsiveContainer width="100%" height="90%">
             <LineChart data={isPM ? proposalEliminationRiskForecast : retentionForecast} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="quarter" />
+              <XAxis dataKey="quarter" tickFormatter={isPM ? pmGraphLabel : undefined} />
               <YAxis domain={isPM ? [8, 16] : [2.5, 5]} tickFormatter={v => `${v}%`} />
-              <Tooltip formatter={v => `${v}%`} />
-              <Legend />
-              <Line type="monotone" dataKey="Actual" stroke="#ef4444" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
-              <Line type="monotone" dataKey="Forecast" stroke="#f472b6" strokeDasharray="5 5" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
+              <Tooltip formatter={isPM ? ((v, name) => [`${v}%`, pmGraphLabel(name)]) : (v => `${v}%`)} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
+              <Line type="monotone" dataKey="Actual" name={isPM ? pmGraphLabel("Actual") : undefined} stroke="#ef4444" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
+              <Line type="monotone" dataKey="Forecast" name={isPM ? pmGraphLabel("Forecast") : undefined} stroke="#f472b6" strokeDasharray="5 5" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -718,15 +812,15 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     } else if (chartId === 'surplus') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-300">{isPM ? 'Pipeline Value Forecast' : 'Financial Surplus/Deficit Forecast'}</h3>
+          <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-300">{isPM ? pmText('Pipeline Value Forecast', 'توقعات قيمة خط الأنابيب') : 'Financial Surplus/Deficit Forecast'}</h3>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={isPM ? pipelineValueForecast : surplusForecast} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tickFormatter={isPM ? pmGraphLabel : undefined} />
               <YAxis tickFormatter={isPM ? (v => `$${v}M`) : (v => `$${v.toLocaleString()}`)} />
-              <Tooltip formatter={isPM ? (v => `$${v}M`) : (v => `$${v.toLocaleString()}`)} />
-              <Bar dataKey="Actual" fill="#22c55e" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Forecast" fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+              <Tooltip formatter={isPM ? ((v, name) => [`$${v}M`, pmGraphLabel(name)]) : (v => `$${v.toLocaleString()}`)} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Bar dataKey="Actual" name={isPM ? pmGraphLabel("Actual") : undefined} fill="#22c55e" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Forecast" name={isPM ? pmGraphLabel("Forecast") : undefined} fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -799,14 +893,14 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     } else if (chartId === 'leadConversion') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">{isPM ? 'Win Probability Trend' : t('dashboard.aiWidgets.leadConversion')}</h3>
+          <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">{isPM ? pmText('Win Probability Trend', 'اتجاه احتمالية الفوز') : t('dashboard.aiWidgets.leadConversion')}</h3>
           <ResponsiveContainer width="100%" height="90%">
             <LineChart data={isPM ? proposalWinProbabilityTrend : leadConversionData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tickFormatter={isPM ? pmGraphLabel : undefined} />
               <YAxis domain={isPM ? [25, 40] : undefined} tickFormatter={isPM ? (v => `${v}%`) : undefined} />
-              <Tooltip formatter={isPM ? (v => [`${v}%`, 'Win rate']) : undefined} />
-              <Legend />
+              <Tooltip formatter={isPM ? (v => [`${v}%`, pmText('Win rate', 'معدل الفوز')]) : undefined} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
               <Line type="monotone" dataKey="Rate" stroke="#6366f1" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} />
             </LineChart>
           </ResponsiveContainer>
@@ -815,16 +909,16 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     } else if (chartId === 'applicationFee') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-300">{isPM ? 'Revenue from Wins' : t('dashboard.aiWidgets.applicationFeeRevenue')}</h3>
+          <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-300">{isPM ? pmText('Revenue from Wins', 'إيرادات من الفوز') : t('dashboard.aiWidgets.applicationFeeRevenue')}</h3>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={isPM ? revenueFromWinsData : applicationFeeData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tickFormatter={isPM ? pmGraphLabel : undefined} />
               <YAxis tickFormatter={isPM ? (v => `$${(v / 1000).toFixed(0)}k`) : (v => `$${v.toLocaleString()}`)} />
-              <Tooltip formatter={isPM ? (v => `$${Number(v).toLocaleString()}`) : (v => `$${v.toLocaleString()}`)} />
-              <Bar dataKey="Revenue" fill="#22c55e" radius={[8, 8, 0, 0]} />
-              <Bar dataKey={isPM ? 'Pending' : 'Discounts'} fill={isPM ? '#f59e0b' : '#ef4444'} radius={[8, 8, 0, 0]} fillOpacity={isPM ? 0.8 : 1} />
-              <Legend />
+              <Tooltip formatter={isPM ? ((v, name) => [`$${Number(v).toLocaleString()}`, pmGraphLabel(name)]) : (v => `$${v.toLocaleString()}`)} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Bar dataKey="Revenue" name={isPM ? pmGraphLabel("Revenue") : undefined} fill="#22c55e" radius={[8, 8, 0, 0]} />
+              <Bar dataKey={isPM ? 'Pending' : 'Discounts'} name={isPM ? pmGraphLabel("Pending") : undefined} fill={isPM ? '#f59e0b' : '#ef4444'} radius={[8, 8, 0, 0]} fillOpacity={isPM ? 0.8 : 1} />
+              <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -832,16 +926,16 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     } else if (chartId === 'deptRevenue') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-          <h3 className="text-lg font-bold mb-2 text-indigo-700 dark:text-indigo-300">{isPM ? 'Win Value by Vehicle' : t('dashboard.aiWidgets.departmentRevenue')}</h3>
+          <h3 className="text-lg font-bold mb-2 text-indigo-700 dark:text-indigo-300">{isPM ? pmText('Win Value by Vehicle', 'قيمة الفوز حسب وسيلة التعاقد') : t('dashboard.aiWidgets.departmentRevenue')}</h3>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={isPM ? winValueByVehicleData : deptRevenueData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={isPM ? 'vehicle' : 'dept'} tick={isPM ? { fontSize: 10 } : undefined} />
+              <XAxis dataKey={isPM ? 'vehicle' : 'dept'} tick={isPM ? { fontSize: 10 } : undefined} tickFormatter={isPM ? pmGraphLabel : undefined} />
               <YAxis tickFormatter={isPM ? (v => `$${v}M`) : (v => `$${v.toLocaleString()}`)} />
-              <Tooltip formatter={isPM ? (v => `$${v}M`) : (v => `$${v.toLocaleString()}`)} />
-              <Legend />
-              <Bar dataKey="Revenue" fill={isPM ? '#74c69d' : '#6366f1'} radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Projected" fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+              <Tooltip formatter={isPM ? ((v, name) => [`$${v}M`, pmGraphLabel(name)]) : (v => `$${v.toLocaleString()}`)} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
+              <Bar dataKey="Revenue" name={isPM ? pmGraphLabel("Revenue") : undefined} fill={isPM ? '#74c69d' : '#6366f1'} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Projected" name={isPM ? pmGraphLabel("Projected") : undefined} fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -888,12 +982,12 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={pipelineValueForecast} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
               <YAxis tickFormatter={v => `$${v}M`} />
-              <Tooltip formatter={v => `$${v}M`} />
-              <Legend />
-              <Bar dataKey="Actual" fill="#22c55e" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Forecast" fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+              <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+              <Legend formatter={(value) => pmGraphLabel(value)} />
+              <Bar dataKey="Actual" name={pmGraphLabel("Actual")} fill="#22c55e" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Forecast" name={pmGraphLabel("Forecast")} fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -921,12 +1015,12 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={proposalPipelineByAgencyData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="agency" />
+              <XAxis dataKey="agency" tickFormatter={pmGraphLabel} />
               <YAxis tickFormatter={v => `$${v}M`} />
-              <Tooltip formatter={v => [`$${v}M`, '']} />
-              <Legend />
-              <Bar dataKey="Pipeline" fill="#6366f1" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Wins" fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
+              <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+              <Legend formatter={(value) => pmGraphLabel(value)} />
+              <Bar dataKey="Pipeline" name={pmGraphLabel("Pipeline")} fill="#6366f1" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Wins" name={pmGraphLabel("Wins")} fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -951,23 +1045,23 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
       const maxVal = isPM ? Math.max(2.5, ...pmRadarData.flatMap(d => [d.Revenue, d.Projected])) : undefined;
       content = (
         <div className="w-[90vw] max-w-3xl min-h-[480px] h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 flex flex-col">
-          <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-300 shrink-0">{isPM ? 'Win Value by Vehicle (Radar)' : t('dashboard.aiWidgets.subjectProfitabilityRadar')}</h3>
+          <h3 className="text-lg font-bold mb-2 text-green-700 dark:text-green-300 shrink-0">{isPM ? pmText('Win Value by Vehicle (Radar)', 'قيمة الفوز حسب وسيلة التعاقد (رادار)') : t('dashboard.aiWidgets.subjectProfitabilityRadar')}</h3>
           <div className="flex-1 min-h-[360px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius={isPM ? 120 : 80} data={isPM ? pmRadarData : departmentProfitData.map(s => ({ department: s.department, Profit: s.Profit }))}>
                 <PolarGrid />
-                <PolarAngleAxis dataKey={isPM ? 'vehicle' : 'department'} tick={isPM ? { fontSize: 12 } : undefined} />
+                <PolarAngleAxis dataKey={isPM ? 'vehicle' : 'department'} tick={isPM ? { fontSize: 12 } : undefined} tickFormatter={isPM ? pmGraphLabel : undefined} />
                 <PolarRadiusAxis angle={30} domain={isPM ? [0, maxVal] : undefined} tickFormatter={isPM ? (v => `$${v}M`) : undefined} />
                 {isPM ? (
                   <>
-                    <Radar name="Current" dataKey="Revenue" stroke="#74c69d" fill="#74c69d" fillOpacity={0.5} />
-                    <Radar name="Projected" dataKey="Projected" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                    <Radar name={pmGraphLabel("Current")} dataKey="Revenue" stroke="#74c69d" fill="#74c69d" fillOpacity={0.5} />
+                    <Radar name={pmGraphLabel("Projected")} dataKey="Projected" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
                   </>
                 ) : (
                   <Radar name="Profit" dataKey="Profit" stroke="#22c55e" fill="#22c55e" fillOpacity={0.5} />
                 )}
-                <Legend />
-                <Tooltip formatter={isPM ? (v => `$${v}M`) : undefined} />
+                <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
+                <Tooltip formatter={isPM ? ((v, name) => [`$${v}M`, pmGraphLabel(name)]) : undefined} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -1006,14 +1100,14 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           data-tour-position="bottom"
         >
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {dashboardTitle ?? (t('dashboard.title') || 'Director Dashboard')}
+          {displayDashboardTitle}
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            {welcomeMessage}
+            {displayWelcomeMessage}
           </p>
-          {basePath === "/rbac/proposal-manager" && (
+            {basePath === "/rbac/proposal-manager" && (
             <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mt-4">
-              Bids Portfolio Health Overview
+              {pmText("Bids Portfolio Health Overview", "نظرة عامة على صحة محفظة العطاءات")}
             </h2>
           )}
         </div>
@@ -1049,9 +1143,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 + i * 0.08 }}
                   >
-                    {card.label.includes('Pipeline Value') || card.label.includes('Deal Size')
+                    {card.formatType === 'currency'
                       ? `$${Number(card.value).toLocaleString()}`
-                      : card.label.includes('Win Rate') || card.label.includes('Win Probability')
+                      : card.formatType === 'percent'
                         ? `${card.value}%`
                         : card.value}
                   </motion.span>
@@ -1125,7 +1219,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 + i * 0.1 }}
                 >
-                  {typeof kpi.value === 'string' ? kpi.value : kpi.label.includes('Finance') ? `$${Number(kpi.value).toLocaleString()}` : kpi.label.includes('Compliance Coverage') || kpi.label.includes('Alignment Score') ? `${kpi.value}%` : kpi.value}
+                  {typeof kpi.value === 'string'
+                    ? kpi.value
+                    : kpi.formatType === 'currency'
+                      ? `$${Number(kpi.value).toLocaleString()}`
+                      : kpi.formatType === 'percent'
+                        ? `${kpi.value}%`
+                        : kpi.value}
                 </motion.span>
               </span>
               <span className="text-sm font-medium mt-1 opacity-80">{kpi.label}</span>
@@ -1152,8 +1252,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           >
             {basePath === "/rbac/proposal-manager" ? (
               <>
-                <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">Rolling Win Rate by Procurement Type</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Trailing 12 months — win rate %</p>
+                <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Rolling Win Rate by Procurement Type", "معدل الفوز المتحرك حسب نوع الشراء")}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Trailing 12 months — win rate %", "آخر 12 شهراً — نسبة معدل الفوز %")}</p>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={rollingWinRateByProcurement} margin={{ top: 12, right: 24, left: 0, bottom: 0 }}>
                     <defs>
@@ -1165,10 +1265,10 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       ))}
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
-                    <Tooltip formatter={(value) => [`${value}%`, undefined]} contentStyle={{ borderRadius: 8 }} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} formatter={(value) => <span className="text-gray-700 dark:text-gray-200">{value}</span>} />
+                    <Tooltip formatter={(value, name) => [`${value}%`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} contentStyle={{ borderRadius: 8 }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} formatter={(value) => <span className="text-gray-700 dark:text-gray-200">{pmGraphLabel(value)}</span>} />
                     <Area type="monotone" dataKey="FAR Part 15 (Best Value)" stroke={WIN_RATE_COLORS["FAR Part 15 (Best Value)"]} strokeWidth={2.5} fill={`url(#${WIN_RATE_GRADIENT_IDS[0]})`} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     <Area type="monotone" dataKey="FAR Part 15 (LPTA)" stroke={WIN_RATE_COLORS["FAR Part 15 (LPTA)"]} strokeWidth={2.5} fill={`url(#${WIN_RATE_GRADIENT_IDS[1]})`} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     <Area type="monotone" dataKey="FAR Part 16 (Task Orders)" stroke={WIN_RATE_COLORS["FAR Part 16 (Task Orders)"]} strokeWidth={2.5} fill={`url(#${WIN_RATE_GRADIENT_IDS[2]})`} dot={{ r: 3 }} activeDot={{ r: 5 }} />
@@ -1204,16 +1304,16 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           >
             {basePath === "/rbac/proposal-manager" ? (
               <>
-                <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">Win Rate vs Capture Lead Time</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Win rate % by proposal lead time (days)</p>
+                <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Win Rate vs Capture Lead Time", "معدل الفوز مقابل مدة الالتقاط")}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Win rate % by proposal lead time (days)", "نسبة الفوز حسب مدة تجهيز العرض (بالأيام)")}</p>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={winRateVsLeadTimeData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="label" tick={{ fontSize: 11 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 60]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
-                    <Tooltip formatter={(value) => [`${value}%`, "Win Rate"]} labelFormatter={(label) => `Lead time: ${label}`} contentStyle={{ borderRadius: 8 }} />
-                    <Legend />
-                    <Line type="monotone" dataKey="winRate" name="Win Rate %" stroke="#6366f1" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+                    <Tooltip formatter={(value) => [`${value}%`, pmText("Win Rate", "معدل الفوز")]} labelFormatter={(label) => `${pmText("Lead time", "مدة الالتقاط")}: ${label}`} contentStyle={{ borderRadius: 8 }} />
+                    <Legend formatter={(value) => pmGraphLabel(value)} />
+                    <Line type="monotone" dataKey="winRate" name={pmText("Win Rate %", "معدل الفوز %")} stroke="#6366f1" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </>
@@ -1249,14 +1349,14 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           transition={{ delay: 0.5 }}
           className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6"
         >
-          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? "Proposal Quality Intelligence" : t('dashboard.charts.departmentPerformance')}</h3>
+          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? pmText("Proposal Quality Intelligence", "ذكاء جودة العروض") : t('dashboard.charts.departmentPerformance')}</h3>
           <ResponsiveContainer width="100%" height={basePath === "/rbac/proposal-manager" ? 300 : 220}>
             <BarChart data={basePath === "/rbac/proposal-manager" ? proposalQualityIntelligenceData : deptPerformance} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="dept" tick={{ fontSize: 12 }} />
+              <XAxis dataKey="dept" tick={{ fontSize: 12 }} tickFormatter={basePath === "/rbac/proposal-manager" ? pmGraphLabel : undefined} />
               <YAxis />
-              <Tooltip />
-              <Legend />
+              <Tooltip formatter={basePath === "/rbac/proposal-manager" ? ((value, name) => [value, pmGraphLabel(name)]) : undefined} labelFormatter={basePath === "/rbac/proposal-manager" ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Legend formatter={basePath === "/rbac/proposal-manager" ? ((value) => pmGraphLabel(value)) : undefined} />
               <Bar dataKey="KPI" fill="#74c69d" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -1274,12 +1374,12 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         >
           <div className="flex items-center gap-2 mb-2">
             {basePath !== "/rbac/proposal-manager" && <span className="text-xl">🧪</span>}
-            <h2 className="text-lg font-bold tracking-wide" title={basePath === "/rbac/proposal-manager" ? "Section M–Driven Scoring Optimization" : undefined}>{basePath === "/rbac/proposal-manager" ? "Core Evaluation Intelligence" : t('dashboard.sections.academicInsights')}</h2>
+            <h2 className="text-lg font-bold tracking-wide" title={basePath === "/rbac/proposal-manager" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : undefined}>{basePath === "/rbac/proposal-manager" ? pmText("Core Evaluation Intelligence", "ذكاء التقييم الأساسي") : t('dashboard.sections.academicInsights')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Multi-year Enrollment/Graduation Chart */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-3">
-              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? "Section M–Driven Scoring Optimization" : t('dashboard.charts.enrollmentGraduation')}</h3>
+              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : t('dashboard.charts.enrollmentGraduation')}</h3>
               <ResponsiveContainer width="100%" height={basePath === "/rbac/proposal-manager" ? 340 : 180}>
                 {basePath === "/rbac/proposal-manager" ? (
                   <LineChart data={sectionMScoringData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -1324,17 +1424,17 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         >
           <div className="flex items-center gap-2 mb-2">
             {basePath !== "/rbac/proposal-manager" && <span className="text-xl">💸</span>}
-            <h2 className="text-lg font-bold tracking-wide">{basePath === "/rbac/proposal-manager" ? "Risk & Compliance Intelligence" : t('dashboard.sections.financialOverview')}</h2>
+            <h2 className="text-lg font-bold tracking-wide">{basePath === "/rbac/proposal-manager" ? pmText("Risk & Compliance Intelligence", "ذكاء المخاطر والامتثال") : t('dashboard.sections.financialOverview')}</h2>
           </div>
           {basePath === "/rbac/proposal-manager" ? (
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 w-full">
-              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Risk & Compliance — Tracked Metrics</h3>
+              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Risk & Compliance — Tracked Metrics", "المخاطر والامتثال — المؤشرات المتتبعة")}</h3>
               <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={riskComplianceIntelligenceData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                    <XAxis dataKey="name" tick={{ fontSize: 10 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip formatter={(value) => [value, "Score"]} />
+                    <Tooltip formatter={(value) => [value, pmText("Score", "النتيجة")]} />
                     <Bar dataKey="score" fill="#74c69d" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -1390,38 +1490,38 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         >
           <div className="flex items-center gap-2 mb-2">
             {basePath !== "/rbac/proposal-manager" && <span className="text-xl">🧑‍💼</span>}
-            <h2 className="text-lg font-bold tracking-wide">{basePath === "/rbac/proposal-manager" ? "Capture & Proposal Pipeline Intelligence" : t('dashboard.sections.hrStaffAnalytics')}</h2>
+            <h2 className="text-lg font-bold tracking-wide">{basePath === "/rbac/proposal-manager" ? pmText("Capture & Proposal Pipeline Intelligence", "ذكاء الالتقاط وخط أنابيب العروض") : t('dashboard.sections.hrStaffAnalytics')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {basePath === "/rbac/proposal-manager" ? (
               <>
                 {/* Proposal Pipeline by Stage (stacked) */}
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-2">
-                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Proposal Pipeline by Stage</h3>
+                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Proposal Pipeline by Stage", "خط أنابيب العروض حسب المرحلة")}</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={proposalPipelineByStage} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
+                      <XAxis dataKey="period" tickFormatter={pmGraphLabel} />
                       <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="Pending" name="Pending" stackId="a" fill="#6366f1" />
-                      <Bar dataKey="InProgress" name="In Progress" stackId="a" fill="#8b5cf6" />
-                      <Bar dataKey="Approved" name="Approved" stackId="a" fill="#f59e0b" />
-                      <Bar dataKey="Delivered" name="Delivered" stackId="a" fill="#22c55e" />
+                      <Tooltip formatter={(value, name) => [value, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                      <Legend formatter={(value) => pmGraphLabel(value)} />
+                      <Bar dataKey="Pending" name={pmText("Pending", "معلّق")} stackId="a" fill="#6366f1" />
+                      <Bar dataKey="InProgress" name={pmText("In Progress", "قيد التنفيذ")} stackId="a" fill="#8b5cf6" />
+                      <Bar dataKey="Approved" name={pmText("Approved", "معتمد")} stackId="a" fill="#f59e0b" />
+                      <Bar dataKey="Delivered" name={pmText("Delivered", "مسلّم")} stackId="a" fill="#22c55e" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 {/* Win Rate Trend (%) */}
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 flex flex-col">
-                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Win Rate Trend (%)</h3>
+                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Win Rate Trend (%)", "اتجاه معدل الفوز (%)")}</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={proposalWinRateTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
+                      <XAxis dataKey="period" tickFormatter={pmGraphLabel} />
                       <YAxis domain={[0, 50]} tickFormatter={(v) => `${v}%`} />
-                      <Tooltip formatter={(value) => [`${value}%`, "Win Rate"]} />
-                      <Line type="monotone" dataKey="WinRate" name="Win Rate %" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
+                      <Tooltip formatter={(value) => [`${value}%`, pmText("Win Rate", "معدل الفوز")]} labelFormatter={(label) => pmGraphLabel(label)} />
+                      <Line type="monotone" dataKey="WinRate" name={pmText("Win Rate %", "معدل الفوز %")} stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -1467,32 +1567,32 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             {/* Operational Quality Intelligence (Production Discipline & Efficiency) */}
             <section className="mt-8" data-tour-position="bottom">
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-lg font-bold tracking-wide">Operational Quality Intelligence (Production Discipline & Efficiency)</h2>
+                <h2 className="text-lg font-bold tracking-wide">{pmText("Operational Quality Intelligence (Production Discipline & Efficiency)", "ذكاء الجودة التشغيلية (انضباط الإنتاج والكفاءة)")}</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-2">
-                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Operational Quality — Tracked Metrics</h3>
+                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Operational Quality - Tracked Metrics", "الجودة التشغيلية - المؤشرات المتتبعة")}</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={operationalQualityData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                      <XAxis dataKey="name" tick={{ fontSize: 10 }} tickFormatter={pmGraphLabel} />
                       <YAxis domain={[0, 100]} />
-                      <Tooltip formatter={(value) => [value, "Score"]} />
+                      <Tooltip formatter={(value) => [value, pmText("Score", "النتيجة")]} />
                       <Bar dataKey="score" fill="#74c69d" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 flex flex-col">
-                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Readiness & Velocity Trend</h3>
+                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Readiness & Velocity Trend", "اتجاه الجاهزية والسرعة")}</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={operationalQualityTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
+                      <XAxis dataKey="period" tickFormatter={pmGraphLabel} />
                       <YAxis domain={[60, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="Readiness" name="Readiness" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
-                      <Line type="monotone" dataKey="Velocity" name="Velocity" stroke="#6366f1" strokeWidth={2} dot={{ r: 4 }} />
+                      <Tooltip formatter={(value, name) => [value, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                      <Legend formatter={(value) => pmGraphLabel(value)} />
+                      <Line type="monotone" dataKey="Readiness" name={pmLabel("Readiness")} stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="Velocity" name={pmLabel("Velocity")} stroke="#6366f1" strokeWidth={2} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -1502,30 +1602,30 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             {/* Competitive Intelligence (Positioning & Win Probability) */}
             <section className="mt-8" data-tour-position="bottom">
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-lg font-bold tracking-wide">Competitive Intelligence (Positioning & Win Probability)</h2>
+                <h2 className="text-lg font-bold tracking-wide">{pmText("Competitive Intelligence (Positioning & Win Probability)", "الذكاء التنافسي (التموضع واحتمالية الفوز)")}</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-2">
-                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Competitive Intelligence — Tracked Metrics</h3>
+                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Competitive Intelligence - Tracked Metrics", "الذكاء التنافسي - المؤشرات المتتبعة")}</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={competitiveIntelligenceData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                      <XAxis dataKey="name" tick={{ fontSize: 10 }} tickFormatter={pmGraphLabel} />
                       <YAxis domain={[0, 100]} />
-                      <Tooltip formatter={(value) => [value, "Score"]} />
+                      <Tooltip formatter={(value) => [value, pmText("Score", "النتيجة")]} />
                       <Bar dataKey="score" fill="#74c69d" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 flex flex-col">
-                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Competitive Position Trend</h3>
+                  <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Competitive Position Trend", "اتجاه المركز التنافسي")}</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={competitiveIntelligenceTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
+                      <XAxis dataKey="period" tickFormatter={pmGraphLabel} />
                       <YAxis domain={[50, 90]} />
-                      <Tooltip formatter={(value) => [value, "Position"]} />
-                      <Line type="monotone" dataKey="Position" name="Position" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 4 }} />
+                      <Tooltip formatter={(value) => [value, pmText("Position", "المركز")]} />
+                      <Line type="monotone" dataKey="Position" name={pmText("Position", "المركز")} stroke="#8b5cf6" strokeWidth={2} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -1590,27 +1690,27 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <ResponsiveContainer width="100%" height={140}>
                       <LineChart data={proposalSubmissionForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
+                        <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="Actual" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
-                        <Line type="monotone" dataKey="Forecast" stroke="#22c55e" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
+                        <Tooltip formatter={(value, name) => [value, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                        <Line type="monotone" dataKey="Actual" name={pmGraphLabel("Actual")} stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
+                        <Line type="monotone" dataKey="Forecast" name={pmGraphLabel("Forecast")} stroke="#22c55e" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-blue-700 dark:text-blue-300">Submission Forecast</span>
+                        <span className="font-bold text-blue-700 dark:text-blue-300">{pmText("Submission Forecast", "توقعات التقديم")}</span>
                         <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        <span className="font-bold text-green-600 dark:text-green-400">~10–11</span> submissions next month; <span className="text-xs">(+15%)</span>.<br />
-                        Highest volume: <span className="font-semibold">FAR 15 Best Value, FAR 16 Task</span>.
+                        <span className="font-bold text-green-600 dark:text-green-400">~10-11</span> {pmText("submissions next month", "تقديمات الشهر القادم")}; <span className="text-xs">(+15%)</span>.<br />
+                        {pmText("Highest volume", "الأعلى حجماً")}: <span className="font-semibold">FAR 15 Best Value, FAR 16 Task</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">89%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Pipeline Stage, Due Dates, Capture Lead Time</span></div>
-                      <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">What-if: +2 capture staff → +1.2 submissions/month</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Pipeline Stage, Due Dates, Capture Lead Time", "مرحلة خط الأنابيب، تواريخ الاستحقاق، مهلة الالتقاط")}</span></div>
+                      <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{pmText("What-if: +2 capture staff -> +1.2 submissions/month", "ماذا لو: +2 من فريق الالتقاط -> +1.2 تقديم/شهر")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -1624,27 +1724,27 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <ResponsiveContainer width="100%" height={140}>
                       <LineChart data={proposalEliminationRiskForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="quarter" />
+                        <XAxis dataKey="quarter" tickFormatter={pmGraphLabel} />
                         <YAxis domain={[8, 16]} tickFormatter={v => `${v}%`} />
-                        <Tooltip formatter={v => `${v}%`} />
-                        <Line type="monotone" dataKey="Actual" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
-                        <Line type="monotone" dataKey="Forecast" stroke="#f472b6" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
+                        <Tooltip formatter={(v, name) => [`${v}%`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                        <Line type="monotone" dataKey="Actual" name={pmGraphLabel("Actual")} stroke="#ef4444" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
+                        <Line type="monotone" dataKey="Forecast" name={pmGraphLabel("Forecast")} stroke="#f472b6" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-pink-700 dark:text-pink-300">Elimination Risk Forecast</span>
+                        <span className="font-bold text-pink-700 dark:text-pink-300">{pmText("Elimination Risk Forecast", "توقعات مخاطر الإقصاء")}</span>
                         <span className="px-2 py-0.5 rounded bg-pink-100 dark:bg-pink-900 text-xs text-pink-700 dark:text-pink-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        Elimination risk expected to fall to <span className="font-bold text-red-600 dark:text-red-400">~9%</span> next quarter.<br />
-                        Highest risk: <span className="font-semibold">Full & Open, LPTA</span>.
+                        {pmText("Elimination risk expected to fall to", "من المتوقع أن تنخفض مخاطر الإقصاء إلى")} <span className="font-bold text-red-600 dark:text-red-400">~9%</span> {pmText("next quarter", "الربع القادم")}.<br />
+                        {pmText("Highest risk", "أعلى مخاطرة")}: <span className="font-semibold">Full & Open, LPTA</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">87%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Compliance Coverage, Mandatory Clauses, FAR Conformance</span></div>
-                      <div className="text-xs text-pink-600 dark:text-pink-300 mb-1">What-if: +5% compliance coverage → -0.8% elimination risk</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Compliance Coverage, Mandatory Clauses, FAR Conformance", "تغطية الامتثال، البنود الإلزامية، مطابقة FAR")}</span></div>
+                      <div className="text-xs text-pink-600 dark:text-pink-300 mb-1">{pmText("What-if: +5% compliance coverage -> -0.8% elimination risk", "ماذا لو: +5% تغطية امتثال -> -0.8% مخاطر إقصاء")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -1658,27 +1758,27 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <ResponsiveContainer width="100%" height={140}>
                       <BarChart data={pipelineValueForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
+                        <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis tickFormatter={v => `$${v}M`} />
-                        <Tooltip formatter={v => `$${v}M`} />
-                        <Bar dataKey="Actual" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="Forecast" fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+                        <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                        <Bar dataKey="Actual" name={pmGraphLabel("Actual")} fill="#22c55e" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="Forecast" name={pmGraphLabel("Forecast")} fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-green-700 dark:text-green-300">Pipeline Value Forecast</span>
+                        <span className="font-bold text-green-700 dark:text-green-300">{pmText("Pipeline Value Forecast", "توقعات قيمة خط الأنابيب")}</span>
                         <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-xs text-green-700 dark:text-green-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        Pipeline value expected <span className="font-bold text-blue-600 dark:text-blue-400">~$8.9M</span> by Aug.<br />
-                        Monitor <span className="font-semibold">DoD, GSA</span> opportunities.
+                        {pmText("Pipeline value expected", "قيمة خط الأنابيب المتوقعة")} <span className="font-bold text-blue-600 dark:text-blue-400">~$8.9M</span> {pmText("by Aug.", "بحلول أغسطس")}.<br />
+                        {pmText("Monitor", "راقب")} <span className="font-semibold">DoD, GSA</span> {pmText("opportunities", "الفرص")}.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">88%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">New RFPs, Win/Loss, Contract Values</span></div>
-                      <div className="text-xs text-green-600 dark:text-green-300 mb-1">What-if: +3 wins → +$1.2M pipeline value</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("New RFPs, Win/Loss, Contract Values", "طلبات عروض جديدة، فوز/خسارة، قيم العقود")}</span></div>
+                      <div className="text-xs text-green-600 dark:text-green-300 mb-1">{pmText("What-if: +3 wins -> +$1.2M pipeline value", "ماذا لو: +3 انتصارات -> +$1.2M قيمة خط الأنابيب")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -1694,9 +1794,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <ResponsiveContainer width="100%" height={140}>
                       <LineChart data={proposalWinProbabilityTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
+                        <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis domain={[25, 40]} tickFormatter={v => `${v}%`} />
-                        <Tooltip formatter={v => `${v}%`} />
+                        <Tooltip formatter={v => `${v}%`} labelFormatter={(label) => pmGraphLabel(label)} />
                         <Line type="monotone" dataKey="Rate" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -1704,16 +1804,16 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-blue-700 dark:text-blue-300">Win Probability Trend</span>
+                        <span className="font-bold text-blue-700 dark:text-blue-300">{pmText("Win Probability Trend", "اتجاه احتمالية الفوز")}</span>
                         <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        Weighted win rate trending to <span className="font-bold text-green-600 dark:text-green-400">~35%</span> (+2%).<br />
-                        Strongest: <span className="font-semibold">Sole Source, FAR 16 Task</span>.
+                        {pmText("Weighted win rate trending to", "اتجاه معدل الفوز الموزون نحو")} <span className="font-bold text-green-600 dark:text-green-400">~35%</span> (+2%).<br />
+                        {pmText("Strongest", "الأقوى")}: <span className="font-semibold">Sole Source, FAR 16 Task</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">90%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Past Performance, Price Position, Technical Score</span></div>
-                      <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">What-if: +5% technical score → +1.5% win rate</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Past Performance, Price Position, Technical Score", "الأداء السابق، تموضع السعر، الدرجة الفنية")}</span></div>
+                      <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{pmText("What-if: +5% technical score -> +1.5% win rate", "ماذا لو: +5% في الدرجة الفنية -> +1.5% معدل فوز")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
@@ -1727,27 +1827,27 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <ResponsiveContainer width="100%" height={140}>
                       <BarChart data={revenueFromWinsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
+                        <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
-                        <Tooltip formatter={v => [`$${Number(v).toLocaleString()}`, 'Revenue']} />
-                        <Bar dataKey="Revenue" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="Pending" fill="#f59e0b" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
+                        <Tooltip formatter={(v, name) => [`$${Number(v).toLocaleString()}`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                        <Bar dataKey="Revenue" name={pmGraphLabel("Revenue")} fill="#22c55e" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="Pending" name={pmGraphLabel("Pending")} fill="#f59e0b" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-green-700 dark:text-green-300">Revenue from Wins</span>
+                        <span className="font-bold text-green-700 dark:text-green-300">{pmText("Revenue from Wins", "إيرادات من الفوز")}</span>
                         <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-xs text-green-700 dark:text-green-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        YTD revenue from won proposals: <span className="font-bold text-blue-600 dark:text-blue-400">~$2.93M</span>.<br />
-                        Pending (award not yet funded): <span className="font-semibold">~$1.28M</span>.
+                        {pmText("YTD revenue from won proposals", "إيرادات السنة حتى الآن من العروض الفائزة")}: <span className="font-bold text-blue-600 dark:text-blue-400">~$2.93M</span>.<br />
+                        {pmText("Pending (award not yet funded)", "معلّق (ترسية غير ممولة بعد)")}: <span className="font-semibold">~$1.28M</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">91%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Win Rate, Contract Value, Award Timing</span></div>
-                      <div className="text-xs text-green-600 dark:text-green-300 mb-1">What-if: +2 wins/month → +$0.4M revenue</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Win Rate, Contract Value, Award Timing", "معدل الفوز، قيمة العقد، توقيت الترسية")}</span></div>
+                      <div className="text-xs text-green-600 dark:text-green-300 mb-1">{pmText("What-if: +2 wins/month -> +$0.4M revenue", "ماذا لو: +2 فوز/شهر -> +$0.4M إيرادات")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -1772,15 +1872,15 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-indigo-700 dark:text-indigo-300">Win Value by Vehicle</span>
+                        <span className="font-bold text-indigo-700 dark:text-indigo-300">{pmText("Win Value by Vehicle", "قيمة الفوز حسب وسيلة التعاقد")}</span>
                         <span className="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-xs text-indigo-700 dark:text-indigo-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        Current vs projected win value by procurement type.<br />
-                        Top: <span className="font-semibold">FAR 16 Task ($1.8M → $2.0M)</span>.
+                        {pmText("Current vs projected win value by procurement type.", "قيمة الفوز الحالية مقابل المتوقعة حسب نوع الشراء.")}<br />
+                        {pmText("Top", "الأعلى")}: <span className="font-semibold">FAR 16 Task ($1.8M -&gt; $2.0M)</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">88%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Vehicle Mix, Win Rate by Type, Deal Size</span></div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Vehicle Mix, Win Rate by Type, Deal Size", "مزيج وسائل التعاقد، معدل الفوز حسب النوع، حجم الصفقة")}</span></div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
@@ -2039,9 +2139,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <ResponsiveContainer width="100%" height={120}>
                     <LineChart data={proposalWinProbabilityTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
+                      <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                       <YAxis domain={[25, 40]} tickFormatter={v => `${v}%`} />
-                      <Tooltip formatter={v => [`${v}%`, 'Win rate']} />
+                      <Tooltip formatter={v => [`${v}%`, pmText('Win rate', 'معدل الفوز')]} labelFormatter={(label) => pmGraphLabel(label)} />
                       <Line type="monotone" dataKey="Rate" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
@@ -2049,15 +2149,15 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-blue-700 dark:text-blue-300">Bid-to-Win Rate Trend</span>
+                      <span className="font-bold text-blue-700 dark:text-blue-300">{pmText("Bid-to-Win Rate Trend", "اتجاه معدل التحول إلى فوز")}</span>
                       <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                     </div>
                     <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                      Win rate trending to <span className="font-bold text-green-600 dark:text-green-400">~35%</span> (+2%).<br />
-                      Strongest: <span className="font-semibold">Sole Source, FAR 16 Task</span>.
+                      {pmText("Win rate trending to", "اتجاه معدل الفوز نحو")} <span className="font-bold text-green-600 dark:text-green-400">~35%</span> (+2%).<br />
+                      {pmText("Strongest", "الأقوى")}: <span className="font-semibold">Sole Source, FAR 16 Task</span>.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">90%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Past Performance, Price Position, Technical Score</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Past Performance, Price Position, Technical Score", "الأداء السابق، تموضع السعر، الدرجة الفنية")}</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
@@ -2072,26 +2172,26 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <ResponsiveContainer width="100%" height={120}>
                     <BarChart data={revenueFromWinsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
+                      <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                       <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
-                      <Tooltip formatter={v => `$${Number(v).toLocaleString()}`} />
-                      <Bar dataKey="Revenue" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="Pending" fill="#f59e0b" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
+                      <Tooltip formatter={(v, name) => [`$${Number(v).toLocaleString()}`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                      <Bar dataKey="Revenue" name={pmGraphLabel("Revenue")} fill="#22c55e" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="Pending" name={pmGraphLabel("Pending")} fill="#f59e0b" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-green-700 dark:text-green-300">Revenue from Wins</span>
+                      <span className="font-bold text-green-700 dark:text-green-300">{pmText("Revenue from Wins", "إيرادات من الفوز")}</span>
                       <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-xs text-green-700 dark:text-green-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                     </div>
                     <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                      YTD from won proposals: <span className="font-bold text-blue-600 dark:text-blue-400">~$2.93M</span>.<br />
-                      Pending (award not funded): <span className="font-semibold">~$1.28M</span>.
+                      {pmText("YTD from won proposals", "إيرادات السنة حتى الآن من العروض الفائزة")}: <span className="font-bold text-blue-600 dark:text-blue-400">~$2.93M</span>.<br />
+                      {pmText("Pending (award not funded)", "معلّق (ترسية غير ممولة)")}: <span className="font-semibold">~$1.28M</span>.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">91%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Win Rate, Contract Value, Award Timing</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Win Rate, Contract Value, Award Timing", "معدل الفوز، قيمة العقد، توقيت الترسية")}</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
@@ -2106,26 +2206,26 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <ResponsiveContainer width="100%" height={120}>
                     <BarChart data={proposalPipelineByAgencyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="agency" />
+                      <XAxis dataKey="agency" tickFormatter={pmGraphLabel} />
                       <YAxis tickFormatter={v => `$${v}M`} />
-                      <Tooltip formatter={v => [`$${v}M`, '']} />
-                      <Bar dataKey="Pipeline" fill="#6366f1" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="Wins" fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
+                      <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                      <Bar dataKey="Pipeline" name={pmGraphLabel("Pipeline")} fill="#6366f1" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="Wins" name={pmGraphLabel("Wins")} fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-indigo-700 dark:text-indigo-300">Pipeline & Wins by Agency</span>
+                      <span className="font-bold text-indigo-700 dark:text-indigo-300">{pmText("Pipeline & Wins by Agency", "خط الأنابيب والفوز حسب الجهة")}</span>
                       <span className="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-xs text-indigo-700 dark:text-indigo-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                     </div>
                     <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                      Pipeline value vs win value by customer agency.<br />
-                      Top: <span className="font-semibold">DoD ($3.2M pipeline, $1.1M wins)</span>.
+                      {pmText("Pipeline value vs win value by customer agency.", "قيمة خط الأنابيب مقابل قيمة الفوز حسب جهة العميل.")}<br />
+                      {pmText("Top", "الأعلى")}: <span className="font-semibold">DoD ($3.2M pipeline, $1.1M wins)</span>.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">89%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Agency Budget, Win Rate by Agency, Contract Type</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Agency Budget, Win Rate by Agency, Contract Type", "ميزانية الجهة، معدل الفوز حسب الجهة، نوع العقد")}</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
@@ -2140,26 +2240,26 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <ResponsiveContainer width="100%" height={120}>
                     <BarChart data={winValueByVehicleData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="vehicle" tick={{ fontSize: 9 }} />
+                      <XAxis dataKey="vehicle" tick={{ fontSize: 9 }} tickFormatter={pmGraphLabel} />
                       <YAxis tickFormatter={v => `$${v}M`} />
-                      <Tooltip formatter={v => [`$${v}M`, '']} />
-                      <Bar dataKey="Revenue" fill="#74c69d" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="Projected" fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.6} />
+                      <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                      <Bar dataKey="Revenue" name={pmGraphLabel("Revenue")} fill="#74c69d" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="Projected" name={pmGraphLabel("Projected")} fill="#6366f1" radius={[8, 8, 0, 0]} fillOpacity={0.6} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-indigo-700 dark:text-indigo-300">Win Value by Vehicle</span>
+                      <span className="font-bold text-indigo-700 dark:text-indigo-300">{pmText("Win Value by Vehicle", "قيمة الفوز حسب وسيلة التعاقد")}</span>
                       <span className="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-xs text-indigo-700 dark:text-indigo-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                     </div>
                     <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                      Current vs projected win value by procurement type.<br />
-                      Top: <span className="font-semibold">FAR 16 Task ($1.8M → $2.0M)</span>.
+                      {pmText("Current vs projected win value by procurement type.", "قيمة الفوز الحالية مقابل المتوقعة حسب نوع الشراء.")}<br />
+                      {pmText("Top", "الأعلى")}: <span className="font-semibold">FAR 16 Task ($1.8M -&gt; $2.0M)</span>.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">88%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Vehicle Mix, Win Rate by Type, Deal Size</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Vehicle Mix, Win Rate by Type, Deal Size", "مزيج وسائل التعاقد، معدل الفوز حسب النوع، حجم الصفقة")}</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
@@ -2174,7 +2274,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <ResponsiveContainer width="100%" height={120}>
                     <RadarChart cx="50%" cy="50%" outerRadius={50} data={winValueByVehicleData.map(d => ({ vehicle: d.vehicle, Revenue: d.Revenue, Projected: d.Projected }))}>
                       <PolarGrid />
-                      <PolarAngleAxis dataKey="vehicle" tick={{ fontSize: 8 }} />
+                      <PolarAngleAxis dataKey="vehicle" tick={{ fontSize: 8 }} tickFormatter={pmGraphLabel} />
                       <PolarRadiusAxis angle={30} tickFormatter={v => `$${v}M`} />
                       <Radar name="Current" dataKey="Revenue" stroke="#74c69d" fill="#74c69d" fillOpacity={0.5} />
                       <Radar name="Projected" dataKey="Projected" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
@@ -2186,15 +2286,15 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-green-700 dark:text-green-300">Win Value by Vehicle (Radar)</span>
+                      <span className="font-bold text-green-700 dark:text-green-300">{pmText("Win Value by Vehicle (Radar)", "قيمة الفوز حسب وسيلة التعاقد (رادار)")}</span>
                       <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-xs text-green-700 dark:text-green-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                     </div>
                     <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                      Current vs projected win value by procurement type.<br />
-                      Instantly spot strongest/weakest vehicles.
+                      {pmText("Current vs projected win value by procurement type.", "قيمة الفوز الحالية مقابل المتوقعة حسب نوع الشراء.")}<br />
+                      {pmText("Instantly spot strongest/weakest vehicles.", "اكتشف فوراً أقوى/أضعف وسائل التعاقد.")}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">88%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Vehicle Mix, Win Rate, Deal Size</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Vehicle Mix, Win Rate, Deal Size", "مزيج وسائل التعاقد، معدل الفوز، حجم الصفقة")}</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.interactiveRadar')}</span>
@@ -2220,15 +2320,15 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-blue-700 dark:text-blue-300">Pipeline Value Trend</span>
+                      <span className="font-bold text-blue-700 dark:text-blue-300">{pmText("Pipeline Value Trend", "اتجاه قيمة خط الأنابيب")}</span>
                       <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                     </div>
                     <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                      Pipeline value expected <span className="font-bold text-green-600 dark:text-green-400">~$8.9M</span> by Aug.<br />
-                      Monitor <span className="font-semibold">DoD, GSA</span> opportunities.
+                      {pmText("Pipeline value expected", "قيمة خط الأنابيب المتوقعة")} <span className="font-bold text-green-600 dark:text-green-400">~$8.9M</span> {pmText("by Aug.", "بحلول أغسطس")}.<br />
+                      {pmText("Monitor", "راقب")} <span className="font-semibold">DoD, GSA</span> {pmText("opportunities", "الفرص")}.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">88%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">New RFPs, Win/Loss, Contract Values</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("New RFPs, Win/Loss, Contract Values", "طلبات عروض جديدة، فوز/خسارة، قيم العقود")}</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>

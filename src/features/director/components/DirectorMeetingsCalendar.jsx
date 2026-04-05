@@ -36,8 +36,56 @@ export default function DirectorMeetingsCalendar() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [viewMode, setViewMode] = useState("list");
-  const { t } = useTranslation('director');
+  const { t, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
+
+  const pmText = (value) => {
+    if (!isPM || !isArabic) return value;
+    const map = {
+      "Proposal Meetings & Calendar": "اجتماعات العروض والتقويم",
+      "Kickoffs, color team reviews, red team, and submission deadlines.": "اجتماعات الانطلاق، مراجعات فريق الألوان، فريق الأحمر، ومواعيد التسليم النهائية.",
+      Upcoming: "القادمة",
+      Completed: "المكتملة",
+      "Total Attendees": "إجمالي المشاركين",
+      "This Week": "هذا الأسبوع",
+      "All Status": "كل الحالات",
+      Scheduled: "مجدول",
+      "Add Meeting": "إضافة اجتماع",
+      Cancelled: "ملغي",
+      "Agenda:": "الأجندة:",
+      "Participants:": "المشاركون:",
+      attendees: "المشاركون",
+      priority: "أولوية",
+      "Meeting": "اجتماع",
+      "Event": "فعالية",
+      // Meeting titles / agendas / participants / locations for PM demo data
+      "Water Wastewater RFP – Kickoff": "طلب عروض المياه والصرف الصحي - اجتماع انطلاق",
+      "Landscape Maintenance – Color Team Review": "صيانة المساحات الخضراء - مراجعة فريق الألوان",
+      "Airport Restaurant – Red Team": "مطعم المطار - فريق الأحمر",
+      "Submission Deadline – Balsitis Playground": "موعد تسليم ملعب بالسيـتِس النهائي",
+      "RFP review, assignments, schedule": "مراجعة طلب العروض وتوزيع المهام والجدول",
+      "Draft review, compliance check": "مراجعة المسودة والتحقق من الامتثال",
+      "Final review before submission": "مراجعة نهائية قبل التقديم",
+      "Final packaging, upload, sign-off": "التجهيز النهائي والرفع والتوقيع بالموافقة",
+      "Capture Manager, Proposal Manager, Writers": "مدير الالتقاط، مدير العروض، والكتاب",
+      "Proposal Manager, Technical Lead, Pricing": "مدير العروض، القائد التقني، والتسعير",
+      "Proposal Manager, Compliance, Graphics": "مدير العروض، الامتثال، والرسومات",
+      "Full proposal team": "الفريق الكامل للعروض",
+      "Conference Room A": "غرفة الاجتماعات أ",
+      "Project Center": "مركز المشاريع",
+      "Main Conference": "المؤتمر الرئيسي",
+      "War Room": "غرفة الطوارئ",
+      "Water Wastewater Kickoff": "انطلاق المياه والصرف الصحي",
+      "Landscape Color Team": "فريق ألوان صيانة المساحات الخضراء",
+      "Airport Restaurant Red Team": "فريق الأحمر لمطعم المطار",
+      "Balsitis Submission Deadline": "موعد تسليم ملعب بالسيـتِس",
+      "Surplus Tanks Go/No-Go": "قرار خزانات الفائض (نعم/لا)",
+    };
+    return map[value] || value;
+  };
+
+  const priorityLabel = (priority) => t(`support.priorities.${priority}`, { defaultValue: priority });
 
   const pmMeetings = [
     { id: 1, date: "2026-03-15", time: "10:00", duration: "2h", title: "Water Wastewater RFP – Kickoff", participants: "Capture Manager, Proposal Manager, Writers", statusKey: "status.scheduled", agenda: "RFP review, assignments, schedule", location: "Conference Room A", type: "kickoff", priority: "high", attendees: 8 },
@@ -194,23 +242,23 @@ export default function DirectorMeetingsCalendar() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiCalendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? "Proposal Meetings & Calendar" : t('meetingsCalendar.title')}
+                {isPM ? pmText("Proposal Meetings & Calendar") : t('meetingsCalendar.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {isPM ? "Kickoffs, color team reviews, red team, and submission deadlines." : t('meetingsCalendar.subtitle')}
+                {isPM ? pmText("Kickoffs, color team reviews, red team, and submission deadlines.") : t('meetingsCalendar.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Upcoming</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('meetingsCalendar.status.scheduled')}</div>
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{upcomingMeetings}</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Completed</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('meetingsCalendar.status.completed')}</div>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">{completedMeetings}</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Total Attendees</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{pmText("Total Attendees")}</div>
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{totalAttendees}</div>
               </div>
             </div>
@@ -228,7 +276,7 @@ export default function DirectorMeetingsCalendar() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{upcomingMeetings}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">Upcoming Meetings</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{t('meetingsCalendar.upcomingMeetings')}</div>
               </div>
               <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20">
                 <FiCalendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -240,7 +288,7 @@ export default function DirectorMeetingsCalendar() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400">{completedMeetings}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">Completed</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{t('meetingsCalendar.status.completed')}</div>
               </div>
               <div className="p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
                 <FiCheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
@@ -252,7 +300,7 @@ export default function DirectorMeetingsCalendar() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{totalAttendees}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">Total Attendees</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{pmText("Total Attendees")}</div>
               </div>
               <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-900/20">
                 <FiUsers className="w-6 h-6 text-purple-600 dark:text-purple-400" />
@@ -264,7 +312,7 @@ export default function DirectorMeetingsCalendar() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">4</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">This Week</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{pmText("This Week")}</div>
               </div>
               <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20">
                 <FiClock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
@@ -299,14 +347,14 @@ export default function DirectorMeetingsCalendar() {
                 onChange={e => setSelectedStatus(e.target.value)}
                 className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
               >
-                <option value="all">All Status</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{pmText("All Status")}</option>
+                <option value="scheduled">{t('meetingsCalendar.status.scheduled')}</option>
+                <option value="completed">{t('meetingsCalendar.status.completed')}</option>
+                <option value="cancelled">{pmText("Cancelled")}</option>
               </select>
               <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
                 <FiPlus className="w-4 h-4" />
-                Add Meeting
+                {pmText("Add Meeting")}
               </button>
             </div>
           </div>
@@ -322,7 +370,7 @@ export default function DirectorMeetingsCalendar() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {isPM ? meeting.title : t(`meetingsCalendar.${meeting.titleKey}`)}
+                          {isPM ? pmText(meeting.title) : t(`meetingsCalendar.${meeting.titleKey}`)}
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mt-1">
                           <div className="flex items-center gap-1">
@@ -335,7 +383,7 @@ export default function DirectorMeetingsCalendar() {
                           </div>
                           <div className="flex items-center gap-1">
                             <FiMapPin className="w-4 h-4" />
-                            {meeting.location}
+                            {isPM ? pmText(meeting.location) : meeting.location}
                           </div>
                         </div>
                       </div>
@@ -346,24 +394,24 @@ export default function DirectorMeetingsCalendar() {
                         {t(`meetingsCalendar.${meeting.statusKey}`)}
                       </span>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(meeting.priority)}`}>
-                        {meeting.priority} priority
+                        {priorityLabel(meeting.priority)} {t('support.priority')}
                       </span>
                       <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
                         <FiUsers className="w-4 h-4" />
-                        {meeting.attendees} attendees
+                        {meeting.attendees} {t('meetingsCalendar.tableHeaders.participants')}
                       </div>
                     </div>
                     
                     <div className="text-sm text-gray-600 dark:text-gray-300">
-                      <div className="font-medium mb-1">Agenda:</div>
-                      <div>{isPM ? meeting.agenda : t(`meetingsCalendar.${meeting.agendaKey}`)}</div>
+                      <div className="font-medium mb-1">{t('meetingsCalendar.tableHeaders.agenda')}:</div>
+                      <div>{isPM ? pmText(meeting.agenda) : t(`meetingsCalendar.${meeting.agendaKey}`)}</div>
                     </div>
                     
                     <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                      <div className="font-medium mb-1">Participants:</div>
+                      <div className="font-medium mb-1">{t('meetingsCalendar.tableHeaders.participants')}:</div>
                       <div className="flex flex-wrap gap-1">
                         {isPM ? (
-                          <span className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded-md text-xs">{meeting.participants}</span>
+                          <span className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded-md text-xs">{pmText(meeting.participants)}</span>
                         ) : (
                           meeting.participantKeys.map((key, i) => (
                             <span key={i} className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded-md text-xs">
@@ -436,10 +484,10 @@ export default function DirectorMeetingsCalendar() {
                     </div>
                     <div>
                       <div className="font-semibold text-gray-900 dark:text-white">
-                        {isPM ? ev.label : t(`meetingsCalendar.${ev.labelKey}`)}
+                        {isPM ? pmText(ev.label) : t(`meetingsCalendar.${ev.labelKey}`)}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-300">
-                        {ev.date} • {ev.type === 'meeting' ? 'Meeting' : 'Event'}
+                        {ev.date} • {ev.type === 'meeting' ? pmText('Meeting') : pmText('Event')}
                       </div>
                     </div>
                   </div>

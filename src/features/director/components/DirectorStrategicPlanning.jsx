@@ -45,8 +45,44 @@ const years = ["2026", "2026", "2026", "2027", "2028"];
 export default function DirectorStrategicPlanning() {
   const location = useLocation();
   const isCaptureStrategy = location.pathname.includes("/rbac/proposal-manager/capture-strategy");
-  const { t, ready } = useTranslation('director');
+  const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
+  const pmText = (en, ar) => (isCaptureStrategy ? (isArabic ? ar : en) : en);
+  const pmLabel = (value) => {
+    if (!isCaptureStrategy || !isArabic) return value;
+    const map = {
+      "Win Rate": "معدل الفوز",
+      "Pipeline Value": "قيمة خط الأنابيب",
+      "Capture Ratio": "نسبة الالتقاط",
+      "Proposals Submitted (YTD)": "العروض المقدمة (منذ بداية السنة)",
+      "Pipeline growth": "نمو خط الأنابيب",
+      "Win rate target": "هدف معدل الفوز",
+      "Capture plan completion": "اكتمال خطة الالتقاط",
+      "Teaming agreements": "اتفاقيات الشراكة",
+      "in-progress": "قيد التنفيذ",
+      planned: "مخطط",
+      high: "مرتفع",
+      medium: "متوسط",
+      low: "منخفض",
+      Capture: "التقاط",
+      Proposal: "العرض",
+      Pricing: "التسعير",
+      Submitted: "تم التقديم",
+      "Go/No-Go": "قرار التقديم/عدم التقديم",
+      upcoming: "قادم",
+      urgent: "عاجل",
+      new: "جديد",
+      Strengths: "نقاط القوة",
+      Weaknesses: "نقاط الضعف",
+      Opportunities: "الفرص",
+      Threats: "التهديدات",
+      "Pipeline ($M)": "خط الأنابيب (مليون $)",
+      "Win Rate %": "معدل الفوز %",
+      Submissions: "التقديمات",
+    };
+    return map[value] || value;
+  };
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [selectedDept, setSelectedDept] = useState("All Departments");
   const [selectedYear, setSelectedYear] = useState("2026");
@@ -78,7 +114,7 @@ export default function DirectorStrategicPlanning() {
 
   if (!ready) {
     return <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 items-center justify-center">
-      <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
+      <div className="text-lg text-gray-600 dark:text-gray-300">{isArabic ? "جارٍ التحميل..." : "Loading..."}</div>
     </div>;
   }
 
@@ -86,10 +122,10 @@ export default function DirectorStrategicPlanning() {
   const departments = [t('strategicPlanning.filters.allDepartments'), t('strategicPlanning.filters.departments.computerScience'), t('strategicPlanning.filters.departments.eee'), t('strategicPlanning.filters.departments.mechanical'), t('strategicPlanning.filters.departments.business'), t('strategicPlanning.filters.departments.biotech')];
   
   const captureKpis = [
-    { label: "Win Rate", value: 32, target: 35, unit: "%", trend: "up", icon: FiAward },
-    { label: "Pipeline Value", value: 43, target: 50, unit: " $M", trend: "up", icon: FiDollarSign },
-    { label: "Capture Ratio", value: 67, target: 70, unit: "%", trend: "up", icon: FiTarget },
-    { label: "Proposals Submitted (YTD)", value: 22, target: 28, unit: "", trend: "down", icon: FiBookOpen },
+    { label: pmText("Win Rate", "معدل الفوز"), value: 32, target: 35, unit: "%", trend: "up", icon: FiAward },
+    { label: pmText("Pipeline Value", "قيمة خط الأنابيب"), value: 43, target: 50, unit: " $M", trend: "up", icon: FiDollarSign },
+    { label: pmText("Capture Ratio", "نسبة الالتقاط"), value: 67, target: 70, unit: "%", trend: "up", icon: FiTarget },
+    { label: pmText("Proposals Submitted (YTD)", "العروض المقدمة (منذ بداية السنة)"), value: 22, target: 28, unit: "", trend: "down", icon: FiBookOpen },
   ];
   const kpis = isCaptureStrategy ? captureKpis : [
     { label: t('strategicPlanning.kpis.studentFacultyRatio'), value: 18, target: 15, unit: ":1", trend: "up", icon: FiUsers },
@@ -99,10 +135,10 @@ export default function DirectorStrategicPlanning() {
   ];
 
   const captureGoals = [
-    { label: "Pipeline growth", progress: 72, icon: FiTrendingUp, color: "blue" },
-    { label: "Win rate target", progress: 85, icon: FiAward, color: "green" },
-    { label: "Capture plan completion", progress: 68, icon: FiTarget, color: "purple" },
-    { label: "Teaming agreements", progress: 55, icon: FiUsers, color: "orange" },
+    { label: pmText("Pipeline growth", "نمو خط الأنابيب"), progress: 72, icon: FiTrendingUp, color: "blue" },
+    { label: pmText("Win rate target", "هدف معدل الفوز"), progress: 85, icon: FiAward, color: "green" },
+    { label: pmText("Capture plan completion", "اكتمال خطة الالتقاط"), progress: 68, icon: FiTarget, color: "purple" },
+    { label: pmText("Teaming agreements", "اتفاقيات الشراكة"), progress: 55, icon: FiUsers, color: "orange" },
   ];
   const goals = isCaptureStrategy ? captureGoals : [
     { label: t('strategicPlanning.strategicGoals.researchOutput'), progress: 70, icon: FiBookOpen, color: "blue" },
@@ -112,10 +148,10 @@ export default function DirectorStrategicPlanning() {
   ];
 
   const captureRoadmap = [
-    { name: "Water Wastewater RFP – Capture", start: "2026", end: "2026", status: "in-progress", priority: "high" },
-    { name: "Landscape Maintenance – Proposal", start: "2026", end: "2026", status: "planned", priority: "medium" },
-    { name: "Airport Restaurant Lease – Pricing", start: "2026", end: "2026", status: "planned", priority: "low" },
-    { name: "Surplus Tanks – Go/No-Go", start: "2026", end: "2026", status: "in-progress", priority: "medium" },
+    { name: pmText("Water Wastewater RFP – Capture", "طلب عروض المياه والصرف الصحي - الالتقاط"), start: "2026", end: "2026", status: "in-progress", priority: "high" },
+    { name: pmText("Landscape Maintenance – Proposal", "صيانة المساحات الخضراء - العرض"), start: "2026", end: "2026", status: "planned", priority: "medium" },
+    { name: pmText("Airport Restaurant Lease – Pricing", "تأجير مطعم المطار - التسعير"), start: "2026", end: "2026", status: "planned", priority: "low" },
+    { name: pmText("Surplus Tanks – Go/No-Go", "خزانات الفائض - قرار التقديم/عدم التقديم"), start: "2026", end: "2026", status: "in-progress", priority: "medium" },
   ];
   const roadmap = isCaptureStrategy ? captureRoadmap : [
     { name: t('strategicPlanning.roadmap.ncaaaPrep'), start: "2026", end: "2026", status: "in-progress", priority: "high" },
@@ -125,11 +161,11 @@ export default function DirectorStrategicPlanning() {
   ];
 
   const captureOpportunities = [
-    { course: "Water Wastewater Study", status: "Capture", lead: "Capture Manager", start: "2026-02", end: "2026-04", priority: "high" },
-    { course: "Landscape Maintenance", status: "Proposal", lead: "Proposal Manager", start: "2026-03", end: "2026-05", priority: "medium" },
-    { course: "Airport Restaurant Lease", status: "Pricing", lead: "Pricing Lead", start: "2026-03", end: "2026-05", priority: "low" },
-    { course: "Balsitis Playground", status: "Submitted", lead: "Proposal Manager", start: "2026-01", end: "2026-03", priority: "high" },
-    { course: "Surplus Tanks", status: "Go/No-Go", lead: "Capture Manager", start: "2026-04", end: "2026-06", priority: "medium" },
+    { course: pmText("Water Wastewater Study", "دراسة المياه والصرف الصحي"), status: "Capture", lead: pmText("Capture Manager", "مدير الالتقاط"), start: "2026-02", end: "2026-04", priority: "high" },
+    { course: pmText("Landscape Maintenance", "صيانة المساحات الخضراء"), status: "Proposal", lead: pmText("Proposal Manager", "مدير العروض"), start: "2026-03", end: "2026-05", priority: "medium" },
+    { course: pmText("Airport Restaurant Lease", "تأجير مطعم المطار"), status: "Pricing", lead: pmText("Pricing Lead", "قائد التسعير"), start: "2026-03", end: "2026-05", priority: "low" },
+    { course: pmText("Balsitis Playground", "ملعب بالسيـتِس"), status: "Submitted", lead: pmText("Proposal Manager", "مدير العروض"), start: "2026-01", end: "2026-03", priority: "high" },
+    { course: pmText("Surplus Tanks", "خزانات الفائض"), status: "Go/No-Go", lead: pmText("Capture Manager", "مدير الالتقاط"), start: "2026-04", end: "2026-06", priority: "medium" },
   ];
   const curriculumMatrix = isCaptureStrategy ? captureOpportunities : [
     { course: t('strategicPlanning.programs.bscAi'), status: t('strategicPlanning.curriculumStatus.proposal'), lead: t('strategicPlanning.faculty.drChen'), start: "2026-06", end: "2026-05", priority: "high" },
@@ -140,10 +176,10 @@ export default function DirectorStrategicPlanning() {
   ];
 
   const captureBidReviews = [
-    { program: "Federal – IT Services", next: "2026", last: "2025", status: "upcoming" },
-    { program: "State – Professional Services", next: "2026", last: "2024", status: "upcoming" },
-    { program: "Commercial – Maintenance", next: "2026", last: "2026", status: "upcoming" },
-    { program: "International – Research", next: "2027", last: "New", status: "new" },
+    { program: pmText("Federal – IT Services", "فيدرالي - خدمات تقنية المعلومات"), next: "2026", last: "2025", status: "upcoming" },
+    { program: pmText("State – Professional Services", "حكومي محلي - خدمات مهنية"), next: "2026", last: "2024", status: "upcoming" },
+    { program: pmText("Commercial – Maintenance", "تجاري - صيانة"), next: "2026", last: "2026", status: "upcoming" },
+    { program: pmText("International – Research", "دولي - أبحاث"), next: "2027", last: pmText("New", "جديد"), status: "new" },
     { program: "GSA Schedule", next: "2026", last: "2023", status: "urgent" },
   ];
   const programEvaluation = isCaptureStrategy ? captureBidReviews : [
@@ -155,10 +191,27 @@ export default function DirectorStrategicPlanning() {
   ];
 
   const captureSwot = {
-    "Strengths": ["Strong past performance in IT/services", "Experienced capture team", "High win rate in recompetes", "Solid teaming partners"],
-    "Weaknesses": ["Limited bandwidth for new captures", "Some boilerplate outdated", "Pricing templates need refresh"],
-    "Opportunities": ["Growing federal IT budget", "State/Local RFPs increasing", "IDIQ recompetes in pipeline"],
-    "Threats": ["Competitor price undercutting", "Tight RFP deadlines", "Resource constraints"],
+    [pmText("Strengths", "نقاط القوة")]: [
+      pmText("Strong past performance in IT/services", "أداء قوي سابق في تقنية المعلومات والخدمات"),
+      pmText("Experienced capture team", "فريق التقاط ذو خبرة"),
+      pmText("High win rate in recompetes", "معدل فوز مرتفع في إعادة المنافسات"),
+      pmText("Solid teaming partners", "شركاء تحالف موثوقون"),
+    ],
+    [pmText("Weaknesses", "نقاط الضعف")]: [
+      pmText("Limited bandwidth for new captures", "قدرة محدودة لفرص الالتقاط الجديدة"),
+      pmText("Some boilerplate outdated", "بعض القوالب الأساسية قديمة"),
+      pmText("Pricing templates need refresh", "قوالب التسعير تحتاج تحديثًا"),
+    ],
+    [pmText("Opportunities", "الفرص")]: [
+      pmText("Growing federal IT budget", "نمو ميزانية تقنية المعلومات الفيدرالية"),
+      pmText("State/Local RFPs increasing", "تزايد طلبات العروض الحكومية والمحلية"),
+      pmText("IDIQ recompetes in pipeline", "إعادات منافسة IDIQ ضمن خط الأنابيب"),
+    ],
+    [pmText("Threats", "التهديدات")]: [
+      pmText("Competitor price undercutting", "خفض أسعار المنافسين"),
+      pmText("Tight RFP deadlines", "مواعيد نهائية ضيقة لطلبات العروض"),
+      pmText("Resource constraints", "قيود الموارد"),
+    ],
   };
   const swot = isCaptureStrategy ? captureSwot : {
     [t('strategicPlanning.swot.strengths')]: [
@@ -187,9 +240,9 @@ export default function DirectorStrategicPlanning() {
   };
 
   const captureTrends = [
-    { label: "Pipeline ($M)", values: [35, 38, 40, 42, 43], years: ["2022", "2023", "2024", "2025", "2026"], color: "#3b82f6" },
-    { label: "Win Rate %", values: [28, 30, 31, 32, 32], years: ["2022", "2023", "2024", "2025", "2026"], color: "#10b981" },
-    { label: "Submissions", values: [18, 20, 21, 22, 22], years: ["2022", "2023", "2024", "2025", "2026"], color: "#f59e0b" },
+    { label: pmText("Pipeline ($M)", "خط الأنابيب (مليون $)"), values: [35, 38, 40, 42, 43], years: ["2022", "2023", "2024", "2025", "2026"], color: "#3b82f6" },
+    { label: pmText("Win Rate %", "معدل الفوز %"), values: [28, 30, 31, 32, 32], years: ["2022", "2023", "2024", "2025", "2026"], color: "#10b981" },
+    { label: pmText("Submissions", "التقديمات"), values: [18, 20, 21, 22, 22], years: ["2022", "2023", "2024", "2025", "2026"], color: "#f59e0b" },
   ];
   const trends = isCaptureStrategy ? captureTrends : [
     { label: t('strategicPlanning.trends.enrollment'), values: [1200, 1300, 1400, 1550, 1700], years: ["2020","2026","2026","2026","2026"], color: "#3b82f6" },
@@ -240,10 +293,10 @@ export default function DirectorStrategicPlanning() {
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {isCaptureStrategy ? "Capture Strategy" : t('strategicPlanning.title')}
+              {isCaptureStrategy ? pmText("Capture Strategy", "استراتيجية الالتقاط") : t('strategicPlanning.title')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg">
-              {isCaptureStrategy ? "Capture planning, win strategy, and pipeline management." : t('strategicPlanning.subtitle')}
+              {isCaptureStrategy ? pmText("Capture planning, win strategy, and pipeline management.", "تخطيط الالتقاط، استراتيجية الفوز، وإدارة خط الأنابيب.") : t('strategicPlanning.subtitle')}
             </p>
           </div>
           
@@ -256,10 +309,10 @@ export default function DirectorStrategicPlanning() {
               >
                 <FiTarget className="w-5 h-5 flex-shrink-0" /> 
                 <span className="hidden sm:inline font-medium">
-                  {isRTLMode ? 'الرؤى الاستراتيجية' : 'Strategic Insights'}
+                  {pmText('Strategic Insights', 'الرؤى الاستراتيجية')}
                 </span>
                 <span className="sm:hidden font-medium">
-                  {isRTLMode ? 'استراتيجي' : 'Strategic'}
+                  {pmText('Strategic', 'استراتيجي')}
                 </span>
               </button>
             </div>
@@ -296,15 +349,12 @@ export default function DirectorStrategicPlanning() {
                 <FiTarget className="text-blue-600 dark:text-blue-400 w-6 h-6" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {isRTLMode ? 'الرؤى الاستراتيجية والتخطيط الذكي' : 'Strategic Insights & Intelligent Planning'}
+                  {pmText('Strategic Insights & Intelligent Planning', 'الرؤى الاستراتيجية والتخطيط الذكي')}
               </h2>
             </div>
             <div className="mb-6">
               <p className="text-gray-600 dark:text-gray-400 text-lg">
-                {isRTLMode 
-                  ? 'رؤى استراتيجية مدعومة بالذكاء الاصطناعي لتحسين الأداء والتخطيط المستقبلي' 
-                  : 'AI-powered strategic insights for enhanced performance and future planning'
-                }
+                {pmText('AI-powered strategic insights for enhanced performance and future planning', 'رؤى استراتيجية مدعومة بالذكاء الاصطناعي لتحسين الأداء والتخطيط المستقبلي')}
               </p>
             </div>
             <DirectorStrategicInsights 
@@ -432,7 +482,7 @@ export default function DirectorStrategicPlanning() {
                     <div className={`flex items-center justify-between ${isRTLMode ? 'flex-row-reverse' : ''}`}>
                       <span className="font-medium text-gray-900 dark:text-white text-sm">{item.name}</span>
                       <div className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>
-                        {item.priority}
+                        {pmLabel(item.priority)}
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -496,7 +546,7 @@ export default function DirectorStrategicPlanning() {
                         <td className="py-3 font-medium text-gray-900 dark:text-white">{row.course}</td>
                         <td className="py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(row.priority)}`}>
-                            {row.status}
+                            {pmLabel(row.status)}
                           </span>
                         </td>
                         <td className="py-3 text-gray-600 dark:text-gray-400">{row.lead}</td>
@@ -525,11 +575,11 @@ export default function DirectorStrategicPlanning() {
                     <div>
                       <h4 className="font-medium text-gray-900 dark:text-white">{prog.program}</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('strategicPlanning.academicPlanning.reviewIn')} {prog.next} ({t('strategicPlanning.academicPlanning.last')}: {prog.last})
+                        {pmText("Review in", t('strategicPlanning.academicPlanning.reviewIn'))} {prog.next} ({pmText("Last", t('strategicPlanning.academicPlanning.last'))}: {prog.last})
                       </p>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(prog.status)}`}>
-                      {prog.status}
+                      {pmLabel(prog.status)}
                     </span>
                   </div>
                 ))}

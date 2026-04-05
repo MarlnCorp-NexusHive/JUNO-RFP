@@ -82,16 +82,16 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
                   ${!isActive ? (darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/10') : ''}
                   ${isRTLMode ? 'text-right' : 'text-left'}
                 `}
-                title={!expanded ? t(f.label) : undefined}
+                title={!expanded ? t(f.label, { defaultValue: f.label }) : undefined}
               >
                 <span className="text-2xl flex-shrink-0">{f.icon}</span>
-                {expanded && <span className="text-white break-words min-w-0">{t(f.label)}</span>}
+                {expanded && <span className="text-white break-words min-w-0">{t(f.label, { defaultValue: f.label })}</span>}
                 {/* Tooltip for collapsed */}
                 {!expanded && (
                   <span className={`absolute top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg ${
                     isRTLMode ? 'right-full mr-2' : 'left-full ml-2'
                   }`}>
-                    {t(f.label)}
+                    {t(f.label, { defaultValue: f.label })}
                   </span>
                 )}
               </button>

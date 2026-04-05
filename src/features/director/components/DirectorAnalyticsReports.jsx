@@ -366,7 +366,7 @@ const contentHubData = {
 
 export default function DirectorAnalyticsReports() {
   const location = useLocation();
-  const { t, ready } = useTranslation('director');
+  const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
   const isBidVault = location.pathname.includes("/rbac/proposal-manager/bid-vault");
   const isContentHub = location.pathname.includes("/rbac/proposal-manager/content-hub");
@@ -379,6 +379,44 @@ export default function DirectorAnalyticsReports() {
   // AI Features State
   const [showFinancialIntelligence, setShowFinancialIntelligence] = useState(false);
   const [financialAnalysis, setFinancialAnalysis] = useState(null);
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
+  const pmText = (en, ar) => (isArabic ? ar : en);
+  const bidLabel = (text) => {
+    const map = {
+      "RFPs Identified": "طلبات العروض المحددة",
+      "Go/No-Go": "قرار التقديم/عدم التقديم",
+      "Proposal Submitted": "تم تقديم العرض",
+      Shortlisted: "القائمة المختصرة",
+      Won: "فوز",
+      Federal: "اتحادي",
+      "State/Local": "ولائي/محلي",
+      Commercial: "تجاري",
+      International: "دولي",
+      Qualification: "التأهيل",
+      Capture: "الالتقاط",
+      Proposal: "العرض",
+      Submitted: "مُقدَّم",
+      Jan: "يناير",
+      Feb: "فبراير",
+      Mar: "مارس",
+      Apr: "أبريل",
+      May: "مايو",
+      Jun: "يونيو",
+      Submissions: "التقديمات",
+      "Win/Loss": "فوز/خسارة",
+      Pipeline: "خط الأنابيب",
+      SubmittedLine: "المقدّم",
+      WonLine: "الفائز",
+      "Win %": "نسبة الفوز %",
+      Lost: "خسارة",
+      Pending: "قيد الانتظار",
+      "Value ($M)": "القيمة (مليون $)",
+      Value: "القيمة",
+      Count: "العدد",
+    };
+    if (!isArabic) return text;
+    return map[text] || text;
+  };
 
   // Refs for auto-scroll functionality
   const financialRef = useRef(null);
@@ -1171,39 +1209,39 @@ export default function DirectorAnalyticsReports() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Proposal Submission Funnel</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Proposal Submission Funnel", "مسار تقديم العروض")}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={bidVaultData.submissionFunnel} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="stage" tick={{ fontSize: 9 }} />
+              <XAxis dataKey="stage" tick={{ fontSize: 9 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
+              <Tooltip labelFormatter={(label) => bidLabel(label)} />
               <Bar dataKey="conversion" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Submissions vs Wins (6M)</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Submissions vs Wins (6M)", "التقديمات مقابل الفوز (آخر 6 أشهر)")}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={bidVaultData.submissionsTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="submitted" stroke="#6366f1" strokeWidth={2} name="Submitted" />
-              <Line type="monotone" dataKey="won" stroke="#22c55e" strokeWidth={2} name="Won" />
+              <Tooltip labelFormatter={(label) => bidLabel(label)} />
+              <Line type="monotone" dataKey="submitted" stroke="#6366f1" strokeWidth={2} name={pmText("Submitted", "المقدّم")} />
+              <Line type="monotone" dataKey="won" stroke="#22c55e" strokeWidth={2} name={pmText("Won", "فوز")} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Win Rate by Fiscal Year</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Win Rate by Fiscal Year", "معدل الفوز حسب السنة المالية")}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={bidVaultData.winRateByFiscal} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="rate" fill="#10b981" radius={[4, 4, 0, 0]} name="Win %" />
+              <Bar dataKey="rate" fill="#10b981" radius={[4, 4, 0, 0]} name={pmText("Win %", "نسبة الفوز %")} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1214,29 +1252,29 @@ export default function DirectorAnalyticsReports() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Win/Loss by Segment</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Win/Loss by Segment", "الفوز/الخسارة حسب القطاع")}</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={bidVaultData.winLossBySegment} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="segment" tick={{ fontSize: 10 }} />
+              <XAxis dataKey="segment" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
+              <Tooltip labelFormatter={(label) => bidLabel(label)} />
               <Legend />
-              <Bar dataKey="won" fill="#22c55e" radius={[4, 4, 0, 0]} name="Won" />
-              <Bar dataKey="lost" fill="#ef4444" radius={[4, 4, 0, 0]} name="Lost" />
-              <Bar dataKey="pending" fill="#eab308" radius={[4, 4, 0, 0]} name="Pending" />
+              <Bar dataKey="won" fill="#22c55e" radius={[4, 4, 0, 0]} name={pmText("Won", "فوز")} />
+              <Bar dataKey="lost" fill="#ef4444" radius={[4, 4, 0, 0]} name={pmText("Lost", "خسارة")} />
+              <Bar dataKey="pending" fill="#eab308" radius={[4, 4, 0, 0]} name={pmText("Pending", "قيد الانتظار")} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Pipeline by Stage ($M)</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Pipeline by Stage ($M)", "خط الأنابيب حسب المرحلة (مليون $)")}</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={bidVaultData.pipelineByStage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
+              <XAxis dataKey="stage" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
-              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} name="Value ($M)" />
+              <Tooltip labelFormatter={(label) => bidLabel(label)} />
+              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} name={pmText("Value ($M)", "القيمة (مليون $)")} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1247,23 +1285,23 @@ export default function DirectorAnalyticsReports() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Pipeline Value by Stage</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Pipeline Value by Stage", "قيمة خط الأنابيب حسب المرحلة")}</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={bidVaultData.pipelineByStage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
+              <XAxis dataKey="stage" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
-              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="count" fill="#22c55e" radius={[4, 4, 0, 0]} />
+              <Tooltip labelFormatter={(label) => bidLabel(label)} />
+              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} name={pmText("Value", "القيمة")} />
+              <Bar dataKey="count" fill="#22c55e" radius={[4, 4, 0, 0]} name={pmText("Count", "العدد")} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Submission Funnel</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Submission Funnel", "مسار التقديم")}</h3>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={bidVaultData.submissionFunnel} dataKey="count" nameKey="stage" cx="50%" cy="50%" outerRadius={80} label>
+              <Pie data={bidVaultData.submissionFunnel.map((x) => ({ ...x, stageLabel: bidLabel(x.stage) }))} dataKey="count" nameKey="stageLabel" cx="50%" cy="50%" outerRadius={80} label>
                 {bidVaultData.submissionFunnel.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -1389,10 +1427,10 @@ export default function DirectorAnalyticsReports() {
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 ${isRTLMode ? 'flex-row-reverse' : ''}`} data-tour="1">
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {isBidVault ? "Bid Vault" : isContentHub ? "Content Hub" : t('analyticsReports.title')}
+              {isBidVault ? pmText("Bid Vault", "مستودع العطاءات") : isContentHub ? "Content Hub" : t('analyticsReports.title')}
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              {isBidVault ? "Bid repository, submission tracking, and win/loss analytics." : isContentHub ? "Past performance library, boilerplate, and reusable content." : t('analyticsReports.subtitle')}
+              {isBidVault ? pmText("Bid repository, submission tracking, and win/loss analytics.", "مستودع العطاءات، تتبع التقديمات، وتحليلات الفوز/الخسارة.") : isContentHub ? "Past performance library, boilerplate, and reusable content." : t('analyticsReports.subtitle')}
             </p>
           </div>
           
@@ -1449,8 +1487,8 @@ export default function DirectorAnalyticsReports() {
                 onChange={(e) => setTimeRange(e.target.value)}
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
-                <option value="6M">Last 6 months</option>
-                <option value="1Y">Last year</option>
+                <option value="6M">{pmText("Last 6 months", "آخر 6 أشهر")}</option>
+                <option value="1Y">{pmText("Last year", "العام الماضي")}</option>
               </select>
             </div>
             )}
@@ -1497,7 +1535,7 @@ export default function DirectorAnalyticsReports() {
                 activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900"
               }`}
             >
-              {tab === "submissions" ? "Submissions" : tab === "winLoss" ? "Win/Loss" : "Pipeline"}
+              {tab === "submissions" ? pmText("Submissions", "التقديمات") : tab === "winLoss" ? pmText("Win/Loss", "فوز/خسارة") : pmText("Pipeline", "خط الأنابيب")}
             </button>
           ))}
           {isContentHub && ["pastPerformance", "boilerplate", "library"].map((tab) => (

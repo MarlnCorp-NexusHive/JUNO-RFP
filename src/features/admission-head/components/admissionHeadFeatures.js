@@ -11,7 +11,7 @@ export const admissionHeadFeatures = [
   { label: "admissionHead.toolsUtilities", icon: "🛠️", route: "/rbac/admission-head/tools", description: "Bulk import/export, forms, reports" },
   { label: "admissionHead.trainingDevelopment", icon: "🎓", route: "/rbac/admission-head/training", description: "Team training, knowledge management" },
   { label: "admissionHead.complianceQuality", icon: "✅", route: "/rbac/admission-head/compliance", description: "Quality assurance, risk management" },
-  { label: "Procurement", icon: "📦", route: "/rbac/admission-head/procurement", description: "Purchase Requests, Vendor Management, Procurement Tracking" },
+  { label: "admissionHead.procurement", icon: "📦", route: "/rbac/admission-head/procurement", description: "Purchase Requests, Vendor Management, Procurement Tracking" },
   { label: "admissionHead.accountManagement", icon: "👤", route: "/rbac/admission-head/account", description: "Profile, HR, referral, tasks, events, attendance, recruitment, helpdesk" },
   { label: "admissionHead.helpSupport", icon: "🆘", route: "/rbac/admission-head/help", description: "Help, support, and documentation" }
 ]; 

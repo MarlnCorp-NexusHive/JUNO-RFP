@@ -114,6 +114,35 @@ export default function MarketingHeadCommunicationHub() {
   const location = useLocation();
   const isPM = location.pathname.includes("/rbac/proposal-manager/communication");
   const { t, ready, i18n } = useTranslation('marketing');
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
+  const pmText = (en, ar) => (isPM ? (isArabic ? ar : en) : en);
+  const pmLabel = (value) => {
+    if (!isPM || !isArabic) return value;
+    const map = {
+      Internal: "داخلي",
+      Project: "مشروع",
+      External: "خارجي",
+      Active: "نشط",
+      Email: "البريد الإلكتروني",
+      WhatsApp: "واتساب",
+      SMS: "رسالة نصية",
+      Scheduled: "مجدول",
+      Sent: "تم الإرسال",
+      Draft: "مسودة",
+      "All Leads": "جميع العملاء المحتملين",
+      "Event Attendees": "حضور الفعالية",
+      Applicants: "المتقدمون",
+      Lead: "عميل محتمل",
+      Campaign: "حملة",
+      Opened: "تم الفتح",
+      Clicked: "تم النقر",
+      Delivered: "تم التسليم",
+      High: "مرتفع",
+      Medium: "متوسط",
+      "Saudi Arabia": "السعودية",
+    };
+    return map[value] || value;
+  };
   const [languageVersion, setLanguageVersion] = useState(0);
   const { isRTLMode } = useLocalization();
 
@@ -193,7 +222,7 @@ const handleShowReplySuggestions = () => {
           <button
             onClick={onClose}
             className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl font-bold"
-            aria-label="Close"
+            aria-label={pmText("Close", "إغلاق")}
           >
             &times;
           </button>
@@ -217,7 +246,7 @@ const handleShowReplySuggestions = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t('communication.modal.status')}</p>
-                  <p className="font-medium">{channel.status}</p>
+                  <p className="font-medium">{pmLabel(channel.status)}</p>
                 </div>
               </div>
             </div>
@@ -262,10 +291,10 @@ const handleShowReplySuggestions = () => {
   <div className={isRTLMode ? 'text-right' : 'text-left'}>
     <h1 className={`text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
       {isRTLMode && <FiMessageCircle className="text-blue-500" />}
-      {isPM ? "Proposal Communication" : t('communication.title')}
+      {isPM ? pmText("Proposal Communication", "اتصال العروض") : t('communication.title')}
       {!isRTLMode && <FiMessageCircle className="text-blue-500" />}
     </h1>
-    <p className="text-sm text-gray-600 dark:text-gray-300">{isPM ? "Kickoffs, reviews, and team messaging for proposals and RFPs." : t('communication.subtitle')}</p>
+    <p className="text-sm text-gray-600 dark:text-gray-300">{isPM ? pmText("Kickoffs, reviews, and team messaging for proposals and RFPs.", "اجتماعات الانطلاق، المراجعات، ورسائل الفريق للعروض وطلبات تقديم العروض.") : t('communication.subtitle')}</p>
   </div>
   
   {/* AI Features Button */}
@@ -274,7 +303,7 @@ const handleShowReplySuggestions = () => {
     onClick={handleShowReplySuggestions}
   >
     <FiTarget /> 
-    {isRTLMode ? 'اقتراحات الرد بالذكاء الاصطناعي' : 'AI Reply Suggestions'}
+    {pmText('AI Reply Suggestions', 'اقتراحات الرد بالذكاء الاصطناعي')}
   </button>
 </div>
 
@@ -288,19 +317,19 @@ const handleShowReplySuggestions = () => {
     <div className={`flex items-center gap-2 mb-4 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
       <FiTarget className="text-purple-500" />
       <h2 className="text-lg font-semibold">
-        {isRTLMode ? 'اقتراحات الرد بالذكاء الاصطناعي' : 'AI Reply Suggestions'}
+        {pmText('AI Reply Suggestions', 'اقتراحات الرد بالذكاء الاصطناعي')}
       </h2>
     </div>
     <MarketingReplySuggestions 
       leadContext={{
-        name: "Saudi Arabia",
-        lastMessage: "Interested in MBA program",
-        channel: "Email",
+        name: pmText("Saudi Arabia", "السعودية"),
+        lastMessage: pmText("Interested in MBA program", "مهتم ببرنامج ماجستير إدارة الأعمال"),
+        channel: pmText("Email", "البريد الإلكتروني"),
         engagement: 0.85
       }}
       onSelectSuggestion={(suggestion) => {
         console.log('Selected suggestion:', suggestion);
-        setConfirmationMessage(`Reply suggestion "${suggestion}" has been applied successfully!`);
+        setConfirmationMessage(pmText(`Reply suggestion "${suggestion}" has been applied successfully!`, `تم تطبيق اقتراح الرد "${suggestion}" بنجاح!`));
         setConfirmationType('success');
         setShowConfirmation(true);
       }}
@@ -337,8 +366,8 @@ const handleShowReplySuggestions = () => {
               {leadComms.map((c) => (
                 <tr key={c.id} className="border-b dark:border-gray-700">
                   <td className="py-3 font-medium">{c.name}</td>
-                  <td className="py-3">{c.channel}</td>
-                  <td className="py-3">{c.lastMsg}</td>
+                  <td className="py-3">{pmLabel(c.channel)}</td>
+                  <td className="py-3">{pmText(c.lastMsg, c.lastMsg === "Interested in MBA program" ? "مهتم ببرنامج ماجستير إدارة الأعمال" : c.lastMsg === "Requested brochure" ? "طلب الكتيب" : c.lastMsg === "Sent application link" ? "تم إرسال رابط التقديم" : c.lastMsg)}</td>
                   <td className="py-3">{c.date}</td>
                   <td className="py-3">
                     <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -354,11 +383,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.leadCommunication.aiResponseSuggestion')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">"Hi, thanks for your interest! Would you like to schedule a call to discuss the MBA program?"</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("\"Hi, thanks for your interest! Would you like to schedule a call to discuss the MBA program?\"", "\"مرحباً، شكراً لاهتمامك! هل ترغب في جدولة مكالمة لمناقشة برنامج ماجستير إدارة الأعمال؟\"")}</div>
           </div>
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.leadCommunication.aiToneOptimizer')}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">Suggestion: Use a more friendly tone for higher conversion.</div>
+            <div className="text-sm text-green-700 dark:text-green-300">{pmText("Suggestion: Use a more friendly tone for higher conversion.", "اقتراح: استخدم نبرة أكثر ودية لرفع معدل التحويل.")}</div>
           </div>
         </div>
       </section>
@@ -378,8 +407,8 @@ const handleShowReplySuggestions = () => {
               {teamChats.map((chat) => (
                 <li key={chat.id} className="flex items-center gap-2">
                   <FiMessageCircle className="text-blue-400" />
-                  <span className="font-medium">{chat.room}</span>
-                  <span className="text-xs text-gray-500">{chat.lastMsg}</span>
+                  <span className="font-medium">{pmText(chat.room, chat.room === "MBA Campaign" ? "حملة ماجستير إدارة الأعمال" : chat.room === "Social Media" ? "وسائل التواصل الاجتماعي" : chat.room === "Events" ? "الفعاليات" : chat.room)}</span>
+                  <span className="text-xs text-gray-500">{pmText(chat.lastMsg, chat.lastMsg === "Design ready for review" ? "التصميم جاهز للمراجعة" : chat.lastMsg === "Scheduled next post" ? "تمت جدولة المنشور القادم" : chat.lastMsg === "Venue confirmed" ? "تم تأكيد الموقع" : chat.lastMsg)}</span>
                   {chat.unread > 0 && <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{chat.unread} {t('communication.teamCollaboration.new')}</span>}
                 </li>
               ))}
@@ -395,11 +424,11 @@ const handleShowReplySuggestions = () => {
         </div>
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg mb-4">
           <div className="font-medium mb-1">{t('communication.teamCollaboration.aiAutoSummarization')}</div>
-          <div className="text-sm text-yellow-700 dark:text-yellow-300">"3 action points: 1) Review design, 2) Approve content, 3) Schedule next post."</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("\"3 action points: 1) Review design, 2) Approve content, 3) Schedule next post.\"", "\"3 نقاط عمل: 1) مراجعة التصميم، 2) اعتماد المحتوى، 3) جدولة المنشور القادم.\"")}</div>
         </div>
         <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
           <div className="font-medium mb-1">{t('communication.teamCollaboration.aiSmartFileSuggestion')}</div>
-          <div className="text-sm text-blue-700 dark:text-blue-300">Suggested: "MBA_Brochure_v2.pdf" for campaign discussion.</div>
+          <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Suggested: \"MBA_Brochure_v2.pdf\" for campaign discussion.", "مقترح: \"MBA_Brochure_v2.pdf\" لمناقشة الحملة.")}</div>
         </div>
       </section>
 
@@ -426,10 +455,10 @@ const handleShowReplySuggestions = () => {
             <tbody>
               {campaignMsgs.map((msg) => (
                 <tr key={msg.id} className="border-b dark:border-gray-700">
-                  <td className="py-3 font-medium">{msg.type}</td>
-                  <td className="py-3">{msg.name}</td>
-                  <td className="py-3">{msg.status}</td>
-                  <td className="py-3">{msg.segment}</td>
+                  <td className="py-3 font-medium">{pmLabel(msg.type)}</td>
+                  <td className="py-3">{pmText(msg.name, msg.name === "Spring Blast" ? "انطلاقة الربيع" : msg.name === "Event Reminder" ? "تذكير الفعالية" : msg.name === "App Deadline" ? "موعد نهائي للتقديم" : msg.name)}</td>
+                  <td className="py-3">{pmLabel(msg.status)}</td>
+                  <td className="py-3">{pmLabel(msg.segment)}</td>
                   <td className="py-3">{msg.sendTime}</td>
                 </tr>
               ))}
@@ -439,16 +468,16 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.campaignMessaging.aiSendTimeOptimization')}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">Best time to send: 10:00 AM for max engagement.</div>
+            <div className="text-sm text-green-700 dark:text-green-300">{pmText("Best time to send: 10:00 AM for max engagement.", "أفضل وقت للإرسال: 10:00 صباحاً لتحقيق أعلى تفاعل.")}</div>
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.campaignMessaging.aiSubjectLinePredictor')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">Subject: "Unlock Your Future at Our MBA Program" (Predicted Open Rate: 38%)</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Subject: \"Unlock Your Future at Our MBA Program\" (Predicted Open Rate: 38%)", "العنوان: \"افتح مستقبلك مع برنامج ماجستير إدارة الأعمال\" (معدل فتح متوقع: 38%)")}</div>
           </div>
         </div>
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg mt-4">
           <div className="font-medium mb-1">{t('communication.campaignMessaging.aiAbTestingInsights')}</div>
-          <div className="text-sm text-yellow-700 dark:text-yellow-300">Variant B performed 12% better in click-through rate.</div>
+          <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("Variant B performed 12% better in click-through rate.", "حقق الإصدار B أداءً أفضل بنسبة 12% في معدل النقر.")}</div>
         </div>
       </section>
 
@@ -474,12 +503,12 @@ const handleShowReplySuggestions = () => {
             <tbody>
               {vendorComms.map((v) => (
                 <tr key={v.id} className="border-b dark:border-gray-700">
-                  <td className="py-3 font-medium">{v.name}</td>
-                  <td className="py-3">{v.type}</td>
-                  <td className="py-3">{v.lastMsg}</td>
+                  <td className="py-3 font-medium">{pmLabel(v.name)}</td>
+                  <td className="py-3">{pmText(v.type, v.type === "Ad Agency" ? "وكالة إعلانات" : v.type === "Printer" ? "مطبعة" : v.type)}</td>
+                  <td className="py-3">{pmText(v.lastMsg, v.lastMsg === "Sent invoice" ? "تم إرسال الفاتورة" : v.lastMsg === "Shared creative" ? "تمت مشاركة المحتوى الإبداعي" : v.lastMsg)}</td>
                   <td className="py-3">{v.date}</td>
                   <td className="py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs ${v.performance === 'High' ? 'bg-green-100 text-green-700' : v.performance === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{v.performance}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs ${v.performance === 'High' ? 'bg-green-100 text-green-700' : v.performance === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{pmLabel(v.performance)}</span>
                   </td>
                 </tr>
               ))}
@@ -489,11 +518,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.vendorPartner.aiVendorPerformanceSummary')}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">Saudi Arabia: $5,000 spent, 120 leads, 30 conversions.</div>
+            <div className="text-sm text-green-700 dark:text-green-300">{pmText("Saudi Arabia: $5,000 spent, 120 leads, 30 conversions.", "السعودية: تم إنفاق 5,000$، 120 عميلًا محتملاً، 30 تحويلاً.")}</div>
           </div>
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.vendorPartner.aiFollowUpNudge')}</div>
-            <div className="text-sm text-yellow-700 dark:text-yellow-300">No follow-up sent to Saudi Arabia in 7 days.</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("No follow-up sent to Saudi Arabia in 7 days.", "لم يتم إرسال متابعة إلى السعودية خلال 7 أيام.")}</div>
           </div>
         </div>
       </section>
@@ -519,8 +548,8 @@ const handleShowReplySuggestions = () => {
             <tbody>
               {commCalendar.map((e) => (
                 <tr key={e.id} className="border-b dark:border-gray-700">
-                  <td className="py-3 font-medium">{e.event}</td>
-                  <td className="py-3">{e.type}</td>
+                  <td className="py-3 font-medium">{pmText(e.event, e.event === "MBA Email Blast" ? "دفعة بريدية لبرنامج ماجستير إدارة الأعمال" : e.event === "Open Day Reminder" ? "تذكير بيوم مفتوح" : e.event)}</td>
+                  <td className="py-3">{pmLabel(e.type)}</td>
                   <td className="py-3">{e.date}</td>
                   <td className="py-3">{e.time}</td>
                 </tr>
@@ -531,11 +560,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationCalendar.aiSmartScheduling')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">No message overlaps. Next free slot: 11:00 AM, 20th April.</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("No message overlaps. Next free slot: 11:00 AM, 20th April.", "لا يوجد تداخل في الرسائل. أقرب وقت متاح: 11:00 صباحاً، 20 أبريل.")}</div>
           </div>
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationCalendar.aiMissedOpportunityAlert')}</div>
-            <div className="text-sm text-yellow-700 dark:text-yellow-300">No campaign scheduled for "Open Day" event.</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("No campaign scheduled for \"Open Day\" event.", "لا توجد حملة مجدولة لفعالية \"اليوم المفتوح\".")}</div>
           </div>
         </div>
       </section>
@@ -561,8 +590,8 @@ const handleShowReplySuggestions = () => {
             <tbody>
               {notifications.map((n) => (
                 <tr key={n.id} className="border-b dark:border-gray-700">
-                  <td className="py-3 font-medium">{n.type}</td>
-                  <td className="py-3">{n.msg}</td>
+                  <td className="py-3 font-medium">{pmLabel(n.type)}</td>
+                  <td className="py-3">{pmText(n.msg, n.msg === "Lead Saudi Arabia viewed brochure 3 times" ? "العميل المحتمل من السعودية شاهد الكتيب 3 مرات" : n.msg === "Spring Blast sent successfully" ? "تم إرسال انطلاقة الربيع بنجاح" : n.msg === "Reply pending from design team" ? "رد فريق التصميم ما زال معلقاً" : n.msg)}</td>
                   <td className="py-3">{n.date}</td>
                   <td className="py-3">
                     {n.urgent ? <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded">{t('communication.notificationAlert.urgentLabel')}</span> : <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">{t('communication.notificationAlert.normal')}</span>}
@@ -575,11 +604,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-red-50 dark:bg-red-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.notificationAlert.aiUrgencyDetector')}</div>
-            <div className="text-sm text-red-700 dark:text-red-300">"Reply pending from design team" flagged as urgent.</div>
+            <div className="text-sm text-red-700 dark:text-red-300">{pmText("\"Reply pending from design team\" flagged as urgent.", "تم وضع علامة عاجل على \"رد فريق التصميم ما زال معلقاً\".")}</div>
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.notificationAlert.aiPrioritization')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">Lead Saudi Arabia ranked high value, prioritize follow-up.</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Lead Saudi Arabia ranked high value, prioritize follow-up.", "العميل المحتمل من السعودية مصنف عالي القيمة؛ أعطِ المتابعة أولوية.")}</div>
           </div>
         </div>
       </section>
@@ -593,10 +622,9 @@ const handleShowReplySuggestions = () => {
           {confirmationType === 'success' ? <FiCheck className="w-5 h-5" /> : <FiAlertCircle className="w-5 h-5" />}
         </div>
         <h3 className="text-lg font-semibold">
-          {confirmationType === 'success' ? 
-            (isRTLMode ? 'تم بنجاح!' : 'Success!') : 
-            (isRTLMode ? 'تنبيه' : 'Alert')
-          }
+          {confirmationType === 'success'
+            ? pmText('Success!', 'تم بنجاح!')
+            : pmText('Alert', 'تنبيه')}
         </h3>
       </div>
       <p className="text-gray-600 dark:text-gray-300 mb-6">{confirmationMessage}</p>
@@ -605,7 +633,7 @@ const handleShowReplySuggestions = () => {
           onClick={() => setShowConfirmation(false)}
           className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}
         >
-          {isRTLMode ? 'حسناً' : 'OK'}
+          {pmText('OK', 'حسناً')}
         </button>
       </div>
     </div>
@@ -633,9 +661,9 @@ const handleShowReplySuggestions = () => {
             <tbody>
               {commLogs.map((log) => (
                 <tr key={log.id} className="border-b dark:border-gray-700">
-                  <td className="py-3 font-medium">{log.name}</td>
-                  <td className="py-3">{log.channel}</td>
-                  <td className="py-3">{log.outcome}</td>
+                  <td className="py-3 font-medium">{pmLabel(log.name)}</td>
+                  <td className="py-3">{pmLabel(log.channel)}</td>
+                  <td className="py-3">{pmLabel(log.outcome)}</td>
                   <td className="py-3">{log.date}</td>
                 </tr>
               ))}
@@ -645,11 +673,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationLogs.aiDropOffDetector')}</div>
-            <div className="text-sm text-yellow-700 dark:text-yellow-300">Lead Saudi Arabia stopped engaging after last WhatsApp message.</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("Lead Saudi Arabia stopped engaging after last WhatsApp message.", "توقف العميل المحتمل من السعودية عن التفاعل بعد آخر رسالة واتساب.")}</div>
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationLogs.aiMessageQualityAnalyzer')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">Suggestion: Clarify next steps in follow-up messages.</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Suggestion: Clarify next steps in follow-up messages.", "اقتراح: وضّح الخطوات التالية في رسائل المتابعة.")}</div>
           </div>
         </div>
       </section>
@@ -663,19 +691,19 @@ const handleShowReplySuggestions = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium mb-2">{t('communication.aiAssistant.composeSmartResponse')}</h3>
-            <div className="text-sm text-gray-700 dark:text-gray-300">"Thank you for your interest! Here's the brochure and next steps for your application."</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("\"Thank you for your interest! Here's the brochure and next steps for your application.\"", "\"شكراً لاهتمامك! إليك الكتيب والخطوات التالية لطلبك.\"")}</div>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium mb-2">{t('communication.aiAssistant.recommendMessageTemplate')}</h3>
-            <div className="text-sm text-gray-700 dark:text-gray-300">"Hi [First Name], are you ready to take the next step in your journey?"</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("\"Hi [First Name], are you ready to take the next step in your journey?\"", "\"مرحباً [الاسم الأول]، هل أنت جاهز لاتخاذ الخطوة التالية في رحلتك؟\"")}</div>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium mb-2">{t('communication.aiAssistant.generateDripCampaign')}</h3>
-            <div className="text-sm text-gray-700 dark:text-gray-300">Day 1: Welcome email. Day 3: Program video. Day 5: Counselor call.</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("Day 1: Welcome email. Day 3: Program video. Day 5: Counselor call.", "اليوم 1: بريد ترحيبي. اليوم 3: فيديو البرنامج. اليوم 5: اتصال المستشار.")}</div>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium mb-2">{t('communication.aiAssistant.summarizeThread')}</h3>
-            <div className="text-sm text-gray-700 dark:text-gray-300">"Lead Saudi Arabia requested info, received brochure, scheduled call."</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("\"Lead Saudi Arabia requested info, received brochure, scheduled call.\"", "\"العميل المحتمل من السعودية طلب معلومات، استلم الكتيب، وتمت جدولة مكالمة.\"")}</div>
           </div>
         </div>
       </section>

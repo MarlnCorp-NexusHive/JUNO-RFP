@@ -1,126 +1,126 @@
 export const adminHeadFeatures = [
   {
     id: 'dashboard',
-    label: 'Dashboard',
+    label: 'adminHead.dashboard',
     path: '.',
     route: '.',
     icon: '🏠'
   },
   {
     id: 'user-role-management',
-    label: 'User & Role Management',
+    label: 'adminHead.userRoleManagement',
     path: 'user-role-management',
     route: 'user-role-management',
     icon: '👤'
   },
   {
     id: 'departments-hierarchy',
-    label: 'Departments & Hierarchy',
+    label: 'adminHead.departmentsHierarchy',
     path: 'departments-hierarchy',
     route: 'departments-hierarchy',
     icon: '🏢'
   },
   {
     id: 'academic-setup',
-    label: 'Academic Setup',
+    label: 'adminHead.academicSetup',
     path: 'academic-setup',
     route: 'academic-setup',
     icon: '🎓'
   },
   {
     id: 'communication',
-    label: 'Communication',
+    label: 'adminHead.communication',
     path: 'communication',
     route: 'communication',
     icon: '💬'
   },
   {
     id: 'settings-configuration',
-    label: 'Settings & Configuration',
+    label: 'adminHead.settingsConfiguration',
     path: 'settings-configuration',
     route: 'settings-configuration',
     icon: '⚙️'
   },
   {
     id: 'integrations',
-    label: 'Integrations',
+    label: 'adminHead.integrations',
     path: 'integrations',
     route: 'integrations',
     icon: '🧩'
   },
   {
     id: 'logs-audit',
-    label: 'Logs & Audit Trail',
+    label: 'adminHead.logsAuditTrail',
     path: 'logs-audit',
     route: 'logs-audit',
     icon: '📋'
   },
   {
     id: 'backup-security',
-    label: 'Backup & Security',
+    label: 'adminHead.backupSecurity',
     path: 'backup-security',
     route: 'backup-security',
     icon: '🛡️'
   },
   {
     id: 'reports-analytics',
-    label: 'Reports & Analytics',
+    label: 'adminHead.reportsAnalytics',
     path: 'reports-analytics',
     route: 'reports-analytics',
     icon: '📊'
   },
   {
     id: 'settings',
-    label: 'Settings',
+    label: 'adminHead.settings',
     path: 'settings',
     route: 'settings',
     icon: '🛠️'
   },
   {
     id: 'help-support',
-    label: 'Help & Support',
+    label: 'adminHead.helpSupport',
     path: 'help-support',
     route: 'help-support',
     icon: '🆘'
   },
   {
     id: 'communication-hub',
-    label: 'Communication Hub',
+    label: 'adminHead.communicationHub',
     path: 'communication-hub',
     route: 'communication-hub',
     icon: '💬'
   },
   {
     id: 'training-development',
-    label: 'Training & Development',
+    label: 'adminHead.trainingDevelopment',
     path: 'training-development',
     route: 'training-development',
     icon: '📚'
   },
   {
     id: 'compliance-quality',
-    label: 'Compliance & Quality',
+    label: 'adminHead.complianceQuality',
     path: 'compliance-quality',
     route: 'compliance-quality',
     icon: '✅'
   },
   {
     id: 'procurement',
-    label: 'Procurement',
+    label: 'adminHead.procurement',
     path: 'procurement',
     route: 'procurement',
     icon: '📦'
   },
   {
     id: 'workspace',
-    label: 'Workspace',
+    label: 'adminHead.workspace',
     path: 'workspace',
     route: 'workspace',
     icon: '💼'
   },
   {
     id: 'support-tickets',
-    label: 'Support Tickets',
+    label: 'adminHead.supportTickets',
     path: 'support-tickets',
     route: 'support-tickets',
     icon: '🎫'

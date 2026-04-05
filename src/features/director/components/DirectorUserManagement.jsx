@@ -43,8 +43,48 @@ export default function DirectorUserManagement() {
   const [search, setSearch] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
-  const { t, ready } = useTranslation('director');
+  const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
+  const pmText = (value) => {
+    if (!isPM || !isArabic) return value;
+    const map = {
+      "Loading...": "جارٍ التحميل...",
+      "Proposal Team Access": "صلاحيات فريق العروض",
+      "Roles, permissions, and access for proposal and capture team.": "الأدوار والصلاحيات والوصول لفريق العروض والالتقاط.",
+      "Total Users": "إجمالي المستخدمين",
+      Active: "نشط",
+      "All Status": "كل الحالات",
+      Inactive: "غير نشط",
+      Pending: "قيد الانتظار",
+      Export: "تصدير",
+      Users: "المستخدمون",
+      "Deselect All": "إلغاء تحديد الكل",
+      "Select All": "تحديد الكل",
+      Remove: "إزالة",
+      "Last login:": "آخر تسجيل دخول:",
+      Department: "القسم",
+      Permissions: "الصلاحيات",
+      Joined: "تاريخ الانضمام",
+      Close: "إغلاق",
+      Name: "الاسم",
+      "Full name": "الاسم الكامل",
+      Email: "البريد الإلكتروني",
+      Role: "الدور",
+      Status: "الحالة",
+      Cancel: "إلغاء",
+      "Add User": "إضافة مستخدم",
+      "Proposal Manager": "مدير العروض",
+      "Capture Manager": "مدير الالتقاط",
+      "Proposal Writer": "كاتب العروض",
+      "Technical Lead": "القائد التقني",
+      "Pricing Lead": "قائد التسعير",
+      "Compliance Specialist": "أخصائي الامتثال",
+      Proposals: "العروض",
+      Capture: "الالتقاط",
+    };
+    return map[value] || value;
+  };
 
   // Show loading state if i18n is not ready
   if (!ready) {
@@ -53,7 +93,7 @@ export default function DirectorUserManagement() {
         <main className="flex-1 p-6 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Loading...</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{pmText("Loading...")}</h1>
           </div>
         </main>
       </div>
@@ -247,19 +287,19 @@ export default function DirectorUserManagement() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiUsers className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? "Proposal Team Access" : t('userManagement.title')}
+                {isPM ? pmText("Proposal Team Access") : t('userManagement.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {isPM ? "Roles, permissions, and access for proposal and capture team." : t('userManagement.subtitle')}
+                {isPM ? pmText("Roles, permissions, and access for proposal and capture team.") : t('userManagement.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Total Users</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('userManagement.metrics.totalUsers')}</div>
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">245</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Active</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('userManagement.userStatuses.active')}</div>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">230</div>
               </div>
             </div>
@@ -335,7 +375,7 @@ export default function DirectorUserManagement() {
               <option value="">{t('userManagement.allRoles')}</option>
               {roles.map(r => (
                 <option key={r} value={r}>
-                  {t(`userManagement.roles.${r}`)}
+                  {isPM ? pmText(r) : t(`userManagement.roles.${r}`)}
                 </option>
               ))}
             </select>
@@ -344,10 +384,10 @@ export default function DirectorUserManagement() {
               onChange={e => setStatusFilter(e.target.value)} 
               className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
+              <option value="all">{pmText("All Status")}</option>
+              <option value="active">{t('userManagement.userStatuses.active')}</option>
+              <option value="inactive">{t('userManagement.userStatuses.inactive')}</option>
+              <option value="pending">{t('userManagement.userStatuses.pending')}</option>
             </select>
             <div className="flex items-center gap-2">
               <button
@@ -360,7 +400,7 @@ export default function DirectorUserManagement() {
               </button>
               <button className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
                 <FiDownload className="w-4 h-4" />
-                Export
+                {pmText("Export")}
               </button>
             </div>
           </div>
@@ -383,7 +423,7 @@ export default function DirectorUserManagement() {
             <div className="flex items-center gap-3">
               <FiUsers className="w-6 h-6 text-green-600 dark:text-green-400" />
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Users ({filteredUsers.length})
+                {pmText("Users")} ({filteredUsers.length})
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -391,12 +431,12 @@ export default function DirectorUserManagement() {
                 onClick={handleSelectAll}
                 className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                {selectedUsers.length === filteredUsers.length ? 'Deselect All' : 'Select All'}
+                {selectedUsers.length === filteredUsers.length ? pmText('Deselect All') : pmText('Select All')}
               </button>
               {selectedUsers.length > 0 && (
                 <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
                   <FiUserX className="w-4 h-4" />
-                  Remove ({selectedUsers.length})
+                  {pmText("Remove")} ({selectedUsers.length})
                 </button>
               )}
             </div>
@@ -429,7 +469,7 @@ export default function DirectorUserManagement() {
                         <div className="flex items-center gap-1">
                           {getRoleIcon(isPM ? u.role?.replace(/\s+/g, '') : u.roleKey?.split('.').pop())}
                           <span className={`px-2 py-1 rounded-md text-xs font-medium ${getRoleColor(isPM ? (u.role?.replace(/\s+/g, '').toLowerCase()) : u.roleKey?.split('.').pop())}`}>
-                            {isPM ? u.role : t(`userManagement.${u.roleKey}`)}
+                            {isPM ? pmText(u.role) : t(`userManagement.${u.roleKey}`)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
@@ -438,13 +478,13 @@ export default function DirectorUserManagement() {
                         </div>
                         <div className="flex items-center gap-1">
                           <FiClock className="w-4 h-4" />
-                          Last login: {u.lastLogin}
+                          {pmText("Last login:")} {u.lastLogin}
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                        <span>Department: {isPM ? u.department : (u.displayDepartment ?? t(`userManagement.${u.departmentKey}`))}</span>
-                        <span>Permissions: {u.permissions}</span>
-                        <span>Joined: {u.joinDate}</span>
+                        <span>{pmText("Department")}: {isPM ? pmText(u.department) : (u.displayDepartment ?? t(`userManagement.${u.departmentKey}`))}</span>
+                        <span>{pmText("Permissions")}: {u.permissions}</span>
+                        <span>{pmText("Joined")}: {u.joinDate}</span>
                       </div>
                     </div>
                   </div>
@@ -472,25 +512,25 @@ export default function DirectorUserManagement() {
             <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('userManagement.addUser')}</h2>
-                <button type="button" onClick={() => setShowAddUserModal(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold" aria-label="Close">&times;</button>
+                <button type="button" onClick={() => setShowAddUserModal(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold" aria-label={pmText("Close")}>&times;</button>
               </div>
               <form onSubmit={handleAddUserSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
-                  <input type="text" required value={newUser.displayName} onChange={(e) => setNewUser((p) => ({ ...p, displayName: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Full name" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Name")} *</label>
+                  <input type="text" required value={newUser.displayName} onChange={(e) => setNewUser((p) => ({ ...p, displayName: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder={pmText("Full name")} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Email")} *</label>
                   <input type="email" required value={newUser.email} onChange={(e) => setNewUser((p) => ({ ...p, email: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="email@company.com" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Role")}</label>
                   <select value={newUser.roleKey} onChange={(e) => setNewUser((p) => ({ ...p, roleKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    {roles.map((r) => <option key={r} value={`roles.${r}`}>{t(`userManagement.roles.${r}`)}</option>)}
+                    {roles.map((r) => <option key={r} value={`roles.${r}`}>{isPM ? pmText(r) : t(`userManagement.roles.${r}`)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Department")}</label>
                   <select value={newUser.departmentKey} onChange={(e) => setNewUser((p) => ({ ...p, departmentKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     <option value="departments.engineering">{t('userManagement.departments.engineering')}</option>
                     <option value="departments.science">{t('userManagement.departments.science')}</option>
@@ -500,7 +540,7 @@ export default function DirectorUserManagement() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Status")}</label>
                   <select value={newUser.statusKey} onChange={(e) => setNewUser((p) => ({ ...p, statusKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     <option value="userStatuses.active">{t('userManagement.userStatuses.active')}</option>
                     <option value="userStatuses.inactive">{t('userManagement.userStatuses.inactive')}</option>
@@ -508,8 +548,8 @@ export default function DirectorUserManagement() {
                   </select>
                 </div>
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setShowAddUserModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add User</button>
+                  <button type="button" onClick={() => setShowAddUserModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{pmText("Cancel")}</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">{pmText("Add User")}</button>
                 </div>
               </form>
             </div>

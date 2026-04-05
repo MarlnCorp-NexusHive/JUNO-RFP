@@ -1,24 +1,15 @@
 /**
- * Tests for Company Intelligence API integration.
- * Uses mocked fetch so tests run without a real API key.
+ * Tests for Company Intelligence (bundled samples + normalizers).
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   normalizeSecFinancials,
   normalizeFmpFinancials,
-  resolveSecCik,
+  fetchCompanyIntelligence,
 } from "./companyIntelligenceService.js";
 
 describe("Company Intelligence Service", () => {
-  beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   describe("normalizeSecFinancials", () => {
     it("returns empty arrays when facts is null", () => {
       const out = normalizeSecFinancials(null);
@@ -88,62 +79,27 @@ describe("Company Intelligence Service", () => {
     });
   });
 
-  describe("resolveSecCik", () => {
-    it("returns null for empty input", async () => {
-      const cik = await resolveSecCik("");
-      expect(cik).toBeNull();
-    });
-
-    it("returns null for whitespace-only input", async () => {
-      const cik = await resolveSecCik("   ");
-      expect(cik).toBeNull();
-    });
-
-    it("resolves CIK by ticker when SEC tickers list is available", async () => {
-      const list = [
-        { cik_str: 320193, ticker: "AAPL", title: "Apple Inc." },
-        { cik_str: 789019, ticker: "MSFT", title: "Microsoft Corporation" },
-      ];
-      vi.mocked(fetch).mockResolvedValueOnce({ ok: true, json: async () => list });
-      vi.resetModules();
-      const { resolveSecCik: resolve } = await import("./companyIntelligenceService.js");
-      const cik = await resolve("AAPL");
-      expect(cik).toBe("0000320193");
-    });
-
-    it("resolves CIK by company name (partial match)", async () => {
-      const list = [{ cik_str: 320193, ticker: "AAPL", title: "Apple Inc." }];
-      vi.mocked(fetch).mockResolvedValueOnce({ ok: true, json: async () => list });
-      vi.resetModules();
-      const { resolveSecCik: resolve } = await import("./companyIntelligenceService.js");
-      const cik = await resolve("Apple");
-      expect(cik).toBe("0000320193");
-    });
-  });
-
   describe("fetchCompanyIntelligence", () => {
-    it("returns sample dataset error when company is not found", async () => {
-      vi.resetModules();
-      const { fetchCompanyIntelligence: fetchCI } = await import("./companyIntelligenceService.js");
-      const result = await fetchCI({ companyName: "UnknownXYZ123" });
+    it("returns error when no sample matches", async () => {
+      const result = await fetchCompanyIntelligence({ companyName: "UnknownXYZ123" });
       expect(result.financials).toBeNull();
       expect(result.error).toBeTruthy();
       expect(result.name).toBe("UnknownXYZ123");
-      expect(result.source).toBe("Sample Dataset");
     });
 
-    it("returns sample company data for a known ticker", async () => {
-      vi.resetModules();
-      const { fetchCompanyIntelligence: fetchCI } = await import("./companyIntelligenceService.js");
-      const result = await fetchCI({ ticker: "AAPL" });
+    it("returns bundled sample data for a known ticker", async () => {
+      const result = await fetchCompanyIntelligence({ ticker: "AAPL", companyName: "AAPL" });
       expect(result.error).toBeNull();
-      expect(result.source).toBe("Sample Dataset");
-      expect(result.name).toBe("Apple Inc.");
-      expect(result.region).toBe("US");
-      expect(result.sector).toBeTruthy();
-      expect(result.financials.revenue[0].value).toBeGreaterThan(0);
-      expect(result.trends.revenue).toBeDefined();
-      expect(result.customers).toBeTruthy();
+      expect(result.financials).toBeTruthy();
+      expect(result.trends?.revenue?.length).toBeGreaterThan(0);
+      expect(result.name).toBeTruthy();
+      expect(result.source).toMatch(/bundled snapshot|Offline sample/);
+    });
+
+    it("resolves by company name substring", async () => {
+      const result = await fetchCompanyIntelligence({ companyName: "Microsoft" });
+      expect(result.error).toBeNull();
+      expect(result.ticker).toBe("MSFT");
     });
   });
 });

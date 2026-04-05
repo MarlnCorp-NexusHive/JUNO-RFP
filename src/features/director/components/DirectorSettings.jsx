@@ -40,8 +40,46 @@ export default function DirectorSettings() {
   const [expandedSections, setExpandedSections] = useState({});
   const [editingField, setEditingField] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const { t } = useTranslation('director');
+  const { t, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
+  const pmText = (value) => {
+    if (!isPM || !isArabic) return value;
+    const map = {
+      "Proposal Manager Settings": "إعدادات مدير العروض",
+      "Profile, notifications, and proposal preferences.": "الملف الشخصي، الإشعارات، وتفضيلات العروض.",
+      "Save Changes": "حفظ التغييرات",
+      Cancel: "إلغاء",
+      "Export Settings": "تصدير الإعدادات",
+      "Settings Categories": "فئات الإعدادات",
+      "Organization information and basic configuration": "معلومات المؤسسة والإعدادات الأساسية",
+      "Business policies and fiscal year configuration": "سياسات العمل وإعدادات السنة المالية",
+      "User access permissions and role management": "صلاحيات وصول المستخدمين وإدارة الأدوار",
+      "Notification preferences and alert settings": "تفضيلات الإشعارات وإعدادات التنبيهات",
+      "Data protection and security settings": "إعدادات حماية البيانات والأمان",
+      "Enable or disable this feature": "تفعيل أو تعطيل هذه الميزة",
+      "Manage user access permissions": "إدارة صلاحيات وصول المستخدمين",
+      "Set percentage value (0-100)": "تحديد قيمة النسبة المئوية (0-100)",
+      "Configure this setting": "تهيئة هذا الإعداد",
+      "Full Access": "وصول كامل",
+      Corporation: "مؤسسة",
+      Company: "شركة",
+      Organization: "منظمة",
+      Enterprise: "منشأة",
+      Quarter: "ربع سنوي",
+      Monthly: "شهري",
+      Annual: "سنوي",
+      "Project-based": "قائم على المشاريع",
+      "1 Year": "سنة واحدة",
+      "3 Years": "3 سنوات",
+      "5 Years": "5 سنوات",
+      "10 Years": "10 سنوات",
+      Permanent: "دائم",
+      Enabled: "مفعل",
+      Disabled: "معطل",
+    };
+    return map[value] || value;
+  };
   
   // Settings categories using translation keys
   const settingsCategories = [
@@ -255,14 +293,18 @@ export default function DirectorSettings() {
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               {option.options?.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>{pmText(opt)}</option>
               ))}
             </select>
           );
         case 'toggle':
           return (
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" defaultChecked={t(`settings.${option.valueKey}`) === 'Enabled'} />
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                defaultChecked={["Enabled", "مفعل", "مفعلة"].includes(t(`settings.${option.valueKey}`))}
+              />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           );
@@ -287,7 +329,7 @@ export default function DirectorSettings() {
         case 'permissions':
           return (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">Full Access</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{pmText("Full Access")}</span>
               <button className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                 <FiEdit3 className="w-4 h-4" />
               </button>
@@ -301,7 +343,7 @@ export default function DirectorSettings() {
         case 'toggle':
           return (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              t(`settings.${option.valueKey}`) === 'Enabled' 
+              ["Enabled", "مفعل", "مفعلة"].includes(t(`settings.${option.valueKey}`))
                 ? 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400' 
                 : 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400'
             }`}>
@@ -311,7 +353,7 @@ export default function DirectorSettings() {
         case 'permissions':
           return (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">Full Access</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{pmText("Full Access")}</span>
               <button 
                 onClick={() => handleEdit(option.labelKey)}
                 className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
@@ -348,10 +390,10 @@ export default function DirectorSettings() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiSettings className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? "Proposal Manager Settings" : t('settings.title')}
+                {isPM ? pmText("Proposal Manager Settings") : t('settings.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {isPM ? "Profile, notifications, and proposal preferences." : t('settings.subtitle')}
+                {isPM ? pmText("Profile, notifications, and proposal preferences.") : t('settings.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -362,20 +404,20 @@ export default function DirectorSettings() {
                     className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
                   >
                     <FiSave className="w-4 h-4" />
-                    Save Changes
+                    {pmText("Save Changes")}
                   </button>
                   <button 
                     onClick={handleCancel}
                     className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
                   >
                     <FiX className="w-4 h-4" />
-                    Cancel
+                    {pmText("Cancel")}
                   </button>
                 </div>
               )}
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
                 <FiDownload className="w-4 h-4" />
-                Export Settings
+                {pmText("Export Settings")}
               </button>
             </div>
           </div>
@@ -397,7 +439,7 @@ export default function DirectorSettings() {
           <div className="flex items-center gap-3 mb-6">
             <FiTarget className="w-6 h-6 text-green-600 dark:text-green-400" />
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Settings Categories
+              {pmText("Settings Categories")}
             </h2>
           </div>
           
@@ -420,7 +462,7 @@ export default function DirectorSettings() {
                     {t(`settings.${cat.nameKey}`)}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {cat.description}
+                    {pmText(cat.description)}
                   </p>
                 </div>
               </button>
@@ -448,7 +490,7 @@ export default function DirectorSettings() {
                 {t(`settings.${currentCategory.nameKey}`)}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                {currentCategory.description}
+                {pmText(currentCategory.description)}
               </p>
             </div>
           </div>
@@ -467,10 +509,10 @@ export default function DirectorSettings() {
                       )}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                      {opt.type === 'toggle' ? 'Enable or disable this feature' : 
-                       opt.type === 'permissions' ? 'Manage user access permissions' :
-                       opt.type === 'percentage' ? 'Set percentage value (0-100)' :
-                       'Configure this setting'}
+                      {opt.type === 'toggle' ? pmText('Enable or disable this feature') : 
+                       opt.type === 'permissions' ? pmText('Manage user access permissions') :
+                       opt.type === 'percentage' ? pmText('Set percentage value (0-100)') :
+                       pmText('Configure this setting')}
                     </div>
                     <div className="flex items-center gap-4">
                       {renderFieldValue(opt)}

@@ -118,6 +118,40 @@ export default function MarketingHeadTeamManagement() {
   const [languageVersion, setLanguageVersion] = useState(0);
   const { isRTLMode } = useLocalization();
   const isProposalManagerTeam = location.pathname.includes('/rbac/proposal-manager/team');
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
+  const pmText = (en, ar) => (isProposalManagerTeam ? (isArabic ? ar : en) : en);
+  const pmTranslate = (text) => {
+    if (!isProposalManagerTeam || !isArabic) return text;
+    const map = {
+      "Capture Manager": "مدير الالتقاط",
+      "Proposal Manager": "مدير العروض",
+      "Proposal Writer": "كاتب العروض",
+      "Technical Lead / Solution Architect": "القائد الفني / مهندس الحلول",
+      "Pricing Lead": "قائد التسعير",
+      "Compliance Specialist": "أخصائي الامتثال",
+      "Graphics": "التصميم",
+      "Sub contractors": "المتعاقدون الفرعيون",
+      "Active Proposals": "العروض النشطة",
+      "Win Rate %": "معدل الفوز %",
+      "Compliance Score": "درجة الامتثال",
+      "On-Time Submissions": "التسليم في الموعد",
+      "FAR/DFARS Overview": "نظرة عامة على FAR/DFARS",
+      "Proposal Writing Workshop": "ورشة كتابة العروض",
+      "Compliance Certification": "شهادة الامتثال",
+      "Solution Architecture Training": "تدريب هندسة الحلول",
+      "Technical volume draft – DoD IT Services": "مسودة المجلد الفني – خدمات تقنية DoD",
+      "Past Performance section": "قسم الأداء السابق",
+      "Compliance matrix & checklist": "مصفوفة الامتثال وقائمة التحقق",
+      "Pricing volume – GSA BPA": "مجلد التسعير – GSA BPA",
+      "Sections completed": "الأقسام المكتملة",
+      "Compliance reviews": "مراجعات الامتثال",
+      "Proposals supported": "العروض المدعومة",
+      "DoD IT Services draft due July 15 – all sections": "موعد تسليم مسودة خدمات DoD التقنية في 15 يوليو – جميع الأقسام",
+      "Compliance matrix sign-off by Friday": "اعتماد مصفوفة الامتثال قبل يوم الجمعة",
+      "Proposal SOP v2 and style guide uploaded": "تم رفع إجراء العمل القياسي للعروض v2 ودليل الأسلوب",
+    };
+    return map[text] || text;
+  };
   
   useEffect(() => {
     setLanguageVersion(prev => prev + 1);
@@ -134,7 +168,7 @@ export default function MarketingHeadTeamManagement() {
       <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
         <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Loading...</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{isArabic ? "جارٍ التحميل..." : "Loading..."}</h1>
           </div>
         </main>
       </div>
@@ -268,7 +302,7 @@ export default function MarketingHeadTeamManagement() {
               <span className="text-4xl">{member.avatar}</span>
               <div>
                 <h2 className="text-xl font-bold">{member.name}</h2>
-                <p className="text-gray-600 dark:text-gray-300">{member.role}</p>
+                <p className="text-gray-600 dark:text-gray-300">{pmTranslate(member.role)}</p>
               </div>
             </div>
           </div>
@@ -279,7 +313,7 @@ export default function MarketingHeadTeamManagement() {
               <p className="text-sm">{member.phone || "—"}</p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">{isProposalManagerTeam ? 'Skills / Expertise' : t('team.modal.skills')}</h3>
+              <h3 className="font-semibold mb-2">{isProposalManagerTeam ? pmText('Skills / Expertise', 'المهارات / الخبرات') : t('team.modal.skills')}</h3>
               <div className="flex flex-wrap gap-2">
                 {(member.skills || []).length > 0
                   ? member.skills.map((skill, index) => (
@@ -291,7 +325,7 @@ export default function MarketingHeadTeamManagement() {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">{isProposalManagerTeam ? 'Active Pursuits / Proposals' : t('team.modal.currentProjects')}</h3>
+              <h3 className="font-semibold mb-2">{isProposalManagerTeam ? pmText('Active Pursuits / Proposals', 'الفرص / العروض النشطة') : t('team.modal.currentProjects')}</h3>
               <div className="space-y-2">
                 {(member.projects || []).length > 0
                   ? member.projects.map((project, index) => (
@@ -326,10 +360,10 @@ export default function MarketingHeadTeamManagement() {
         >
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
             <h1 className="text-2xl font-bold !text-gray-900 dark:!text-white flex items-center gap-2">
-              {isProposalManagerTeam ? 'Manage Proposal Team' : t('team.title')} <FiUsers className="text-blue-500" />
+              {isProposalManagerTeam ? pmText('Manage Proposal Team', 'إدارة فريق إعداد العروض') : t('team.title')} <FiUsers className="text-blue-500" />
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              {isProposalManagerTeam ? 'Structure, roles, assignments, and performance for your proposal team.' : t('team.subtitle')}
+              {isProposalManagerTeam ? pmText('Structure, roles, assignments, and performance for your proposal team.', 'هيكل الفريق والأدوار والتكليفات ومؤشرات الأداء لفريق إعداد العروض.') : t('team.subtitle')}
             </p>
           </div>
           
@@ -341,16 +375,16 @@ export default function MarketingHeadTeamManagement() {
                 className={`px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors whitespace-nowrap ${isRTLMode ? 'flex-row-reverse' : ''}`}
               >
                 <FiPlus className="w-4 h-4 flex-shrink-0" /> 
-                <span className="hidden sm:inline">{isProposalManagerTeam ? 'Add Team Member' : t('team.addTeamMember')}</span>
-                <span className="sm:hidden">Add</span>
+                <span className="hidden sm:inline">{isProposalManagerTeam ? pmText('Add Team Member', 'إضافة عضو فريق') : t('team.addTeamMember')}</span>
+                <span className="sm:hidden">{isProposalManagerTeam ? pmText('Add', 'إضافة') : 'Add'}</span>
               </button>
               
               <button 
                 className={`px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 transition-colors whitespace-nowrap ${isRTLMode ? 'flex-row-reverse' : ''}`}
               >
                 <FiDownload className="w-4 h-4 flex-shrink-0" /> 
-                <span className="hidden sm:inline">{isProposalManagerTeam ? 'Export Roster' : t('team.exportReport')}</span>
-                <span className="sm:hidden">Export</span>
+                <span className="hidden sm:inline">{isProposalManagerTeam ? pmText('Export Roster', 'تصدير قائمة الفريق') : t('team.exportReport')}</span>
+                <span className="sm:hidden">{isProposalManagerTeam ? pmText('Export', 'تصدير') : 'Export'}</span>
               </button>
             </div>
           </div>
@@ -359,13 +393,13 @@ export default function MarketingHeadTeamManagement() {
         {/* Performance Metrics Overview */}
         <div className="mb-8">
   <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-    {isProposalManagerTeam ? 'Proposal Team Metrics' : t('team.sections.teamStructure.performanceOverview')}
+    {isProposalManagerTeam ? pmText('Proposal Team Metrics', 'مؤشرات فريق إعداد العروض') : t('team.sections.teamStructure.performanceOverview')}
   </h2>
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     {(isProposalManagerTeam ? proposalManagerMetrics : performanceMetrics).map((metric, index) => (
       <MetricCard
         key={index}
-        title={metric.metric}
+        title={pmTranslate(metric.metric)}
         value={metric.achieved}
         target={metric.target}
         achieved={metric.achieved}
@@ -395,17 +429,17 @@ export default function MarketingHeadTeamManagement() {
                   <FiUsers className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? 'Proposal Team Structure' : t('team.sections.teamStructure.title')}
+                  {isProposalManagerTeam ? pmText('Proposal Team Structure', 'هيكل فريق إعداد العروض') : t('team.sections.teamStructure.title')}
                 </h2>
                 <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded animate-pulse">
-                  {isProposalManagerTeam ? 'AI' : t('team.sections.teamStructure.aiSuggestion')}
+                  {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.teamStructure.aiSuggestion')}
                 </span>
               </div>
               
               <div className="space-y-4">
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 dark:text-white mb-3">
-                    {isProposalManagerTeam ? 'By Role' : t('team.sections.teamStructure.byRole')}
+                    {isProposalManagerTeam ? pmText('By Role', 'حسب الدور') : t('team.sections.teamStructure.byRole')}
                   </h3>
                   <div className="space-y-2">
                     {(() => {
@@ -416,7 +450,7 @@ export default function MarketingHeadTeamManagement() {
                       }, {});
                       return Object.entries(byRole).map(([role, names]) => (
                         <div key={role} className="flex items-center justify-between py-2">
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{role}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{pmTranslate(role)}</span>
                           <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-600 dark:text-gray-400">
                               {names.length === 1 ? names[0] : names.join(", ")}
@@ -433,18 +467,18 @@ export default function MarketingHeadTeamManagement() {
                 
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 dark:text-white mb-3">
-                    {isProposalManagerTeam ? 'Reporting Hierarchy' : t('team.sections.teamStructure.reportingHierarchy')}
+                    {isProposalManagerTeam ? pmText('Reporting Hierarchy', 'الهيكل الإداري للتقارير') : t('team.sections.teamStructure.reportingHierarchy')}
                   </h3>
                   <div className="space-y-2">
                     <div className="text-sm text-gray-700 dark:text-gray-300">
                       {members.length > 0
                         ? isProposalManagerTeam
-                          ? `${members.find(m => m.role === 'Proposal Manager')?.name ?? members[0].name} (Proposal Manager) → ${members.filter(m => m.role !== 'Proposal Manager').map((m) => m.name).join(", ") || "—"}`
+                          ? `${members.find(m => m.role === 'Proposal Manager')?.name ?? members[0].name} ${pmText('(Proposal Manager)', '(مدير العروض)')} → ${members.filter(m => m.role !== 'Proposal Manager').map((m) => m.name).join(", ") || "—"}`
                           : `${members[0].name} (Supervisor) → ${members.slice(1).map((m) => m.name).join(", ") || "—"}`
                         : "—"}
                     </div>
                     <div className="text-xs text-blue-600 animate-bounce">
-                      {isProposalManagerTeam ? 'AI suggests balancing section ownership across writers.' : t('team.sections.teamStructure.aiWorkloadSuggestion')}
+                      {isProposalManagerTeam ? pmText('AI suggests balancing section ownership across writers.', 'يقترح الذكاء الاصطناعي موازنة ملكية الأقسام بين الكتّاب.') : t('team.sections.teamStructure.aiWorkloadSuggestion')}
                     </div>
                   </div>
                 </div>
@@ -466,7 +500,7 @@ export default function MarketingHeadTeamManagement() {
                   <FiSettings className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? 'Role Access & Permissions' : t('team.sections.roleAccess.title')}
+                  {isProposalManagerTeam ? pmText('Role Access & Permissions', 'صلاحيات الوصول حسب الدور') : t('team.sections.roleAccess.title')}
                 </h2>
               </div>
               
@@ -488,10 +522,16 @@ export default function MarketingHeadTeamManagement() {
                         onClick={() => handleMemberClick(member)}
                       >
                         <td className="py-3 text-gray-700 dark:text-gray-300">{member.name}</td>
-                        <td className="py-3 text-gray-700 dark:text-gray-300">{member.role}</td>
+                        <td className="py-3 text-gray-700 dark:text-gray-300">{pmTranslate(member.role)}</td>
                         <td className="py-3 text-gray-700 dark:text-gray-300">
                           {isProposalManagerTeam
-                            ? (member.role === "Proposal Manager" ? "Full access" : member.role === "Compliance Specialist" ? "Compliance, Sections" : member.role === "Proposal Writer" ? "Sections, Past Performance" : "Sections")
+                            ? (member.role === "Proposal Manager"
+                                ? pmText("Full access", "وصول كامل")
+                                : member.role === "Compliance Specialist"
+                                  ? pmText("Compliance, Sections", "الامتثال، الأقسام")
+                                  : member.role === "Proposal Writer"
+                                    ? pmText("Sections, Past Performance", "الأقسام، الأداء السابق")
+                                    : pmText("Sections", "الأقسام"))
                             : (index === 0 ? "All" : index === 1 ? "Content, Campaigns" : "Campaigns")}
                         </td>
                         <td className="py-3" onClick={(e) => e.stopPropagation()}>
@@ -509,7 +549,7 @@ export default function MarketingHeadTeamManagement() {
                   </tbody>
                 </table>
                 <div className="mt-2 text-xs text-purple-600">
-                  {isProposalManagerTeam ? 'AI suggests assigning Compliance review to specialists only.' : t('team.sections.roleAccess.aiPermissionSuggestion')}
+                  {isProposalManagerTeam ? pmText('AI suggests assigning Compliance review to specialists only.', 'يقترح الذكاء الاصطناعي إسناد مراجعة الامتثال للمتخصصين فقط.') : t('team.sections.roleAccess.aiPermissionSuggestion')}
                 </div>
               </div>
             </section>
@@ -529,10 +569,10 @@ export default function MarketingHeadTeamManagement() {
                   <FiBookOpen className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? 'Training & Certifications' : t('team.sections.trainingDevelopment.title')}
+                  {isProposalManagerTeam ? pmText('Training & Certifications', 'التدريب والشهادات') : t('team.sections.trainingDevelopment.title')}
                 </h2>
                 <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded animate-pulse">
-                  {isProposalManagerTeam ? 'AI' : t('team.sections.trainingDevelopment.aiRecommendations')}
+                  {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.trainingDevelopment.aiRecommendations')}
                 </span>
               </div>
               
@@ -552,7 +592,7 @@ export default function MarketingHeadTeamManagement() {
                 ).map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}: {item.training}</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}: {pmTranslate(item.training)}</span>
                     </div>
                     <StatusBadge status={item.status}>
                       {t(`team.sections.trainingDevelopment.${item.status}`)}
@@ -560,7 +600,7 @@ export default function MarketingHeadTeamManagement() {
                   </div>
                 ))}
                 <div className="text-xs text-yellow-600 animate-bounce">
-                  {isProposalManagerTeam ? 'AI recommends FAR/DFARS refresh for new team members.' : t('team.sections.trainingDevelopment.aiTrainingRecommendation')}
+                  {isProposalManagerTeam ? pmText('AI recommends FAR/DFARS refresh for new team members.', 'يوصي الذكاء الاصطناعي بتحديث تدريب FAR/DFARS لأعضاء الفريق الجدد.') : t('team.sections.trainingDevelopment.aiTrainingRecommendation')}
                 </div>
               </div>
             </section>
@@ -583,10 +623,10 @@ export default function MarketingHeadTeamManagement() {
                   <FiClipboard className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? 'Section Assignments & Deadlines' : t('team.sections.taskAssignment.title')}
+                  {isProposalManagerTeam ? pmText('Section Assignments & Deadlines', 'تعيين الأقسام والمواعيد النهائية') : t('team.sections.taskAssignment.title')}
                 </h2>
                 <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded animate-pulse">
-                  {isProposalManagerTeam ? 'AI' : t('team.sections.taskAssignment.aiSmartAssignment')}
+                  {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.taskAssignment.aiSmartAssignment')}
                 </span>
               </div>
               
@@ -616,7 +656,7 @@ export default function MarketingHeadTeamManagement() {
                         ]
                     ).map((task, index) => (
                       <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                        <td className="py-3 text-gray-700 dark:text-gray-300">{task.task}</td>
+                        <td className="py-3 text-gray-700 dark:text-gray-300">{pmTranslate(task.task)}</td>
                         <td className="py-3 text-gray-700 dark:text-gray-300">{task.assigned}</td>
                         <td className="py-3">
                           <StatusBadge status={task.status}>
@@ -630,7 +670,7 @@ export default function MarketingHeadTeamManagement() {
                   </tbody>
                 </table>
                 <div className="mt-2 text-xs text-green-600 animate-bounce">
-                  {isProposalManagerTeam ? 'AI suggests assigning Technical Lead for solution narrative.' : t('team.sections.taskAssignment.aiAssignmentSuggestion')}
+                  {isProposalManagerTeam ? pmText('AI suggests assigning Technical Lead for solution narrative.', 'يقترح الذكاء الاصطناعي إسناد السرد الفني إلى القائد الفني.') : t('team.sections.taskAssignment.aiAssignmentSuggestion')}
                 </div>
               </div>
             </section>
@@ -650,17 +690,17 @@ export default function MarketingHeadTeamManagement() {
                   <FiBarChart2 className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? 'Team Performance' : t('team.sections.performanceDashboard.title')}
+                  {isProposalManagerTeam ? pmText('Team Performance', 'أداء الفريق') : t('team.sections.performanceDashboard.title')}
                 </h2>
                 <span className="ml-2 text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded animate-pulse">
-                  {isProposalManagerTeam ? 'AI' : t('team.sections.performanceDashboard.aiLeaderboard')}
+                  {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.performanceDashboard.aiLeaderboard')}
                 </span>
               </div>
               
               <div className="space-y-4">
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 dark:text-white mb-3">
-                    {isProposalManagerTeam ? 'Contributions' : t('team.sections.performanceDashboard.kpis')}
+                    {isProposalManagerTeam ? pmText('Contributions', 'المساهمات') : t('team.sections.performanceDashboard.kpis')}
                   </h3>
                   <div className="space-y-2">
                     {(isProposalManagerTeam
@@ -676,7 +716,7 @@ export default function MarketingHeadTeamManagement() {
                         ]
                     ).map((item, index) => (
                       <div key={index} className="text-sm text-gray-700 dark:text-gray-300">
-                        <span className="font-medium">{item.metric}:</span> {item.data}
+                        <span className="font-medium">{pmTranslate(item.metric)}:</span> {pmTranslate(item.data)}
                       </div>
                     ))}
                   </div>
@@ -703,13 +743,13 @@ export default function MarketingHeadTeamManagement() {
                             <span className="text-sm text-gray-700 dark:text-gray-300">{member.name}</span>
                           </div>
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {isProposalManagerTeam ? 'Score' : t('team.sections.performanceDashboard.score')}: {member.performance ?? 80}
+                            {isProposalManagerTeam ? pmText('Score', 'النتيجة') : t('team.sections.performanceDashboard.score')}: {member.performance ?? 80}
                           </span>
                         </div>
                       ))}
                   </div>
                   <div className="mt-2 text-xs text-pink-600 animate-bounce">
-                    {isProposalManagerTeam ? 'AI suggests workload balance before color team.' : t('team.sections.performanceDashboard.aiBurnoutPrediction')}
+                    {isProposalManagerTeam ? pmText('AI suggests workload balance before color team.', 'يقترح الذكاء الاصطناعي موازنة عبء العمل قبل مراجعة فريق الألوان.') : t('team.sections.performanceDashboard.aiBurnoutPrediction')}
                   </div>
                 </div>
               </div>
@@ -730,10 +770,10 @@ export default function MarketingHeadTeamManagement() {
                   <FiMessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? 'Team Updates & Reminders' : t('team.sections.communicationCenter.title')}
+                  {isProposalManagerTeam ? pmText('Team Updates & Reminders', 'تحديثات الفريق والتذكيرات') : t('team.sections.communicationCenter.title')}
                 </h2>
                 <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded animate-pulse">
-                  {isProposalManagerTeam ? 'AI' : t('team.sections.communicationCenter.aiSummary')}
+                  {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.communicationCenter.aiSummary')}
                 </span>
               </div>
               
@@ -756,12 +796,12 @@ export default function MarketingHeadTeamManagement() {
                       <span className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase">
                         {t(`team.sections.communicationCenter.${item.type}`)}
                       </span>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">{item.message}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">{pmTranslate(item.message)}</p>
                     </div>
                   </div>
                 ))}
                 <div className="text-xs text-blue-600 animate-bounce">
-                  {isProposalManagerTeam ? 'AI highlights upcoming submission milestones.' : t('team.sections.communicationCenter.aiTopUpdates')}
+                  {isProposalManagerTeam ? pmText('AI highlights upcoming submission milestones.', 'يبرز الذكاء الاصطناعي المراحل القادمة للتسليم.') : t('team.sections.communicationCenter.aiTopUpdates')}
                 </div>
               </div>
             </section>
@@ -774,7 +814,7 @@ export default function MarketingHeadTeamManagement() {
             <div className="absolute inset-0" onClick={() => setShowAddModal(false)} />
             <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isProposalManagerTeam ? 'Add Team Member' : t('team.addTeamMember')}</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isProposalManagerTeam ? pmText('Add Team Member', 'إضافة عضو فريق') : t('team.addTeamMember')}</h2>
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
@@ -786,18 +826,18 @@ export default function MarketingHeadTeamManagement() {
               </div>
               <form onSubmit={handleAddMemberSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Name *', 'الاسم *') : 'Name *'}</label>
                   <input
                     type="text"
                     required
                     value={newMember.name}
                     onChange={(e) => setNewMember((p) => ({ ...p, name: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    placeholder={isProposalManagerTeam ? "e.g. John Smith" : "e.g. Ahmed Al-Saud"}
+                    placeholder={isProposalManagerTeam ? pmText("e.g. John Smith", "مثال: أحمد علي") : "e.g. Ahmed Al-Saud"}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Role', 'الدور') : 'Role'}</label>
                   <select
                     value={isProposalManagerTeam && !PROPOSAL_MANAGER_ROLES.includes(newMember.role) ? PROPOSAL_MANAGER_ROLES[0] : newMember.role}
                     onChange={(e) => setNewMember((p) => ({ ...p, role: e.target.value }))}
@@ -816,18 +856,18 @@ export default function MarketingHeadTeamManagement() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Email *', 'البريد الإلكتروني *') : 'Email *'}</label>
                   <input
                     type="email"
                     required
                     value={newMember.email}
                     onChange={(e) => setNewMember((p) => ({ ...p, email: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    placeholder="email@example.com"
+                    placeholder={isProposalManagerTeam ? pmText("email@example.com", "name@example.com") : "email@example.com"}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Phone', 'الهاتف') : 'Phone'}</label>
                   <input
                     type="tel"
                     value={newMember.phone}
@@ -837,35 +877,35 @@ export default function MarketingHeadTeamManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? 'Skills / Expertise (comma-separated)' : 'Skills (comma-separated)'}</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Skills / Expertise (comma-separated)', 'المهارات / الخبرات (مفصولة بفواصل)') : 'Skills (comma-separated)'}</label>
                   <input
                     type="text"
                     value={newMember.skills}
                     onChange={(e) => setNewMember((p) => ({ ...p, skills: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    placeholder={isProposalManagerTeam ? "e.g. Technical Writing, FAR/DFARS, Past Performance" : "e.g. SEO, Social Media, Analytics"}
+                    placeholder={isProposalManagerTeam ? pmText("e.g. Technical Writing, FAR/DFARS, Past Performance", "مثال: كتابة فنية، FAR/DFARS، الأداء السابق") : "e.g. SEO, Social Media, Analytics"}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? 'Active Pursuits / Proposals (comma-separated)' : 'Projects (comma-separated)'}</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Active Pursuits / Proposals (comma-separated)', 'الفرص / العروض النشطة (مفصولة بفواصل)') : 'Projects (comma-separated)'}</label>
                   <input
                     type="text"
                     value={newMember.projects}
                     onChange={(e) => setNewMember((p) => ({ ...p, projects: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    placeholder={isProposalManagerTeam ? "e.g. DoD IT Services, GSA BPA, NASA Follow-on" : "e.g. Q3 Campaign, Brand Refresh"}
+                    placeholder={isProposalManagerTeam ? pmText("e.g. DoD IT Services, GSA BPA, NASA Follow-on", "مثال: خدمات تقنية DoD، GSA BPA، متابعة NASA") : "e.g. Q3 Campaign, Brand Refresh"}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{isProposalManagerTeam ? pmText('Status', 'الحالة') : 'Status'}</label>
                   <select
                     value={newMember.status}
                     onChange={(e) => setNewMember((p) => ({ ...p, status: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
-                    <option>Active</option>
-                    <option>On Leave</option>
-                    <option>Pending</option>
+                    <option>{isProposalManagerTeam ? pmText('Active', 'نشط') : 'Active'}</option>
+                    <option>{isProposalManagerTeam ? pmText('On Leave', 'في إجازة') : 'On Leave'}</option>
+                    <option>{isProposalManagerTeam ? pmText('Pending', 'قيد الانتظار') : 'Pending'}</option>
                   </select>
                 </div>
                 <div className={`flex gap-3 pt-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
@@ -874,13 +914,13 @@ export default function MarketingHeadTeamManagement() {
                     onClick={() => setShowAddModal(false)}
                     className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    Cancel
+                    {isProposalManagerTeam ? pmText('Cancel', 'إلغاء') : 'Cancel'}
                   </button>
                   <button
                     type="submit"
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    {isProposalManagerTeam ? 'Add Team Member' : 'Add Member'}
+                    {isProposalManagerTeam ? pmText('Add Team Member', 'إضافة عضو فريق') : 'Add Member'}
                   </button>
                 </div>
               </form>

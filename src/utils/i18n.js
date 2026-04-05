@@ -106,6 +106,7 @@ i18n
     
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
+      lookupLocalStorage: 'preferred-language',
       caches: ['localStorage'],
     },
     

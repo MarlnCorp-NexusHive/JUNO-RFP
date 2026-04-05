@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "refresh-companies": "node scripts/refresh-company-intelligence-samples.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

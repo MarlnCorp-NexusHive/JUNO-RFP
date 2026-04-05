@@ -1,58 +1,9 @@
+import bundle from "./companyIntelligenceSamplesData.json";
+
+const BUNDLE_COMPANIES = bundle.companies ?? [];
+
+/** International / ADR rows (not US SEC primary listing); merged when absent from bundled US dataset. */
 const RAW_COMPANIES = [
-  ["AAPL", "Apple Inc.", "US", 391, 25, 0.9, "Consumers, enterprise, education"],
-  ["MSFT", "Microsoft Corporation", "US", 245, 36, 2.1, "Enterprise IT, cloud, SMB"],
-  ["GOOGL", "Alphabet Inc.", "US", 350, 28, 1.4, "Advertisers, cloud customers"],
-  ["AMZN", "Amazon.com, Inc.", "US", 638, 7, 0.8, "Retail consumers, sellers, AWS"],
-  ["META", "Meta Platforms, Inc.", "US", 135, 29, 1.3, "Advertisers and social users"],
-  ["NVDA", "NVIDIA Corporation", "US", 120, 49, 1.5, "AI, data center, gaming OEMs"],
-  ["TSLA", "Tesla, Inc.", "US", 97, 14, 1.1, "EV buyers, fleet operators"],
-  ["BRK.B", "Berkshire Hathaway Inc.", "US", 365, 12, 2.6, "Insurance, utilities, rail"],
-  ["JPM", "JPMorgan Chase & Co.", "US", 161, 30, 2.9, "Retail and corporate banking"],
-  ["V", "Visa Inc.", "US", 35, 54, 1.6, "Banks, merchants, cardholders"],
-  ["MA", "Mastercard Incorporated", "US", 26, 45, 1.4, "Banks, fintechs, merchants"],
-  ["WMT", "Walmart Inc.", "US", 648, 3, 0.7, "Retail shoppers, B2B buyers"],
-  ["COST", "Costco Wholesale Corporation", "US", 254, 3, 0.8, "Membership retail consumers"],
-  ["HD", "The Home Depot, Inc.", "US", 153, 11, 0.9, "Homeowners, contractors"],
-  ["LOW", "Lowe's Companies, Inc.", "US", 86, 9, 0.9, "DIY and professional builders"],
-  ["JNJ", "Johnson & Johnson", "US", 88, 18, 1.5, "Hospitals, pharmacies, consumers"],
-  ["PFE", "Pfizer Inc.", "US", 58, 11, 1.2, "Healthcare providers, governments"],
-  ["MRK", "Merck & Co., Inc.", "US", 60, 27, 1.3, "Hospitals, clinics, pharma partners"],
-  ["ABBV", "AbbVie Inc.", "US", 55, 21, 1.3, "Healthcare systems and payers"],
-  ["UNH", "UnitedHealth Group Incorporated", "US", 371, 6, 0.8, "Members, employers, providers"],
-  ["CVS", "CVS Health Corporation", "US", 357, 3, 0.8, "Patients, insurers, pharmacies"],
-  ["PEP", "PepsiCo, Inc.", "US", 91, 12, 1.0, "Retail channels and food service"],
-  ["KO", "The Coca-Cola Company", "US", 46, 23, 1.1, "Bottlers, distributors, retail"],
-  ["MCD", "McDonald's Corporation", "US", 26, 33, 0.9, "Franchisees and restaurant consumers"],
-  ["NKE", "NIKE, Inc.", "US", 51, 12, 1.0, "Athletic consumers, retailers"],
-  ["SBUX", "Starbucks Corporation", "US", 36, 10, 0.9, "Retail consumers and licensees"],
-  ["DIS", "The Walt Disney Company", "US", 89, 8, 1.2, "Viewers, parks guests, advertisers"],
-  ["NFLX", "Netflix, Inc.", "US", 39, 16, 1.0, "Streaming subscribers globally"],
-  ["CMCSA", "Comcast Corporation", "US", 121, 14, 1.1, "Broadband users, advertisers"],
-  ["T", "AT&T Inc.", "US", 122, 9, 1.1, "Wireless and enterprise telecom"],
-  ["VZ", "Verizon Communications Inc.", "US", 134, 10, 1.1, "Wireless consumers and businesses"],
-  ["ORCL", "Oracle Corporation", "US", 53, 22, 1.2, "Enterprise database and cloud clients"],
-  ["ADBE", "Adobe Inc.", "US", 21, 30, 1.4, "Creative professionals and enterprises"],
-  ["CRM", "Salesforce, Inc.", "US", 36, 16, 1.3, "Enterprise sales/service teams"],
-  ["INTC", "Intel Corporation", "US", 54, 6, 1.2, "PC and server OEM partners"],
-  ["AMD", "Advanced Micro Devices, Inc.", "US", 23, 9, 1.1, "Cloud, OEM and gaming customers"],
-  ["QCOM", "QUALCOMM Incorporated", "US", 36, 21, 1.2, "OEM handset and IoT partners"],
-  ["CSCO", "Cisco Systems, Inc.", "US", 53, 18, 1.1, "Enterprise networking buyers"],
-  ["IBM", "International Business Machines Corporation", "US", 63, 11, 1.3, "Enterprise and government accounts"],
-  ["GE", "GE Aerospace", "US", 67, 15, 1.0, "Airlines and aerospace customers"],
-  ["CAT", "Caterpillar Inc.", "US", 67, 16, 0.9, "Construction and mining operators"],
-  ["DE", "Deere & Company", "US", 61, 17, 0.9, "Farm and construction businesses"],
-  ["BA", "The Boeing Company", "US", 78, 3, 0.9, "Commercial and defense customers"],
-  ["HON", "Honeywell International Inc.", "US", 38, 15, 1.0, "Industrial and aerospace clients"],
-  ["MMM", "3M Company", "US", 33, 12, 1.0, "Industrial and healthcare channels"],
-  ["RTX", "RTX Corporation", "US", 74, 8, 1.0, "Defense and aerospace buyers"],
-  ["LMT", "Lockheed Martin Corporation", "US", 68, 10, 0.9, "Government defense contracts"],
-  ["NOC", "Northrop Grumman Corporation", "US", 39, 9, 0.9, "Government and defense programs"],
-  ["UPS", "United Parcel Service, Inc.", "US", 91, 10, 0.9, "Ecommerce merchants and SMBs"],
-  ["FDX", "FedEx Corporation", "US", 90, 5, 0.9, "Global logistics customers"],
-  ["UBER", "Uber Technologies, Inc.", "US", 37, 8, 0.8, "Riders, couriers, merchants"],
-  ["ABNB", "Airbnb, Inc.", "US", 11, 20, 1.0, "Hosts and travelers"],
-  ["PYPL", "PayPal Holdings, Inc.", "US", 30, 14, 1.1, "Consumers, merchants, marketplaces"],
-  ["XYZ", "Block, Inc.", "US", 23, 3, 0.9, "Sellers and Cash App users"],
   ["SHOP", "Shopify Inc.", "Canada", 8, 10, 1.2, "Ecommerce merchants and partners"],
   ["TD", "The Toronto-Dominion Bank", "Canada", 53, 20, 2.6, "Consumer and business banking"],
   ["RY", "Royal Bank of Canada", "Canada", 60, 22, 2.7, "Retail, wealth, commercial banking"],
@@ -104,8 +55,6 @@ const RAW_COMPANIES = [
   ["VALE", "Vale S.A.", "Brazil", 42, 19, 1.1, "Steel and industrial customers"],
   ["BBD", "Banco Bradesco S.A.", "Brazil", 19, 11, 2.5, "Retail and corporate banking"],
   ["MELI", "MercadoLibre, Inc.", "Argentina", 15, 10, 1.1, "Ecommerce shoppers and sellers"],
-  ["YUM", "Yum! Brands, Inc.", "US", 7, 21, 0.8, "Franchisees and restaurant consumers"],
-  ["DASH", "DoorDash, Inc.", "US", 9, 2, 0.8, "Delivery consumers and merchants"],
   ["SPOT", "Spotify Technology S.A.", "Sweden", 15, 6, 1.0, "Streaming subscribers and advertisers"],
   ["ADYEN.AS", "Adyen N.V.", "Netherlands", 2, 24, 1.2, "Enterprise merchants and platforms"],
 ];
@@ -147,20 +96,46 @@ function inferSector(name, customers) {
   return "Diversified";
 }
 
-export const SAMPLE_COMPANIES = RAW_COMPANIES.map(
-  ([ticker, name, region, baseRevenueB, marginPct, assetMultiplier, customers]) => {
-    const series = buildSeries(baseRevenueB, marginPct, assetMultiplier);
-    return {
-      ticker,
-      name,
-      region,
-      sector: inferSector(name, customers),
-      source: "Sample Dataset",
-      customers,
-      revenue: series.revenue,
-      netIncome: series.netIncome,
-      assets: series.assets,
-    };
-  },
-);
+const BUNDLE_TICKERS = new Set(BUNDLE_COMPANIES.map((c) => String(c.ticker).toUpperCase()));
 
+const DEFAULT_CUSTOMERS =
+  "Public company; consult SEC filings (10-K) for customer concentration and segment reporting.";
+
+const fromBundle = BUNDLE_COMPANIES.map((c) => {
+  const customers = DEFAULT_CUSTOMERS;
+  const sector =
+    (c.sector && String(c.sector).trim()) || inferSector(c.name || "", customers);
+  return {
+    ticker: c.ticker,
+    name: c.name || c.ticker,
+    region: c.region || "US",
+    sector,
+    source: "SEC EDGAR (bundled snapshot)",
+    customers,
+    revenue: c.revenue || [],
+    netIncome: c.netIncome || [],
+    assets: c.assets || [],
+  };
+});
+
+const fromInternational = RAW_COMPANIES.filter(
+  ([ticker]) => !BUNDLE_TICKERS.has(String(ticker).toUpperCase()),
+).map(([ticker, name, region, baseRevenueB, marginPct, assetMultiplier, customers]) => {
+  const series = buildSeries(baseRevenueB, marginPct, assetMultiplier);
+  return {
+    ticker,
+    name,
+    region,
+    sector: inferSector(name, customers),
+    source: "Offline sample (illustrative)",
+    customers,
+    revenue: series.revenue,
+    netIncome: series.netIncome,
+    assets: series.assets,
+  };
+});
+
+/** All searchable companies: US bundled SEC facts + illustrative international/ADR samples. */
+export const SAMPLE_COMPANIES = [...fromBundle, ...fromInternational].sort((a, b) =>
+  a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+);

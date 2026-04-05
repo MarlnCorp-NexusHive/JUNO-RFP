@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../../hooks/useLocalization';
+import { useTranslation } from 'react-i18next';
 
 const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
   const { currentLanguage, toggleLanguage } = useLocalization();
+  const { t } = useTranslation('common');
+  const isEnglish = String(currentLanguage || 'en').toLowerCase().startsWith('en');
   const [isHovered, setIsHovered] = useState(false);
   const [glowAnimation, setGlowAnimation] = useState(false);
+  const switchLabel = isEnglish
+    ? t('language.switchToArabic')
+    : t('language.switchToEnglish');
 
   // Glow animation every 6 seconds
   useEffect(() => {
@@ -24,7 +30,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
         darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/30'
       } ${glowAnimation ? 'shadow-lg shadow-green-400/10 ring-1 ring-green-400/5' : ''}`}
       style={{ background: "transparent" }}
-      title={currentLanguage === 'en' ? 'Switch to Arabic' : 'Switch to English'}
+      title={switchLabel}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -33,7 +39,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
         <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-50 shadow-xl whitespace-nowrap">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-            {currentLanguage === 'en' ? 'Switch to Arabic' : 'Switch to English'}
+            {switchLabel}
           </div>
           {/* Tooltip arrow */}
           <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black"></div>
@@ -54,7 +60,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
           <span className={`font-bold text-lg relative z-10 transition-all duration-300 ${
             isHovered ? 'text-green-200' : 'text-white'
           }`}>
-            {currentLanguage === 'en' ? 'EN' : 'AR'}
+            {isEnglish ? 'EN' : 'AR'}
           </span>
           
           {/* Language switch indicator */}
@@ -67,7 +73,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
         <span className={`text-white whitespace-nowrap transition-transform duration-200 ${
           isHovered ? 'translate-x-1' : ''
         }`}>
-          {currentLanguage === 'en' ? 'Switch to Arabic' : 'Switch to English'}
+          {switchLabel}
         </span>
       )}
 

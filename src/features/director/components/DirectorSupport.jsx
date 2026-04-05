@@ -39,8 +39,31 @@ export default function DirectorSupport() {
   const [activeFaq, setActiveFaq] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const { t, ready } = useTranslation('director');
+  const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
+  const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
+  const pmText = (value) => {
+    if (!isPM || !isArabic) return value;
+    const map = {
+      "Loading...": "جارٍ التحميل...",
+      "Proposal & RFP Support": "دعم العروض وطلبات تقديم العروض",
+      "FAQs, how-tos, and contacts for proposal and RFP processes.": "الأسئلة الشائعة، الأدلة العملية، ووسائل التواصل الخاصة بعمليات العروض وطلبات تقديم العروض.",
+      "Help Articles": "مقالات المساعدة",
+      FAQs: "الأسئلة الشائعة",
+      articles: "مقالات",
+      priority: "أولوية",
+      Response: "الاستجابة",
+      "2-4 hours": "2-4 ساعات",
+      Immediate: "فوري",
+      "Coming Soon": "قريباً",
+      "Real-time": "بالوقت الفعلي",
+      account: "الحساب",
+      technical: "تقني",
+      compliance: "الامتثال",
+      data: "البيانات",
+    };
+    return map[value] || value;
+  };
 
   // Show loading state if i18n is not ready
   if (!ready) {
@@ -49,7 +72,7 @@ export default function DirectorSupport() {
         <main className="flex-1 p-6 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Loading...</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{pmText("Loading...")}</h1>
           </div>
         </main>
       </div>
@@ -203,19 +226,19 @@ export default function DirectorSupport() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiHelpCircle className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? "Proposal & RFP Support" : t('support.title')}
+                {isPM ? pmText("Proposal & RFP Support") : t('support.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {isPM ? "FAQs, how-tos, and contacts for proposal and RFP processes." : t('support.subtitle')}
+                {isPM ? pmText("FAQs, how-tos, and contacts for proposal and RFP processes.") : t('support.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Help Articles</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{pmText("Help Articles")}</div>
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">41</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">FAQs</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{pmText("FAQs")}</div>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">5</div>
               </div>
             </div>
@@ -295,7 +318,7 @@ export default function DirectorSupport() {
                       {t(`support.${topic.titleKey}`)}
                     </h3>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {topic.articles} articles
+                      {topic.articles} {pmText("articles")}
                     </div>
                   </div>
                 </div>
@@ -355,10 +378,10 @@ export default function DirectorSupport() {
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(faq.priority)}`}>
-                            {faq.priority} priority
+                            {t(`support.priorities.${faq.priority}`, { defaultValue: faq.priority })} {pmText("priority")}
                           </span>
                           <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {faq.category}
+                            {pmText(faq.category)}
                           </span>
                         </div>
                       </div>
@@ -431,7 +454,7 @@ export default function DirectorSupport() {
                       {t(`support.${channel.titleKey}`)}
                     </h3>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Response: {channel.responseTime}
+                      {pmText("Response")}: {pmText(channel.responseTime)}
                     </div>
                   </div>
                 </div>
