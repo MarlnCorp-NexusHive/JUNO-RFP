@@ -1,9 +1,10 @@
 /**
- * Company Intelligence — frontend only. Resolves companies from bundled sample data
- * (see companyIntelligenceSamples.js + companyIntelligenceSamplesData.json). No network calls.
+ * Company Intelligence — resolves from bundled sample data first; if no match, calls JUNO backend
+ * for live Wikipedia + AI structuring (see POST /company-intelligence-remote).
  */
 
 import { SAMPLE_COMPANIES } from "../features/proposal-manager/data/companyIntelligenceSamples";
+import { fetchCompanyIntelligenceRemote } from "./api.js";
 
 function findSampleCompany({ companyName, ticker }) {
   const t = (ticker || "").trim();
@@ -171,7 +172,38 @@ export async function fetchCompanyIntelligence(options = {}) {
       customers: match.customers || "",
       source: match.source,
       error: null,
+      remote: false,
     };
+  }
+
+  try {
+    const remote = await fetchCompanyIntelligenceRemote({ query: displayName });
+    if (remote && remote.error == null && remote.name) {
+      const fin = remote.financials || { revenue: [], netIncome: [], assets: [] };
+      const tr = remote.trends || fin;
+      return {
+        name: remote.name,
+        ticker: remote.ticker ?? null,
+        region: remote.region ?? null,
+        sector: remote.sector ?? null,
+        financials: {
+          revenue: fin.revenue || [],
+          netIncome: fin.netIncome || [],
+          assets: fin.assets || [],
+        },
+        trends: {
+          revenue: tr.revenue || [],
+          netIncome: tr.netIncome || [],
+          assets: tr.assets || [],
+        },
+        customers: remote.customers || "",
+        source: remote.source || "Live lookup",
+        error: null,
+        remote: true,
+      };
+    }
+  } catch (e) {
+    console.warn("[Company Intelligence] Remote lookup failed:", e?.message || e);
   }
 
   return {
@@ -183,6 +215,48 @@ export async function fetchCompanyIntelligence(options = {}) {
     trends: null,
     customers: null,
     source: null,
-    error: `No sample data for "${displayName}". Pick from the list or try a known ticker (e.g. AAPL, MSFT).`,
+    error: `No sample data for "${displayName}" and live lookup failed. Ensure juno-backend is running (port 3000) with OPENAI_API_KEY, or pick from the list (e.g. AAPL, MSFT).`,
   };
+}
+
+/**
+ * Plain-text snapshot of a resolved company for AI context (JUNO backend /ask-with-context).
+ */
+export function formatCompanySnapshotForAi(data) {
+  if (!data || data.error) return "";
+  const fin = data.financials;
+  const hasSeries =
+    fin?.revenue?.length || fin?.netIncome?.length || fin?.assets?.length;
+  const narrative = (data.customers || "").trim();
+  if (!fin || (!hasSeries && !narrative)) return "";
+  const fmt = (v) => {
+    if (v == null || v === "") return "n/a";
+    if (typeof v === "number" && !Number.isNaN(v)) {
+      return v.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    return String(v);
+  };
+  const lines = [];
+  lines.push(`Company: ${data.name}`);
+  lines.push(`Ticker: ${data.ticker || "n/a"}`);
+  lines.push(`Region: ${data.region || "n/a"}`);
+  lines.push(`Sector: ${data.sector || "n/a"}`);
+  lines.push(`Data source: ${data.source || "n/a"}`);
+  lines.push("");
+  const dump = (title, rows) => {
+    if (!rows?.length) return;
+    lines.push(`${title} (reporting period → value USD):`);
+    for (const x of rows.slice(0, 16)) {
+      lines.push(`  ${x.period}: ${fmt(x.value)}`);
+    }
+    lines.push("");
+  };
+  dump("Revenue", fin.revenue);
+  dump("Net income", fin.netIncome);
+  dump("Total assets", fin.assets);
+  if (data.customers) {
+    lines.push("Narrative / customer context:");
+    lines.push(data.customers);
+  }
+  return lines.join("\n").trim();
 }

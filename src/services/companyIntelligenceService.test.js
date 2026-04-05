@@ -2,7 +2,16 @@
  * Tests for Company Intelligence (bundled samples + normalizers).
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("./api.js", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    fetchCompanyIntelligenceRemote: vi.fn(() => Promise.reject(new Error("remote disabled in tests"))),
+  };
+});
+
 import {
   normalizeSecFinancials,
   normalizeFmpFinancials,
@@ -80,11 +89,12 @@ describe("Company Intelligence Service", () => {
   });
 
   describe("fetchCompanyIntelligence", () => {
-    it("returns error when no sample matches", async () => {
+    it("returns error when no sample matches and remote lookup is unavailable", async () => {
       const result = await fetchCompanyIntelligence({ companyName: "UnknownXYZ123" });
       expect(result.financials).toBeNull();
       expect(result.error).toBeTruthy();
       expect(result.name).toBe("UnknownXYZ123");
+      expect(result.error).toMatch(/live lookup failed|No sample data/);
     });
 
     it("returns bundled sample data for a known ticker", async () => {
@@ -94,6 +104,7 @@ describe("Company Intelligence Service", () => {
       expect(result.trends?.revenue?.length).toBeGreaterThan(0);
       expect(result.name).toBeTruthy();
       expect(result.source).toMatch(/bundled snapshot|Offline sample/);
+      expect(result.remote).toBe(false);
     });
 
     it("resolves by company name substring", async () => {

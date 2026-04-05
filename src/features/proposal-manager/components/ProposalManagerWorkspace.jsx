@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -12,11 +12,13 @@ import {
   updateDocument,
   deleteDocument,
   appendExtractedQAs,
+  replaceExtractedQAsInContentHub,
 } from "../services/proposalManagerStorage";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
-import { FiFolder, FiFile, FiUpload, FiTrash2, FiEdit2, FiChevronDown, FiChevronRight, FiZap } from "react-icons/fi";
+import { FiFolder, FiFile, FiUpload, FiTrash2, FiEdit2, FiZap, FiMessageSquare, FiRefreshCw } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
+import { generateAnswer, structureRfpRequirementsWithAi } from "../../../services/api.js";
 
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
@@ -34,6 +36,19 @@ function humanFactKey(key) {
     .split("_")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(" ");
+}
+
+function rfpQuestionKey(index) {
+  return `q_${index}`;
+}
+
+/** Prefer stored answer; for requirement-only rows (empty answer) show full question text. */
+function workspaceReferenceText(row) {
+  if (!row) return "—";
+  const a = (row.answer || "").trim();
+  if (a) return a;
+  const q = (row.question || "").trim();
+  return q || "—";
 }
 
 export default function ProposalManagerWorkspace() {
@@ -55,6 +70,14 @@ export default function ProposalManagerWorkspace() {
   const [editingFolderId, setEditingFolderId] = useState(null);
   const [newFolderName, setNewFolderName] = useState("");
   const fileInputRef = useRef(null);
+  const rfpBackfillDone = useRef(new Set());
+  const [rfpId, setRfpId] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
+  const [aiSplitLoading, setAiSplitLoading] = useState(false);
+  const [aiSplitError, setAiSplitError] = useState("");
 
   const refreshDocs = useCallback(() => setDocuments(getDocuments()));
   const refreshFolders = useCallback(() => setFolders(getFolders()));
@@ -125,6 +148,7 @@ export default function ProposalManagerWorkspace() {
         });
         appendExtractedQAs(qas, documentTypeId, docId, DOCUMENT_TYPE_TO_TAGS);
         refreshDocs();
+        if (qas.length > 0 || text.trim().length >= 80) setRfpId(docId);
       } catch (err) {
         setScanProgress(null);
         console.warn("Extract failed for", file.name, err);
@@ -154,6 +178,187 @@ export default function ProposalManagerWorkspace() {
       ? documents
       : documents.filter((d) => d.folderId === selectedFolderId);
   const rootFolders = folders.filter((f) => !f.parentId);
+
+  const docsForWorkspace = useMemo(
+    () =>
+      currentDocs.filter(
+        (d) => (d.extractedQAs?.length ?? 0) > 0 || (d.rawText?.length ?? 0) >= 80,
+      ),
+    [currentDocs],
+  );
+
+  const activeRfpDoc = useMemo(
+    () => (rfpId ? documents.find((d) => d.id === rfpId) : null),
+    [documents, rfpId],
+  );
+
+  const questions = useMemo(() => {
+    const doc = activeRfpDoc;
+    if (!doc) return [];
+    const stored = doc.extractedQAs ?? [];
+    if (stored.length > 0) return stored;
+    const raw = doc.rawText || "";
+    if (raw.length < 80) return [];
+    try {
+      return extractFromText(raw).qas;
+    } catch {
+      return [];
+    }
+  }, [activeRfpDoc]);
+
+  useEffect(() => {
+    if (!rfpId) return;
+    const d = getDocuments().find((x) => x.id === rfpId);
+    if (!d || (d.extractedQAs?.length ?? 0) > 0) return;
+    const raw = d.rawText || "";
+    if (raw.length < 80) return;
+    if (rfpBackfillDone.current.has(rfpId)) return;
+    rfpBackfillDone.current.add(rfpId);
+    try {
+      const { facts, qas } = extractFromText(raw);
+      if (qas.length > 0) {
+        updateDocument(rfpId, { extractedFacts: facts, extractedQAs: qas });
+        refreshDocs();
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [rfpId, refreshDocs]);
+
+  useEffect(() => {
+    if (rfpId && !currentDocs.some((d) => d.id === rfpId)) {
+      setRfpId(null);
+      setSelectedQuestionIndex(null);
+      setAnswers({});
+      setAiError("");
+      setAiSplitError("");
+    }
+  }, [currentDocs, rfpId]);
+
+  useEffect(() => {
+    if (!rfpId) {
+      setAnswers({});
+      setSelectedQuestionIndex(null);
+      setAiError("");
+      return;
+    }
+    const d = getDocuments().find((x) => x.id === rfpId);
+    setAnswers(d?.rfpWorkspaceAnswers && typeof d.rfpWorkspaceAnswers === "object" ? { ...d.rfpWorkspaceAnswers } : {});
+    setSelectedQuestionIndex(null);
+    setAiError("");
+    setAiSplitError("");
+  }, [rfpId]);
+
+  const handleAiSplitAndNumberRequirements = useCallback(async () => {
+    const doc = getDocuments().find((d) => d.id === rfpId);
+    const raw = doc?.rawText?.trim() || "";
+    if (!rfpId || !doc || raw.length < 80) return;
+    setAiSplitError("");
+    setAiSplitLoading(true);
+    try {
+      const { items } = await structureRfpRequirementsWithAi(raw);
+      if (!Array.isArray(items) || items.length === 0) {
+        setAiSplitError(t("proposalManagerWorkspace.rfpWorkspace.aiSplitEmpty"));
+        return;
+      }
+      const qas = items.map((it, i) => {
+        const n = typeof it.n === "number" && it.n >= 1 ? it.n : i + 1;
+        const q = (it.q || "").trim();
+        const ref = typeof it.ref === "string" ? it.ref.trim() : "";
+        const question = /^\d+[\.)]\s/.test(q) ? q : `${n}. ${q}`;
+        return { question, answer: ref };
+      });
+      updateDocument(rfpId, {
+        extractedQAs: qas,
+        rfpWorkspaceAnswers: {},
+      });
+      replaceExtractedQAsInContentHub(rfpId, qas, doc.documentTypeId, DOCUMENT_TYPE_TO_TAGS);
+      rfpBackfillDone.current.add(rfpId);
+      refreshDocs();
+      setAnswers({});
+      setSelectedQuestionIndex(null);
+      setAiError("");
+    } catch (e) {
+      setAiSplitError(
+        e?.response?.data?.error ?? e?.message ?? t("proposalManagerWorkspace.rfpWorkspace.aiSplitFailed"),
+      );
+    } finally {
+      setAiSplitLoading(false);
+    }
+  }, [rfpId, t, refreshDocs]);
+
+  const totalQuestions = questions.length;
+  const answeredCount = useMemo(() => {
+    if (!totalQuestions) return 0;
+    let n = 0;
+    for (let i = 0; i < totalQuestions; i++) {
+      const v = answers[rfpQuestionKey(i)];
+      if (typeof v === "string" && v.trim().length > 0) n += 1;
+    }
+    return n;
+  }, [answers, totalQuestions]);
+
+  const progressPercent = totalQuestions ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
+  const persistAnswers = useCallback(
+    (docId, nextAnswers) => {
+      updateDocument(docId, { rfpWorkspaceAnswers: nextAnswers });
+      refreshDocs();
+    },
+    [refreshDocs],
+  );
+
+  const handleAnswerChange = useCallback(
+    (key, value) => {
+      if (!rfpId) return;
+      setAnswers((prev) => {
+        const next = { ...prev, [key]: value };
+        persistAnswers(rfpId, next);
+        return next;
+      });
+    },
+    [rfpId, persistAnswers],
+  );
+
+  const handleGenerateAiAnswer = useCallback(async () => {
+    if (rfpId == null || selectedQuestionIndex == null || selectedQuestionIndex < 0) return;
+    const row = questions[selectedQuestionIndex];
+    if (!row?.question?.trim()) return;
+    setAiError("");
+    setAiLoading(true);
+    const key = rfpQuestionKey(selectedQuestionIndex);
+    const context = (issuerBrief || "").trim().slice(0, 4000);
+    const qLine = row.question.trim();
+    const docNum = qLine.match(/^(\d+)[\.)]\s/);
+    const numberingNote = docNum
+      ? `This requirement is numbered ${docNum[1]} in the solicitation text. Respond to this numbered item only.`
+      : `This is workspace item ${selectedQuestionIndex + 1} of ${questions.length}. Treat it as one discrete requirement.`;
+    const promptParts = [
+      "You are a professional proposal writer. Draft a concise, formal response suitable for an RFP submission.",
+      "",
+      numberingNote,
+      "",
+      "Requirement / question from the RFP:",
+      qLine,
+    ];
+    if (context) {
+      promptParts.push("", "Optional context (issuer / capture notes — use only if relevant):", context);
+    }
+    promptParts.push("", "Respond in clear prose. Do not repeat the question as a heading unless necessary.");
+    try {
+      const text = await generateAnswer(promptParts.join("\n"));
+      handleAnswerChange(key, text);
+    } catch (e) {
+      setAiError(e?.response?.data?.error ?? e?.message ?? "AI request failed");
+    } finally {
+      setAiLoading(false);
+    }
+  }, [rfpId, selectedQuestionIndex, questions, issuerBrief, handleAnswerChange]);
+
+  const selectedKey =
+    selectedQuestionIndex != null && selectedQuestionIndex >= 0
+      ? rfpQuestionKey(selectedQuestionIndex)
+      : null;
 
   return (
     <div className="min-h-screen bg-[#F6F7FA] dark:bg-gray-900 p-6">
@@ -371,6 +576,206 @@ export default function ProposalManagerWorkspace() {
             </div>
           </div>
         </div>
+
+        <section className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <FiMessageSquare className="text-indigo-500 shrink-0" />
+                {t("proposalManagerWorkspace.rfpWorkspace.title")}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {t("proposalManagerWorkspace.rfpWorkspace.subtitle")}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t("proposalManagerWorkspace.rfpWorkspace.selectDocument")}
+            </label>
+            <select
+              value={rfpId || ""}
+              onChange={(e) => setRfpId(e.target.value || null)}
+              className="w-full max-w-xl rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm"
+            >
+              <option value="">{t("proposalManagerWorkspace.rfpWorkspace.selectPlaceholder")}</option>
+              {docsForWorkspace.map((d) => {
+                const n = d.extractedQAs?.length ?? 0;
+                const label =
+                  n > 0
+                    ? t("proposalManagerWorkspace.rfpWorkspace.optionWithCount", {
+                        name: d.name,
+                        count: n,
+                      })
+                    : t("proposalManagerWorkspace.rfpWorkspace.optionTextOnly", { name: d.name });
+                return (
+                  <option key={d.id} value={d.id}>
+                    {label}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          {!rfpId ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("proposalManagerWorkspace.rfpWorkspace.emptyNoSelection")}
+            </p>
+          ) : (
+            <>
+              {(activeRfpDoc?.rawText?.length ?? 0) >= 80 && (
+                <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void handleAiSplitAndNumberRequirements()}
+                    disabled={aiSplitLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium shrink-0"
+                  >
+                    {aiSplitLoading ? (
+                      <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                    ) : (
+                      <FiZap className="w-4 h-4 shrink-0" />
+                    )}
+                    {aiSplitLoading
+                      ? t("proposalManagerWorkspace.rfpWorkspace.aiSplitRunning")
+                      : t("proposalManagerWorkspace.rfpWorkspace.aiSplitButton")}
+                  </button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+                    {t("proposalManagerWorkspace.rfpWorkspace.aiSplitHint")}
+                  </p>
+                </div>
+              )}
+              {aiSplitError ? (
+                <p className="text-sm text-red-600 dark:text-red-400 mb-3">{aiSplitError}</p>
+              ) : null}
+              {questions.length === 0 ? (
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  {t("proposalManagerWorkspace.rfpWorkspace.emptyNoQuestions")}
+                </p>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate pr-2" title={activeRfpDoc?.name}>
+                        {t("proposalManagerWorkspace.rfpWorkspace.rfpTitleLabel")}: {activeRfpDoc?.name}
+                      </h3>
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
+                        {t("proposalManagerWorkspace.rfpWorkspace.progressLabel", {
+                          percent: progressPercent,
+                          answered: answeredCount,
+                          total: totalQuestions,
+                        })}
+                      </span>
+                    </div>
+                    <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-indigo-600 transition-[width] duration-300 ease-out"
+                        style={{ width: `${progressPercent}%` }}
+                        role="progressbar"
+                        aria-valuenow={progressPercent}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-[min(28rem,62vh)]">
+                    <div className="lg:col-span-1 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-900/30">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-3 py-2 border-b border-gray-200 dark:border-gray-600">
+                        {t("proposalManagerWorkspace.rfpWorkspace.questionList")}
+                      </p>
+                      <ul className="overflow-y-auto flex-1 max-h-[min(32rem,60vh)] divide-y divide-gray-200 dark:divide-gray-600">
+                        {questions.map((row, index) => {
+                          const key = rfpQuestionKey(index);
+                          const answered = Boolean(answers[key]?.trim());
+                          const selected = selectedQuestionIndex === index;
+                          const qText = row.question || t("proposalManagerWorkspace.rfpWorkspace.untitledQuestion");
+                          return (
+                            <li key={key}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedQuestionIndex(index);
+                                  setAiError("");
+                                }}
+                                title={qText}
+                                className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${
+                                  selected
+                                    ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-100"
+                                    : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                }`}
+                              >
+                                <span className="flex items-start gap-2">
+                                  <span
+                                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                                      answered ? "bg-emerald-500" : "bg-gray-300 dark:bg-gray-600"
+                                    }`}
+                                    aria-hidden
+                                  />
+                                  <span className="min-w-0 flex-1 whitespace-normal break-words leading-snug">
+                                    {qText}
+                                  </span>
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+
+                    <div className="lg:col-span-2 flex flex-col border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50/80 dark:bg-gray-900/20 p-4">
+                      {selectedQuestionIndex == null ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 flex-1 flex items-center justify-center min-h-[12rem]">
+                          {t("proposalManagerWorkspace.rfpWorkspace.pickQuestion")}
+                        </p>
+                      ) : (
+                        <>
+                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                            {t("proposalManagerWorkspace.rfpWorkspace.extractedStub")}
+                          </p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 p-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 max-h-[min(14rem,40vh)] min-h-[6rem] overflow-y-auto whitespace-pre-wrap break-words">
+                            {workspaceReferenceText(questions[selectedQuestionIndex])}
+                          </p>
+                          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                            {t("proposalManagerWorkspace.rfpWorkspace.yourAnswer")}
+                          </label>
+                          <textarea
+                            value={selectedKey ? answers[selectedKey] ?? "" : ""}
+                            onChange={(e) => selectedKey && handleAnswerChange(selectedKey, e.target.value)}
+                            rows={10}
+                            placeholder={t("proposalManagerWorkspace.rfpWorkspace.answerPlaceholder")}
+                            className="flex-1 w-full min-h-[10rem] rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 text-sm resize-y mb-3"
+                          />
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => void handleGenerateAiAnswer()}
+                              disabled={aiLoading}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium"
+                            >
+                              {aiLoading ? (
+                                <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                              ) : (
+                                <FiZap className="w-4 h-4 shrink-0" />
+                              )}
+                              {aiLoading
+                                ? t("proposalManagerWorkspace.rfpWorkspace.aiGenerating")
+                                : t("proposalManagerWorkspace.rfpWorkspace.generateWithAi")}
+                            </button>
+                          </div>
+                          {aiError ? (
+                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{aiError}</p>
+                          ) : null}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </section>
       </div>
     </div>
   );

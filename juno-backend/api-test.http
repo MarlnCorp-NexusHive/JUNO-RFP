@@ -1,0 +1,37 @@
+### 1. BASIC AI TEST
+POST http://localhost:3000/generate-answer
+Content-Type: application/json
+
+{
+  "question": "What is an RFP?"
+}
+
+---
+
+### 1b. STRUCTURE RFP REQUIREMENTS (numbered list JSON)
+POST http://localhost:3000/structure-rfp-requirements
+Content-Type: application/json
+
+{
+  "text": "8. References: How many references (3 minimum)? 9. Demonstration: Will you require a demo? 10. Format: Submit in Word."
+}
+
+---
+
+### 2. CONTEXT AI TEST (no file)
+POST http://localhost:3000/ask-with-context
+Content-Type: application/json
+
+{
+  "question": "What is this document about?",
+  "document": "This is an RFP for building a procurement system in 6 months with cloud infrastructure."
+}
+
+---
+
+### 3. FILE UPLOAD AI TEST (IMPORTANT)
+POST http://localhost:3000/ask-with-file
+Content-Type: multipart/form-data
+
+file: @sample.txt
+question: What is this document about?

@@ -1,0 +1,1 @@
+This is an RFP for building a procurement system with cloud infrastructure. Deadline is 6 months.

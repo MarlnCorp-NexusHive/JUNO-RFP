@@ -255,12 +255,39 @@
     "remove": "Remove",
     "scanResult": "Scan result",
     "extractedSummary": "{{facts}} facts, {{qas}} Q&As extracted.",
-    "viewInContentHub": "View them in Content Hub."
+    "viewInContentHub": "View them in Content Hub.",
+    "rfpWorkspace": {
+      "title": "RFP response workspace",
+      "subtitle": "Pick a scanned document, answer each extracted question, and track completion. Answers are saved with the document in this browser.",
+      "selectDocument": "Scanned document",
+      "selectPlaceholder": "Select a document…",
+      "optionWithCount": "{{name}} ({{count}} items)",
+      "optionTextOnly": "{{name}} (text — select to load items)",
+      "emptyNoSelection": "Upload and scan a file in the section above, then pick it here to work through extracted requirements.",
+      "emptyNoQuestions": "No readable requirements were found in this text. Try Rescan or another file.",
+      "rfpTitleLabel": "RFP",
+      "progressLabel": "{{percent}}% · {{answered}} / {{total}} answered",
+      "questionList": "Extracted questions",
+      "untitledQuestion": "(Untitled question)",
+      "pickQuestion": "Select a question on the left to view or edit your response.",
+      "extractedStub": "Text from document (reference)",
+      "yourAnswer": "Your response",
+      "answerPlaceholder": "Type your proposal response, or use Generate with AI.",
+      "generateWithAi": "Generate with AI",
+      "aiGenerating": "Generating…",
+      "aiSplitButton": "Split & number with AI",
+      "aiSplitRunning": "Splitting with AI…",
+      "aiSplitHint": "Uses your scanned document text to produce a clean, numbered list of separate requirements (replaces the current list and saved answers for this document).",
+      "aiSplitEmpty": "The model returned no items. Try again or use Rescan.",
+      "aiSplitFailed": "Could not split requirements with AI. Check that the API is running and try again."
+    }
   },
   "proposalManagerCompanyIntelligence": {
     "title": "Company Intelligence",
     "autoPushLabel": "Automatically push company data & charts to Pricing and Workspace when I load a company",
     "syncedNotice": "Synced to Proposal Manager forms (Pricing · Workspace).",
+    "remoteBadge": "Live lookup",
+    "remoteLookupDisclaimer": "This profile was built from live English Wikipedia excerpts plus AI structuring, not from the offline 1,152-company dataset. Financial charts appear only when figures were explicitly stated in those sources; verify all facts before submitting an RFP.",
     "companyNameOrTicker": "Company name or ticker",
     "allRegions": "All regions",
     "allSectors": "All sectors",
@@ -291,12 +318,22 @@
     "errorNoCompanyMatched": "No company matched \"{{query}}\" under filters: {{region}} / {{sector}}.",
     "errorFailedToFetch": "Failed to fetch company data.",
     "errorNoSampleData": "No sample data for \"{{query}}\". Pick from the list or try a known ticker (e.g. AAPL, MSFT).",
+    "aiBriefing": {
+      "title": "AI briefing",
+      "subtitle": "Summary grounded in the figures below, via JUNO backend (POST /ask-with-context). Revenue, net income, and assets charts use the same sample data.",
+      "loading": "Analyzing company data…",
+      "genericError": "Could not generate AI briefing. Is juno-backend running on port 3000 with OPENAI_API_KEY set?",
+      "prompt": "The user searched for \"{{query}}\". Using ONLY the structured company data in the document, write a concise briefing for a proposal manager: (1) financial scale and trajectory, (2) notable strengths or risks visible in the numbers, (3) one or two proposal-relevant angles (partnership, competitive, or service positioning). Cite specific reporting periods and figures when stating numbers. If the data does not support a point, say so."
+    },
     "charts": {
       "title": "Financial trends",
       "subtitle": "Revenue and net income by reporting period",
+      "assetsTitle": "Total assets by period",
+      "assetsSubtitle": "Same sample dataset as the metrics above",
       "labels": {
         "revenue": "Revenue",
-        "netIncome": "Net income"
+        "netIncome": "Net income",
+        "assets": "Total assets"
       }
     },
     "regions": {
@@ -349,6 +386,36 @@
     "addQAButton": "Add Q&A",
     "noQAsYet": "No Q&As yet. Add manually or upload documents in Workspace to extract Q&As.",
     "companyIntelligenceQuestionPrefix": "Company intelligence",
+    "aiAssistant": {
+      "heading": "Ask AI",
+      "hint": "Ask about your proposal. Optionally attach a file (e.g. .txt); the server reads it as text for context.",
+      "questionPlaceholder": "e.g. What is an RFP?",
+      "submit": "Get answer",
+      "loading": "Thinking…",
+      "responseLabel": "Answer",
+      "unknownError": "Something went wrong"
+    },
+    "companyProfileGenerator": {
+      "heading": "Company Profile Generator",
+      "hint": "Enter a company name, website, and/or paste a short description. JUNO backend generates structured RFP-ready text.",
+      "companyNameLabel": "Company name",
+      "companyNamePlaceholder": "e.g. Acme Federal Solutions LLC",
+      "websiteLabel": "Website URL",
+      "websitePlaceholder": "https://www.example.com",
+      "pastedContentLabel": "Pasted company description (optional)",
+      "pastedContentPlaceholder": "Paste an About page, capability statement, or notes…",
+      "submit": "Generate Company Profile",
+      "loading": "Generating profile…",
+      "errorPrefix": "Could not generate profile.",
+      "validationHint": "Enter at least a company name, a website URL, or pasted text.",
+      "sections": {
+        "overview": "Company overview",
+        "keyServices": "Key services",
+        "strengths": "Strengths",
+        "experience": "Relevant experience",
+        "rfpParagraph": "Suggested RFP response paragraph"
+      }
+    },
     "tooltips": {
       "copyAnswer": "Copy answer",
       "editTags": "Edit tags"

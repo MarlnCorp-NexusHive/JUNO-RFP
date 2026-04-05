@@ -195,6 +195,88 @@ export function looksLikeRealText(str, minLength = 15) {
   return true;
 }
 
+/**
+ * Questionnaires often put "8. Foo … 9. Bar" in one paragraph. Split before each new list number.
+ */
+function splitInlineNumberedItems(block) {
+  const t = block.trim();
+  if (!t) return [];
+  const pieces = t.split(/\s+(?=\d{1,2}[\.)]\s+[A-Za-z"(])/);
+  return pieces.map((p) => p.trim()).filter((p) => p.length >= 12);
+}
+
+/** Drop OCR/page-break junk like "naire" before "8. References:" */
+function trimLeadingBeforeFirstListMarker(s) {
+  const t = s.trim();
+  if (/^\d{1,2}[\.)]\s/.test(t)) return t;
+  const m = t.match(/\d{1,2}[\.)]\s+[A-Za-z"(]/);
+  if (m && m.index > 0 && m.index < 120) return t.slice(m.index).trim();
+  return t;
+}
+
+/**
+ * Typical RFPs use numbered requirements / shall / must — not "Q:" / "A:" pairs.
+ * Turn requirement-like paragraphs into { question, answer } rows (empty answer = draft in UI).
+ */
+function extractRfpRequirementSnippets(text) {
+  const trimmed = text.trim();
+  if (trimmed.length < 120) return [];
+
+  const paragraphs = trimmed
+    .split(/\n\s*\n+/)
+    .map((b) => b.trim())
+    .filter((b) => b.length >= 35 && b.length <= 4000);
+
+  /** @type {string[]} */
+  const chunks = [];
+  for (const p of paragraphs) {
+    const parts = splitInlineNumberedItems(p);
+    const use = parts.length > 0 ? parts : [p];
+    for (const raw of use) {
+      const cleaned = trimLeadingBeforeFirstListMarker(raw);
+      if (cleaned.length >= 20) chunks.push(cleaned);
+    }
+  }
+
+  const out = [];
+  const seen = new Set();
+
+  const add = (p, requireSignal) => {
+    const q = p.slice(0, 2000);
+    const sig = q.slice(0, 96);
+    if (seen.has(sig)) return;
+    if (!looksLikeRealText(q, 10)) return;
+    if (requireSignal) {
+      const isLikely =
+        /\?/.test(q) ||
+        /\b(shall|must\s+be|must\s+not|is\s+required|are\s+required|offeror|proposer|vendor|contractor|bidder|responding\s+offeror|evaluation\s+criteria|technical\s+approach)\b/i.test(
+          q,
+        ) ||
+        /^\d+[\.)]\s+\S/.test(q) ||
+        /^[•*▪▫◦\-–—]\s+\S/.test(q) ||
+        /^(section|attachment|exhibit|appendix|volume|part)\s+[A-Z0-9.\-]+/im.test(q);
+      if (!isLikely) return;
+    }
+    seen.add(sig);
+    out.push({ question: q, answer: "" });
+  };
+
+  for (const p of chunks) {
+    add(p, true);
+    if (out.length >= 80) break;
+  }
+
+  if (out.length === 0) {
+    for (const p of chunks) {
+      if (p.length < 65 || p.length > 2000) continue;
+      add(p, false);
+      if (out.length >= 18) break;
+    }
+  }
+
+  return out;
+}
+
 // Q&A: look for Q: / A: or Question / Answer or numbered Q1, A1, etc.
 function extractQAs(text) {
   const qas = [];
@@ -264,12 +346,19 @@ function extractQAs(text) {
     }
   }
 
-  // Fallback: if nothing matched but document has readable content, add one summary (no garbage)
   const trimmed = text.trim();
-  if (qas.length === 0 && trimmed.length > 150 && looksLikeRealText(trimmed, 50)) {
+
+  // RFP-style requirements (numbered / shall / must / Section L, etc.)
+  if (qas.length === 0 && trimmed.length > 120) {
+    const reqSnippets = extractRfpRequirementSnippets(trimmed);
+    if (reqSnippets.length > 0) return reqSnippets;
+  }
+
+  // Fallback: one block so workspace always has something when text exists
+  if (qas.length === 0 && trimmed.length > 100 && looksLikeRealText(trimmed, 25)) {
     qas.push({
-      question: "Document content (no Q&A format detected)",
-      answer: trimmed.slice(0, 1500) + (trimmed.length > 1500 ? "…" : ""),
+      question: "Document content (no structured requirements detected — draft below)",
+      answer: trimmed.slice(0, 2000) + (trimmed.length > 2000 ? "…" : ""),
     });
   }
 

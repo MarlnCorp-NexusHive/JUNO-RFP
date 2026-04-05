@@ -1,7 +1,9 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useLocalization } from "../../../hooks/useLocalization";
-import { fetchCompanyIntelligence } from "../../../services/companyIntelligenceService";
+import { askWithContext } from "../../../services/api.js";
+import { fetchCompanyIntelligence, formatCompanySnapshotForAi } from "../../../services/companyIntelligenceService";
 import { SAMPLE_COMPANIES } from "../data/companyIntelligenceSamples";
 import { FiSearch, FiTrendingUp, FiDollarSign, FiUsers, FiGlobe, FiRefreshCw, FiAlertCircle, FiZap } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
@@ -92,6 +94,9 @@ export default function CompanyIntelligencePage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [saved, setSaved] = useState(loadSaved);
+  const [aiInsight, setAiInsight] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   const regionOptions = useMemo(
     () => ["All", ...Array.from(new Set(SAMPLE_COMPANIES.map((c) => c.region))).sort()],
@@ -155,6 +160,30 @@ export default function CompanyIntelligencePage() {
     setSortDir("asc");
   };
 
+  const runAiBriefing = useCallback(async (data, userQuery) => {
+    const doc = formatCompanySnapshotForAi(data);
+    if (!doc) {
+      setAiInsight("");
+      setAiError("");
+      setAiLoading(false);
+      return;
+    }
+    setAiLoading(true);
+    setAiError("");
+    setAiInsight("");
+    try {
+      const question = t("proposalManagerCompanyIntelligence.aiBriefing.prompt", { query: userQuery });
+      const answer = await askWithContext(question, doc);
+      setAiInsight(answer);
+    } catch (e) {
+      setAiError(
+        e?.response?.data?.error ?? e?.message ?? t("proposalManagerCompanyIntelligence.aiBriefing.genericError"),
+      );
+    } finally {
+      setAiLoading(false);
+    }
+  }, [t]);
+
   const handleSearch = useCallback(async (rawQuery) => {
     const q = (rawQuery ?? query ?? "").trim();
     if (!q) {
@@ -162,6 +191,9 @@ export default function CompanyIntelligencePage() {
       return;
     }
     setError("");
+    setAiInsight("");
+    setAiError("");
+    setAiLoading(false);
     setLoading(true);
     setResult(null);
     try {
@@ -172,6 +204,8 @@ export default function CompanyIntelligencePage() {
 
       if (data?.error) {
         setResult({ ...data, error: t("proposalManagerCompanyIntelligence.errorNoSampleData", { query: q }) });
+        setAiInsight("");
+        setAiError("");
         return;
       }
 
@@ -182,6 +216,8 @@ export default function CompanyIntelligencePage() {
           || (selectedSector !== "All" && data.sector !== selectedSector))
       ) {
         setResult(null);
+        setAiInsight("");
+        setAiError("");
         const displayRegion = selectedRegion === "All" ? t("proposalManagerCompanyIntelligence.allRegions") : selectedRegion;
         const displaySector = selectedSector === "All" ? t("proposalManagerCompanyIntelligence.allSectors") : selectedSector;
         setError(
@@ -195,9 +231,23 @@ export default function CompanyIntelligencePage() {
       }
 
       setResult(data);
+      if (data && !data.error && data.financials) {
+        void runAiBriefing(data, q);
+      }
       if (data && !data.error && data.name) {
         const id = `ci_${Date.now()}_${(data.ticker || data.name).replace(/\s/g, "_")}`;
-        saveCompany({ id, name: data.name, ticker: data.ticker, region: data.region, sector: data.sector, source: data.source, financials: data.financials, trends: data.trends, customers: data.customers });
+        saveCompany({
+          id,
+          name: data.name,
+          ticker: data.ticker,
+          region: data.region,
+          sector: data.sector,
+          source: data.source,
+          financials: data.financials,
+          trends: data.trends,
+          customers: data.customers,
+          remote: !!data.remote,
+        });
         setSaved(loadSaved());
       }
       if (data && !data.error && data.financials && autoSyncForms) {
@@ -209,10 +259,12 @@ export default function CompanyIntelligencePage() {
       }
     } catch (e) {
       setError(e.message || t("proposalManagerCompanyIntelligence.errorFailedToFetch"));
+      setAiInsight("");
+      setAiError("");
     } finally {
       setLoading(false);
     }
-  }, [query, selectedRegion, selectedSector, autoSyncForms, linkFromIntelligence]);
+  }, [query, selectedRegion, selectedSector, autoSyncForms, linkFromIntelligence, runAiBriefing, t]);
 
   const formatValue = (v) => {
     if (v == null || typeof v !== "number") return "—";
@@ -230,6 +282,12 @@ export default function CompanyIntelligencePage() {
     : netIncomeData.length
       ? netIncomeData
       : [];
+
+  const assetsBarRows = useMemo(() => {
+    const rows = result?.trends?.assets;
+    if (!rows?.length) return [];
+    return [...rows].reverse();
+  }, [result]);
 
   return (
     <div className={isRTLMode ? "rtl" : "ltr"} dir={isRTLMode ? "rtl" : "ltr"}>
@@ -368,8 +426,25 @@ export default function CompanyIntelligencePage() {
                   <button
                     type="button"
                     onClick={() => {
+                      const snapshot = {
+                        name: c.name,
+                        ticker: c.ticker,
+                        region: c.region,
+                        sector: c.sector,
+                        source: c.source,
+                        financials: c.financials,
+                        trends: c.trends,
+                        customers: c.customers,
+                        remote: !!c.remote,
+                      };
                       setQuery(c.ticker || c.name);
-                      setResult({ name: c.name, ticker: c.ticker, region: c.region, sector: c.sector, source: c.source, financials: c.financials, trends: c.trends, customers: c.customers });
+                      setResult(snapshot);
+                      if (c.financials) void runAiBriefing(snapshot, c.ticker || c.name);
+                      else {
+                        setAiInsight("");
+                        setAiError("");
+                        setAiLoading(false);
+                      }
                     }}
                     className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-600"
                   >
@@ -389,7 +464,17 @@ export default function CompanyIntelligencePage() {
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">{result.name}</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {result.ticker && `${result.ticker} · `}{result.region || "—"}{result.sector ? ` · ${result.sector}` : ""} · {result.source || "—"}
+                    {result.remote ? (
+                      <span className="ms-2 inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/40 text-sky-800 dark:text-sky-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                        {t("proposalManagerCompanyIntelligence.remoteBadge")}
+                      </span>
+                    ) : null}
                   </p>
+                  {result.remote && !result.error ? (
+                    <p className="mt-2 text-xs text-amber-800 dark:text-amber-200/90 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 rounded-lg px-3 py-2">
+                      {t("proposalManagerCompanyIntelligence.remoteLookupDisclaimer")}
+                    </p>
+                  ) : null}
                 </div>
                 {result.financials && !result.error && (
                   <button
@@ -413,6 +498,32 @@ export default function CompanyIntelligencePage() {
             {result.error && (
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-amber-800 dark:text-amber-200">
                 {result.error}
+              </div>
+            )}
+
+            {result.financials && !result.error && (
+              <div className="rounded-xl border border-indigo-200/90 dark:border-indigo-800/80 bg-indigo-50/60 dark:bg-indigo-950/25 p-4 md:p-6 shadow-sm">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+                  <FiZap className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  {t("proposalManagerCompanyIntelligence.aiBriefing.title")}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t("proposalManagerCompanyIntelligence.aiBriefing.subtitle")}
+                </p>
+                {aiLoading && (
+                  <p className="mt-3 text-sm text-indigo-800 dark:text-indigo-200 flex items-center gap-2">
+                    <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                    {t("proposalManagerCompanyIntelligence.aiBriefing.loading")}
+                  </p>
+                )}
+                {aiError && !aiLoading && (
+                  <p className="mt-3 text-sm text-red-600 dark:text-red-400">{aiError}</p>
+                )}
+                {aiInsight && !aiLoading && (
+                  <div className="mt-3 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
+                    {aiInsight}
+                  </div>
+                )}
               </div>
             )}
 
@@ -453,6 +564,37 @@ export default function CompanyIntelligencePage() {
                       showNetIncome={Boolean(result.trends?.netIncome?.length)}
                       formatValue={formatValue}
                     />
+                  </div>
+                )}
+
+                {assetsBarRows.length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700/80 shadow-sm p-4 md:p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      {t("proposalManagerCompanyIntelligence.charts.assetsTitle")}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      {t("proposalManagerCompanyIntelligence.charts.assetsSubtitle")}
+                    </p>
+                    <div className="h-[min(16rem,40vh)] w-full min-h-[220px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={assetsBarRows} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-600" vertical={false} />
+                          <XAxis dataKey="period" tick={{ fill: "currentColor", fontSize: 10 }} className="text-gray-500" />
+                          <YAxis tickFormatter={(v) => formatValue(v)} width={52} tick={{ fontSize: 10 }} className="text-gray-500" />
+                          <Tooltip
+                            formatter={(value) => formatValue(value)}
+                            labelFormatter={(label) => String(label)}
+                            contentStyle={{ borderRadius: "0.5rem" }}
+                          />
+                          <Bar
+                            dataKey="value"
+                            name={t("proposalManagerCompanyIntelligence.charts.labels.assets")}
+                            fill="#8b5cf6"
+                            radius={[4, 4, 0, 0]}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 )}
 

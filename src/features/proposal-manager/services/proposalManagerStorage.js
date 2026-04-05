@@ -141,6 +141,13 @@ export function appendExtractedQAs(extractedQAs, documentTypeId, sourceDocumentI
   saveContentHubQAs(qas);
 }
 
+/** Remove prior hub rows for this source doc, then append the new list (keeps Content Hub in sync after AI re-split). */
+export function replaceExtractedQAsInContentHub(sourceDocumentId, extractedQAs, documentTypeId, documentTypeToTags) {
+  const without = getContentHubQAs().filter((q) => q.sourceDocumentId !== sourceDocumentId);
+  saveContentHubQAs(without);
+  appendExtractedQAs(extractedQAs, documentTypeId, sourceDocumentId, documentTypeToTags);
+}
+
 // ——— RFP Response document sections (for auto-generate) ———
 export function getResponseSections() {
   return load(KEYS.RESPONSE_SECTIONS);

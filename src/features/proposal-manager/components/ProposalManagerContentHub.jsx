@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   getContentHubQAs,
@@ -6,9 +6,10 @@ import {
   updateContentHubQA,
   deleteContentHubQA,
 } from "../services/proposalManagerStorage";
-import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap } from "react-icons/fi";
+import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { useTranslation } from "react-i18next";
+import { generateAnswer, askWithFile, generateCompanyProfile } from "../../../services/api.js";
 
 const SUGGESTED_TAGS = [
   "Section L",
@@ -36,6 +37,17 @@ export default function ProposalManagerContentHub() {
   const [newQuestion, setNewQuestion] = useState("");
   const [newAnswer, setNewAnswer] = useState("");
   const [newTags, setNewTags] = useState("");
+  const [question, setQuestion] = useState("");
+  const [file, setFile] = useState(null);
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  const aiFileInputRef = useRef(null);
+  const [profileCompanyName, setProfileCompanyName] = useState("");
+  const [profileWebsite, setProfileWebsite] = useState("");
+  const [profileText, setProfileText] = useState("");
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileResult, setProfileResult] = useState(null);
 
   const TAG_LABEL_KEY_BY_VALUE = {
     "Section L": "sectionL",
@@ -99,6 +111,54 @@ export default function ProposalManagerContentHub() {
     navigator.clipboard?.writeText(qa.answer);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const q = question.trim();
+    if (!q || loading) return;
+    setLoading(true);
+    setResponse("");
+    try {
+      const answer = file ? await askWithFile(file, q) : await generateAnswer(q);
+      setResponse(answer);
+      setFile(null);
+      if (aiFileInputRef.current) aiFileInputRef.current.value = "";
+    } catch (err) {
+      const msg =
+        err?.response?.data?.error ??
+        err?.message ??
+        t("proposalManagerContentHub.aiAssistant.unknownError");
+      setResponse(`[Error] ${msg}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const profileHasInput =
+    profileCompanyName.trim().length > 0
+    || profileWebsite.trim().length > 0
+    || profileText.trim().length > 0;
+
+  const handleGenerateCompanyProfile = async (e) => {
+    e.preventDefault();
+    if (!profileHasInput || profileLoading) return;
+    setProfileLoading(true);
+    setProfileError("");
+    setProfileResult(null);
+    try {
+      const data = await generateCompanyProfile({
+        companyName: profileCompanyName.trim(),
+        companyWebsite: profileWebsite.trim(),
+        companyText: profileText.trim(),
+      });
+      setProfileResult(data);
+    } catch (err) {
+      const msg = err?.response?.data?.error ?? err?.message ?? t("proposalManagerContentHub.companyProfileGenerator.errorPrefix");
+      setProfileError(msg);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   const handlePushIssuerToHub = () => {
     if (!issuer?.narrative) return;
     addContentHubQA({
@@ -120,6 +180,167 @@ export default function ProposalManagerContentHub() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">{t("proposalManagerContentHub.description")}</p>
         </div>
+
+        <section className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+            <FiZap className="text-indigo-500 shrink-0" />
+            {t("proposalManagerContentHub.aiAssistant.heading")}
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            {t("proposalManagerContentHub.aiAssistant.hint")}
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder={t("proposalManagerContentHub.aiAssistant.questionPlaceholder")}
+              disabled={loading}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm"
+            />
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                ref={aiFileInputRef}
+                type="file"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                disabled={loading}
+                className="text-sm text-gray-600 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-200"
+              />
+              <button
+                type="submit"
+                disabled={loading || !question.trim()}
+                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:pointer-events-none text-white text-sm font-medium"
+              >
+                {loading ? t("proposalManagerContentHub.aiAssistant.loading") : t("proposalManagerContentHub.aiAssistant.submit")}
+              </button>
+            </div>
+          </form>
+          {response ? (
+            <div
+              className={`mt-4 rounded-lg border px-3 py-2 text-sm whitespace-pre-wrap ${
+                response.startsWith("[Error]")
+                  ? "border-red-200 dark:border-red-900/50 bg-red-50/80 dark:bg-red-950/20 text-red-800 dark:text-red-200"
+                  : "border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100"
+              }`}
+            >
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                {t("proposalManagerContentHub.aiAssistant.responseLabel")}
+              </p>
+              {response.startsWith("[Error]") ? response.replace(/^\[Error\]\s*/, "") : response}
+            </div>
+          ) : null}
+        </section>
+
+        <section className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+            <FiLayers className="text-indigo-500 shrink-0" />
+            {t("proposalManagerContentHub.companyProfileGenerator.heading")}
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            {t("proposalManagerContentHub.companyProfileGenerator.hint")}
+          </p>
+          <form onSubmit={handleGenerateCompanyProfile} className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                {t("proposalManagerContentHub.companyProfileGenerator.companyNameLabel")}
+              </label>
+              <input
+                type="text"
+                value={profileCompanyName}
+                onChange={(e) => setProfileCompanyName(e.target.value)}
+                placeholder={t("proposalManagerContentHub.companyProfileGenerator.companyNamePlaceholder")}
+                disabled={profileLoading}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                {t("proposalManagerContentHub.companyProfileGenerator.websiteLabel")}
+              </label>
+              <input
+                type="url"
+                value={profileWebsite}
+                onChange={(e) => setProfileWebsite(e.target.value)}
+                placeholder={t("proposalManagerContentHub.companyProfileGenerator.websitePlaceholder")}
+                disabled={profileLoading}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                {t("proposalManagerContentHub.companyProfileGenerator.pastedContentLabel")}
+              </label>
+              <textarea
+                value={profileText}
+                onChange={(e) => setProfileText(e.target.value)}
+                placeholder={t("proposalManagerContentHub.companyProfileGenerator.pastedContentPlaceholder")}
+                disabled={profileLoading}
+                rows={4}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm resize-y min-h-[96px]"
+              />
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t("proposalManagerContentHub.companyProfileGenerator.validationHint")}
+            </p>
+            <button
+              type="submit"
+              disabled={profileLoading || !profileHasInput}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:pointer-events-none text-white text-sm font-medium"
+            >
+              {profileLoading ? (
+                <>
+                  <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                  {t("proposalManagerContentHub.companyProfileGenerator.loading")}
+                </>
+              ) : (
+                t("proposalManagerContentHub.companyProfileGenerator.submit")
+              )}
+            </button>
+          </form>
+          {profileError ? (
+            <div className="mt-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50/80 dark:bg-red-950/20 px-3 py-2 text-sm text-red-800 dark:text-red-200">
+              {profileError}
+            </div>
+          ) : null}
+          {profileResult ? (
+            <div className="mt-4 space-y-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+              {[
+                {
+                  key: "companyOverview",
+                  labelKey: "proposalManagerContentHub.companyProfileGenerator.sections.overview",
+                },
+                {
+                  key: "keyServices",
+                  labelKey: "proposalManagerContentHub.companyProfileGenerator.sections.keyServices",
+                },
+                {
+                  key: "strengths",
+                  labelKey: "proposalManagerContentHub.companyProfileGenerator.sections.strengths",
+                },
+                {
+                  key: "relevantExperience",
+                  labelKey: "proposalManagerContentHub.companyProfileGenerator.sections.experience",
+                },
+                {
+                  key: "suggestedRfpResponseParagraph",
+                  labelKey: "proposalManagerContentHub.companyProfileGenerator.sections.rfpParagraph",
+                },
+              ].map(({ key, labelKey }) => (
+                <div
+                  key={key}
+                  className="rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/40 px-3 py-3"
+                >
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                    {t(labelKey)}
+                  </h3>
+                  <div className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
+                    {profileResult[key] || "—"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </section>
 
         {issuer && (
           <div className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/90 dark:bg-indigo-950/30 px-4 py-3 flex flex-wrap items-center justify-between gap-3">

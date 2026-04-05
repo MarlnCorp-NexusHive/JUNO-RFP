@@ -1,0 +1,24 @@
+# Project root — paths are relative to this file (REST Client: Send Request)
+
+### JSON: generate-answer
+POST http://localhost:3000/generate-answer
+Content-Type: application/json
+
+{
+  "question": "What is an RFP?"
+}
+
+### Multipart: ask-with-file (file + question)
+POST http://localhost:3000/ask-with-file
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryJunoAskFile
+
+------WebKitFormBoundaryJunoAskFile
+Content-Disposition: form-data; name="question"
+
+What is this document about?
+------WebKitFormBoundaryJunoAskFile
+Content-Disposition: form-data; name="file"; filename="sample.txt"
+Content-Type: text/plain
+
+< ./juno-backend/sample.txt
+------WebKitFormBoundaryJunoAskFile--
