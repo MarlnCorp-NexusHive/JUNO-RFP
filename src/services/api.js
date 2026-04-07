@@ -2,9 +2,22 @@ import axios from "axios";
 
 /* ================= BASE API ================= */
 
-// Use ONE consistent env variable everywhere
+/**
+ * Dev: empty base URL → requests go to the Vite dev origin and are proxied to the backend (vite.config.js).
+ * Prod: set VITE_API_URL to your API origin, or default to localhost:3000 for local preview.
+ */
+function resolveApiBaseUrl() {
+  // In local development always use same-origin + Vite proxy.
+  // This avoids stale/wrong VITE_API_URL values causing 404 HTML pages like "Cannot POST ...".
+  if (import.meta.env.DEV) return "";
+  const fromEnv = (import.meta.env.VITE_API_URL ?? "").trim().replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  // Fallback for local preview builds.
+  return "http://localhost:3000";
+}
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: resolveApiBaseUrl(),
 });
 
 /* ================= BASIC AI ================= */
@@ -50,10 +63,31 @@ export const askWithFile = async (file, question) => {
   formData.append("file", file);
   formData.append("question", question);
 
-  // IMPORTANT: do NOT set headers manually
   const res = await API.post("/ask-with-file", formData);
 
   return res.data.answer;
 };
+
+/* ================= RFP DOCUMENT ================= */
+export const generateRfpDocument = async (payload) => {
+  const res = await API.post("/generate-rfp-document", payload, {
+    responseType: "blob",
+  });
+  return res.data;
+};
+
+/* ================= ERROR HANDLER ================= */
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const detail = error?.response?.data;
+    if (detail instanceof Blob) {
+      console.error("API error:", error.message, "(response body is a Blob; status", error.response?.status + ")");
+    } else {
+      console.error("API error:", detail || error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default API;

@@ -279,7 +279,17 @@
       "aiSplitRunning": "جارٍ التقسيم بالذكاء الاصطناعي…",
       "aiSplitHint": "يستخدم نص المستند المفحوص لإنشاء قائمة مرقمة ومنفصلة للمتطلبات (يستبدل القائمة الحالية والإجابات المحفوظة لهذا المستند).",
       "aiSplitEmpty": "لم يُرجع النموذج عناصر. أعد المحاولة أو استخدم إعادة الفحص.",
-      "aiSplitFailed": "تعذّر تقسيم المتطلبات بالذكاء الاصطناعي. تأكد من تشغيل واجهة البرمجة ثم أعد المحاولة."
+      "aiSplitFailed": "تعذّر تقسيم المتطلبات بالذكاء الاصطناعي. تأكد من تشغيل واجهة البرمجة ثم أعد المحاولة.",
+      "generateDocumentButton": "إنشاء المستند",
+      "documentTemplateLabel": "قالب المستند",
+      "generateDocumentTemplateSummary": "القالب: {{template}}",
+      "generateDocumentHint": "أجب عن سؤال واحد على الأقل لتفعيل إنشاء المستند.",
+      "generateDocumentModalTitle": "إنشاء مستند طلب العرض",
+      "generateDocumentModalSubtitle": "أكّد التحميل باستخدام القالب المحدد أعلاه.",
+      "confirmGenerateDocument": "إنشاء",
+      "generatingDocument": "جارٍ إنشاء المستند...",
+      "generateDocumentNoAnswers": "لا توجد أسئلة مُجاب عنها. يرجى الإجابة عن سؤال واحد على الأقل.",
+      "generateDocumentFailed": "فشل إنشاء المستند. حاول مرة أخرى."
     }
   },
   "proposalManagerCompanyIntelligence": {

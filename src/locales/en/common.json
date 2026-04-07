@@ -279,7 +279,17 @@
       "aiSplitRunning": "Splitting with AI…",
       "aiSplitHint": "Uses your scanned document text to produce a clean, numbered list of separate requirements (replaces the current list and saved answers for this document).",
       "aiSplitEmpty": "The model returned no items. Try again or use Rescan.",
-      "aiSplitFailed": "Could not split requirements with AI. Check that the API is running and try again."
+      "aiSplitFailed": "Could not split requirements with AI. Check that the API is running and try again.",
+      "generateDocumentButton": "Generate Document",
+      "documentTemplateLabel": "Document template",
+      "generateDocumentTemplateSummary": "Template: {{template}}",
+      "generateDocumentHint": "Answer at least one question to enable document generation.",
+      "generateDocumentModalTitle": "Generate RFP Document",
+      "generateDocumentModalSubtitle": "Confirm download using the template selected above.",
+      "confirmGenerateDocument": "Generate",
+      "generatingDocument": "Generating document...",
+      "generateDocumentNoAnswers": "No answered questions found. Please answer at least one question.",
+      "generateDocumentFailed": "Failed to generate document. Please try again."
     }
   },
   "proposalManagerCompanyIntelligence": {

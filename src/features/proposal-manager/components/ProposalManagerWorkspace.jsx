@@ -18,10 +18,15 @@ import { extractFromFile, extractFromText } from "../services/extractFromDocumen
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
 import { FiFolder, FiFile, FiUpload, FiTrash2, FiEdit2, FiZap, FiMessageSquare, FiRefreshCw } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
-import { generateAnswer, structureRfpRequirementsWithAi } from "../../../services/api.js";
+import { generateAnswer, structureRfpRequirementsWithAi, generateRfpDocument } from "../../../services/api.js";
 
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
+const TEMPLATE_OPTIONS = [
+  { id: "classic", label: "Classic" },
+  { id: "modern", label: "Modern" },
+  { id: "technical", label: "Technical" },
+];
 
 function formatDate(iso) {
   try {
@@ -51,6 +56,26 @@ function workspaceReferenceText(row) {
   return q || "—";
 }
 
+async function messageFromApiError(error) {
+  const data = error?.response?.data;
+  if (data instanceof Blob) {
+    try {
+      const text = await data.text();
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && typeof parsed.error === "string") return parsed.error;
+      } catch {
+        /* not JSON */
+      }
+      return text || error.message;
+    } catch {
+      return error?.message ?? "Request failed";
+    }
+  }
+  if (data && typeof data === "object" && typeof data.error === "string") return data.error;
+  return error?.message ?? "Request failed";
+}
+
 export default function ProposalManagerWorkspace() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -78,6 +103,10 @@ export default function ProposalManagerWorkspace() {
   const [aiError, setAiError] = useState("");
   const [aiSplitLoading, setAiSplitLoading] = useState(false);
   const [aiSplitError, setAiSplitError] = useState("");
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("classic");
+  const [documentGenerating, setDocumentGenerating] = useState(false);
+  const [documentGenerateError, setDocumentGenerateError] = useState("");
 
   const refreshDocs = useCallback(() => setDocuments(getDocuments()));
   const refreshFolders = useCallback(() => setFolders(getFolders()));
@@ -354,6 +383,57 @@ export default function ProposalManagerWorkspace() {
       setAiLoading(false);
     }
   }, [rfpId, selectedQuestionIndex, questions, issuerBrief, handleAnswerChange]);
+
+  const handleOpenGenerateModal = useCallback(() => {
+    setDocumentGenerateError("");
+    setShowGenerateModal(true);
+  }, []);
+
+  const handleGenerateDocument = useCallback(async () => {
+    if (!rfpId) return;
+    const answeredQuestions = questions
+      .map((row, index) => {
+        const answer = (answers[rfpQuestionKey(index)] || "").trim();
+        if (!answer) return null;
+        return {
+          number: index + 1,
+          question: (row?.question || "").trim(),
+          answer,
+        };
+      })
+      .filter(Boolean);
+
+    if (answeredQuestions.length === 0) {
+      setDocumentGenerateError(t("proposalManagerWorkspace.rfpWorkspace.generateDocumentNoAnswers"));
+      return;
+    }
+
+    setDocumentGenerateError("");
+    setDocumentGenerating(true);
+    try {
+      const blob = await generateRfpDocument({
+        answeredQuestions,
+        companyName: issuer?.name || "",
+        companyLogoUrl: issuer?.logoUrl || issuer?.logo || "",
+        selectedTemplate,
+      });
+      const fileName = `rfp-response-${selectedTemplate}.docx`;
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setShowGenerateModal(false);
+    } catch (e) {
+      const msg = await messageFromApiError(e);
+      setDocumentGenerateError(msg || t("proposalManagerWorkspace.rfpWorkspace.generateDocumentFailed"));
+    } finally {
+      setDocumentGenerating(false);
+    }
+  }, [rfpId, questions, answers, issuer, selectedTemplate, t]);
 
   const selectedKey =
     selectedQuestionIndex != null && selectedQuestionIndex >= 0
@@ -646,6 +726,46 @@ export default function ProposalManagerWorkspace() {
                   </p>
                 </div>
               )}
+              <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-3">
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="rfp-document-template"
+                    className="text-xs font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    {t("proposalManagerWorkspace.rfpWorkspace.documentTemplateLabel")}
+                  </label>
+                  <select
+                    id="rfp-document-template"
+                    value={selectedTemplate}
+                    onChange={(e) => setSelectedTemplate(e.target.value)}
+                    disabled={documentGenerating}
+                    className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm w-full sm:w-auto min-w-[12rem]"
+                  >
+                    {TEMPLATE_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleOpenGenerateModal}
+                    disabled={documentGenerating || answeredCount === 0}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium"
+                  >
+                    {documentGenerating
+                      ? t("proposalManagerWorkspace.rfpWorkspace.generatingDocument")
+                      : t("proposalManagerWorkspace.rfpWorkspace.generateDocumentButton")}
+                  </button>
+                  {answeredCount === 0 ? (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentHint")}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
               {aiSplitError ? (
                 <p className="text-sm text-red-600 dark:text-red-400 mb-3">{aiSplitError}</p>
               ) : null}
@@ -777,6 +897,48 @@ export default function ProposalManagerWorkspace() {
           )}
         </section>
       </div>
+      {showGenerateModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-5">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentModalTitle")}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentModalSubtitle")}
+            </p>
+            <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">
+              {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentTemplateSummary", {
+                template:
+                  TEMPLATE_OPTIONS.find((o) => o.id === selectedTemplate)?.label ?? selectedTemplate,
+              })}
+            </p>
+            {documentGenerateError ? (
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">{documentGenerateError}</p>
+            ) : null}
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!documentGenerating) setShowGenerateModal(false);
+                }}
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm"
+              >
+                {t("proposalManagerWorkspace.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleGenerateDocument()}
+                disabled={documentGenerating}
+                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium"
+              >
+                {documentGenerating
+                  ? t("proposalManagerWorkspace.rfpWorkspace.generatingDocument")
+                  : t("proposalManagerWorkspace.rfpWorkspace.confirmGenerateDocument")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
