@@ -356,6 +356,7 @@ export default function ProposalManagerWorkspace() {
     setAiError("");
     setAiLoading(true);
     const key = rfpQuestionKey(selectedQuestionIndex);
+    const draftAnswer = (answers[key] || "").trim();
     const context = (issuerBrief || "").trim().slice(0, 4000);
     const qLine = row.question.trim();
     const docNum = qLine.match(/^(\d+)[\.)]\s/);
@@ -373,6 +374,19 @@ export default function ProposalManagerWorkspace() {
     if (context) {
       promptParts.push("", "Optional context (issuer / capture notes — use only if relevant):", context);
     }
+    if (draftAnswer) {
+      promptParts.push(
+        "",
+        "The offeror has typed a short draft in the response box. Turn it into a full, submission-ready answer.",
+        "Rules:",
+        "- Preserve the meaning and any facts in the draft (yes/no, counts, numbers such as \"5\", refusals such as \"No\", etc.); do not contradict the draft.",
+        "- If the draft is very brief, interpret it in the context of the requirement above and expand with clear, professional prose appropriate for an RFP.",
+        "- Do not paste the draft alone; expand it into complete sentences and paragraphs as needed.",
+        "",
+        "Draft to expand:",
+        draftAnswer,
+      );
+    }
     promptParts.push("", "Respond in clear prose. Do not repeat the question as a heading unless necessary.");
     try {
       const text = await generateAnswer(promptParts.join("\n"));
@@ -382,7 +396,7 @@ export default function ProposalManagerWorkspace() {
     } finally {
       setAiLoading(false);
     }
-  }, [rfpId, selectedQuestionIndex, questions, issuerBrief, handleAnswerChange]);
+  }, [rfpId, selectedQuestionIndex, questions, answers, issuerBrief, handleAnswerChange]);
 
   const handleOpenGenerateModal = useCallback(() => {
     setDocumentGenerateError("");
