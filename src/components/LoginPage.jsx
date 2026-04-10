@@ -32,6 +32,7 @@ const dashboardRoute = (user) => {
   if (user.team === "Procurement Team" && user.role === "Manager") return "/rbac/marketing-head";
   if (user.team === "Sales Enablement Team" && user.role === "Manager") return "/rbac/marketing-head";
   if (user.team === "Proposal Team" && user.role === "Proposal Manager") return "/rbac/proposal-manager";
+  if (user.team === "RFP Collaboration" && user.role === "RFP Auditor") return "/rbac/rfp-auditor";
   // Add more as you build more dashboards
   // Default fallback
   return "/unauthorized";
@@ -85,13 +86,20 @@ function LoginPageContent() {
     setError("");
     
     try {
+      preloadDemoUsers();
       // Simulate loading delay for better UX
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       const users = localStorageService.getUsers();
-      const user = users.find(
-        (u) => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password
-      );
+      const ident = username.trim().toLowerCase();
+      const passIn = password.trim();
+      const user = users.find((u) => {
+        const uName = String(u.username || "").toLowerCase();
+        const uMail = String(u.collabEmail || "").toLowerCase();
+        const passOk = String(u.password || "") === passIn;
+        if (!passOk) return false;
+        return uName === ident || (uMail && uMail === ident);
+      });
       if (user) {
         localStorage.setItem("rbac_current_user", JSON.stringify(user));
         navigate(dashboardRoute(user));

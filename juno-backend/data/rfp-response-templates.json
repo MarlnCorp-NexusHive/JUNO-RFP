@@ -1,0 +1,132 @@
+{
+  "templates": [
+    {
+      "id": "standard-industry",
+      "attribution": "ai-rfp-response-generator (MIT) — adapted outline",
+      "sections": [
+        {
+          "id": "executive_summary",
+          "title": "1. Executive Summary",
+          "hint": "Hook evaluators: client challenge, high-level approach, differentiators, value, next steps. Use only facts from the Q&As."
+        },
+        {
+          "id": "company_background",
+          "title": "2. Company Background & Qualifications",
+          "hint": "Credibility: overview, certifications, relevant experience, track record. Pull from Q&As about company history, certs, similar work."
+        },
+        {
+          "id": "technical_approach",
+          "title": "3. Technical Approach & Methodology",
+          "hint": "How you meet requirements: architecture, methods, tools Phases, standards. Map technical and functional Q&As here."
+        },
+        {
+          "id": "team_structure",
+          "title": "4. Project Team & Organizational Structure",
+          "hint": "Roles, org chart narrative key personnel, staffing. Use Q&As on team staffing, roles responsibilities."
+        },
+        {
+          "id": "work_plan",
+          "title": "5. Work Plan & Timeline",
+          "hint": "Schedule milestones dependencies delivery. Map schedule kickoff and timeline Q&As."
+        },
+        {
+          "id": "risk_management",
+          "title": "6. Risk Management & Mitigation",
+          "hint": "Risks mitigations contingencies QA. Map risk quality and issue-related Q&As."
+        },
+        {
+          "id": "compliance_matrix",
+          "title": "7. Compliance Matrix",
+          "hint": "Table or bullet mapping RFP requirements to where they are addressed reference requirement numbers from the workspace."
+        },
+        {
+          "id": "pricing",
+          "title": "8. Pricing & Cost Structure",
+          "hint": "Commercial narrative only use figures already stated in workspace answers do not invent prices."
+        },
+        {
+          "id": "references",
+          "title": "9. References & Case Studies",
+          "hint": "Past projects customers testimonials. Map past performance and reference Q&As."
+        }
+      ]
+    },
+    {
+      "id": "federal-style",
+      "attribution": "Original outline; common federal-style response sections",
+      "sections": [
+        {
+          "id": "transmittal",
+          "title": "Cover / Transmittal",
+          "hint": "Short letter: offeror solicitation reference key commitments submission contents."
+        },
+        {
+          "id": "executive_summary",
+          "title": "Executive Summary",
+          "hint": "Evaluation-friendly overview of compliance and differentiators."
+        },
+        {
+          "id": "understanding",
+          "title": "Understanding of the Requirements",
+          "hint": "Restate scope objectives constraints show understanding map scope background Q&As."
+        },
+        {
+          "id": "technical_approach",
+          "title": "Technical Approach",
+          "hint": "Solution design standards integration security performance map technical Q&As."
+        },
+        {
+          "id": "management",
+          "title": "Management & Staffing",
+          "hint": "PMO staffing training transition SLAs map management and operations Q&As."
+        },
+        {
+          "id": "past_performance",
+          "title": "Past Performance",
+          "hint": "Relevant contracts CPARS-style narrative use only cited experience from Q&As."
+        },
+        {
+          "id": "quality",
+          "title": "Quality Assurance",
+          "hint": "QA QC metrics reporting continuous improvement."
+        },
+        {
+          "id": "subcontracting",
+          "title": "Subcontracting & Small Business",
+          "hint": "Sub plan flow-down OR state Not applicable if Q&As indicate no subs required."
+        },
+        {
+          "id": "cost_narrative",
+          "title": "Cost / Pricing Narrative",
+          "hint": "Basis of estimate assumptions CLIN mapping only use numbers explicitly in workspace answers."
+        }
+      ]
+    },
+    {
+      "id": "lean-commercial",
+      "attribution": "Original shortened outline",
+      "sections": [
+        {
+          "id": "executive_summary",
+          "title": "Executive Summary",
+          "hint": "Concise overview value proposition differentiators."
+        },
+        {
+          "id": "solution",
+          "title": "Solution & Technical Approach",
+          "hint": "Core solution architecture and how requirements are met."
+        },
+        {
+          "id": "delivery",
+          "title": "Delivery Plan",
+          "hint": "Implementation phases milestones dependencies go-to-live."
+        },
+        {
+          "id": "commercial",
+          "title": "Commercial Terms Summary",
+          "hint": "Pricing model timeline to contract key terms only from Q&As."
+        }
+      ]
+    }
+  ]
+}

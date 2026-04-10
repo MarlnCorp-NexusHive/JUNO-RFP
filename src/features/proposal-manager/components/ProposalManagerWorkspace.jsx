@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   getFolders,
@@ -16,17 +16,121 @@ import {
 } from "../services/proposalManagerStorage";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
-import { FiFolder, FiFile, FiUpload, FiTrash2, FiEdit2, FiZap, FiMessageSquare, FiRefreshCw } from "react-icons/fi";
+import {
+  FiFolder,
+  FiFile,
+  FiUpload,
+  FiTrash2,
+  FiEdit2,
+  FiZap,
+  FiMessageSquare,
+  FiRefreshCw,
+  FiChevronDown,
+  FiCheck,
+  FiUserPlus,
+} from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { generateAnswer, structureRfpRequirementsWithAi, generateRfpDocument } from "../../../services/api.js";
+import { rfpCollab } from "../../../services/rfpCollabApi.js";
+import { ensureProposalManagerCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
+import {
+  buildCollabQuestionsPayload,
+  mapServerQuestionsToLocalIndices,
+} from "../services/workspaceCollabBridge.js";
 
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
+const TEMPLATE_PREVIEW_BASE = `${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/rfp-template-previews`;
+
+const COLLAB_STATUS_KEYS = {
+  unassigned: "rfpCollaboration.status.unassigned",
+  assigned: "rfpCollaboration.status.assigned",
+  in_progress: "rfpCollaboration.status.inProgress",
+  submitted: "rfpCollaboration.status.submitted",
+  approved: "rfpCollaboration.status.approved",
+  rejected: "rfpCollaboration.status.rejected",
+  changes_requested: "rfpCollaboration.status.changesRequested",
+};
+
 const TEMPLATE_OPTIONS = [
-  { id: "classic", label: "Classic" },
-  { id: "modern", label: "Modern" },
-  { id: "technical", label: "Technical" },
+  {
+    id: "standard-industry",
+    labelKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.standardIndustry",
+    describeKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.standardIndustryDescription",
+    thumbVariant: "standard",
+    previewSrc: `${TEMPLATE_PREVIEW_BASE}/standard-industry.svg`,
+  },
+  {
+    id: "federal-style",
+    labelKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.federalStyle",
+    describeKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.federalStyleDescription",
+    thumbVariant: "federal",
+    previewSrc: `${TEMPLATE_PREVIEW_BASE}/federal-style.svg`,
+  },
+  {
+    id: "lean-commercial",
+    labelKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.leanCommercial",
+    describeKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.leanCommercialDescription",
+    thumbVariant: "lean",
+    previewSrc: `${TEMPLATE_PREVIEW_BASE}/lean-commercial.svg`,
+  },
 ];
+
+/** Raster/SVG preview with CSS mockup fallback if the image fails to load. */
+function RfpTemplatePreviewImage({ src, variant, title, className = "" }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return <RfpTemplateThumbnail variant={variant} className={className} />;
+  }
+  return (
+    <div
+      className={`overflow-hidden rounded-lg border border-gray-200/90 dark:border-gray-600 bg-white dark:bg-gray-950 shadow-sm ${className}`}
+    >
+      <img
+        src={src}
+        alt=""
+        title={title}
+        loading="lazy"
+        decoding="async"
+        className="w-full h-full object-cover object-top block"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  );
+}
+
+/** Mini document mockup for template thumbnails (fallback only). */
+function RfpTemplateThumbnail({ variant, className = "" }) {
+  const cfg =
+    variant === "federal"
+      ? { sections: 7, accent: "bg-slate-600 dark:bg-slate-500", tight: true }
+      : variant === "lean"
+        ? { sections: 4, accent: "bg-emerald-600 dark:bg-emerald-500", tight: false }
+        : { sections: 9, accent: "bg-indigo-500 dark:bg-indigo-500", tight: true };
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-inner ${className}`}
+      aria-hidden
+    >
+      <div className={`h-2 w-full ${cfg.accent}`} />
+      <div className={`p-2 ${cfg.tight ? "space-y-1" : "space-y-1.5"}`}>
+        {Array.from({ length: cfg.sections }).map((_, i) => (
+          <div key={i} className="space-y-0.5">
+            <div
+              className="h-1 rounded-sm bg-gray-400/90 dark:bg-gray-500"
+              style={{ width: `${72 + ((i * 7) % 24)}%` }}
+            />
+            <div className="h-0.5 rounded-sm bg-gray-200 dark:bg-gray-600 w-full" />
+            {!cfg.tight ? (
+              <div className="h-0.5 rounded-sm bg-gray-100 dark:bg-gray-700 w-[88%]" />
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function formatDate(iso) {
   try {
@@ -104,9 +208,36 @@ export default function ProposalManagerWorkspace() {
   const [aiSplitLoading, setAiSplitLoading] = useState(false);
   const [aiSplitError, setAiSplitError] = useState("");
   const [showGenerateModal, setShowGenerateModal] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("classic");
+  const [selectedTemplate, setSelectedTemplate] = useState("standard-industry");
   const [documentGenerating, setDocumentGenerating] = useState(false);
   const [documentGenerateError, setDocumentGenerateError] = useState("");
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const templatePickerRef = useRef(null);
+
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [auditAuditors, setAuditAuditors] = useState([]);
+  const [selectedAuditorId, setSelectedAuditorId] = useState("");
+  const [auditAssignBusy, setAuditAssignBusy] = useState(false);
+  const [auditAssignError, setAuditAssignError] = useState("");
+  const [collabQuestionByIndex, setCollabQuestionByIndex] = useState({});
+
+  useEffect(() => {
+    if (!templatePickerOpen) return;
+    const onMouseDown = (e) => {
+      if (templatePickerRef.current && !templatePickerRef.current.contains(e.target)) {
+        setTemplatePickerOpen(false);
+      }
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setTemplatePickerOpen(false);
+    };
+    document.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [templatePickerOpen]);
 
   const refreshDocs = useCallback(() => setDocuments(getDocuments()));
   const refreshFolders = useCallback(() => setFolders(getFolders()));
@@ -278,6 +409,176 @@ export default function ProposalManagerWorkspace() {
     setAiSplitError("");
   }, [rfpId]);
 
+  const collabLinkKey = useMemo(() => {
+    const d = activeRfpDoc;
+    if (!d?.rfpCollabWorkspaceId) return "";
+    const ids = d.rfpCollabQuestionIds;
+    return `${d.rfpCollabWorkspaceId}:${Array.isArray(ids) ? ids.join(",") : ""}`;
+  }, [activeRfpDoc]);
+
+  const collabLinked =
+    Boolean(activeRfpDoc?.rfpCollabWorkspaceId) &&
+    Array.isArray(activeRfpDoc?.rfpCollabQuestionIds) &&
+    activeRfpDoc.rfpCollabQuestionIds.length === questions.length &&
+    questions.length > 0;
+
+  const collabLinkStale =
+    Boolean(activeRfpDoc?.rfpCollabWorkspaceId) &&
+    questions.length > 0 &&
+    (!Array.isArray(activeRfpDoc?.rfpCollabQuestionIds) ||
+      activeRfpDoc.rfpCollabQuestionIds.length !== questions.length);
+
+  useEffect(() => {
+    if (!rfpId || !collabLinked) {
+      setCollabQuestionByIndex({});
+      return;
+    }
+    let cancelled = false;
+    let iv;
+    const tick = async () => {
+      if (cancelled) return;
+      const doc = getDocuments().find((d) => d.id === rfpId);
+      if (!doc?.rfpCollabWorkspaceId || !Array.isArray(doc.rfpCollabQuestionIds)) return;
+      if (doc.rfpCollabQuestionIds.length !== questions.length) return;
+      try {
+        const sess = await ensureProposalManagerCollabSession();
+        const tok = sess?.token;
+        if (!tok) return;
+        const { data } = await rfpCollab.getWorkspace(tok, doc.rfpCollabWorkspaceId);
+        if (cancelled) return;
+        const sqs = data.questions || [];
+        const next = {};
+        doc.rfpCollabQuestionIds.forEach((id, idx) => {
+          if (!id) return;
+          const sq = sqs.find((q) => q.id === id);
+          if (sq) next[idx] = sq;
+        });
+        setCollabQuestionByIndex(next);
+      } catch {
+        if (!cancelled) setCollabQuestionByIndex({});
+      }
+    };
+    tick();
+    iv = setInterval(tick, 12_000);
+    return () => {
+      cancelled = true;
+      clearInterval(iv);
+    };
+  }, [rfpId, collabLinked, collabLinkKey, questions.length, activeRfpDoc?.rfpCollabWorkspaceId]);
+
+  useEffect(() => {
+    if (!showAuditModal) return;
+    let cancelled = false;
+    setAuditAssignError("");
+    (async () => {
+      try {
+        const sess = await ensureProposalManagerCollabSession();
+        const tok = sess?.token;
+        if (!tok) {
+          if (!cancelled) {
+            setAuditAssignError(t("proposalManagerWorkspace.rfpWorkspace.auditCollabRequired"));
+          }
+          return;
+        }
+        const { data } = await rfpCollab.listAuditors(tok);
+        const list = data.auditors || [];
+        if (cancelled) return;
+        setAuditAuditors(list);
+        setSelectedAuditorId((prev) => {
+          if (prev && list.some((a) => a.id === prev)) return prev;
+          return list[0]?.id || "";
+        });
+      } catch (e) {
+        if (!cancelled) setAuditAssignError(await messageFromApiError(e));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [showAuditModal, t]);
+
+  const handleUnlinkCollab = useCallback(() => {
+    if (!rfpId) return;
+    updateDocument(rfpId, { rfpCollabWorkspaceId: null, rfpCollabQuestionIds: null });
+    refreshDocs();
+    setCollabQuestionByIndex({});
+  }, [rfpId, refreshDocs]);
+
+  const handleConfirmAssignAudit = useCallback(async () => {
+    if (rfpId == null || selectedQuestionIndex == null || selectedQuestionIndex < 0 || !selectedAuditorId) return;
+    setAuditAssignBusy(true);
+    setAuditAssignError("");
+    try {
+      const sess = await ensureProposalManagerCollabSession();
+      const tok = sess?.token;
+      if (!tok) {
+        setAuditAssignError(t("proposalManagerWorkspace.rfpWorkspace.auditCollabRequired"));
+        return;
+      }
+      let doc = getDocuments().find((d) => d.id === rfpId);
+      if (!doc) return;
+      let wsId = doc.rfpCollabWorkspaceId;
+      let qIds = doc.rfpCollabQuestionIds;
+      const needsNew =
+        !wsId ||
+        !Array.isArray(qIds) ||
+        qIds.length !== questions.length ||
+        !qIds[selectedQuestionIndex];
+
+      if (needsNew) {
+        const title = `${doc.name || "RFP"} — audit`;
+        const { data } = await rfpCollab.createWorkspace(tok, {
+          title: title.slice(0, 500),
+          document: (doc.rawText || "").slice(0, 500_000),
+          questions: buildCollabQuestionsPayload(questions),
+        });
+        wsId = data.workspace.id;
+        qIds = mapServerQuestionsToLocalIndices(questions, data.questions || []);
+        if (!qIds.length || qIds.some((id) => !id)) {
+          setAuditAssignError(t("proposalManagerWorkspace.rfpWorkspace.auditCollabMapFailed"));
+          return;
+        }
+        updateDocument(rfpId, { rfpCollabWorkspaceId: wsId, rfpCollabQuestionIds: qIds });
+        refreshDocs();
+        doc = getDocuments().find((d) => d.id === rfpId) || doc;
+      }
+
+      const questionId = (qIds || doc.rfpCollabQuestionIds || [])[selectedQuestionIndex];
+      if (!questionId) {
+        setAuditAssignError(t("proposalManagerWorkspace.rfpWorkspace.auditCollabMapFailed"));
+        return;
+      }
+
+      await rfpCollab.assignQuestion(tok, {
+        workspaceId: wsId,
+        questionId,
+        auditorUserId: selectedAuditorId,
+      });
+      setShowAuditModal(false);
+      const { data: wsData } = await rfpCollab.getWorkspace(tok, wsId);
+      const ids = (getDocuments().find((d) => d.id === rfpId) || doc).rfpCollabQuestionIds || qIds;
+      const next = {};
+      const sqs = wsData.questions || [];
+      ids.forEach((id, idx) => {
+        if (!id) return;
+        const sq = sqs.find((q) => q.id === id);
+        if (sq) next[idx] = sq;
+      });
+      setCollabQuestionByIndex(next);
+    } catch (e) {
+      setAuditAssignError(await messageFromApiError(e));
+    } finally {
+      setAuditAssignBusy(false);
+    }
+  }, [
+    rfpId,
+    selectedQuestionIndex,
+    selectedAuditorId,
+    questions,
+    t,
+    refreshDocs,
+  ]);
+
   const handleAiSplitAndNumberRequirements = useCallback(async () => {
     const doc = getDocuments().find((d) => d.id === rfpId);
     const raw = doc?.rawText?.trim() || "";
@@ -300,6 +601,8 @@ export default function ProposalManagerWorkspace() {
       updateDocument(rfpId, {
         extractedQAs: qas,
         rfpWorkspaceAnswers: {},
+        rfpCollabWorkspaceId: null,
+        rfpCollabQuestionIds: null,
       });
       replaceExtractedQAsInContentHub(rfpId, qas, doc.documentTypeId, DOCUMENT_TYPE_TO_TAGS);
       rfpBackfillDone.current.add(rfpId);
@@ -348,6 +651,17 @@ export default function ProposalManagerWorkspace() {
     },
     [rfpId, persistAnswers],
   );
+
+  const handleInsertAuditorResponse = useCallback(() => {
+    if (selectedQuestionIndex == null || selectedQuestionIndex < 0) return;
+    const key = rfpQuestionKey(selectedQuestionIndex);
+    const cq = collabQuestionByIndex[selectedQuestionIndex];
+    const text = (cq?.submittedAnswer || "").trim();
+    if (!text) return;
+    const cur = (answers[key] || "").trim();
+    const merged = cur ? `${cur}\n\n---\n${text}` : text;
+    handleAnswerChange(key, merged);
+  }, [selectedQuestionIndex, collabQuestionByIndex, answers, handleAnswerChange]);
 
   const handleGenerateAiAnswer = useCallback(async () => {
     if (rfpId == null || selectedQuestionIndex == null || selectedQuestionIndex < 0) return;
@@ -741,26 +1055,93 @@ export default function ProposalManagerWorkspace() {
                 </div>
               )}
               <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-3">
-                <div className="flex flex-col gap-1">
-                  <label
-                    htmlFor="rfp-document-template"
+                <div className="flex flex-col gap-1 relative max-w-3xl" ref={templatePickerRef}>
+                  <span
+                    id="rfp-document-template-label"
                     className="text-xs font-medium text-gray-500 dark:text-gray-400"
                   >
                     {t("proposalManagerWorkspace.rfpWorkspace.documentTemplateLabel")}
-                  </label>
-                  <select
+                  </span>
+                  <button
+                    type="button"
                     id="rfp-document-template"
-                    value={selectedTemplate}
-                    onChange={(e) => setSelectedTemplate(e.target.value)}
+                    aria-haspopup="listbox"
+                    aria-expanded={templatePickerOpen}
+                    aria-labelledby="rfp-document-template-label rfp-document-template"
                     disabled={documentGenerating}
-                    className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm w-full sm:w-auto min-w-[12rem]"
+                    onClick={() => setTemplatePickerOpen((o) => !o)}
+                    className="inline-flex items-center justify-between gap-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm w-full sm:w-auto min-w-[14rem] text-left hover:bg-gray-50 dark:hover:bg-gray-600/80 disabled:opacity-50"
                   >
-                    {TEMPLATE_OPTIONS.map((opt) => (
-                      <option key={opt.id} value={opt.id}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    <span className="truncate">
+                      {(() => {
+                        const opt = TEMPLATE_OPTIONS.find((o) => o.id === selectedTemplate);
+                        return opt ? t(opt.labelKey) : selectedTemplate;
+                      })()}
+                    </span>
+                    <FiChevronDown
+                      className={`w-4 h-4 shrink-0 text-gray-500 transition-transform ${templatePickerOpen ? "rotate-180" : ""}`}
+                      aria-hidden
+                    />
+                  </button>
+
+                  {templatePickerOpen ? (
+                    <div
+                      role="listbox"
+                      aria-label={t("proposalManagerWorkspace.rfpWorkspace.documentTemplateLabel")}
+                      className="absolute left-0 top-full z-40 mt-1 w-full min-w-[min(100%,24rem)] sm:min-w-[28rem] rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xl p-3"
+                    >
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 px-0.5">
+                        {t("proposalManagerWorkspace.rfpWorkspace.documentTemplatePickerHint")}
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {TEMPLATE_OPTIONS.map((opt) => {
+                          const selected = opt.id === selectedTemplate;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              role="option"
+                              aria-selected={selected}
+                              onClick={() => {
+                                setSelectedTemplate(opt.id);
+                                setTemplatePickerOpen(false);
+                              }}
+                              className={`flex flex-col rounded-lg border p-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                                selected
+                                  ? "border-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/40 ring-1 ring-indigo-400 dark:ring-indigo-600"
+                                  : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700/40"
+                              }`}
+                            >
+                              <RfpTemplatePreviewImage
+                                src={opt.previewSrc}
+                                variant={opt.thumbVariant}
+                                title={t(opt.labelKey)}
+                                className="w-full aspect-[3/4] max-h-[140px] mb-2"
+                              />
+                              <span className="text-xs font-semibold text-gray-900 dark:text-white flex items-start gap-1.5">
+                                {selected ? (
+                                  <FiCheck
+                                    className="w-3.5 h-3.5 shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5"
+                                    aria-hidden
+                                  />
+                                ) : (
+                                  <span className="w-3.5 shrink-0" aria-hidden />
+                                )}
+                                <span className="leading-tight">{t(opt.labelKey)}</span>
+                              </span>
+                              <span className="text-[11px] leading-snug text-gray-600 dark:text-gray-400 mt-1 ps-[22px]">
+                                {t(opt.describeKey)}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <p className="text-xs text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed mt-1">
+                    {t("proposalManagerWorkspace.rfpWorkspace.documentTemplateAiHint")}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
@@ -814,6 +1195,21 @@ export default function ProposalManagerWorkspace() {
                     </div>
                   </div>
 
+                  {collabLinkStale ? (
+                    <div className="mb-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/90 dark:bg-amber-950/30 px-3 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm text-amber-900 dark:text-amber-100">
+                        {t("proposalManagerWorkspace.rfpWorkspace.auditLinkStale")}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleUnlinkCollab}
+                        className="text-sm font-medium text-amber-900 dark:text-amber-100 underline decoration-amber-700/60 hover:decoration-amber-900 dark:hover:decoration-amber-200"
+                      >
+                        {t("proposalManagerWorkspace.rfpWorkspace.auditUnlinkCollab")}
+                      </button>
+                    </div>
+                  ) : null}
+
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-[min(28rem,62vh)]">
                     <div className="lg:col-span-1 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-900/30">
                       <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-3 py-2 border-b border-gray-200 dark:border-gray-600">
@@ -825,6 +1221,11 @@ export default function ProposalManagerWorkspace() {
                           const answered = Boolean(answers[key]?.trim());
                           const selected = selectedQuestionIndex === index;
                           const qText = row.question || t("proposalManagerWorkspace.rfpWorkspace.untitledQuestion");
+                          const cq = collabQuestionByIndex[index];
+                          const auditStatus =
+                            cq && cq.status && cq.status !== "unassigned"
+                              ? t(COLLAB_STATUS_KEYS[cq.status] || COLLAB_STATUS_KEYS.unassigned)
+                              : null;
                           return (
                             <li key={key}>
                               <button
@@ -848,7 +1249,12 @@ export default function ProposalManagerWorkspace() {
                                     aria-hidden
                                   />
                                   <span className="min-w-0 flex-1 whitespace-normal break-words leading-snug">
-                                    {qText}
+                                    <span className="block">{qText}</span>
+                                    {auditStatus ? (
+                                      <span className="mt-1 inline-block text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200">
+                                        {t("proposalManagerWorkspace.rfpWorkspace.auditBadge")}: {auditStatus}
+                                      </span>
+                                    ) : null}
                                   </span>
                                 </span>
                               </button>
@@ -871,6 +1277,80 @@ export default function ProposalManagerWorkspace() {
                           <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 p-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 max-h-[min(14rem,40vh)] min-h-[6rem] overflow-y-auto whitespace-pre-wrap break-words">
                             {workspaceReferenceText(questions[selectedQuestionIndex])}
                           </p>
+
+                          {collabLinked ? (
+                            <div className="mb-3 rounded-lg border border-violet-200/90 dark:border-violet-800/80 bg-violet-50/60 dark:bg-violet-950/25 p-3 space-y-2">
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <p className="text-xs font-semibold text-violet-900 dark:text-violet-100 uppercase tracking-wide">
+                                  {t("proposalManagerWorkspace.rfpWorkspace.auditPanelTitle")}
+                                </p>
+                                {activeRfpDoc?.rfpCollabWorkspaceId ? (
+                                  <Link
+                                    to={`/rbac/proposal-manager/rfp-collaboration/w/${activeRfpDoc.rfpCollabWorkspaceId}`}
+                                    className="text-xs font-medium text-violet-700 dark:text-violet-300 hover:underline"
+                                  >
+                                    {t("proposalManagerWorkspace.rfpWorkspace.auditOpenHub")}
+                                  </Link>
+                                ) : null}
+                              </div>
+                              {(() => {
+                                const cq = collabQuestionByIndex[selectedQuestionIndex];
+                                if (!cq) {
+                                  return (
+                                    <p className="text-xs text-violet-800/80 dark:text-violet-200/80">
+                                      {t("proposalManagerWorkspace.rfpWorkspace.auditStatusLoading")}
+                                    </p>
+                                  );
+                                }
+                                const stLabel = t(
+                                  COLLAB_STATUS_KEYS[cq.status] || COLLAB_STATUS_KEYS.unassigned,
+                                );
+                                return (
+                                  <>
+                                    <p className="text-xs text-violet-900 dark:text-violet-100">
+                                      <span className="font-medium text-violet-950 dark:text-violet-50">
+                                        {t("rfpCollaboration.statusLabel")}:
+                                      </span>{" "}
+                                      {stLabel}
+                                      {cq.assignedToName ? (
+                                        <>
+                                          {" · "}
+                                          <span className="font-medium">{t("rfpCollaboration.assignee")}:</span>{" "}
+                                          {cq.assignedToName}
+                                        </>
+                                      ) : null}
+                                    </p>
+                                    {cq.submittedAnswer?.trim() ? (
+                                      <div className="space-y-2">
+                                        <p className="text-xs font-medium text-violet-900 dark:text-violet-100">
+                                          {t("proposalManagerWorkspace.rfpWorkspace.auditorSubmittedLabel")}
+                                        </p>
+                                        <div className="text-sm text-gray-800 dark:text-gray-200 max-h-32 overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-violet-200/80 dark:border-violet-800 bg-white/80 dark:bg-gray-900/40 p-2">
+                                          {cq.submittedAnswer.trim()}
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={handleInsertAuditorResponse}
+                                          className="text-xs font-medium text-violet-700 dark:text-violet-300 hover:underline"
+                                        >
+                                          {t("proposalManagerWorkspace.rfpWorkspace.insertAuditorResponse")}
+                                        </button>
+                                      </div>
+                                    ) : cq.answerDraft?.trim() && cq.status !== "submitted" ? (
+                                      <p className="text-xs text-violet-800 dark:text-violet-200/90 italic">
+                                        {t("proposalManagerWorkspace.rfpWorkspace.auditDraftInProgress")}
+                                      </p>
+                                    ) : cq.status === "assigned" || cq.status === "in_progress" ? (
+                                      <p className="text-xs text-violet-800 dark:text-violet-200/90">
+                                        {t("proposalManagerWorkspace.rfpWorkspace.auditWaitingAuditor")}
+                                      </p>
+                                    ) : null}
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          ) : null}
+
                           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                             {t("proposalManagerWorkspace.rfpWorkspace.yourAnswer")}
                           </label>
@@ -897,6 +1377,18 @@ export default function ProposalManagerWorkspace() {
                                 ? t("proposalManagerWorkspace.rfpWorkspace.aiGenerating")
                                 : t("proposalManagerWorkspace.rfpWorkspace.generateWithAi")}
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAuditAssignError("");
+                                setShowAuditModal(true);
+                              }}
+                              disabled={auditAssignBusy || collabLinkStale}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-violet-500/80 dark:border-violet-500 bg-white dark:bg-gray-800 text-violet-800 dark:text-violet-200 hover:bg-violet-50 dark:hover:bg-violet-950/40 disabled:opacity-50 text-sm font-medium"
+                            >
+                              <FiUserPlus className="w-4 h-4 shrink-0" />
+                              {t("rfpCollaboration.askToAudit")}
+                            </button>
                           </div>
                           {aiError ? (
                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{aiError}</p>
@@ -922,8 +1414,10 @@ export default function ProposalManagerWorkspace() {
             </p>
             <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">
               {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentTemplateSummary", {
-                template:
-                  TEMPLATE_OPTIONS.find((o) => o.id === selectedTemplate)?.label ?? selectedTemplate,
+                template: (() => {
+                  const opt = TEMPLATE_OPTIONS.find((o) => o.id === selectedTemplate);
+                  return opt ? t(opt.labelKey) : selectedTemplate;
+                })(),
               })}
             </p>
             {documentGenerateError ? (
@@ -948,6 +1442,65 @@ export default function ProposalManagerWorkspace() {
                 {documentGenerating
                   ? t("proposalManagerWorkspace.rfpWorkspace.generatingDocument")
                   : t("proposalManagerWorkspace.rfpWorkspace.confirmGenerateDocument")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showAuditModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div
+            className="w-full max-w-md rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-5"
+            role="dialog"
+            aria-labelledby="audit-modal-title"
+          >
+            <h3 id="audit-modal-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t("proposalManagerWorkspace.rfpWorkspace.auditModalTitle")}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {t("proposalManagerWorkspace.rfpWorkspace.auditModalSubtitle")}
+            </p>
+            {auditAssignError ? (
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">{auditAssignError}</p>
+            ) : null}
+            <label className="block mt-4 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t("proposalManagerWorkspace.rfpWorkspace.auditSelectAuditor")}
+            </label>
+            <select
+              value={selectedAuditorId}
+              onChange={(e) => setSelectedAuditorId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm"
+            >
+              {auditAuditors.length === 0 ? (
+                <option value="">{t("proposalManagerWorkspace.rfpWorkspace.auditNoAuditors")}</option>
+              ) : (
+                auditAuditors.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name || a.email}
+                  </option>
+                ))
+              )}
+            </select>
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!auditAssignBusy) setShowAuditModal(false);
+                }}
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm"
+              >
+                {t("proposalManagerWorkspace.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleConfirmAssignAudit()}
+                disabled={auditAssignBusy || !selectedAuditorId || auditAuditors.length === 0}
+                className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium"
+              >
+                {auditAssignBusy
+                  ? t("proposalManagerWorkspace.rfpWorkspace.auditAssigning")
+                  : t("proposalManagerWorkspace.rfpWorkspace.auditConfirmAssign")}
               </button>
             </div>
           </div>

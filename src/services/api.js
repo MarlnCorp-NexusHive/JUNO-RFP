@@ -68,6 +68,12 @@ export const askWithFile = async (file, question) => {
   return res.data.answer;
 };
 
+/* ================= RFP IMPORTANT DATES ================= */
+export const extractImportantDatesFromDocument = async (document) => {
+  const res = await API.post("/extract-dates", { document });
+  return res.data;
+};
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {

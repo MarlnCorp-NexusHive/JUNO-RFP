@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
 import SidebarLanguageSwitcher from "../../../components/localization/SidebarLanguageSwitcher";
 import SmartTourButton from "../../../components/tours/SmartTourButton";
+import { clearCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
 import SageAIButton from "../../../components/ui/SageAIButton";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
 
@@ -37,6 +38,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
 
   const handleLogout = () => {
     localStorage.removeItem("rbac_current_user");
+    clearCollabSession();
     navigate("/login");
   };
 
@@ -71,7 +73,9 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 scrollbar-thin scrollbar-thumb-[#888] scrollbar-track-transparent">
         <div className="flex flex-col gap-2">
           {features.map((f) => {
-            const isActive = location.pathname === f.route;
+            const isActive = f.matchPrefix
+              ? location.pathname === f.route || location.pathname.startsWith(`${f.route}/`)
+              : location.pathname === f.route;
             return (
               <button
                 key={f.label}

@@ -26,7 +26,16 @@ export const localStorageService = {
   setRoles: (roles) => setItem(KEYS.ROLES, roles),
   getTemplates: () => getItem(KEYS.TEMPLATES),
   setTemplates: (templates) => setItem(KEYS.TEMPLATES, templates),
-  getUsers: () => getItem(KEYS.USERS),
+  getUsers: () => {
+    try {
+      const raw = localStorage.getItem(KEYS.USERS);
+      if (!raw) return [];
+      const val = JSON.parse(raw);
+      return Array.isArray(val) ? val : [];
+    } catch {
+      return [];
+    }
+  },
   setUsers: (users) => setItem(KEYS.USERS, users),
   getAssignments: () => getItem(KEYS.ASSIGNMENTS),
   setAssignments: (assignments) => setItem(KEYS.ASSIGNMENTS, assignments),

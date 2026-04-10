@@ -7,11 +7,12 @@ import TourOverlay from "../../../components/tours/TourOverlay";
 import { TourProvider } from "../../../components/tours/TourContext";
 import { useTour } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
+import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 
 function AutoStartTour({ role }) {
   const location = useLocation();
   const { startTour, getTourStatus, isActive } = useTour();
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = parseLocalStorageJson("rbac_current_user");
 
   const getCurrentPage = (pathname) => {
     const segments = pathname.split('/');
@@ -27,6 +28,7 @@ function AutoStartTour({ role }) {
       if (segments.includes('compliance')) return 'compliance';
       if (segments.includes('meetings-calendar')) return 'meetings-calendar';
       if (segments.includes('user-management')) return 'user-management';
+      if (segments.includes('rfp-collaboration')) return 'rfp-collaboration';
       if (segments.includes('workspace')) return 'workspace';
       if (segments.includes('help-support')) return 'help-support';
       if (segments.includes('settings')) return 'settings';
@@ -55,7 +57,7 @@ function AutoStartTour({ role }) {
 }
 
 export default function ProposalManagerLayout() {
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = parseLocalStorageJson("rbac_current_user");
   const [expanded, setExpanded] = useState(false);
   const { isRTLMode } = useLocalization();
 

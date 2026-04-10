@@ -29,9 +29,140 @@ Content-Type: application/json
 
 ---
 
+### 2b. EXTRACT IMPORTANT DATES (RFP text)
+POST http://localhost:3000/extract-dates
+Content-Type: application/json
+
+{
+  "document": "Sealed proposals must be received by March 15, 2026 at 2:00 PM local time. A pre-bid conference will be held on 03/01/2026. Bids will be opened publicly on March 16, 2026. Contract performance begins April 1, 2026 and ends September 30, 2027."
+}
+
+---
+
 ### 3. FILE UPLOAD AI TEST (IMPORTANT)
 POST http://localhost:3000/ask-with-file
 Content-Type: multipart/form-data
 
 file: @sample.txt
 question: What is this document about?
+
+###
+### --- RFP COLLABORATION (in-memory) — base path /rfp-collab ---
+### Users: jordan@juno / pm123 (Jordan Mitchell, PM)
+###        aiyana@juno, chayton@juno, talise@juno, kiona@juno / aud123 (Auditors)
+### After login, use: Authorization: Bearer <token>  (token = user id from response)
+###
+
+### C1. Login (Proposal Manager)
+POST http://localhost:3000/rfp-collab/auth/login
+Content-Type: application/json
+
+{
+  "email": "jordan@juno",
+  "password": "pm123"
+}
+
+###
+
+### C2. Create workspace + questions (replace Bearer with PM token from C1)
+POST http://localhost:3000/rfp-collab/create-workspace
+Content-Type: application/json
+Authorization: Bearer user_pm_1
+
+{
+  "title": "Sample Cloud RFP",
+  "document": "Section L: Technical volume required. Past performance: 3 references.",
+  "questions": [
+    { "number": 1, "text": "Describe your cloud security architecture." },
+    { "number": 2, "text": "List three comparable past performances." }
+  ]
+}
+
+###
+
+### C3. List auditors (PM)
+GET http://localhost:3000/rfp-collab/auditors
+Authorization: Bearer user_pm_1
+
+###
+
+### C4. Assign question (use workspace id + question id from C2 response body)
+POST http://localhost:3000/rfp-collab/assign-question
+Content-Type: application/json
+Authorization: Bearer user_pm_1
+
+{
+  "workspaceId": "REPLACE_WS_ID",
+  "questionId": "REPLACE_Q_ID",
+  "auditorUserId": "user_aud_2"
+}
+
+###
+
+### C5. Auditor dashboard — Chayton Bitsui (user_aud_2)
+GET http://localhost:3000/rfp-collab/auditor-dashboard/user_aud_2
+Authorization: Bearer user_aud_2
+
+###
+
+### C6. AI draft answer (auditor; needs OPENAI_API_KEY)
+POST http://localhost:3000/rfp-collab/draft-answer-ai
+Content-Type: application/json
+Authorization: Bearer user_aud_2
+
+{
+  "workspaceId": "REPLACE_WS_ID",
+  "questionId": "REPLACE_Q_ID"
+}
+
+###
+
+### C7. Submit answer
+POST http://localhost:3000/rfp-collab/submit-answer
+Content-Type: application/json
+Authorization: Bearer user_aud_2
+
+{
+  "workspaceId": "REPLACE_WS_ID",
+  "questionId": "REPLACE_Q_ID",
+  "answerText": "Our organization implements zero-trust architecture with continuous monitoring..."
+}
+
+###
+
+### C8. Review answer (PM) — decision: approve | reject | request_changes
+POST http://localhost:3000/rfp-collab/review-answer
+Content-Type: application/json
+Authorization: Bearer user_pm_1
+
+{
+  "workspaceId": "REPLACE_WS_ID",
+  "questionId": "REPLACE_Q_ID",
+  "decision": "approve",
+  "comment": "Looks good for volume 1."
+}
+
+###
+
+### C9. Activity logs (PM)
+GET http://localhost:3000/rfp-collab/logs/REPLACE_WS_ID
+Authorization: Bearer user_pm_1
+
+###
+
+### C10. Quarterly review items (PM or assigned auditor)
+GET http://localhost:3000/rfp-collab/quarterly-review/REPLACE_WS_ID
+Authorization: Bearer user_aud_2
+
+###
+
+### C11. Quarterly review update (auditor)
+POST http://localhost:3000/rfp-collab/quarterly-review
+Content-Type: application/json
+Authorization: Bearer user_aud_2
+
+{
+  "workspaceId": "REPLACE_WS_ID",
+  "reviewItemId": "REPLACE_QR_ITEM_ID",
+  "status": "needs_update"
+}

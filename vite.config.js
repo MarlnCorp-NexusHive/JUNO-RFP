@@ -20,7 +20,11 @@ export default defineConfig(({ mode }) => {
       host: true,
       strictPort: false,
       proxy: {
-        "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file)$":
+        "/rfp-collab": {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates)$":
           {
             target: backendTarget,
             changeOrigin: true,

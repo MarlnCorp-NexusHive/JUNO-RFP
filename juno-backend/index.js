@@ -3,16 +3,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
 import multer from "multer";
+import mammoth from "mammoth";
+import { PDFParse } from "pdf-parse";
 
-// ✅ CORRECT DOCX IMPORT (IMPORTANT)
-import {
-  AlignmentType,
-  Document,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  TextRun,
-} from "docx";
+import { buildGeneratedRfpDocument } from "./rfpDocumentBuilder.js";
+import { extractImportantDates } from "./extractImportantDates.js";
+import { initCollaboration, collaborationRouter } from "./collaboration/index.js";
+import { registerRfpAssistantEndpoints } from "./rfpAssistantEndpoints.js";
 
 dotenv.config();
 
@@ -20,8 +17,8 @@ const app = express();
 
 /* ================= CORE MIDDLEWARE ================= */
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "12mb" }));
+app.use(express.urlencoded({ extended: true, limit: "12mb" }));
 
 /* ================= DEBUG LOGGER ================= */
 app.use((req, res, next) => {
@@ -37,11 +34,75 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+initCollaboration(openai);
+app.use("/rfp-collab", collaborationRouter);
+registerRfpAssistantEndpoints(app, openai);
+
 /* ================= MULTER ================= */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 },
 });
+
+const MIN_EXTRACTED_CHARS = 24;
+
+async function extractUploadedDocumentText(buffer, originalname = "", mimetype = "") {
+  const name = (originalname || "").toLowerCase();
+  const type = (mimetype || "").toLowerCase();
+
+  if (name.endsWith(".txt") || type.includes("text/plain")) {
+    return { text: buffer.toString("utf8").trim(), format: "txt" };
+  }
+
+  if (name.endsWith(".pdf") || type.includes("pdf")) {
+    const parser = new PDFParse({ data: buffer });
+    try {
+      const result = await parser.getText();
+      await parser.destroy();
+      return { text: (result?.text || "").trim(), format: "pdf" };
+    } catch (e) {
+      await parser.destroy().catch(() => {});
+      return { text: "", format: "pdf", error: e?.message || "Could not read PDF text." };
+    }
+  }
+
+  if (
+    name.endsWith(".docx") ||
+    type.includes("wordprocessingml") ||
+    type.includes("officedocument.wordprocessingml")
+  ) {
+    try {
+      const result = await mammoth.extractRawText({ buffer });
+      return { text: (result?.value || "").trim(), format: "docx" };
+    } catch (e) {
+      return { text: "", format: "docx", error: e?.message || "Could not read DOCX." };
+    }
+  }
+
+  if (name.endsWith(".doc")) {
+    try {
+      const result = await mammoth.extractRawText({ buffer });
+      return { text: (result?.value || "").trim(), format: "doc" };
+    } catch {
+      return {
+        text: "",
+        format: "doc",
+        error: "Legacy .doc is not supported. Save as .docx or .pdf and try again.",
+      };
+    }
+  }
+
+  const asUtf8 = buffer.toString("utf8").trim();
+  if (asUtf8.length >= MIN_EXTRACTED_CHARS && /[\r\n]/.test(asUtf8)) {
+    return { text: asUtf8, format: "text-fallback" };
+  }
+
+  return {
+    text: "",
+    format: "unknown",
+    error: "Unsupported file type. Use .txt, .pdf, or .docx.",
+  };
+}
 
 /* ================= ROUTES ================= */
 
@@ -64,6 +125,25 @@ app.get("/test-ai", async (req, res) => {
   } catch (err) {
     console.error("TEST ERROR:", err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// EXTRACT IMPORTANT DATES (RFP text)
+app.post("/extract-dates", async (req, res) => {
+  try {
+    const { document: documentText } = req.body || {};
+
+    if (typeof documentText !== "string") {
+      return res.status(400).json({
+        error: 'Request body must include string field "document"',
+      });
+    }
+
+    const result = await extractImportantDates(openai, documentText);
+    res.json(result);
+  } catch (err) {
+    console.error("EXTRACT DATES ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Date extraction failed" });
   }
 });
 
@@ -132,89 +212,15 @@ app.post("/generate-rfp-document", async (req, res) => {
       });
     }
 
-    // Templates
-    const title =
-      selectedTemplate === "modern"
-        ? "RFP RESPONSE DOCUMENT"
-        : selectedTemplate === "technical"
-        ? "Technical Proposal"
-        : "RFP Response";
-
-    const children = [];
-
-    // TITLE
-    children.push(
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        heading: HeadingLevel.TITLE,
-        children: [
-          new TextRun({
-            text: title,
-            bold: true,
-          }),
-        ],
-      })
-    );
-
-    // COMPANY
-    children.push(
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        children: [
-          new TextRun({
-            text: `Company: ${companyName || "N/A"}`,
-            italics: true,
-          }),
-        ],
-      })
-    );
-
-    children.push(new Paragraph({ text: "" }));
-
-    // QUESTIONS + ANSWERS
-    normalized.forEach((row) => {
-      children.push(
-        new Paragraph({
-          heading: HeadingLevel.HEADING_2,
-          children: [
-            new TextRun({
-              text: `${row.number}. ${row.question}`,
-              bold: true,
-            }),
-          ],
-        })
-      );
-
-      children.push(
-        new Paragraph({
-          children: [new TextRun(row.answer)],
-        })
-      );
-
-      children.push(new Paragraph({ text: "" }));
+    const { buffer, contentType, filename } = await buildGeneratedRfpDocument({
+      openai,
+      selectedTemplate,
+      normalized,
+      companyName,
     });
 
-    const doc = new Document({
-      sections: [
-        {
-          properties: {},
-          children,
-        },
-      ],
-    });
-
-    const buffer = await Packer.toBuffer(doc);
-
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    );
-
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="rfp-response-${selectedTemplate}.docx"`
-    );
-
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.send(buffer);
 
     console.log("✅ Document generated successfully");
@@ -237,18 +243,36 @@ app.post("/ask-with-file", upload.single("file"), async (req, res) => {
       });
     }
 
-    const documentText = file.buffer.toString("utf-8");
+    const extracted = await extractUploadedDocumentText(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+    );
+
+    if (extracted.error) {
+      return res.status(400).json({ error: extracted.error });
+    }
+
+    if (!extracted.text || extracted.text.length < MIN_EXTRACTED_CHARS) {
+      return res.status(400).json({
+        error:
+          "Could not extract enough text from this file. Try a text-based PDF or Word document, or use a .txt export.",
+      });
+    }
+
+    const documentText = extracted.text.slice(0, 120000);
 
     const response = await openai.chat.completions.create({
       model: "gpt-4.1",
       messages: [
         {
           role: "system",
-          content: "Answer ONLY using uploaded document.",
+          content:
+            "Answer ONLY using the uploaded document excerpt below. If the answer is not in the document, say it is not stated in the document.",
         },
         {
           role: "user",
-          content: `DOCUMENT:\n${documentText}\n\nQUESTION:\n${question}`,
+          content: `DOCUMENT (extracted text):\n${documentText}\n\nQUESTION:\n${question}`,
         },
       ],
     });
@@ -288,5 +312,11 @@ app.listen(PORT, () => {
   console.log("GET  /test-ai");
   console.log("POST /generate-answer");
   console.log("POST /generate-rfp-document");
-  console.log("POST /ask-with-file\n");
+  console.log("POST /ask-with-file");
+  console.log("POST /extract-dates");
+  console.log("POST /structure-rfp-requirements");
+  console.log("POST /ask-with-context");
+  console.log("POST /company-intelligence-remote");
+  console.log("POST /generate-company-profile");
+  console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)\n");
 });

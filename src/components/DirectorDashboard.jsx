@@ -12,6 +12,7 @@ import DirectorAuditCompliance from '../features/director/components/DirectorAud
 import DirectorMeetingsCalendar from '../features/director/components/DirectorMeetingsCalendar';
 import DirectorUserManagement from '../features/director/components/DirectorUserManagement';
 import DirectorCommunicationHub from '../features/director/components/DirectorCommunicationHub';
+import { parseLocalStorageJson } from "../utils/safeStorage.js";
 
 const features = [
   { label: "Dashboard", icon: "📊", route: "/rbac/director", description: "Corporate Performance Overview, KPI Summary, Alerts & Notices" },
@@ -370,7 +371,7 @@ const employeeDemographicsData = {
 export default function DirectorDashboard({ basePath = "/rbac/director", dashboardTitle, welcomeMessage: welcomeMessageProp }) {
   const { t, ready, i18n } = useTranslation(['director', 'welcome']);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = parseLocalStorageJson("rbac_current_user");
   const welcomeMessage = welcomeMessageProp ?? t(`welcome:${user?.username || 'director'}`);
   const [modalCard, setModalCard] = useState(null);
   const [modalChart, setModalChart] = useState(null);

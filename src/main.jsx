@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './utils/i18n' // Initialize i18n before app starts
 import App from './App.jsx'
+import RootErrorBoundary from './components/RootErrorBoundary.jsx'
 import { preloadDemoUsers } from './data/preloadDemoUsers'
 import { restoreRTLState } from './utils/rtl'
 
@@ -15,6 +16,8 @@ setTimeout(() => {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <RootErrorBoundary>
+      <App />
+    </RootErrorBoundary>
   </StrictMode>,
 )

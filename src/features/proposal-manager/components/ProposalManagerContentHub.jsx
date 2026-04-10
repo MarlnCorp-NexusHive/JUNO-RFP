@@ -6,7 +6,7 @@ import {
   updateContentHubQA,
   deleteContentHubQA,
 } from "../services/proposalManagerStorage";
-import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers } from "react-icons/fi";
+import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { useTranslation } from "react-i18next";
 import { generateAnswer, askWithFile, generateCompanyProfile } from "../../../services/api.js";
@@ -111,6 +111,11 @@ export default function ProposalManagerContentHub() {
     navigator.clipboard?.writeText(qa.answer);
   };
 
+  const clearAiFile = () => {
+    setFile(null);
+    if (aiFileInputRef.current) aiFileInputRef.current.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const q = question.trim();
@@ -120,8 +125,7 @@ export default function ProposalManagerContentHub() {
     try {
       const answer = file ? await askWithFile(file, q) : await generateAnswer(q);
       setResponse(answer);
-      setFile(null);
-      if (aiFileInputRef.current) aiFileInputRef.current.value = "";
+      clearAiFile();
     } catch (err) {
       const msg =
         err?.response?.data?.error ??
@@ -198,14 +202,43 @@ export default function ProposalManagerContentHub() {
               disabled={loading}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm"
             />
+            <input
+              ref={aiFileInputRef}
+              type="file"
+              accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              className="hidden"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              disabled={loading}
+            />
             <div className="flex flex-wrap items-center gap-3">
-              <input
-                ref={aiFileInputRef}
-                type="file"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              <button
+                type="button"
+                onClick={() => aiFileInputRef.current?.click()}
                 disabled={loading}
-                className="text-sm text-gray-600 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-200"
-              />
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+              >
+                <FiUpload className="w-4 h-4 shrink-0" aria-hidden />
+                {t("proposalManagerContentHub.aiAssistant.chooseFile")}
+              </button>
+              {file ? (
+                <div className="flex items-center gap-2 min-w-0 max-w-full">
+                  <span
+                    className="text-sm text-gray-700 dark:text-gray-200 truncate max-w-[260px]"
+                    title={file.name}
+                  >
+                    {t("proposalManagerContentHub.aiAssistant.selectedFile", { name: file.name })}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearAiFile}
+                    disabled={loading}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50"
+                  >
+                    <FiX className="w-3.5 h-3.5" aria-hidden />
+                    {t("proposalManagerContentHub.aiAssistant.clearFile")}
+                  </button>
+                </div>
+              ) : null}
               <button
                 type="submit"
                 disabled={loading || !question.trim()}

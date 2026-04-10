@@ -105,6 +105,12 @@ import ProposalPricingPage from './features/proposal-manager/components/Proposal
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
 import CompanyIntelligencePage from './features/proposal-manager/components/CompanyIntelligencePage';
 import ProposalManagerContentHub from './features/proposal-manager/components/ProposalManagerContentHub';
+import RfpCollaborationPmHub from "./features/rfp-collaboration/RfpCollaborationPmHub.jsx";
+import RfpCollaborationPmWorkspace from "./features/rfp-collaboration/RfpCollaborationPmWorkspace.jsx";
+import RfpAuditorShell from "./features/rfp-collaboration/RfpAuditorShell.jsx";
+import RfpAuditorRbacLayout from "./features/rfp-collaboration/RfpAuditorRbacLayout.jsx";
+import RfpAuditorHome from "./features/rfp-collaboration/RfpAuditorHome.jsx";
+import RfpAuditorQuestion from "./features/rfp-collaboration/RfpAuditorQuestion.jsx";
 import { LocalizationProvider } from './hooks/useLocalization.jsx';
 import './utils/i18n'; // Initialize i18n
 // Add this line with other imports (around line 100)
@@ -124,6 +130,14 @@ export default function App() {
         <Routes>
         {/* <Route path="/" element={<LandingPage />} /> */}
         <Route path="/" element={<LoginPage />} />
+        <Route path="/collaboration" element={<RfpAuditorShell />}>
+          <Route index element={<RfpAuditorHome />} />
+          <Route path="workspace/:workspaceId/question/:questionId" element={<RfpAuditorQuestion />} />
+        </Route>
+        <Route path="/rbac/rfp-auditor" element={<RfpAuditorRbacLayout />}>
+          <Route index element={<RfpAuditorHome />} />
+          <Route path="workspace/:workspaceId/question/:questionId" element={<RfpAuditorQuestion />} />
+        </Route>
         <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/corporate-info" element={<CorporateInfo />} />
@@ -223,6 +237,8 @@ export default function App() {
           <Route path="compliance" element={<DirectorAuditCompliance />} />
           <Route path="meetings-calendar" element={<DirectorMeetingsCalendar />} />
           <Route path="user-management" element={<DirectorUserManagement />} />
+          <Route path="rfp-collaboration" element={<RfpCollaborationPmHub />} />
+          <Route path="rfp-collaboration/w/:workspaceId" element={<RfpCollaborationPmWorkspace />} />
           <Route path="workspace" element={<ProposalManagerWorkspace />} />
           <Route path="help-support" element={<DirectorSupport />} />
           <Route path="settings" element={<DirectorSettings />} />

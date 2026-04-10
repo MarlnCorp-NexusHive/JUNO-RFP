@@ -1,7 +1,7 @@
 // preloadDemoUsers.js
-export function preloadDemoUsers() {
-  const key = 'rbac_users';
-  const users = [
+/** Canonical demo accounts (ids 1–27). Merged into localStorage so older cached lists still get RFP auditors. */
+function getCanonicalDemoUsers() {
+  return [
     // Superadmin
     { id: 1, username: "superadmin", password: "superadmin123", displayName: "Super Admin", team: null, role: "Super Admin", permissions: ["*"], createdAt: Date.now() },
     // Marketing Team
@@ -42,6 +42,33 @@ export function preloadDemoUsers() {
     { id: 22, username: "sales_enablement_manager", password: "Salesenablement@2026", displayName: "Sales Enablement Manager", team: "Sales Enablement Team", role: "Manager", createdAt: Date.now() },
     // Proposal Team
     { id: 23, username: "proposal_manager", password: "Proposal_manager@2026", displayName: "Proposal Manager", team: "Proposal Team", role: "Proposal Manager", createdAt: Date.now() },
+    // RFP Collaboration — auditors (main login; collab* fields sync /rfp-collab API)
+    { id: 24, username: "aiyana_yazzie", password: "aud123", displayName: "Aiyana Yazzie", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "aiyana@juno", collabPassword: "aud123", createdAt: Date.now() },
+    { id: 25, username: "chayton_bitsui", password: "aud123", displayName: "Chayton Bitsui", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "chayton@juno", collabPassword: "aud123", createdAt: Date.now() },
+    { id: 26, username: "talise_nez", password: "aud123", displayName: "Talise Nez", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "talise@juno", collabPassword: "aud123", createdAt: Date.now() },
+    { id: 27, username: "kiona_tsosie", password: "aud123", displayName: "Kiona Tsosie", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "kiona@juno", collabPassword: "aud123", createdAt: Date.now() },
   ];
-  localStorage.setItem(key, JSON.stringify(users));
-} 
+}
+
+export function preloadDemoUsers() {
+  const key = "rbac_users";
+  const fresh = getCanonicalDemoUsers();
+  let existing = [];
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) existing = JSON.parse(raw);
+  } catch {
+    existing = [];
+  }
+  if (!Array.isArray(existing)) existing = [];
+
+  const byId = new Map();
+  for (const u of existing) {
+    if (u && typeof u.id === "number") byId.set(u.id, u);
+  }
+  for (const u of fresh) {
+    byId.set(u.id, u);
+  }
+  const merged = Array.from(byId.values()).sort((a, b) => a.id - b.id);
+  localStorage.setItem(key, JSON.stringify(merged));
+}
