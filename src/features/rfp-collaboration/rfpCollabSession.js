@@ -24,6 +24,10 @@ export function isMainAppRfpAuditor() {
  * After main JUNO login as RFP Auditor, sync collaboration API session (seeded email/password on user record).
  */
 export async function ensureRbacAuditorCollabSession() {
+  const existing = loadCollabSession();
+  if (existing?.token && existing?.user?.role === "auditor") {
+    return existing;
+  }
   if (!isMainAppRfpAuditor()) return null;
   let rbac;
   try {
@@ -58,11 +62,11 @@ export function isMainAppProposalManager() {
  * using the seeded PM account (override with VITE_COLLAB_PM_EMAIL / VITE_COLLAB_PM_PASSWORD).
  */
 export async function ensureProposalManagerCollabSession() {
-  if (!isMainAppProposalManager()) return null;
   const existing = loadCollabSession();
   if (existing?.token && existing?.user?.role === "proposal_manager") {
     return existing;
   }
+  if (!isMainAppProposalManager()) return null;
   const email = (import.meta.env.VITE_COLLAB_PM_EMAIL || "jordan@juno").trim();
   const password = import.meta.env.VITE_COLLAB_PM_PASSWORD || "pm123";
   const { data } = await rfpCollab.login(email, password);

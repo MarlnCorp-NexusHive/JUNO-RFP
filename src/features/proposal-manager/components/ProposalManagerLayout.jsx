@@ -57,7 +57,6 @@ function AutoStartTour({ role }) {
 }
 
 export default function ProposalManagerLayout() {
-  const user = parseLocalStorageJson("rbac_current_user");
   const [expanded, setExpanded] = useState(false);
   const { isRTLMode } = useLocalization();
 
@@ -71,7 +70,7 @@ export default function ProposalManagerLayout() {
         }`}>
           <Sidebar
             features={proposalManagerFeatures}
-            userLabel={user?.displayName || "Proposal Manager"}
+            userLabel="Proposal manger"
             expanded={expanded}
             setExpanded={setExpanded}
             role="proposal-manager"

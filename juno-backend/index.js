@@ -10,6 +10,17 @@ import { buildGeneratedRfpDocument } from "./rfpDocumentBuilder.js";
 import { extractImportantDates } from "./extractImportantDates.js";
 import { initCollaboration, collaborationRouter } from "./collaboration/index.js";
 import { registerRfpAssistantEndpoints } from "./rfpAssistantEndpoints.js";
+import {
+  extractStructuredData,
+  storeStructuredData,
+  getStructuredDataForWorkspace,
+} from "./tableExtractionService.js";
+import {
+  saveWorkspaceDocument,
+  getWorkspaceDocument,
+  buildWorkspaceDocumentDocx,
+  ensureWorkspaceDocument,
+} from "./workspaceDocumentService.js";
 
 dotenv.config();
 
@@ -286,6 +297,114 @@ app.post("/ask-with-file", upload.single("file"), async (req, res) => {
   }
 });
 
+/* ================= STRUCTURED TABLES / FIGURES ================= */
+
+app.post("/extract-structured-data", async (req, res) => {
+  try {
+    const { document: documentText, workspaceId, documentId, skipAi } = req.body || {};
+
+    if (typeof documentText !== "string" || !documentText.trim()) {
+      return res.status(400).json({
+        error: 'Request body must include non-empty string field "document"',
+      });
+    }
+
+    const result = await extractStructuredData(openai, documentText, {
+      workspaceId,
+      documentId,
+      skipAi: Boolean(skipAi),
+    });
+
+    if (workspaceId != null && documentId != null) {
+      const ws = String(workspaceId).trim();
+      const doc = String(documentId).trim();
+      if (ws && doc) {
+        storeStructuredData(ws, doc, result);
+      }
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error("EXTRACT STRUCTURED DATA ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Extraction failed" });
+  }
+});
+
+app.get("/get-tables/:workspaceId", (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    if (!workspaceId || typeof workspaceId !== "string") {
+      return res.status(400).json({ error: "workspaceId is required" });
+    }
+    const data = getStructuredDataForWorkspace(workspaceId);
+    res.json(data);
+  } catch (err) {
+    console.error("GET TABLES ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Failed to load tables" });
+  }
+});
+
+/* ================= WORKSPACE DOCUMENT MODEL + EXPORT ================= */
+
+app.post("/workspace-document/:workspaceId", (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const model = req.body?.document;
+    if (!workspaceId) {
+      return res.status(400).json({ error: "workspaceId is required" });
+    }
+    if (!model || typeof model !== "object") {
+      return res.status(400).json({ error: 'Request body must include object field "document"' });
+    }
+    const saved = saveWorkspaceDocument(workspaceId, model);
+    res.json({ workspaceId, document: saved });
+  } catch (err) {
+    console.error("SAVE WORKSPACE DOCUMENT ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Failed to save workspace document" });
+  }
+});
+
+app.get("/workspace-document/:workspaceId", (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    if (!workspaceId) return res.status(400).json({ error: "workspaceId is required" });
+    const existing = getWorkspaceDocument(workspaceId);
+    if (!existing) return res.status(404).json({ error: "Workspace document not found" });
+    res.json({ workspaceId, document: existing });
+  } catch (err) {
+    console.error("GET WORKSPACE DOCUMENT ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Failed to load workspace document" });
+  }
+});
+
+app.post("/workspace-document/:workspaceId/seed", (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const { questions = [], answers = {} } = req.body || {};
+    if (!workspaceId) return res.status(400).json({ error: "workspaceId is required" });
+    const doc = ensureWorkspaceDocument(workspaceId, questions, answers);
+    res.json({ workspaceId, document: doc });
+  } catch (err) {
+    console.error("SEED WORKSPACE DOCUMENT ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Failed to seed workspace document" });
+  }
+});
+
+app.get("/export-document/:workspaceId", async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    if (!workspaceId) return res.status(400).json({ error: "workspaceId is required" });
+    const { buffer, filename, contentType } = await buildWorkspaceDocumentDocx(workspaceId);
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (err) {
+    console.error("EXPORT WORKSPACE DOCUMENT ERROR:", err.message);
+    const code = err.statusCode || 500;
+    res.status(code).json({ error: err.message || "Failed to export workspace document" });
+  }
+});
+
 /* ================= GLOBAL ERROR ================= */
 
 app.use((err, req, res, next) => {
@@ -314,6 +433,12 @@ app.listen(PORT, () => {
   console.log("POST /generate-rfp-document");
   console.log("POST /ask-with-file");
   console.log("POST /extract-dates");
+  console.log("POST /extract-structured-data");
+  console.log("GET  /get-tables/:workspaceId");
+  console.log("POST /workspace-document/:workspaceId");
+  console.log("GET  /workspace-document/:workspaceId");
+  console.log("POST /workspace-document/:workspaceId/seed");
+  console.log("GET  /export-document/:workspaceId");
   console.log("POST /structure-rfp-requirements");
   console.log("POST /ask-with-context");
   console.log("POST /company-intelligence-remote");

@@ -414,7 +414,15 @@
       "auditSelectAuditor": "المدقق",
       "auditNoAuditors": "لا يوجد مدققون",
       "auditAssigning": "جارٍ التعيين…",
-      "auditConfirmAssign": "تعيين"
+      "auditConfirmAssign": "تعيين",
+      "extractStructuredButton": "استخراج الجداول والأشكال",
+      "extractStructuredRunning": "جارٍ الاستخراج…",
+      "extractStructuredHint": "يعمل على نص المستند المفحوص (الخادم). عند ربط التعاون الجماعي تُخزَّن النتائج تحت تلك المساحة لاسترجاعها لاحقاً.",
+      "structuredModalTitle": "الجداول والأشكال",
+      "structuredModalSummary": "{{tables}} جدول/جداول، {{figures}} مرجع شكل/أشكال.",
+      "structuredModalClose": "إغلاق",
+      "structuredNoTables": "لم يُعثر على جداول في النص المستخرج.",
+      "structuredNoFigures": "لم يُعثر على مراجع أشكال (مثل «الشكل 1»)."
     }
   },
   "proposalManagerCompanyIntelligence": {

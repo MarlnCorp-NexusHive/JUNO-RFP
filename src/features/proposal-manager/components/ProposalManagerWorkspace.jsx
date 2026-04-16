@@ -28,15 +28,26 @@ import {
   FiChevronDown,
   FiCheck,
   FiUserPlus,
+  FiGrid,
 } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
-import { generateAnswer, structureRfpRequirementsWithAi, generateRfpDocument } from "../../../services/api.js";
+import {
+  generateAnswer,
+  structureRfpRequirementsWithAi,
+  generateRfpDocument,
+  extractStructuredRfpData,
+  seedWorkspaceDocument,
+  saveWorkspaceDocument,
+  getWorkspaceDocument,
+  exportWorkspaceDocument,
+} from "../../../services/api.js";
 import { rfpCollab } from "../../../services/rfpCollabApi.js";
 import { ensureProposalManagerCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
 import {
   buildCollabQuestionsPayload,
   mapServerQuestionsToLocalIndices,
 } from "../services/workspaceCollabBridge.js";
+import RichTextAnswerEditor, { toPlainTextFromHtml, toHtmlFromPlain } from "./document/RichTextAnswerEditor.jsx";
 
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
@@ -220,6 +231,16 @@ export default function ProposalManagerWorkspace() {
   const [auditAssignBusy, setAuditAssignBusy] = useState(false);
   const [auditAssignError, setAuditAssignError] = useState("");
   const [collabQuestionByIndex, setCollabQuestionByIndex] = useState({});
+  const [structuredExtractLoading, setStructuredExtractLoading] = useState(false);
+  const [structuredExtractError, setStructuredExtractError] = useState("");
+  const [structuredExtractResult, setStructuredExtractResult] = useState(null);
+  const [showStructuredModal, setShowStructuredModal] = useState(false);
+  const [workspaceDocumentModel, setWorkspaceDocumentModel] = useState({
+    title: "RFP Response",
+    sections: [],
+  });
+  const [workspaceDocumentSyncError, setWorkspaceDocumentSyncError] = useState("");
+  const [workspaceDocExporting, setWorkspaceDocExporting] = useState(false);
 
   useEffect(() => {
     if (!templatePickerOpen) return;
@@ -400,6 +421,9 @@ export default function ProposalManagerWorkspace() {
       setAnswers({});
       setSelectedQuestionIndex(null);
       setAiError("");
+      setStructuredExtractError("");
+      setStructuredExtractResult(null);
+      setShowStructuredModal(false);
       return;
     }
     const d = getDocuments().find((x) => x.id === rfpId);
@@ -407,6 +431,9 @@ export default function ProposalManagerWorkspace() {
     setSelectedQuestionIndex(null);
     setAiError("");
     setAiSplitError("");
+    setStructuredExtractError("");
+    setStructuredExtractResult(null);
+    setShowStructuredModal(false);
   }, [rfpId]);
 
   const collabLinkKey = useMemo(() => {
@@ -619,6 +646,25 @@ export default function ProposalManagerWorkspace() {
     }
   }, [rfpId, t, refreshDocs]);
 
+  const handleExtractStructured = useCallback(async () => {
+    const doc = getDocuments().find((d) => d.id === rfpId);
+    const raw = doc?.rawText?.trim() || "";
+    if (!rfpId || !doc || raw.length < 80) return;
+    setStructuredExtractError("");
+    setStructuredExtractLoading(true);
+    try {
+      const opts = { documentId: doc.id };
+      if (doc.rfpCollabWorkspaceId) opts.workspaceId = doc.rfpCollabWorkspaceId;
+      const data = await extractStructuredRfpData(raw, opts);
+      setStructuredExtractResult(data);
+      setShowStructuredModal(true);
+    } catch (e) {
+      setStructuredExtractError(await messageFromApiError(e));
+    } finally {
+      setStructuredExtractLoading(false);
+    }
+  }, [rfpId]);
+
   const totalQuestions = questions.length;
   const answeredCount = useMemo(() => {
     if (!totalQuestions) return 0;
@@ -663,6 +709,34 @@ export default function ProposalManagerWorkspace() {
     handleAnswerChange(key, merged);
   }, [selectedQuestionIndex, collabQuestionByIndex, answers, handleAnswerChange]);
 
+  useEffect(() => {
+    if (!rfpId || !collabLinked) return;
+    setAnswers((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      Object.entries(collabQuestionByIndex).forEach(([idxStr, cq]) => {
+        const idx = Number(idxStr);
+        if (!Number.isInteger(idx) || idx < 0) return;
+        if (cq?.status !== "approved") return;
+
+        const approvedText = String(cq?.submittedAnswer || "").trim();
+        if (!approvedText) return;
+
+        const key = rfpQuestionKey(idx);
+        const existing = String(next[key] || "").trim();
+        if (existing) return;
+
+        next[key] = approvedText;
+        changed = true;
+      });
+
+      if (!changed) return prev;
+      persistAnswers(rfpId, next);
+      return next;
+    });
+  }, [rfpId, collabLinked, collabQuestionByIndex, persistAnswers]);
+
   const handleGenerateAiAnswer = useCallback(async () => {
     if (rfpId == null || selectedQuestionIndex == null || selectedQuestionIndex < 0) return;
     const row = questions[selectedQuestionIndex];
@@ -705,6 +779,12 @@ export default function ProposalManagerWorkspace() {
     try {
       const text = await generateAnswer(promptParts.join("\n"));
       handleAnswerChange(key, text);
+      setWorkspaceDocumentModel((prev) => ({
+        ...prev,
+        sections: (prev.sections || []).map((s) =>
+          s.id === key ? { ...s, answerHtml: toHtmlFromPlain(text) } : s,
+        ),
+      }));
     } catch (e) {
       setAiError(e?.response?.data?.error ?? e?.message ?? "AI request failed");
     } finally {
@@ -717,34 +797,55 @@ export default function ProposalManagerWorkspace() {
     setShowGenerateModal(true);
   }, []);
 
+  const selectedKey =
+    selectedQuestionIndex != null && selectedQuestionIndex >= 0
+      ? rfpQuestionKey(selectedQuestionIndex)
+      : null;
+
+  const workspaceDocId = useMemo(() => {
+    if (!rfpId) return null;
+    const collabId = activeRfpDoc?.rfpCollabWorkspaceId;
+    return collabId ? `collab_${collabId}` : `pm_${rfpId}`;
+  }, [rfpId, activeRfpDoc?.rfpCollabWorkspaceId]);
+
+  const computedDocumentModel = useMemo(() => {
+    const sections = questions.map((row, idx) => {
+      const key = rfpQuestionKey(idx);
+      const plain = answers[key] ?? "";
+      const existing = workspaceDocumentModel.sections?.find((s) => s.id === key);
+      const answerHtml = existing?.answerHtml?.trim() ? existing.answerHtml : toHtmlFromPlain(plain);
+      return {
+        id: key,
+        question: (row?.question || "").trim(),
+        answerHtml,
+        formatting: existing?.formatting || {},
+      };
+    });
+    return {
+      title: workspaceDocumentModel.title || "RFP Response",
+      sections,
+    };
+  }, [questions, answers, workspaceDocumentModel]);
+
   const handleGenerateDocument = useCallback(async () => {
     if (!rfpId) return;
-    const answeredQuestions = questions
-      .map((row, index) => {
-        const answer = (answers[rfpQuestionKey(index)] || "").trim();
-        if (!answer) return null;
-        return {
-          number: index + 1,
-          question: (row?.question || "").trim(),
-          answer,
-        };
-      })
-      .filter(Boolean);
-
-    if (answeredQuestions.length === 0) {
-      setDocumentGenerateError(t("proposalManagerWorkspace.rfpWorkspace.generateDocumentNoAnswers"));
-      return;
-    }
-
     setDocumentGenerateError("");
     setDocumentGenerating(true);
     try {
-      const blob = await generateRfpDocument({
-        answeredQuestions,
-        companyName: issuer?.name || "",
-        companyLogoUrl: issuer?.logoUrl || issuer?.logo || "",
-        selectedTemplate,
-      });
+      const answeredCountForExport = computedDocumentModel.sections.filter((s) =>
+        String(s?.answerHtml || "").replace(/<[^>]*>/g, "").trim(),
+      ).length;
+      if (answeredCountForExport === 0) {
+        setDocumentGenerateError(t("proposalManagerWorkspace.rfpWorkspace.generateDocumentNoAnswers"));
+        return;
+      }
+      if (!workspaceDocId) {
+        setDocumentGenerateError("Workspace document id missing");
+        return;
+      }
+
+      await saveWorkspaceDocument(workspaceDocId, computedDocumentModel);
+      const blob = await exportWorkspaceDocument(workspaceDocId);
       const fileName = `rfp-response-${selectedTemplate}.docx`;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -761,12 +862,69 @@ export default function ProposalManagerWorkspace() {
     } finally {
       setDocumentGenerating(false);
     }
-  }, [rfpId, questions, answers, issuer, selectedTemplate, t]);
+  }, [rfpId, computedDocumentModel, workspaceDocId, selectedTemplate, t]);
 
-  const selectedKey =
-    selectedQuestionIndex != null && selectedQuestionIndex >= 0
-      ? rfpQuestionKey(selectedQuestionIndex)
-      : null;
+  useEffect(() => {
+    if (!workspaceDocId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setWorkspaceDocumentSyncError("");
+        const loaded = await getWorkspaceDocument(workspaceDocId);
+        if (!cancelled && loaded?.document) {
+          setWorkspaceDocumentModel(loaded.document);
+          return;
+        }
+      } catch {
+        // not found is expected on first load
+      }
+      try {
+        const seeded = await seedWorkspaceDocument(workspaceDocId, { questions, answers });
+        if (!cancelled && seeded?.document) {
+          setWorkspaceDocumentModel(seeded.document);
+        }
+      } catch (e) {
+        if (!cancelled) setWorkspaceDocumentSyncError(e?.message || "Could not initialize document model");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceDocId]);
+
+  useEffect(() => {
+    if (!workspaceDocId) return;
+    const timer = setTimeout(async () => {
+      try {
+        setWorkspaceDocumentSyncError("");
+        await saveWorkspaceDocument(workspaceDocId, computedDocumentModel);
+      } catch (e) {
+        setWorkspaceDocumentSyncError(e?.message || "Could not sync document model");
+      }
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [workspaceDocId, computedDocumentModel]);
+
+  const handleDownloadWorkspaceDocument = useCallback(async () => {
+    if (!workspaceDocId) return;
+    setWorkspaceDocExporting(true);
+    try {
+      await saveWorkspaceDocument(workspaceDocId, computedDocumentModel);
+      const blob = await exportWorkspaceDocument(workspaceDocId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${activeRfpDoc?.name || "rfp-response"}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      setWorkspaceDocumentSyncError(await messageFromApiError(e));
+    } finally {
+      setWorkspaceDocExporting(false);
+    }
+  }, [workspaceDocId, computedDocumentModel, activeRfpDoc?.name]);
 
   return (
     <div className="min-h-screen bg-[#F6F7FA] dark:bg-gray-900 p-6">
@@ -1033,25 +1191,48 @@ export default function ProposalManagerWorkspace() {
           ) : (
             <>
               {(activeRfpDoc?.rawText?.length ?? 0) >= 80 && (
-                <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
-                  <button
-                    type="button"
-                    onClick={() => void handleAiSplitAndNumberRequirements()}
-                    disabled={aiSplitLoading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium shrink-0"
-                  >
-                    {aiSplitLoading ? (
-                      <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
-                    ) : (
-                      <FiZap className="w-4 h-4 shrink-0" />
-                    )}
-                    {aiSplitLoading
-                      ? t("proposalManagerWorkspace.rfpWorkspace.aiSplitRunning")
-                      : t("proposalManagerWorkspace.rfpWorkspace.aiSplitButton")}
-                  </button>
+                <div className="mb-4 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3">
+                    <button
+                      type="button"
+                      onClick={() => void handleAiSplitAndNumberRequirements()}
+                      disabled={aiSplitLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium shrink-0"
+                    >
+                      {aiSplitLoading ? (
+                        <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                      ) : (
+                        <FiZap className="w-4 h-4 shrink-0" />
+                      )}
+                      {aiSplitLoading
+                        ? t("proposalManagerWorkspace.rfpWorkspace.aiSplitRunning")
+                        : t("proposalManagerWorkspace.rfpWorkspace.aiSplitButton")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleExtractStructured()}
+                      disabled={structuredExtractLoading || aiSplitLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 disabled:opacity-50 text-white text-sm font-medium shrink-0"
+                    >
+                      {structuredExtractLoading ? (
+                        <FiRefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                      ) : (
+                        <FiGrid className="w-4 h-4 shrink-0" />
+                      )}
+                      {structuredExtractLoading
+                        ? t("proposalManagerWorkspace.rfpWorkspace.extractStructuredRunning")
+                        : t("proposalManagerWorkspace.rfpWorkspace.extractStructuredButton")}
+                    </button>
+                  </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
                     {t("proposalManagerWorkspace.rfpWorkspace.aiSplitHint")}
                   </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+                    {t("proposalManagerWorkspace.rfpWorkspace.extractStructuredHint")}
+                  </p>
+                  {structuredExtractError ? (
+                    <p className="text-sm text-red-600 dark:text-red-400">{structuredExtractError}</p>
+                  ) : null}
                 </div>
               )}
               <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-3">
@@ -1351,16 +1532,30 @@ export default function ProposalManagerWorkspace() {
                             </div>
                           ) : null}
 
-                          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            {t("proposalManagerWorkspace.rfpWorkspace.yourAnswer")}
-                          </label>
-                          <textarea
-                            value={selectedKey ? answers[selectedKey] ?? "" : ""}
-                            onChange={(e) => selectedKey && handleAnswerChange(selectedKey, e.target.value)}
-                            rows={10}
-                            placeholder={t("proposalManagerWorkspace.rfpWorkspace.answerPlaceholder")}
-                            className="flex-1 w-full min-h-[10rem] rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 text-sm resize-y mb-3"
-                          />
+                          <div className="mb-3">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                              {t("proposalManagerWorkspace.rfpWorkspace.yourAnswer")}
+                            </label>
+                            <RichTextAnswerEditor
+                              valueHtml={
+                                selectedKey
+                                  ? computedDocumentModel.sections.find((s) => s.id === selectedKey)?.answerHtml || "<p></p>"
+                                  : "<p></p>"
+                              }
+                              placeholder={t("proposalManagerWorkspace.rfpWorkspace.answerPlaceholder")}
+                              onChange={(html) => {
+                                if (!selectedKey) return;
+                                const plain = toPlainTextFromHtml(html);
+                                handleAnswerChange(selectedKey, plain);
+                                setWorkspaceDocumentModel((prev) => ({
+                                  ...prev,
+                                  sections: (prev.sections || []).map((s) =>
+                                    s.id === selectedKey ? { ...s, answerHtml: html } : s,
+                                  ),
+                                }));
+                              }}
+                            />
+                          </div>
                           <div className="flex flex-wrap items-center gap-2">
                             <button
                               type="button"
@@ -1389,9 +1584,20 @@ export default function ProposalManagerWorkspace() {
                               <FiUserPlus className="w-4 h-4 shrink-0" />
                               {t("rfpCollaboration.askToAudit")}
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleDownloadWorkspaceDocument()}
+                              disabled={workspaceDocExporting}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white text-sm font-medium"
+                            >
+                              {workspaceDocExporting ? "Preparing..." : "Download Document"}
+                            </button>
                           </div>
                           {aiError ? (
                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{aiError}</p>
+                          ) : null}
+                          {workspaceDocumentSyncError ? (
+                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{workspaceDocumentSyncError}</p>
                           ) : null}
                         </>
                       )}
@@ -1442,6 +1648,89 @@ export default function ProposalManagerWorkspace() {
                 {documentGenerating
                   ? t("proposalManagerWorkspace.rfpWorkspace.generatingDocument")
                   : t("proposalManagerWorkspace.rfpWorkspace.confirmGenerateDocument")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showStructuredModal && structuredExtractResult ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl">
+            <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("proposalManagerWorkspace.rfpWorkspace.structuredModalTitle")}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {t("proposalManagerWorkspace.rfpWorkspace.structuredModalSummary", {
+                  tables: structuredExtractResult.tables?.length ?? 0,
+                  figures: structuredExtractResult.figures?.length ?? 0,
+                })}
+              </p>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-6 text-sm">
+              {(structuredExtractResult.tables?.length ?? 0) === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400">{t("proposalManagerWorkspace.rfpWorkspace.structuredNoTables")}</p>
+              ) : (
+                <div className="space-y-4">
+                  {structuredExtractResult.tables.map((tbl) => {
+                    const headers = tbl.headers || [];
+                    const rows = tbl.rows || [];
+                    return (
+                    <div key={tbl.id} className="rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+                      <p className="px-3 py-2 bg-gray-50 dark:bg-gray-900/50 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                        {tbl.id}
+                        {tbl.title ? ` · ${tbl.title}` : ""}
+                      </p>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left border-collapse">
+                          <thead>
+                            <tr>
+                              {headers.map((h, i) => (
+                                <th key={i} className="border border-gray-200 dark:border-gray-600 px-2 py-1 font-semibold text-gray-800 dark:text-gray-200">
+                                  {h}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((row, ri) => (
+                              <tr key={ri}>
+                                {headers.map((_, ci) => (
+                                  <td key={ci} className="border border-gray-200 dark:border-gray-600 px-2 py-1 text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words max-w-xs">
+                                    {row?.[ci] ?? ""}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    );
+                  })}
+                </div>
+              )}
+              {(structuredExtractResult.figures?.length ?? 0) === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400">{t("proposalManagerWorkspace.rfpWorkspace.structuredNoFigures")}</p>
+              ) : (
+                <ul className="space-y-3">
+                  {structuredExtractResult.figures.map((fig) => (
+                    <li key={fig.id} className="rounded-lg border border-gray-200 dark:border-gray-600 p-3">
+                      <p className="font-medium text-gray-900 dark:text-white">{fig.caption}</p>
+                      <p className="mt-1 text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{fig.description}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="px-5 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowStructuredModal(false)}
+                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
+              >
+                {t("proposalManagerWorkspace.rfpWorkspace.structuredModalClose")}
               </button>
             </div>
           </div>

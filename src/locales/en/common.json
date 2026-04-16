@@ -414,7 +414,15 @@
       "auditSelectAuditor": "Auditor",
       "auditNoAuditors": "No auditors available",
       "auditAssigning": "Assigning…",
-      "auditConfirmAssign": "Assign"
+      "auditConfirmAssign": "Assign",
+      "extractStructuredButton": "Extract tables & figures",
+      "extractStructuredRunning": "Extracting…",
+      "extractStructuredHint": "Runs on this document’s scanned text (backend). If Team Collab is linked, results are also stored under that workspace for later API retrieval.",
+      "structuredModalTitle": "Tables & figures",
+      "structuredModalSummary": "{{tables}} table(s), {{figures}} figure reference(s).",
+      "structuredModalClose": "Close",
+      "structuredNoTables": "No tables detected in the extracted text.",
+      "structuredNoFigures": "No figure references (e.g. “Figure 1”) detected."
     }
   },
   "proposalManagerCompanyIntelligence": {

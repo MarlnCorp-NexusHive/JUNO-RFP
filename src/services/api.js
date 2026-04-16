@@ -74,6 +74,46 @@ export const extractImportantDatesFromDocument = async (document) => {
   return res.data;
 };
 
+/** Tables + figures from RFP text; optional workspaceId + documentId persist server-side (in-memory). */
+export const extractStructuredRfpData = async (document, options = {}) => {
+  const { workspaceId, documentId, skipAi } = options;
+  const res = await API.post("/extract-structured-data", {
+    document,
+    ...(workspaceId != null ? { workspaceId } : {}),
+    ...(documentId != null ? { documentId } : {}),
+    ...(skipAi != null ? { skipAi } : {}),
+  });
+  return res.data;
+};
+
+export const getStructuredTablesForWorkspace = async (workspaceId) => {
+  const res = await API.get(`/get-tables/${encodeURIComponent(workspaceId)}`);
+  return res.data;
+};
+
+/* ================= WORKSPACE DOCUMENT MODEL ================= */
+export const seedWorkspaceDocument = async (workspaceId, payload) => {
+  const res = await API.post(`/workspace-document/${encodeURIComponent(workspaceId)}/seed`, payload);
+  return res.data;
+};
+
+export const saveWorkspaceDocument = async (workspaceId, document) => {
+  const res = await API.post(`/workspace-document/${encodeURIComponent(workspaceId)}`, { document });
+  return res.data;
+};
+
+export const getWorkspaceDocument = async (workspaceId) => {
+  const res = await API.get(`/workspace-document/${encodeURIComponent(workspaceId)}`);
+  return res.data;
+};
+
+export const exportWorkspaceDocument = async (workspaceId) => {
+  const res = await API.get(`/export-document/${encodeURIComponent(workspaceId)}`, {
+    responseType: "blob",
+  });
+  return res.data;
+};
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {
