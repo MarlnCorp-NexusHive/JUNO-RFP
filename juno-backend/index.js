@@ -25,6 +25,24 @@ import { buildStyledWorkspaceDocx } from "./styledWorkspaceExport.js";
 
 dotenv.config();
 
+/**
+ * Safe Content-Disposition for file downloads. Node rejects non-Latin-1 / non-ASCII in
+ * header values; our filenames use em dashes and may include accents (issuer names).
+ * ASCII filename= fallback plus RFC 5987 filename*=UTF-8'' for full Unicode.
+ */
+function attachmentContentDisposition(filename) {
+  const raw = String(filename || "download.docx").trim() || "download.docx";
+  const ascii =
+    raw
+      .replace(/[^\x20-\x7E]/g, "-")
+      .replace(/["\\/]/g, "-")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 180) || "download.docx";
+  const star = encodeURIComponent(raw);
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${star}`;
+}
+
 const app = express();
 
 /* ================= CORE MIDDLEWARE ================= */
@@ -232,7 +250,7 @@ app.post("/generate-rfp-document", async (req, res) => {
     });
 
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Disposition", attachmentContentDisposition(filename));
     res.send(buffer);
 
     console.log("✅ Document generated successfully");
@@ -418,7 +436,7 @@ app.get("/export-document/:workspaceId", async (req, res) => {
         issuerDisplayName ? { issuerDisplayName } : {},
       );
       res.setHeader("Content-Type", contentType);
-      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.setHeader("Content-Disposition", attachmentContentDisposition(filename));
       if (appliedReplacements != null) {
         res.setHeader("X-Styled-Replacements", String(appliedReplacements));
       }
@@ -431,7 +449,7 @@ app.get("/export-document/:workspaceId", async (req, res) => {
 
     const { buffer, filename, contentType } = await buildWorkspaceDocumentDocx(workspaceId);
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Disposition", attachmentContentDisposition(filename));
     res.send(buffer);
   } catch (err) {
     console.error("EXPORT WORKSPACE DOCUMENT ERROR:", err.message);
