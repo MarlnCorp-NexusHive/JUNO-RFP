@@ -21,6 +21,7 @@ import {
   buildWorkspaceDocumentDocx,
   ensureWorkspaceDocument,
 } from "./workspaceDocumentService.js";
+import { buildStyledWorkspaceDocx } from "./styledWorkspaceExport.js";
 
 dotenv.config();
 
@@ -390,10 +391,44 @@ app.post("/workspace-document/:workspaceId/seed", (req, res) => {
   }
 });
 
+/** @deprecated Use GET /export-document/:id?style=styled (same proxy prefix as plain export). */
+app.get("/export-document-styled/:workspaceId", (req, res) => {
+  const { workspaceId } = req.params;
+  if (!workspaceId) return res.status(400).send("workspaceId required");
+  res.redirect(307, `/export-document/${encodeURIComponent(workspaceId)}?style=styled`);
+});
+
 app.get("/export-document/:workspaceId", async (req, res) => {
   try {
     const { workspaceId } = req.params;
     if (!workspaceId) return res.status(400).json({ error: "workspaceId is required" });
+
+    const styled =
+      req.query.style === "styled" || req.query.styled === "1" || req.query.styled === "true";
+
+    if (styled) {
+      const issuerDisplayName = (() => {
+        const a = req.query.issuerName ?? req.query.issuer;
+        if (typeof a === "string" && a.trim()) return a.trim();
+        return "";
+      })();
+      const { buffer, filename, contentType, appliedReplacements, mergeMode } = await buildStyledWorkspaceDocx(
+        openai,
+        workspaceId,
+        issuerDisplayName ? { issuerDisplayName } : {},
+      );
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      if (appliedReplacements != null) {
+        res.setHeader("X-Styled-Replacements", String(appliedReplacements));
+      }
+      if (mergeMode) {
+        res.setHeader("X-Styled-Merge-Mode", String(mergeMode));
+      }
+      res.send(buffer);
+      return;
+    }
+
     const { buffer, filename, contentType } = await buildWorkspaceDocumentDocx(workspaceId);
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
@@ -438,7 +473,7 @@ app.listen(PORT, () => {
   console.log("POST /workspace-document/:workspaceId");
   console.log("GET  /workspace-document/:workspaceId");
   console.log("POST /workspace-document/:workspaceId/seed");
-  console.log("GET  /export-document/:workspaceId");
+  console.log("GET  /export-document/:workspaceId (?style=styled for template merge)");
   console.log("POST /structure-rfp-requirements");
   console.log("POST /ask-with-context");
   console.log("POST /company-intelligence-remote");

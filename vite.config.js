@@ -6,34 +6,25 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const backendTarget = env.VITE_BACKEND_PROXY_TARGET || "http://127.0.0.1:3000";
 
+  /** Long timeouts: styled export + AI doc generation can exceed default proxy limits. */
+  const prox = (extra = {}) => ({
+    target: backendTarget,
+    changeOrigin: true,
+    timeout: 600_000,
+    proxyTimeout: 600_000,
+    ...extra,
+  });
+
   /** Shared between dev server and `vite preview` so API routes are never404 from the static host. */
   const apiProxy = {
-    "/rfp-collab": {
-      target: backendTarget,
-      changeOrigin: true,
-    },
+    "/rfp-collab": prox(),
     // Prefix rules (reliable); regex bundle below is kept for other routes.
-    "/extract-structured-data": {
-      target: backendTarget,
-      changeOrigin: true,
-    },
-    "/get-tables": {
-      target: backendTarget,
-      changeOrigin: true,
-    },
-    "/workspace-document": {
-      target: backendTarget,
-      changeOrigin: true,
-    },
-    "/export-document": {
-      target: backendTarget,
-      changeOrigin: true,
-    },
+    "/extract-structured-data": prox(),
+    "/get-tables": prox(),
+    "/workspace-document": prox(),
+    "/export-document": prox(),
     "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates)$":
-      {
-        target: backendTarget,
-        changeOrigin: true,
-      },
+      prox(),
   };
 
   return {

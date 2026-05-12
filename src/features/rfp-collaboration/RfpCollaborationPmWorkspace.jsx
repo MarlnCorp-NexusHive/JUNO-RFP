@@ -62,6 +62,8 @@ export default function RfpCollaborationPmWorkspace() {
 
   const [quarterly, setQuarterly] = useState([]);
 
+  const workspaceNotFound = error === "Workspace not found";
+
   const selected = useMemo(
     () => questions.find((q) => q.id === selectedId) || null,
     [questions, selectedId],
@@ -259,8 +261,30 @@ export default function RfpCollaborationPmWorkspace() {
       </div>
 
       {error ? (
-        <div className="rounded-lg border border-red-200 dark:border-red-900/40 bg-red-50/80 dark:bg-red-950/20 px-3 py-2 text-sm text-red-800 dark:text-red-200">
-          {error}
+        <div className="space-y-3">
+          <div className="rounded-lg border border-red-200 dark:border-red-900/40 bg-red-50/80 dark:bg-red-950/20 px-3 py-2 text-sm text-red-800 dark:text-red-200">
+            {error}
+          </div>
+          {workspaceNotFound ? (
+            <div className="rounded-lg border border-amber-200 dark:border-amber-900/40 bg-amber-50/90 dark:bg-amber-950/25 px-4 py-3 text-sm text-amber-950 dark:text-amber-100 space-y-2">
+              <p className="font-semibold">{t("rfpCollaboration.workspaceMissingTitle")}</p>
+              <p className="text-amber-900/90 dark:text-amber-100/90">{t("rfpCollaboration.workspaceMissingBody")}</p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Link
+                  to="/rbac/proposal-manager/source-docs"
+                  className="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700"
+                >
+                  {t("rfpCollaboration.workspaceMissingOpenSourceDocs")}
+                </Link>
+                <Link
+                  to="/rbac/proposal-manager/rfp-collaboration"
+                  className="inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  {t("rfpCollaboration.workspaceMissingOpenHub")}
+                </Link>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

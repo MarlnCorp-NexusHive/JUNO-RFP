@@ -23,6 +23,13 @@ function escapeHtml(text) {
     .replace(/'/g, "&#39;");
 }
 
+/** Strip C0 controls (except TAB/LF/CR) and lone surrogates so Word accepts OOXML text runs. */
+function sanitizeWordPlainText(s) {
+  return String(s || "")
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+    .replace(/[\uD800-\uDFFF]/g, "");
+}
+
 export function sanitizeAnswerHtml(html) {
   const input = String(html || "");
   const normalizedBlocks = input
@@ -116,7 +123,13 @@ function inlineRunsFromHtml(html) {
       runs.push(new TextRun({ text: "\n" }));
       continue;
     }
-    runs.push(new TextRun({ text: token.replace(/&nbsp;/g, " "), bold, italics }));
+    runs.push(
+      new TextRun({
+        text: sanitizeWordPlainText(token.replace(/&nbsp;/g, " ")),
+        bold,
+        italics,
+      }),
+    );
   }
   return runs.length ? runs : [new TextRun("")];
 }
@@ -207,7 +220,7 @@ export async function buildWorkspaceDocumentDocx(workspaceId) {
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { after: 280 },
-      children: [new TextRun({ text: model.title || "RFP Response", bold: true })],
+      children: [new TextRun({ text: sanitizeWordPlainText(model.title || "RFP Response"), bold: true })],
     }),
   ];
 
@@ -216,7 +229,12 @@ export async function buildWorkspaceDocumentDocx(workspaceId) {
       new Paragraph({
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 180, after: 140 },
-        children: [new TextRun({ text: `${i + 1}. ${section.question || "Untitled question"}`, bold: true })],
+        children: [
+          new TextRun({
+            text: sanitizeWordPlainText(`${i + 1}. ${section.question || "Untitled question"}`),
+            bold: true,
+          }),
+        ],
       }),
     );
     docChildren.push(...paragraphsFromAnswerHtml(section.answerHtml || ""));

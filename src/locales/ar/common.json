@@ -257,6 +257,10 @@
     "cancel": "إلغاء",
     "create": "إنشاء المساحة",
     "backToWorkspaces": "العودة إلى المساحات",
+    "workspaceMissingTitle": "مساحة التعاون هذه غير موجودة على الخادم",
+    "workspaceMissingBody": "يحدث ذلك غالباً بعد إعادة تشغيل الخادم (كانت المساحات تُخزَّن مؤقتاً في الذاكرة فقط). أصبحت المساحات تُحفظ على القرص لتبقى بعد إعادة التشغيل. لهذا الرابط: افتح طلب العروض من «المستندات المصدرية» ثم استخدم «طلب تدقيق» من جديد لإنشاء رابط مساحة جديد. يمكنك أيضاً إزالة الرابط القديم من مساحة العمل إن استمر الخطأ.",
+    "workspaceMissingOpenSourceDocs": "فتح المستندات المصدرية",
+    "workspaceMissingOpenHub": "فتح مركز التعاون",
     "usePmPortal": "استخدم مركز تعاون مدير العروض:",
     "openPmHub": "فتح المركز",
     "summary": "ملخص",
@@ -384,7 +388,9 @@
       "generateDocumentTemplateSummary": "القالب: {{template}}",
       "generateDocumentHint": "أجب عن سؤال واحد على الأقل لتفعيل إنشاء المستند.",
       "generateDocumentModalTitle": "إنشاء مستند طلب العرض",
-      "generateDocumentModalSubtitle": "أكّد التحميل باستخدام القالب المحدد أعلاه.",
+      "generateDocumentModalSubtitle": "اختر شكل ملف Word. الخيار المنظّم يستخدم التخطيط الذي اخترته أعلاه مع الذكاء الاصطناعي على الخادم.",
+      "generateModalStructuredTitle": "مستند منظّم بالذكاء الاصطناعي",
+      "generateModalStructuredDescription": "يبني أقساماً احترافية من إجاباتك باستخدام القالب الذي اخترته ({{template}})، ثم يضيف ملحق أسئلة وأجوبة. يتطلب OpenAI على الخادم.",
       "documentTemplates": {
         "standardIndustry": "استجابة قياسية لطلب العرض",
         "standardIndustryDescription": "تسعة أقسام: ملخص تنفيذي، الشركة، الجانب التقني، الفريق، الخطة، المخاطر، الامتثال، التسعير، المراجع.",
@@ -422,7 +428,20 @@
       "structuredModalSummary": "{{tables}} جدول/جداول، {{figures}} مرجع شكل/أشكال.",
       "structuredModalClose": "إغلاق",
       "structuredNoTables": "لم يُعثر على جداول في النص المستخرج.",
-      "structuredNoFigures": "لم يُعثر على مراجع أشكال (مثل «الشكل 1»)."
+      "structuredNoFigures": "لم يُعثر على مراجع أشكال (مثل «الشكل 1»).",
+      "downloadDocument": "تنزيل المستند",
+      "exportModalTitle": "تنزيل الرد",
+      "exportModalSubtitle": "اختر كيفية تصدير إجاباتك إلى Word.",
+      "exportOptionSimpleTitle": "مستند أسئلة وأجوبة بسيط",
+      "exportOptionSimpleDescription": "ملف Word منظم بكل متطلب وردك—سريع وسهل للمراجعة.",
+      "exportOptionStyledTitle": "عرض مقترح منسّق (قالب)",
+      "exportOptionStyledDescription": "يستخدم قالب Word «Marln technical proposal to DXC» على الخادم. يوجّه الذكاء الاصطناعي إجاباتك إلى الفقرات المناسبة مع الحفاظ على الأنماط والبنية قدر الإمكان—راجع الملف في Word قبل الإرسال.",
+      "exportOptionStyledBadge": "ذكاء اصطناعي",
+      "exportStyledSoonButton": "غير متاح بعد",
+      "exportDownloadStyled": "تنزيل Word منسّق",
+      "exportStyledPreparing": "جارٍ دمج القالب…",
+      "exportDownloadSimple": "تنزيل بهذا الشكل",
+      "exportPreparing": "جارٍ التحضير…"
     }
   },
   "proposalManagerCompanyIntelligence": {

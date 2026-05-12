@@ -38,12 +38,19 @@ function builtinTitle(selectedTemplate) {
   return "RFP Response";
 }
 
+function sanitizeWordPlainText(s) {
+  return String(s || "")
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+    .replace(/[\uD800-\uDFFF]/g, "");
+}
+
 function splitLongTextRuns(text) {
+  const safe = sanitizeWordPlainText(text);
   const chunk = 8000;
-  if (text.length <= chunk) return [new TextRun(text)];
+  if (safe.length <= chunk) return [new TextRun(safe)];
   const runs = [];
-  for (let i = 0; i < text.length; i += chunk) {
-    runs.push(new TextRun(text.slice(i, i + chunk)));
+  for (let i = 0; i < safe.length; i += chunk) {
+    runs.push(new TextRun(safe.slice(i, i + chunk)));
   }
   return runs;
 }

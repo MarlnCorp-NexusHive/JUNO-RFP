@@ -1,3 +1,9 @@
+# Runtime collaboration store (RFP team collab workspaces — survives backend restart)
+juno-backend/data/collaboration-runtime-state.json
+
+# Local styled-export smoke / test outputs
+juno-backend/_*.docx
+
 # Logs
 logs
 *.log

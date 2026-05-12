@@ -1,5 +1,6 @@
 import { store, generateId, activityBus } from "./store.js";
 import { seedQuarterlyItems } from "./seedData.js";
+import { scheduleCollaborationPersist } from "./collaborationPersistence.js";
 
 /** @type {import("openai").OpenAI | null} */
 let openaiClient = null;
@@ -131,6 +132,7 @@ export function createWorkspace(pmUserId, { title, document, questions }) {
     extra: { title: ws.title },
   });
 
+  scheduleCollaborationPersist();
   return getWorkspaceDetail(wsId, pmUserId);
 }
 
@@ -238,6 +240,7 @@ export function assignQuestion(pmUserId, { workspaceId, questionId, auditorUserI
     extra: { auditor: auditor.name, auditor_id: auditorUserId },
   });
 
+  scheduleCollaborationPersist();
   return { question: summarizeQuestion(q, store.usersById.get(pmUserId)) };
 }
 
@@ -282,6 +285,7 @@ export function saveDraft(auditorUserId, { workspaceId, questionId, answerDraft 
     });
   }
 
+  scheduleCollaborationPersist();
   return { question: summarizeQuestion(q, store.usersById.get(auditorUserId)) };
 }
 
@@ -328,6 +332,7 @@ export async function draftAnswerWithAi(auditorUserId, { workspaceId, questionId
     question: q,
   });
 
+  scheduleCollaborationPersist();
   return { answerDraft: q.answerDraft, question: summarizeQuestion(q, store.usersById.get(auditorUserId)) };
 }
 
@@ -361,6 +366,7 @@ export function submitAnswer(auditorUserId, { workspaceId, questionId, answerTex
     question: q,
   });
 
+  scheduleCollaborationPersist();
   return { question: summarizeQuestion(q, store.usersById.get(auditorUserId)) };
 }
 
@@ -401,6 +407,7 @@ export function reviewAnswer(pmUserId, { workspaceId, questionId, decision, comm
     extra: { comment: q.pmReviewComment },
   });
 
+  scheduleCollaborationPersist();
   return { question: summarizeQuestion(q, store.usersById.get(pmUserId)) };
 }
 
@@ -435,6 +442,7 @@ export function askClarification(auditorUserId, { workspaceId, questionId, messa
     extra: { message_id: msg.id, preview: body.slice(0, 200) },
   });
 
+  scheduleCollaborationPersist();
   return { message: msg };
 }
 
@@ -465,6 +473,7 @@ export function replyClarification(pmUserId, { workspaceId, questionId, message 
     extra: { message_id: msg.id, preview: body.slice(0, 200) },
   });
 
+  scheduleCollaborationPersist();
   return { message: msg };
 }
 
@@ -557,6 +566,7 @@ export function updateQuarterlyReview(auditorUserId, { workspaceId, reviewItemId
     },
   });
 
+  scheduleCollaborationPersist();
   return { item };
 }
 
