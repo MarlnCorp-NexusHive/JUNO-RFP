@@ -25,8 +25,6 @@ import {
   FiZap,
   FiMessageSquare,
   FiRefreshCw,
-  FiChevronDown,
-  FiCheck,
   FiUserPlus,
   FiGrid,
 } from "react-icons/fi";
@@ -34,7 +32,6 @@ import { useProposalIssuer } from "./ProposalIssuerContext";
 import {
   generateAnswer,
   structureRfpRequirementsWithAi,
-  generateRfpDocument,
   extractStructuredRfpData,
   seedWorkspaceDocument,
   saveWorkspaceDocument,
@@ -52,7 +49,6 @@ import RichTextAnswerEditor, { toPlainTextFromHtml, toHtmlFromPlain } from "./do
 
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
-const TEMPLATE_PREVIEW_BASE = `${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/rfp-template-previews`;
 
 /** Remove characters invalid in Windows / macOS download file names. */
 function sanitizeFileNameSegment(raw, maxLen = 100) {
@@ -83,86 +79,6 @@ const COLLAB_STATUS_KEYS = {
   rejected: "rfpCollaboration.status.rejected",
   changes_requested: "rfpCollaboration.status.changesRequested",
 };
-
-const TEMPLATE_OPTIONS = [
-  {
-    id: "standard-industry",
-    labelKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.standardIndustry",
-    describeKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.standardIndustryDescription",
-    thumbVariant: "standard",
-    previewSrc: `${TEMPLATE_PREVIEW_BASE}/standard-industry.svg`,
-  },
-  {
-    id: "federal-style",
-    labelKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.federalStyle",
-    describeKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.federalStyleDescription",
-    thumbVariant: "federal",
-    previewSrc: `${TEMPLATE_PREVIEW_BASE}/federal-style.svg`,
-  },
-  {
-    id: "lean-commercial",
-    labelKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.leanCommercial",
-    describeKey: "proposalManagerWorkspace.rfpWorkspace.documentTemplates.leanCommercialDescription",
-    thumbVariant: "lean",
-    previewSrc: `${TEMPLATE_PREVIEW_BASE}/lean-commercial.svg`,
-  },
-];
-
-/** Raster/SVG preview with CSS mockup fallback if the image fails to load. */
-function RfpTemplatePreviewImage({ src, variant, title, className = "" }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) {
-    return <RfpTemplateThumbnail variant={variant} className={className} />;
-  }
-  return (
-    <div
-      className={`overflow-hidden rounded-lg border border-gray-200/90 dark:border-gray-600 bg-white dark:bg-gray-950 shadow-sm ${className}`}
-    >
-      <img
-        src={src}
-        alt=""
-        title={title}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover object-top block"
-        onError={() => setFailed(true)}
-      />
-    </div>
-  );
-}
-
-/** Mini document mockup for template thumbnails (fallback only). */
-function RfpTemplateThumbnail({ variant, className = "" }) {
-  const cfg =
-    variant === "federal"
-      ? { sections: 7, accent: "bg-slate-600 dark:bg-slate-500", tight: true }
-      : variant === "lean"
-        ? { sections: 4, accent: "bg-emerald-600 dark:bg-emerald-500", tight: false }
-        : { sections: 9, accent: "bg-indigo-500 dark:bg-indigo-500", tight: true };
-
-  return (
-    <div
-      className={`relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-inner ${className}`}
-      aria-hidden
-    >
-      <div className={`h-2 w-full ${cfg.accent}`} />
-      <div className={`p-2 ${cfg.tight ? "space-y-1" : "space-y-1.5"}`}>
-        {Array.from({ length: cfg.sections }).map((_, i) => (
-          <div key={i} className="space-y-0.5">
-            <div
-              className="h-1 rounded-sm bg-gray-400/90 dark:bg-gray-500"
-              style={{ width: `${72 + ((i * 7) % 24)}%` }}
-            />
-            <div className="h-0.5 rounded-sm bg-gray-200 dark:bg-gray-600 w-full" />
-            {!cfg.tight ? (
-              <div className="h-0.5 rounded-sm bg-gray-100 dark:bg-gray-700 w-[88%]" />
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 /** Mini preview for “simple Q&A” export in the download modal. */
 function ExportSimpleFormatThumbnail({ className = "" }) {
@@ -224,47 +140,6 @@ function ExportStyledFormatThumbnail({ className = "" }) {
           <div className="h-1.5 w-full rounded-sm bg-gray-200 dark:bg-gray-600" />
           <div className="h-1.5 w-[88%] rounded-sm bg-gray-200/80 dark:bg-gray-600" />
           <div className="h-1.5 w-[72%] rounded-sm bg-gray-100 dark:bg-gray-700" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Mini preview for “structured AI” generate in the generate-document modal. */
-function GenerateStructuredFormatThumbnail({ className = "" }) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-xl border border-violet-300/70 dark:border-violet-800/50 bg-gradient-to-br from-white via-violet-50/40 to-indigo-50/50 dark:from-gray-900 dark:via-violet-950/25 dark:to-gray-900 shadow-inner ${className}`}
-      aria-hidden
-    >
-      <div className="flex items-center justify-between gap-2 px-2.5 py-2 bg-gradient-to-r from-violet-600 to-indigo-600">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <div className="h-6 w-6 rounded-md bg-white/25 ring-1 ring-white/40 shrink-0 flex items-center justify-center">
-            <FiZap className="w-3.5 h-3.5 text-amber-200" aria-hidden />
-          </div>
-          <div className="h-1.5 flex-1 max-w-[70%] rounded-sm bg-white/90" />
-        </div>
-        <span className="text-[8px] font-bold uppercase tracking-wider text-white/80 shrink-0">AI</span>
-      </div>
-      <div className="p-2.5 space-y-1.5">
-        {[1, 2, 3, 4].map((n) => (
-          <div
-            key={n}
-            className="flex items-stretch gap-1.5 rounded-lg border border-violet-200/50 dark:border-violet-900/40 bg-white/70 dark:bg-gray-800/40 px-1.5 py-1"
-          >
-            <span className="text-[9px] font-bold text-violet-600 dark:text-violet-300 tabular-nums shrink-0 w-3.5">
-              {n}
-            </span>
-            <div className="flex-1 space-y-0.5 min-w-0 pt-0.5">
-              <div className="h-1 rounded-sm bg-violet-400/70 dark:bg-violet-500/50 w-[78%]" />
-              <div className="h-0.5 rounded-sm bg-gray-200 dark:bg-gray-600 w-full" />
-              <div className="h-0.5 rounded-sm bg-gray-200/80 dark:bg-gray-600 w-[62%]" />
-            </div>
-          </div>
-        ))}
-        <div className="rounded border border-dashed border-indigo-300/60 dark:border-indigo-700/50 px-1.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20">
-          <div className="h-0.5 w-[40%] rounded-sm bg-indigo-400/60 dark:bg-indigo-500/40 mb-0.5" />
-          <div className="h-0.5 w-full rounded-sm bg-gray-200/90 dark:bg-gray-600" />
         </div>
       </div>
     </div>
@@ -346,12 +221,6 @@ export default function ProposalManagerWorkspace() {
   const [aiError, setAiError] = useState("");
   const [aiSplitLoading, setAiSplitLoading] = useState(false);
   const [aiSplitError, setAiSplitError] = useState("");
-  const [showGenerateModal, setShowGenerateModal] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("standard-industry");
-  const [documentGenerating, setDocumentGenerating] = useState(false);
-  const [documentGenerateError, setDocumentGenerateError] = useState("");
-  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
-  const templatePickerRef = useRef(null);
 
   const [showAuditModal, setShowAuditModal] = useState(false);
   const [auditAuditors, setAuditAuditors] = useState([]);
@@ -372,24 +241,6 @@ export default function ProposalManagerWorkspace() {
   const [workspaceDocExporting, setWorkspaceDocExporting] = useState(false);
   const [styledDocExporting, setStyledDocExporting] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-
-  useEffect(() => {
-    if (!templatePickerOpen) return;
-    const onMouseDown = (e) => {
-      if (templatePickerRef.current && !templatePickerRef.current.contains(e.target)) {
-        setTemplatePickerOpen(false);
-      }
-    };
-    const onKey = (e) => {
-      if (e.key === "Escape") setTemplatePickerOpen(false);
-    };
-    document.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [templatePickerOpen]);
 
   const refreshDocs = useCallback(() => setDocuments(getDocuments()));
   const refreshFolders = useCallback(() => setFolders(getFolders()));
@@ -965,11 +816,6 @@ export default function ProposalManagerWorkspace() {
     }
   }, [rfpId, selectedQuestionIndex, questions, answers, issuerBrief, handleAnswerChange]);
 
-  const handleOpenGenerateModal = useCallback(() => {
-    setDocumentGenerateError("");
-    setShowGenerateModal(true);
-  }, []);
-
   const selectedKey =
     selectedQuestionIndex != null && selectedQuestionIndex >= 0
       ? rfpQuestionKey(selectedQuestionIndex)
@@ -1001,55 +847,6 @@ export default function ProposalManagerWorkspace() {
       sections,
     };
   }, [questions, answers, workspaceDocumentModel]);
-
-  const handleGenerateDocument = useCallback(async () => {
-    if (!rfpId) return;
-    setDocumentGenerateError("");
-    setDocumentGenerating(true);
-    try {
-      const answeredQuestions = computedDocumentModel.sections
-        .map((s, idx) => ({
-          number: idx + 1,
-          question: String(s?.question || "").trim(),
-          answer: toPlainTextFromHtml(s?.answerHtml || "")
-            .trim()
-            .replace(/\s+/g, " "),
-        }))
-        .filter((row) => row.answer.length > 0);
-
-      if (answeredQuestions.length === 0) {
-        setDocumentGenerateError(t("proposalManagerWorkspace.rfpWorkspace.generateDocumentNoAnswers"));
-        return;
-      }
-      if (!workspaceDocId) {
-        setDocumentGenerateError("Workspace document id missing");
-        return;
-      }
-
-      await saveWorkspaceDocument(workspaceDocId, computedDocumentModel);
-      const blob = await generateRfpDocument({
-        answeredQuestions,
-        companyName: String(issuer?.name || "").trim(),
-        selectedTemplate,
-      });
-      const base = workspaceResponseDownloadBase(issuer?.name, activeRfpDoc?.name);
-      const fileName = `${base} (Generated).docx`;
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      setShowGenerateModal(false);
-    } catch (e) {
-      const msg = await messageFromApiError(e);
-      setDocumentGenerateError(msg || t("proposalManagerWorkspace.rfpWorkspace.generateDocumentFailed"));
-    } finally {
-      setDocumentGenerating(false);
-    }
-  }, [rfpId, computedDocumentModel, workspaceDocId, selectedTemplate, issuer?.name, t, activeRfpDoc?.name]);
 
   useEffect(() => {
     if (!workspaceDocId) return;
@@ -1137,7 +934,6 @@ export default function ProposalManagerWorkspace() {
       a.remove();
       window.URL.revokeObjectURL(url);
       setShowExportModal(false);
-      setShowGenerateModal(false);
     } catch (e) {
       setWorkspaceDocumentSyncError(await messageFromApiError(e));
     } finally {
@@ -1461,113 +1257,6 @@ export default function ProposalManagerWorkspace() {
                   ) : null}
                 </div>
               )}
-              <div className="mb-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-3">
-                <div className="flex flex-col gap-1 relative max-w-3xl" ref={templatePickerRef}>
-                  <span
-                    id="rfp-document-template-label"
-                    className="text-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    {t("proposalManagerWorkspace.rfpWorkspace.documentTemplateLabel")}
-                  </span>
-                  <button
-                    type="button"
-                    id="rfp-document-template"
-                    aria-haspopup="listbox"
-                    aria-expanded={templatePickerOpen}
-                    aria-labelledby="rfp-document-template-label rfp-document-template"
-                    disabled={documentGenerating}
-                    onClick={() => setTemplatePickerOpen((o) => !o)}
-                    className="inline-flex items-center justify-between gap-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm w-full sm:w-auto min-w-[14rem] text-left hover:bg-gray-50 dark:hover:bg-gray-600/80 disabled:opacity-50"
-                  >
-                    <span className="truncate">
-                      {(() => {
-                        const opt = TEMPLATE_OPTIONS.find((o) => o.id === selectedTemplate);
-                        return opt ? t(opt.labelKey) : selectedTemplate;
-                      })()}
-                    </span>
-                    <FiChevronDown
-                      className={`w-4 h-4 shrink-0 text-gray-500 transition-transform ${templatePickerOpen ? "rotate-180" : ""}`}
-                      aria-hidden
-                    />
-                  </button>
-
-                  {templatePickerOpen ? (
-                    <div
-                      role="listbox"
-                      aria-label={t("proposalManagerWorkspace.rfpWorkspace.documentTemplateLabel")}
-                      className="absolute left-0 top-full z-40 mt-1 w-full min-w-[min(100%,24rem)] sm:min-w-[28rem] rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xl p-3"
-                    >
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 px-0.5">
-                        {t("proposalManagerWorkspace.rfpWorkspace.documentTemplatePickerHint")}
-                      </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {TEMPLATE_OPTIONS.map((opt) => {
-                          const selected = opt.id === selectedTemplate;
-                          return (
-                            <button
-                              key={opt.id}
-                              type="button"
-                              role="option"
-                              aria-selected={selected}
-                              onClick={() => {
-                                setSelectedTemplate(opt.id);
-                                setTemplatePickerOpen(false);
-                              }}
-                              className={`flex flex-col rounded-lg border p-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                                selected
-                                  ? "border-indigo-500 bg-indigo-50/80 dark:bg-indigo-950/40 ring-1 ring-indigo-400 dark:ring-indigo-600"
-                                  : "border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700/40"
-                              }`}
-                            >
-                              <RfpTemplatePreviewImage
-                                src={opt.previewSrc}
-                                variant={opt.thumbVariant}
-                                title={t(opt.labelKey)}
-                                className="w-full aspect-[3/4] max-h-[140px] mb-2"
-                              />
-                              <span className="text-xs font-semibold text-gray-900 dark:text-white flex items-start gap-1.5">
-                                {selected ? (
-                                  <FiCheck
-                                    className="w-3.5 h-3.5 shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5"
-                                    aria-hidden
-                                  />
-                                ) : (
-                                  <span className="w-3.5 shrink-0" aria-hidden />
-                                )}
-                                <span className="leading-tight">{t(opt.labelKey)}</span>
-                              </span>
-                              <span className="text-[11px] leading-snug text-gray-600 dark:text-gray-400 mt-1 ps-[22px]">
-                                {t(opt.describeKey)}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <p className="text-xs text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed mt-1">
-                    {t("proposalManagerWorkspace.rfpWorkspace.documentTemplateAiHint")}
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleOpenGenerateModal}
-                    disabled={documentGenerating || answeredCount === 0}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium"
-                  >
-                    {documentGenerating
-                      ? t("proposalManagerWorkspace.rfpWorkspace.generatingDocument")
-                      : t("proposalManagerWorkspace.rfpWorkspace.generateDocumentButton")}
-                  </button>
-                  {answeredCount === 0 ? (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentHint")}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
               {aiSplitError ? (
                 <p className="text-sm text-red-600 dark:text-red-400 mb-3">{aiSplitError}</p>
               ) : null}
@@ -1927,106 +1616,6 @@ export default function ProposalManagerWorkspace() {
                   type="button"
                   onClick={() => {
                     if (!workspaceDocExporting && !styledDocExporting) setShowExportModal(false);
-                  }}
-                  className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                >
-                  {t("proposalManagerWorkspace.cancel")}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {showGenerateModal ? (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4">
-          <div
-            className="w-full max-w-3xl rounded-2xl border border-gray-200/90 dark:border-gray-600/80 bg-white dark:bg-gray-900 shadow-2xl shadow-indigo-950/10 dark:shadow-black/40 overflow-hidden"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="generate-modal-title"
-          >
-            <div className="relative px-6 pt-6 pb-2 bg-gradient-to-br from-gray-50 via-white to-violet-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-violet-950/20 border-b border-gray-100 dark:border-gray-800">
-              <div className="absolute top-0 end-0 w-40 h-40 rounded-full bg-violet-400/10 dark:bg-violet-500/5 blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 start-0 w-32 h-32 rounded-full bg-indigo-400/10 dark:bg-indigo-500/5 blur-2xl pointer-events-none" />
-              <h3 id="generate-modal-title" className="relative text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentModalTitle")}
-              </h3>
-              <p className="relative text-sm text-gray-600 dark:text-gray-400 mt-1.5 max-w-2xl">
-                {t("proposalManagerWorkspace.rfpWorkspace.generateDocumentModalSubtitle")}
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6">
-              {documentGenerateError ? (
-                <p className="mb-4 text-sm text-red-600 dark:text-red-400">{documentGenerateError}</p>
-              ) : null}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                <div className="group flex flex-col rounded-2xl border-2 border-violet-200/90 dark:border-violet-800/70 bg-gradient-to-b from-white to-violet-50/50 dark:from-gray-800/80 dark:to-violet-950/25 shadow-lg shadow-violet-900/5 dark:shadow-none ring-1 ring-violet-500/10 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-900/10">
-                  <div className="p-4 pb-0">
-                    <GenerateStructuredFormatThumbnail className="h-[7.5rem] w-full" />
-                  </div>
-                  <div className="flex flex-col flex-1 p-4 pt-3">
-                    <p className="text-base font-semibold text-gray-900 dark:text-white leading-snug">
-                      {t("proposalManagerWorkspace.rfpWorkspace.generateModalStructuredTitle")}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed flex-1">
-                      {t("proposalManagerWorkspace.rfpWorkspace.generateModalStructuredDescription", {
-                        template: (() => {
-                          const opt = TEMPLATE_OPTIONS.find((o) => o.id === selectedTemplate);
-                          return opt ? t(opt.labelKey) : selectedTemplate;
-                        })(),
-                      })}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => void handleGenerateDocument()}
-                      disabled={documentGenerating || styledDocExporting || answeredCount === 0}
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 text-white text-sm font-semibold shadow-md shadow-violet-900/20 transition"
-                    >
-                      {documentGenerating
-                        ? t("proposalManagerWorkspace.rfpWorkspace.generatingDocument")
-                        : t("proposalManagerWorkspace.rfpWorkspace.confirmGenerateDocument")}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="group relative flex flex-col rounded-2xl border-2 border-indigo-200/90 dark:border-indigo-800/70 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800/80 dark:to-indigo-950/25 shadow-lg shadow-indigo-900/5 dark:shadow-none ring-1 ring-indigo-500/10 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-900/10">
-                  <span className="absolute top-3 end-3 z-10 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 dark:bg-indigo-500/25 dark:text-indigo-100 ring-1 ring-indigo-300/50 dark:ring-indigo-500/30">
-                    {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledBadge")}
-                  </span>
-                  <div className="p-4 pb-0">
-                    <ExportStyledFormatThumbnail className="h-[7.5rem] w-full" />
-                  </div>
-                  <div className="flex flex-col flex-1 p-4 pt-3">
-                    <p className="text-base font-semibold text-gray-900 dark:text-white leading-snug">
-                      {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledTitle")}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed flex-1">
-                      {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledDescription")}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => void handleDownloadStyledWorkspaceDocument()}
-                      disabled={
-                        styledDocExporting || workspaceDocExporting || documentGenerating || !workspaceDocId || answeredCount === 0
-                      }
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white text-sm font-semibold shadow-md shadow-indigo-900/20 transition"
-                    >
-                      {styledDocExporting
-                        ? t("proposalManagerWorkspace.rfpWorkspace.exportStyledPreparing")
-                        : t("proposalManagerWorkspace.rfpWorkspace.exportDownloadStyled")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!documentGenerating && !styledDocExporting) setShowGenerateModal(false);
                   }}
                   className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
