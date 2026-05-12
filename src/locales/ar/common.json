@@ -436,7 +436,7 @@
       "exportOptionSimpleTitle": "مستند أسئلة وأجوبة بسيط",
       "exportOptionSimpleDescription": "ملف Word منظم بكل متطلب وردك—سريع وسهل للمراجعة.",
       "exportOptionStyledTitle": "عرض مقترح منسّق (قالب)",
-      "exportOptionStyledDescription": "يستخدم قالب Word «Marln technical proposal to DXC» على الخادم. يوجّه الذكاء الاصطناعي إجاباتك إلى الفقرات المناسبة مع الحفاظ على الأنماط والبنية قدر الإمكان—راجع الملف في Word قبل الإرسال.",
+      "exportOptionStyledDescription": "يستخدم قالب Word «Marln technical proposal to DXC» على الخادم. يوجّه الذكاء الاصطناعي إجاباتك إلى الفقرات المناسبة مع الحفاظ على الأنماط والبنية قدر الإمكان.",
       "exportOptionStyledBadge": "ذكاء اصطناعي",
       "exportStyledSoonButton": "غير متاح بعد",
       "exportDownloadStyled": "تنزيل Word منسّق",

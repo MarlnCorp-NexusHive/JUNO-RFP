@@ -436,7 +436,7 @@
       "exportOptionSimpleTitle": "Simple Q&A document",
       "exportOptionSimpleDescription": "A clean Word file with each requirement and your response—fast and easy to review.",
       "exportOptionStyledTitle": "Styled proposal (template)",
-      "exportOptionStyledDescription": "Uses the Marln technical proposal to DXC Word template on the server. AI maps your answers into the right paragraphs while preserving styles and structure as much as possible—review in Word before sending.",
+      "exportOptionStyledDescription": "Uses the Marln technical proposal to DXC Word template on the server. AI maps your answers into the right paragraphs while preserving styles and structure as much as possible.",
       "exportOptionStyledBadge": "AI",
       "exportStyledSoonButton": "Not available yet",
       "exportDownloadStyled": "Download styled Word",
