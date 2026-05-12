@@ -1,3 +1,8 @@
+# Netlify only hosts the static SPA. The Express API (juno-backend) must run elsewhere
+# (Railway, Render, Fly, EC2, etc.). In Netlify: Site settings → Environment variables →
+# add VITE_API_URL = https://your-api-host.example.com (no trailing slash), then redeploy.
+# Without it, production builds default to http://localhost:3000 and downloads/API fail.
+
 [build]
   command = "npm run build"
   publish = "dist"

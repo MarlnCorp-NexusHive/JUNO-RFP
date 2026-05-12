@@ -12,6 +12,11 @@ function resolveApiBaseUrl() {
   if (import.meta.env.DEV) return "";
   const fromEnv = (import.meta.env.VITE_API_URL ?? "").trim().replace(/\/$/, "");
   if (fromEnv) return fromEnv;
+  if (import.meta.env.PROD && typeof console !== "undefined") {
+    console.warn(
+      "[JUNO] VITE_API_URL is not set. Production API calls use http://localhost:3000, which fails on Netlify and other hosts. Set VITE_API_URL to your deployed juno-backend origin and redeploy.",
+    );
+  }
   // Fallback for local preview builds.
   return "http://localhost:3000";
 }
