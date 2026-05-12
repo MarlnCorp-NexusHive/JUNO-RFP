@@ -359,6 +359,7 @@ export default function ProposalManagerWorkspace() {
   const [auditAssignBusy, setAuditAssignBusy] = useState(false);
   const [auditAssignError, setAuditAssignError] = useState("");
   const [collabQuestionByIndex, setCollabQuestionByIndex] = useState({});
+  const [collabStaleNotice, setCollabStaleNotice] = useState("");
   const [structuredExtractLoading, setStructuredExtractLoading] = useState(false);
   const [structuredExtractError, setStructuredExtractError] = useState("");
   const [structuredExtractResult, setStructuredExtractResult] = useState(null);
@@ -547,10 +548,21 @@ export default function ProposalManagerWorkspace() {
   }, [currentDocs, rfpId]);
 
   useEffect(() => {
+    if (!collabStaleNotice) return;
+    const tmr = setTimeout(() => setCollabStaleNotice(""), 14_000);
+    return () => clearTimeout(tmr);
+  }, [collabStaleNotice]);
+
+  useEffect(() => {
+    setCollabStaleNotice("");
+  }, [rfpId]);
+
+  useEffect(() => {
     if (!rfpId) {
       setAnswers({});
       setSelectedQuestionIndex(null);
       setAiError("");
+      setAiSplitError("");
       setStructuredExtractError("");
       setStructuredExtractResult(null);
       setShowStructuredModal(false);
@@ -611,8 +623,20 @@ export default function ProposalManagerWorkspace() {
           if (sq) next[idx] = sq;
         });
         setCollabQuestionByIndex(next);
-      } catch {
-        if (!cancelled) setCollabQuestionByIndex({});
+      } catch (e) {
+        if (cancelled) return;
+        setCollabQuestionByIndex({});
+        const status = e?.response?.status;
+        const msg = e?.response?.data?.error || e?.message || "";
+        const notFound = status === 404 || String(msg).includes("Workspace not found");
+        if (notFound) {
+          const latest = getDocuments().find((d) => d.id === rfpId);
+          if (latest?.rfpCollabWorkspaceId) {
+            updateDocument(rfpId, { rfpCollabWorkspaceId: null, rfpCollabQuestionIds: null });
+            refreshDocs();
+          }
+          setCollabStaleNotice(t("proposalManagerWorkspace.rfpWorkspace.collabStaleLinkCleared"));
+        }
       }
     };
     tick();
@@ -1553,6 +1577,14 @@ export default function ProposalManagerWorkspace() {
                 </p>
               ) : (
                 <>
+                  {collabStaleNotice ? (
+                    <div
+                      role="status"
+                      className="mb-4 rounded-lg border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-950 dark:text-amber-100"
+                    >
+                      {collabStaleNotice}
+                    </div>
+                  ) : null}
                   <div className="mb-4">
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                       <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate pr-2" title={activeRfpDoc?.name}>

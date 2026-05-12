@@ -406,6 +406,7 @@
       "auditCollabRequired": "Team Collab could not connect. Ensure you are logged in as Proposal Manager and the collaboration API is running.",
       "auditCollabMapFailed": "Could not link workspace questions to this list. Try again or split requirements again.",
       "auditLinkStale": "This document’s questions changed after Team Collab was linked. Unlink to assign auditors to the current list.",
+      "collabStaleLinkCleared": "The saved collaboration link no longer exists on the server (for example after a deploy). It was cleared from this document — use “Ask to audit” again to create a fresh workspace.",
       "auditUnlinkCollab": "Unlink Team Collab",
       "auditBadge": "Audit",
       "auditPanelTitle": "Team audit",
