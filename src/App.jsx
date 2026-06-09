@@ -105,6 +105,7 @@ import ProposalPricingPage from './features/proposal-manager/components/Proposal
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
 import CompanyIntelligencePage from './features/proposal-manager/components/CompanyIntelligencePage';
 import ProposalManagerContentHub from './features/proposal-manager/components/ProposalManagerContentHub';
+import ProposalManagerCalendar from './features/proposal-manager/components/ProposalManagerCalendar';
 import RfpCollaborationPmHub from "./features/rfp-collaboration/RfpCollaborationPmHub.jsx";
 import RfpCollaborationPmWorkspace from "./features/rfp-collaboration/RfpCollaborationPmWorkspace.jsx";
 import RfpAuditorShell from "./features/rfp-collaboration/RfpAuditorShell.jsx";
@@ -235,7 +236,7 @@ export default function App() {
           <Route path="pricing" element={<ProposalPricingPage />} />
           <Route path="communication" element={<MarketingHeadCommunicationHub />} />
           <Route path="compliance" element={<DirectorAuditCompliance />} />
-          <Route path="meetings-calendar" element={<DirectorMeetingsCalendar />} />
+          <Route path="meetings-calendar" element={<ProposalManagerCalendar />} />
           <Route path="user-management" element={<DirectorUserManagement />} />
           <Route path="rfp-collaboration" element={<RfpCollaborationPmHub />} />
           <Route path="rfp-collaboration/w/:workspaceId" element={<RfpCollaborationPmWorkspace />} />

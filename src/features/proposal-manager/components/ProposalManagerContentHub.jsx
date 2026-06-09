@@ -6,10 +6,12 @@ import {
   updateContentHubQA,
   deleteContentHubQA,
 } from "../services/proposalManagerStorage";
-import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX } from "react-icons/fi";
+import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { useTranslation } from "react-i18next";
-import { generateAnswer, askWithFile, generateCompanyProfile } from "../../../services/api.js";
+import { generateAnswer, askWithFile, generateCompanyProfile, generateSlideDeck } from "../../../services/api.js";
+
+const MIN_SLIDE_CONTENT_CHARS = 120;
 
 const SUGGESTED_TAGS = [
   "Section L",
@@ -41,6 +43,8 @@ export default function ProposalManagerContentHub() {
   const [file, setFile] = useState(null);
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
+  const [slideLoading, setSlideLoading] = useState(false);
+  const [slideError, setSlideError] = useState("");
   const aiFileInputRef = useRef(null);
   const [profileCompanyName, setProfileCompanyName] = useState("");
   const [profileWebsite, setProfileWebsite] = useState("");
@@ -122,6 +126,7 @@ export default function ProposalManagerContentHub() {
     if (!q || loading) return;
     setLoading(true);
     setResponse("");
+    setSlideError("");
     try {
       const answer = file ? await askWithFile(file, q) : await generateAnswer(q);
       setResponse(answer);
@@ -160,6 +165,36 @@ export default function ProposalManagerContentHub() {
       setProfileError(msg);
     } finally {
       setProfileLoading(false);
+    }
+  };
+
+  const canGenerateSlides =
+    response &&
+    !response.startsWith("[Error]") &&
+    response.trim().length >= MIN_SLIDE_CONTENT_CHARS;
+
+  const handleGenerateSlides = async () => {
+    if (!canGenerateSlides || slideLoading) return;
+    setSlideLoading(true);
+    setSlideError("");
+    try {
+      const { blob, filename } = await generateSlideDeck({
+        question: question.trim(),
+        content: response,
+        issuerName: issuer?.name,
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setSlideError(err?.message || t("proposalManagerContentHub.aiAssistant.slideDeckError"));
+    } finally {
+      setSlideLoading(false);
     }
   };
 
@@ -256,10 +291,45 @@ export default function ProposalManagerContentHub() {
                   : "border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100"
               }`}
             >
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                {t("proposalManagerContentHub.aiAssistant.responseLabel")}
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  {t("proposalManagerContentHub.aiAssistant.responseLabel")}
+                </p>
+                {canGenerateSlides ? (
+                  <button
+                    type="button"
+                    onClick={handleGenerateSlides}
+                    disabled={slideLoading}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-xs font-medium"
+                  >
+                    {slideLoading ? (
+                      <FiRefreshCw className="w-3.5 h-3.5 animate-spin" aria-hidden />
+                    ) : (
+                      <FiDownload className="w-3.5 h-3.5" aria-hidden />
+                    )}
+                    {slideLoading
+                      ? t("proposalManagerContentHub.aiAssistant.slideDeckLoading")
+                      : t("proposalManagerContentHub.aiAssistant.slideDeck")}
+                  </button>
+                ) : null}
+              </div>
               {response.startsWith("[Error]") ? response.replace(/^\[Error\]\s*/, "") : response}
+              {slideLoading ? (
+                <p className="mt-3 text-xs font-medium text-violet-700 dark:text-violet-300 border-t border-violet-200/60 dark:border-violet-900/40 pt-2 flex items-center gap-2">
+                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
+                  {t("proposalManagerContentHub.aiAssistant.slideDeckLoading")}
+                </p>
+              ) : null}
+              {slideError ? (
+                <p className="mt-3 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">
+                  {slideError}
+                </p>
+              ) : null}
+              {canGenerateSlides && !slideLoading ? (
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200/80 dark:border-gray-600 pt-2">
+                  {t("proposalManagerContentHub.aiAssistant.slideDeckHint")}
+                </p>
+              ) : null}
             </div>
           ) : null}
         </section>

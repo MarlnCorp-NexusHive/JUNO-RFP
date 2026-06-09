@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => {
     "/get-tables": prox(),
     "/workspace-document": prox(),
     "/export-document": prox(),
+    "/calendar": prox(),
+    "/generate-slide-deck": prox(),
     "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates)$":
       prox(),
   };

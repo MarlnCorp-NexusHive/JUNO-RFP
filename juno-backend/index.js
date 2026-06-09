@@ -22,6 +22,8 @@ import {
   ensureWorkspaceDocument,
 } from "./workspaceDocumentService.js";
 import { buildStyledWorkspaceDocx } from "./styledWorkspaceExport.js";
+import { initCalendar, calendarRouter } from "./calendar/index.js";
+import { generateSlideDeckFromContent } from "./slideDeckBuilder.js";
 
 dotenv.config();
 
@@ -65,7 +67,9 @@ const openai = new OpenAI({
 });
 
 initCollaboration(openai);
+initCalendar();
 app.use("/rfp-collab", collaborationRouter);
+app.use("/calendar", calendarRouter);
 registerRfpAssistantEndpoints(app, openai);
 
 /* ================= MULTER ================= */
@@ -458,6 +462,34 @@ app.get("/export-document/:workspaceId", async (req, res) => {
   }
 });
 
+/* ================= CONTENT HUB → SLIDE DECK ================= */
+
+app.post("/generate-slide-deck", async (req, res) => {
+  try {
+    const { question, content, clientName, issuerName } = req.body || {};
+    if (!content || typeof content !== "string" || !content.trim()) {
+      return res.status(400).json({ error: "content is required" });
+    }
+    const result = await generateSlideDeckFromContent(openai, {
+      question,
+      content,
+      clientName,
+      issuerName,
+    });
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    );
+    res.setHeader("Content-Disposition", attachmentContentDisposition(result.filename));
+    res.setHeader("X-Slide-Count", String(result.slideCount));
+    res.send(result.buffer);
+  } catch (err) {
+    console.error("SLIDE DECK ERROR:", err.message);
+    const code = err.statusCode || 500;
+    res.status(code).json({ error: err.message || "Slide deck generation failed" });
+  }
+});
+
 /* ================= GLOBAL ERROR ================= */
 
 app.use((err, req, res, next) => {
@@ -496,5 +528,7 @@ app.listen(PORT, () => {
   console.log("POST /ask-with-context");
   console.log("POST /company-intelligence-remote");
   console.log("POST /generate-company-profile");
-  console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)\n");
+  console.log("POST /generate-slide-deck");
+  console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
+  console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines\n");
 });

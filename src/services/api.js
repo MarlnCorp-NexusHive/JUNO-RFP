@@ -156,6 +156,54 @@ export const exportWorkspaceDocumentStyled = async (workspaceId, issuerDisplayNa
   return assertBlobIsDocxOrThrow(res, "Styled export");
 };
 
+async function errorMessageFromBlobResponse(blob, fallback) {
+  if (!(blob instanceof Blob)) return fallback;
+  const text = await blob.text();
+  try {
+    const j = JSON.parse(text);
+    if (typeof j?.error === "string") return j.error;
+  } catch {
+    /* HTML or plain text */
+  }
+  if (/Cannot POST \/generate-slide-deck/i.test(text)) {
+    return "Slide deck API is not running. Restart juno-backend (node index.js) and try again.";
+  }
+  return text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 400) || fallback;
+}
+
+/* ================= SLIDE DECK (Content Hub) ================= */
+export const generateSlideDeck = async ({ question, content, issuerName }) => {
+  let res;
+  try {
+    res = await API.post(
+      "/generate-slide-deck",
+      { question, content, issuerName },
+      { responseType: "blob" },
+    );
+  } catch (err) {
+    const msg = await errorMessageFromBlobResponse(
+      err?.response?.data,
+      err?.message || "Slide deck request failed",
+    );
+    throw new Error(msg);
+  }
+  const blob = res.data;
+  if (!(blob instanceof Blob)) {
+    throw new Error("Slide deck: invalid response");
+  }
+  const head = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
+  if (head[0] !== 0x50 || head[1] !== 0x4b) {
+    throw new Error(await errorMessageFromBlobResponse(blob, "Server did not return a PowerPoint file"));
+  }
+  const slideCount = res.headers?.["x-slide-count"];
+  const disposition = res.headers?.["content-disposition"] || "";
+  const fnMatch = disposition.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+  const filename = fnMatch
+    ? decodeURIComponent(fnMatch[1].replace(/"/g, "").trim())
+    : "content-hub-deck.pptx";
+  return { blob, filename, slideCount: slideCount ? Number(slideCount) : null };
+};
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {
