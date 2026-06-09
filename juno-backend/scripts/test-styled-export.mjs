@@ -92,7 +92,7 @@ const mockOneReplace = {
           {
             message: {
               content: JSON.stringify({
-                replacements: [{ paragraphIndex: pick, newText: "REPLACEMENT LINE 1\nLINE 2" }],
+                replacements: [{ qaNumber: 1, paragraphIndex: pick, newText: "Hello world with unicode — €" }],
                 notes: "one replace",
               }),
             },

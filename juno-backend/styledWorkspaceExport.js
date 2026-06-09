@@ -13,8 +13,58 @@ const TEMPLATE_PATH = path.join(
 
 const MAX_AI_REPLACEMENTS = 55;
 const MAX_NEW_TEXT_LEN = 14_000;
-const MAX_PAYLOAD_CHARS = 48_000;
+const MAX_PAYLOAD_CHARS = 52_000;
+const PARAGRAPH_PREVIEW_LEN = 420;
 const STYLED_EXPORT_MODEL = process.env.STYLED_EXPORT_MODEL || "gpt-4o";
+
+/** Paragraph previews that look like placeholders — always include in AI payload when subsampling. */
+const PLACEHOLDER_PREVIEW_RE =
+  /\b(tbd|to\s*do|lorem|ipsum|placeholder|sample\s+text|type\s+here|\[insert|xxx\b|n\/?a\b|fill\s+in|your\s+text|t\.?\s*b\.?\s*d\.?)\b|\[\s*\]|\(\s*\)/i;
+
+function tokenizeForOverlap(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w.length > 2);
+}
+
+/** Share of significant answer tokens that appear in newText (detect wrong-QA mixes / hallucinations). */
+function answerTokenRecallInNewText(answer, newText) {
+  const ansTok = tokenizeForOverlap(answer);
+  if (ansTok.length === 0) return newText.trim().length === 0 ? 1 : 0;
+  const nt = new Set(tokenizeForOverlap(newText));
+  let hit = 0;
+  for (const w of ansTok) {
+    if (nt.has(w)) hit++;
+  }
+  return hit / ansTok.length;
+}
+
+function inferQaNumberFromNewText(newText, qa) {
+  let best = { n: null, score: 0 };
+  for (let i = 0; i < qa.length; i++) {
+    const s = answerTokenRecallInNewText(qa[i].answer, newText);
+    if (s > best.score) best = { n: i + 1, score: s };
+  }
+  if (best.score < 0.12) return null;
+  return best.n;
+}
+
+function questionKeywordHints(question) {
+  const words = tokenizeForOverlap(question).filter((w) => w.length > 4);
+  return [...new Set(words)].slice(0, 14);
+}
+
+/** Heuristic: short, punctuation-light previews are often headings — deprioritize for body answers. */
+function paragraphKindGuess(preview) {
+  const t = String(preview || "").trim();
+  if (!t) return 0;
+  if (t.length <= 72 && !/[.?:;]/.test(t)) return 1;
+  if (/^(appendix|table of contents|references?|section\s+\d+)/i.test(t)) return 1;
+  return 0;
+}
 
 function decodeXmlText(s) {
   return String(s || "")
@@ -290,8 +340,11 @@ function buildParagraphSamples(totalParagraphs, getXml) {
   const previews = [];
   for (let i = 0; i < totalParagraphs; i++) {
     const xml = getXml(i);
-    const t = extractParagraphPlainText(xml).replace(/\s+/g, " ").trim().slice(0, 220);
-    previews.push({ i, t });
+    const raw = extractParagraphPlainText(xml).replace(/\s+/g, " ").trim();
+    const t = raw.slice(0, PARAGRAPH_PREVIEW_LEN);
+    const k = paragraphKindGuess(t);
+    const ph = PLACEHOLDER_PREVIEW_RE.test(raw) ? 1 : 0;
+    previews.push({ i, t, k, ph });
   }
   let json = JSON.stringify(previews);
   if (json.length <= MAX_PAYLOAD_CHARS) {
@@ -299,17 +352,20 @@ function buildParagraphSamples(totalParagraphs, getXml) {
   }
 
   const n = totalParagraphs;
-  const target = Math.min(300, n);
+  const target = Math.min(320, n);
   const set = new Set();
-  for (let k = 0; k < 24; k++) set.add(k);
-  for (let k = Math.max(0, n - 24); k < n; k++) set.add(k);
+  for (let k = 0; k < 28; k++) set.add(k);
+  for (let k = Math.max(0, n - 28); k < n; k++) set.add(k);
   for (let k = 0; k < target; k++) {
     set.add(Math.min(n - 1, Math.floor((k * n) / target)));
+  }
+  for (let idx = 0; idx < previews.length; idx++) {
+    if (previews[idx].ph) set.add(idx);
   }
   let idxs = [...set].sort((a, b) => a - b);
   let samples = idxs.map((i) => previews[i]);
   json = JSON.stringify(samples);
-  while (json.length > MAX_PAYLOAD_CHARS && samples.length > 100) {
+  while (json.length > MAX_PAYLOAD_CHARS && samples.length > 120) {
     samples = samples.filter((_, idx) => idx % 2 === 0);
     json = JSON.stringify(samples);
   }
@@ -405,12 +461,25 @@ export async function buildStyledWorkspaceDocx(openai, workspaceId, options = {}
 
   const { samples, paragraphCount: totalP } = buildParagraphSamples(paragraphCount, (i) => pXmlByIndex[i]);
 
+  const qaForModel = qa.map((row) => ({
+    number: row.number,
+    question: row.question,
+    answer: row.answer,
+    questionKeywords: questionKeywordHints(row.question),
+  }));
+
   const userPayload = {
     totalParagraphCount: totalP,
     paragraphSamples: samples,
-    qa,
+    qa: qaForModel,
+    fieldNotes: {
+      i: "paragraph index (0 .. totalParagraphCount-1)",
+      t: "plain-text preview of that paragraph (truncated)",
+      k: "1 if preview looks like a section heading (avoid for long body answers unless the answer truly belongs there), 0 otherwise",
+      ph: "1 if preview looks like placeholder/boilerplate (good merge target), 0 otherwise",
+    },
     instructions:
-      "Map workspace Q&A answers into the Marln technical proposal template. Each qa item has number, question, answer. Use paragraphIndex from 0 to totalParagraphCount-1. Prefer paragraphs whose preview text relates to that requirement, is placeholder/TBD/Lorem, or sits under a matching heading. You SHOULD return one replacement per qa item when you can find any reasonable target (up to the max). paragraphIndex must appear in paragraphSamples OR still be a valid index in range.",
+      "Map each workspace Q&A answer into the Marln technical proposal body. Each qa item has number, question, answer, questionKeywords. For every replacement you MUST set qaNumber equal to qa.number. newText must be the substantive text from that qa.answer only (light grammar cleanup allowed; do not invent requirements). Choose paragraphIndex whose preview t is semantically about that topic: share words with questionKeywords or the question/answer, OR ph=1 placeholder text, OR obvious body/response filler. Strongly prefer k=0 paragraphs for multi-sentence answers. Do NOT put answers on title pages, TOC lines, confidentiality headers, signature blocks, or unrelated boilerplate. At most one paragraphIndex per qa.number unless the answer clearly needs two disjoint blocks.",
   };
 
   let parsed = null;
@@ -423,12 +492,13 @@ export async function buildStyledWorkspaceDocx(openai, workspaceId, options = {}
         {
           role: "system",
           content: `You merge RFP workspace answers into an existing Word document body (OOXML w:p paragraphs).
-Return ONLY valid JSON: {"replacements":[{"paragraphIndex":number,"newText":"string"}],"notes":string}.
+Return ONLY valid JSON: {"replacements":[{"qaNumber":number,"paragraphIndex":number,"newText":"string"}],"notes":string}.
 Rules:
+- qaNumber: required integer matching qa.number from the user payload (1-based).
 - paragraphIndex: integer, 0 <= paragraphIndex < totalParagraphCount from the user JSON.
-- Return up to ${MAX_AI_REPLACEMENTS} replacements. Aim for at least one replacement per qa item when any paragraph preview relates to that question or is clearly filler/placeholder text.
+- Return up to ${MAX_AI_REPLACEMENTS} replacements. Aim for one replacement per qa item when a reasonable body target exists.
 - newText: plain text only (no HTML). Newlines allowed. Max ${MAX_NEW_TEXT_LEN} characters each; truncate if needed.
-- Do not invent facts beyond the provided answers.
+- newText must be grounded in the matching qa.answer (no fabricated requirements).
 - No duplicate paragraphIndex.`,
         },
         {
@@ -454,9 +524,30 @@ Rules:
       : [];
   const seen = new Set();
   const replacements = [];
+
+  function replacementAlignsWithQa(qaRow, newText) {
+    const a = String(qaRow?.answer || "").trim();
+    if (!a) return false;
+    if (a.length <= 55) {
+      const nt = newText.toLowerCase().replace(/\s+/g, " ");
+      const al = a.toLowerCase().replace(/\s+/g, " ");
+      if (al.length >= 2 && nt.includes(al)) return true;
+      return answerTokenRecallInNewText(a, newText) >= 0.42;
+    }
+    return answerTokenRecallInNewText(a, newText) >= 0.14;
+  }
+
   for (const row of rawList) {
     const paragraphIndex = Number(row?.paragraphIndex ?? row?.paragraph_index);
     const newText = String(row?.newText ?? row?.new_text ?? "").slice(0, MAX_NEW_TEXT_LEN);
+    let qaNumber = Number(row?.qaNumber ?? row?.qa_number);
+    if (!Number.isInteger(qaNumber) || qaNumber < 1 || qaNumber > qa.length) {
+      qaNumber = inferQaNumberFromNewText(newText, qa);
+    }
+    if (!Number.isInteger(qaNumber) || qaNumber < 1 || qaNumber > qa.length) continue;
+    const qaRow = qa[qaNumber - 1];
+    if (!replacementAlignsWithQa(qaRow, newText)) continue;
+
     if (!Number.isInteger(paragraphIndex)) continue;
     if (paragraphIndex < 0 || paragraphIndex >= paragraphCount) continue;
     if (seen.has(paragraphIndex)) continue;

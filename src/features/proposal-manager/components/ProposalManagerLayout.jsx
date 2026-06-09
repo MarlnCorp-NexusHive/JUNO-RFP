@@ -70,7 +70,7 @@ export default function ProposalManagerLayout() {
         }`}>
           <Sidebar
             features={proposalManagerFeatures}
-            userLabel="Proposal manger"
+            userLabel="Proposal Manager"
             expanded={expanded}
             setExpanded={setExpanded}
             role="proposal-manager"
