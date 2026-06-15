@@ -29,6 +29,7 @@ function AutoStartTour({ role }) {
       if (segments.includes('meetings-calendar')) return 'meetings-calendar';
       if (segments.includes('user-management')) return 'user-management';
       if (segments.includes('rfp-collaboration')) return 'rfp-collaboration';
+      if (segments.includes('technical-solutioning')) return 'technical-solutioning';
       if (segments.includes('workspace')) return 'workspace';
       if (segments.includes('help-support')) return 'help-support';
       if (segments.includes('settings')) return 'settings';

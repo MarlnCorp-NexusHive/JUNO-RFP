@@ -4,6 +4,7 @@ export const proposalManagerFeatures = [
   { label: "proposalManager.sourceDocs", icon: "📄", route: "/rbac/proposal-manager/source-docs", description: "Source documents and reference materials" },
   { label: "proposalManager.manageTeam", icon: "👥", route: "/rbac/proposal-manager/team", description: "Team Management and Collaboration" },
   { label: "proposalManager.rfpCollaboration", icon: "🤝", route: "/rbac/proposal-manager/rfp-collaboration", description: "Assign RFP questions to auditors, AI drafts, review, activity log" },
+  { label: "proposalManager.technicalSolutioning", icon: "🏗️", route: "/rbac/proposal-manager/technical-solutioning", description: "AI solution architecture from reference designs and RFP requirements" },
   { label: "proposalManager.bidVault", icon: "📦", route: "/rbac/proposal-manager/bid-vault", description: "Bid repository and submissions" },
   { label: "proposalManager.captureStrategy", icon: "🗺️", route: "/rbac/proposal-manager/capture-strategy", description: "Capture strategy and planning" },
   { label: "proposalManager.contentHub", icon: "📝", route: "/rbac/proposal-manager/content-hub", description: "Content library and assets" },

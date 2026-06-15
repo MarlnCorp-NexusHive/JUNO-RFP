@@ -100,6 +100,7 @@ import DirectorLayout from './features/director/components/DirectorLayout';
 import DirectorWorkspace from './features/director/components/DirectorWorkspace';
 import DirectorSupport from './features/director/components/DirectorSupport';
 import ProposalManagerLayout from './features/proposal-manager/components/ProposalManagerLayout';
+import TechnicalSolutioningPage from './features/proposal-manager/components/TechnicalSolutioningPage';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
@@ -240,6 +241,7 @@ export default function App() {
           <Route path="user-management" element={<DirectorUserManagement />} />
           <Route path="rfp-collaboration" element={<RfpCollaborationPmHub />} />
           <Route path="rfp-collaboration/w/:workspaceId" element={<RfpCollaborationPmWorkspace />} />
+          <Route path="technical-solutioning" element={<TechnicalSolutioningPage />} />
           <Route path="workspace" element={<ProposalManagerWorkspace />} />
           <Route path="help-support" element={<DirectorSupport />} />
           <Route path="settings" element={<DirectorSettings />} />

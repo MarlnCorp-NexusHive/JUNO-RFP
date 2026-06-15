@@ -1,0 +1,1119 @@
+# =============================================================================
+# JUNO RFP — Target Architecture Pseudocode (Fully Completed Product)
+# =============================================================================
+# Marln Corp · Production SaaS target state
+# Scope: multi-tenant, server-authoritative RFP response management platform
+# Not a description of the current localStorage / in-memory prototype.
+# =============================================================================
+
+
+# =============================================================================
+# SECTION 1 — CORE DOMAIN MODELS
+# =============================================================================
+
+TYPE Organization
+  id: UUID
+  name: string
+  slug: string
+  branding: { logoUrl, primaryColor, docxTemplateId }
+  ssoConfig: { provider, metadataUrl, clientId } | null
+  plan: "starter" | "professional" | "enterprise"
+  createdAt: timestamp
+
+TYPE User
+  id: UUID
+  orgId: UUID
+  email: string
+  displayName: string
+  role: "proposal_manager" | "writer" | "auditor" | "pricing" | "legal" | "director" | "admin"
+  teamIds: UUID[]
+  mfaEnabled: boolean
+  lastLoginAt: timestamp
+
+TYPE Opportunity
+  id: UUID
+  orgId: UUID
+  title: string
+  issuerName: string
+  issuerSnapshotId: UUID | null
+  status: "capturing" | "active" | "submitted" | "won" | "lost" | "no_bid"
+  captureScore: float
+  dueDate: date
+  ownerUserId: UUID
+  createdAt: timestamp
+
+TYPE RfpDocument
+  id: UUID
+  opportunityId: UUID
+  version: int
+  fileName: string
+  blobKey: string              # S3 object key
+  mimeType: string
+  extractedText: string
+  uploadedBy: UUID
+  uploadedAt: timestamp
+
+TYPE Requirement
+  id: UUID
+  opportunityId: UUID
+  documentId: UUID
+  number: string               # e.g. "3.2.1"
+  text: string
+  section: string
+  complianceTags: string[]
+  dueDate: date | null
+
+TYPE Answer
+  id: UUID
+  requirementId: UUID
+  contentHtml: string
+  contentPlain: string
+  status: "draft" | "in_review" | "changes_requested" | "approved"
+  authorUserId: UUID
+  source: "manual" | "ai" | "content_hub"
+  contentHubItemId: UUID | null
+  updatedAt: timestamp
+
+TYPE Assignment
+  id: UUID
+  requirementId: UUID
+  assigneeUserId: UUID
+  assignedBy: UUID
+  status: "assigned" | "in_progress" | "submitted"
+  dueDate: date | null
+
+TYPE Review
+  id: UUID
+  answerId: UUID
+  reviewerUserId: UUID
+  decision: "approved" | "changes_requested" | "rejected"
+  comment: string
+  reviewedAt: timestamp
+
+TYPE Clarification
+  id: UUID
+  requirementId: UUID
+  fromUserId: UUID
+  body: string
+  threadId: UUID
+  createdAt: timestamp
+
+TYPE ContentHubItem
+  id: UUID
+  orgId: UUID
+  title: string
+  contentHtml: string
+  tags: string[]
+  approvedBy: UUID
+  sourceAnswerId: UUID | null
+  createdAt: timestamp
+
+TYPE CompanySnapshot
+  id: UUID
+  orgId: UUID
+  query: string
+  profile: json
+  fetchedAt: timestamp
+
+TYPE PricingModel
+  id: UUID
+  opportunityId: UUID
+  version: int
+  lineItems: PricingLineItem[]
+  totalAmount: money
+  status: "draft" | "pending_approval" | "approved"
+  approvedBy: UUID | null
+
+TYPE PricingLineItem
+  label: string
+  quantity: float
+  unitCost: money
+  amount: money
+
+TYPE CalendarEvent
+  id: UUID
+  opportunityId: UUID
+  title: string
+  start: timestamp
+  end: timestamp | null
+  allDay: boolean
+  type: "deadline" | "milestone" | "meeting" | "submission" | "review"
+  source: "manual" | "rfp_ai" | "collaboration"
+  createdBy: UUID | null
+
+TYPE ExportJob
+  id: UUID
+  opportunityId: UUID
+  type: "docx_plain" | "docx_styled" | "pptx"
+  status: "queued" | "processing" | "completed" | "failed"
+  outputBlobKey: string | null
+  error: string | null
+  requestedBy: UUID
+  createdAt: timestamp
+
+TYPE AuditEvent
+  id: UUID
+  orgId: UUID
+  actorUserId: UUID
+  entityType: string
+  entityId: UUID
+  action: string
+  payload: json
+  createdAt: timestamp
+  immutable: true
+
+
+# =============================================================================
+# SECTION 2 — PLATFORM BOOTSTRAP
+# =============================================================================
+
+PROGRAM Main
+  CONFIG = loadEnv()
+
+  DB          = connectPostgres(CONFIG.databaseUrl)
+  REDIS       = connectRedis(CONFIG.redisUrl)
+  S3          = connectObjectStorage(CONFIG.s3Bucket)
+  QUEUE       = connectJobQueue(REDIS)
+  AI          = initAiOrchestrator(CONFIG.openaiApiKey)
+  NOTIFIER    = initNotificationService(CONFIG.emailProvider)
+  OBS         = startMetricsAndTracing()
+
+  AUTH        = AuthService(DB, REDIS, CONFIG.jwtSecret)
+  CORE        = CoreService(DB, S3, AI, NOTIFIER, AUTH)
+  COLLAB      = CollabService(DB, REDIS, AI, NOTIFIER, AUTH)
+  DOCS        = DocumentService(DB, S3, QUEUE, AUTH)
+  CALENDAR    = CalendarService(DB, AUTH)
+  INTEL       = CompanyIntelService(DB, AI, CONFIG.externalApis, AUTH)
+
+  GATEWAY = ApiGateway(
+    auth: AUTH,
+    rateLimiter: RateLimiter(REDIS),
+    services: { core: CORE, collab: COLLAB, docs: DOCS, calendar: CALENDAR, intel: INTEL }
+  )
+
+  WORKERS = startWorkerPool(QUEUE, {
+    structureWorker: StructureWorker(DB, AI, NOTIFIER, CALENDAR),
+    exportWorker:    ExportWorker(DB, S3, AI, NOTIFIER),
+    notifyWorker:    NotifyWorker(NOTIFIER)
+  })
+
+  SERVE GATEWAY on CONFIG.port
+END PROGRAM
+
+
+# =============================================================================
+# SECTION 3 — AUTHENTICATION & AUTHORIZATION
+# =============================================================================
+
+FUNCTION AuthService.login(email, password, orgSlug)
+  org  = DB.findOrgBySlug(orgSlug)
+  user = DB.findUserByEmailAndOrg(email, org.id)
+
+  IF user is null OR NOT verifyPassword(password, user.passwordHash)
+    THROW Unauthorized
+  END IF
+
+  IF user.mfaEnabled
+    RETURN { status: "mfa_required", mfaToken: createMfaChallenge(user.id) }
+  END IF
+
+  session = createSession(user)
+  REDIS.store("session:" + session.id, session, ttl = 8h)
+  RETURN { accessToken: signJwt(user), refreshToken: session.refreshToken }
+END FUNCTION
+
+FUNCTION AuthService.loginWithSso(samlAssertion)
+  email = extractEmail(samlAssertion)
+  org   = resolveOrgFromSaml(samlAssertion)
+  user  = DB.findOrProvisionSsoUser(email, org.id)
+  session = createSession(user)
+  RETURN issueTokens(session)
+END FUNCTION
+
+FUNCTION AuthService.refresh(refreshToken)
+  session = REDIS.get("session:" + hash(refreshToken))
+  IF session is null OR session.expired
+    THROW Unauthorized
+  END IF
+  user = DB.getUser(session.userId)
+  RETURN { accessToken: signJwt(user), refreshToken: rotate(session) }
+END FUNCTION
+
+FUNCTION requireAuth(request)
+  token  = parseBearerToken(request.headers.Authorization)
+  claims = verifyJwt(token)
+  user   = DB.getUser(claims.userId)
+
+  IF user is null OR user.orgId != claims.orgId
+    THROW Unauthorized
+  END IF
+
+  RETURN user
+END FUNCTION
+
+FUNCTION requirePermission(user, permission, resource)
+  policy = DB.getRolePolicy(user.role, user.orgId)
+  IF NOT policy.allows(permission, resource)
+    THROW Forbidden
+  END IF
+END FUNCTION
+
+FUNCTION audit(user, action, entityType, entityId, payload)
+  DB.insertAuditEvent({
+    orgId: user.orgId,
+    actorUserId: user.id,
+    entityType,
+    entityId,
+    action,
+    payload,
+    immutable: true,
+    createdAt: now()
+  })
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 4 — OPPORTUNITY LIFECYCLE
+# =============================================================================
+
+FUNCTION CoreService.createOpportunity(user, input)
+  requirePermission(user, "opportunity.create")
+
+  opportunity = DB.insertOpportunity({
+    orgId: user.orgId,
+    title: input.title,
+    issuerName: input.issuerName,
+    status: "capturing",
+    ownerUserId: user.id,
+    dueDate: input.dueDate,
+    createdAt: now()
+  })
+
+  audit(user, "opportunity.created", "Opportunity", opportunity.id, input)
+  NOTIFIER.notifyTeam(user.teamIds, "New opportunity: " + opportunity.title)
+  RETURN opportunity
+END FUNCTION
+
+FUNCTION CoreService.qualifyOpportunity(user, opportunityId, signals)
+  requirePermission(user, "opportunity.update")
+  opportunity = DB.getOpportunity(opportunityId, user.orgId)
+
+  score = AI.scoreCaptureFit({
+    issuer: opportunity.issuerName,
+    rfpSummary: signals.summary,
+    pastWins: DB.getSimilarWins(user.orgId, opportunity.issuerName),
+    capacity: DB.getTeamCapacity(user.orgId)
+  })
+
+  opportunity.captureScore = score.value
+  opportunity.status = IF score.recommendation == "pursue" THEN "active" ELSE "capturing"
+  DB.updateOpportunity(opportunity)
+
+  audit(user, "opportunity.qualified", "Opportunity", opportunity.id, score)
+  RETURN opportunity
+END FUNCTION
+
+FUNCTION CoreService.markSubmitted(user, opportunityId, submissionMeta)
+  requirePermission(user, "opportunity.submit")
+  opportunity = DB.getOpportunity(opportunityId, user.orgId)
+  opportunity.status = "submitted"
+  DB.updateOpportunity(opportunity)
+  audit(user, "opportunity.submitted", "Opportunity", opportunity.id, submissionMeta)
+  RETURN opportunity
+END FUNCTION
+
+FUNCTION CoreService.closeOpportunity(user, opportunityId, outcome, notes)
+  requirePermission(user, "opportunity.close")
+  opportunity = DB.getOpportunity(opportunityId, user.orgId)
+  opportunity.status = outcome    # "won" | "lost" | "no_bid"
+
+  DB.updateOpportunity(opportunity)
+  DB.archiveToBidVault({
+    opportunityId,
+    outcome,
+    lessonsLearned: notes,
+    finalArtifacts: DB.listExportArtifacts(opportunityId)
+  })
+
+  audit(user, "opportunity.closed", "Opportunity", opportunity.id, { outcome, notes })
+  RETURN opportunity
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 5 — RFP INGEST & AI STRUCTURING
+# =============================================================================
+
+FUNCTION DocumentService.uploadRfp(user, opportunityId, file)
+  requirePermission(user, "rfp.upload")
+  opportunity = DB.getOpportunity(opportunityId, user.orgId)
+
+  blobKey       = S3.put(file, path = "orgs/{orgId}/opps/{opportunityId}/source/{uuid}")
+  extractedText = extractText(file)    # PDF · DOCX · TXT pipeline
+
+  document = DB.insertRfpDocument({
+    opportunityId,
+    version: nextVersion(opportunityId),
+    fileName: file.name,
+    blobKey,
+    mimeType: file.type,
+    extractedText,
+    uploadedBy: user.id,
+    uploadedAt: now()
+  })
+
+  QUEUE.enqueue("structure_rfp", {
+    opportunityId,
+    documentId: document.id,
+    requestedBy: user.id
+  })
+
+  audit(user, "rfp.uploaded", "RfpDocument", document.id, { fileName: file.name })
+  RETURN { document, jobStatus: "structuring_queued" }
+END FUNCTION
+
+WORKER StructureWorker.handle(job)
+  document    = DB.getRfpDocument(job.documentId)
+  opportunity = DB.getOpportunity(job.opportunityId)
+
+  result = AI.structureRequirements({
+    text: document.extractedText,
+    issuer: opportunity.issuerName
+  })
+
+  FOR EACH item IN result.requirements
+    DB.insertRequirement({
+      opportunityId: opportunity.id,
+      documentId: document.id,
+      number: item.number,
+      text: item.text,
+      section: item.section,
+      complianceTags: item.tags
+    })
+  END FOR
+
+  dates = AI.extractImportantDates(document.extractedText)
+  CalendarService.syncDeadlines(opportunity.id, dates)
+
+  NOTIFIER.notifyUser(job.requestedBy,
+    "RFP structured: " + len(result.requirements) + " requirements found")
+
+  audit(systemUser(), "rfp.structured", "RfpDocument", document.id,
+    { count: len(result.requirements) })
+END WORKER
+
+
+# =============================================================================
+# SECTION 6 — WORKSPACE, ANSWERS & CONTENT HUB
+# =============================================================================
+
+FUNCTION CoreService.getWorkspace(user, opportunityId)
+  requirePermission(user, "workspace.read")
+  requirements = DB.listRequirements(opportunityId, user.orgId)
+  answers      = DB.listAnswersForRequirements(requirements.map(r => r.id))
+  assignments  = DB.listAssignments(opportunityId)
+
+  RETURN {
+    opportunity: DB.getOpportunity(opportunityId, user.orgId),
+    requirements,
+    answersByRequirementId: groupBy(answers, "requirementId"),
+    assignmentsByRequirementId: groupBy(assignments, "requirementId")
+  }
+END FUNCTION
+
+FUNCTION CoreService.saveAnswerDraft(user, requirementId, contentHtml)
+  requirePermission(user, "answer.write")
+  requirement = DB.getRequirement(requirementId, user.orgId)
+
+  answer = DB.upsertAnswer({
+    requirementId,
+    contentHtml,
+    contentPlain: stripHtml(contentHtml),
+    status: "draft",
+    authorUserId: user.id,
+    source: "manual",
+    updatedAt: now()
+  })
+
+  REDIS.publish("workspace:" + requirement.opportunityId, {
+    type: "answer.updated",
+    requirementId,
+    answerId: answer.id
+  })
+
+  audit(user, "answer.draft_saved", "Answer", answer.id)
+  RETURN answer
+END FUNCTION
+
+FUNCTION CoreService.generateAiDraft(user, requirementId, context)
+  requirePermission(user, "answer.ai_generate")
+  requirement = DB.getRequirement(requirementId, user.orgId)
+  opportunity = DB.getOpportunity(requirement.opportunityId, user.orgId)
+
+  similar       = DB.searchContentHub(user.orgId, requirement.text, limit = 5)
+  issuerProfile = DB.getCompanyProfile(opportunity.issuerName)
+
+  draft = AI.generateAnswer({
+    question: requirement.text,
+    rfpContext: context.documentText,
+    companyProfile: issuerProfile,
+    reusableContent: similar,
+    tone: context.tone
+  })
+
+  answer = DB.upsertAnswer({
+    requirementId,
+    contentHtml: draft.html,
+    contentPlain: draft.plain,
+    status: "draft",
+    authorUserId: user.id,
+    source: "ai",
+    updatedAt: now()
+  })
+
+  audit(user, "answer.ai_generated", "Answer", answer.id)
+  RETURN answer
+END FUNCTION
+
+FUNCTION CoreService.promoteToContentHub(user, answerId, tags)
+  requirePermission(user, "content_hub.publish")
+  answer = DB.getAnswer(answerId, user.orgId)
+
+  item = DB.insertContentHubItem({
+    orgId: user.orgId,
+    title: deriveTitle(answer),
+    contentHtml: answer.contentHtml,
+    tags,
+    approvedBy: user.id,
+    sourceAnswerId: answer.id,
+    createdAt: now()
+  })
+
+  answer.contentHubItemId = item.id
+  DB.updateAnswer(answer)
+
+  audit(user, "content_hub.published", "ContentHubItem", item.id)
+  RETURN item
+END FUNCTION
+
+FUNCTION CoreService.searchContentHub(user, query, filters)
+  requirePermission(user, "content_hub.read")
+  RETURN DB.searchContentHub(user.orgId, query, filters)
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 7 — COLLABORATION (PM · WRITERS · AUDITORS)
+# =============================================================================
+
+FUNCTION CollabService.assignRequirement(user, requirementId, assigneeUserId, dueDate)
+  requirePermission(user, "assignment.create")
+  requirement = DB.getRequirement(requirementId, user.orgId)
+
+  assignment = DB.insertAssignment({
+    requirementId,
+    assigneeUserId,
+    assignedBy: user.id,
+    status: "assigned",
+    dueDate
+  })
+
+  NOTIFIER.notifyUser(assigneeUserId,
+    "Assigned requirement " + requirement.number)
+
+  REDIS.publish("workspace:" + requirement.opportunityId, {
+    type: "assignment.created",
+    assignmentId: assignment.id
+  })
+
+  audit(user, "assignment.created", "Assignment", assignment.id)
+  RETURN assignment
+END FUNCTION
+
+FUNCTION CollabService.submitAnswer(user, answerId)
+  requirePermission(user, "answer.submit")
+  answer = DB.getAnswer(answerId, user.orgId)
+
+  IF answer.contentPlain is empty
+    THROW ValidationError("Cannot submit empty answer")
+  END IF
+
+  answer.status = "in_review"
+  DB.updateAnswer(answer)
+
+  assignment = DB.getAssignmentForRequirement(answer.requirementId, user.id)
+  IF assignment exists
+    assignment.status = "submitted"
+    DB.updateAssignment(assignment)
+  END IF
+
+  reviewers = DB.getAuditorsForOpportunity(answer.opportunityId)
+  NOTIFIER.notifyUsers(reviewers, "Answer submitted for review")
+  audit(user, "answer.submitted", "Answer", answer.id)
+  RETURN answer
+END FUNCTION
+
+FUNCTION CollabService.reviewAnswer(user, answerId, decision, comment)
+  requirePermission(user, "answer.review")
+  answer = DB.getAnswer(answerId, user.orgId)
+
+  review = DB.insertReview({
+    answerId,
+    reviewerUserId: user.id,
+    decision,
+    comment,
+    reviewedAt: now()
+  })
+
+  answer.status = mapReviewToAnswerStatus(decision)
+  DB.updateAnswer(answer)
+
+  NOTIFIER.notifyUser(answer.authorUserId, "Review decision: " + decision)
+  audit(user, "answer.reviewed", "Answer", answer.id, { decision, comment })
+  RETURN { answer, review }
+END FUNCTION
+
+FUNCTION CollabService.askClarification(user, requirementId, message)
+  requirePermission(user, "clarification.create")
+  requirement = DB.getRequirement(requirementId, user.orgId)
+
+  thread = DB.insertClarification({
+    requirementId,
+    fromUserId: user.id,
+    body: message,
+    threadId: uuid(),
+    createdAt: now()
+  })
+
+  pm = DB.getOpportunityOwner(requirement.opportunityId)
+  NOTIFIER.notifyUser(pm.id, "Clarification requested on " + requirement.number)
+  audit(user, "clarification.created", "Clarification", thread.id)
+  RETURN thread
+END FUNCTION
+
+FUNCTION CollabService.replyClarification(user, threadId, message)
+  requirePermission(user, "clarification.reply")
+  reply = DB.insertClarification({
+    threadId,
+    fromUserId: user.id,
+    body: message,
+    createdAt: now()
+  })
+  audit(user, "clarification.replied", "Clarification", reply.id)
+  RETURN reply
+END FUNCTION
+
+FUNCTION CollabService.getAuditorDashboard(userId)
+  assignments     = DB.listOpenAssignmentsForUser(userId)
+  awaitingReview  = DB.listAnswersAwaitingReviewForUser(userId)
+  clarifications  = DB.listOpenClarificationsForUser(userId)
+  RETURN { assignments, awaitingReview, clarifications }
+END FUNCTION
+
+FUNCTION CollabService.streamActivity(user, opportunityId)
+  requirePermission(user, "workspace.read")
+  channel = "workspace:" + opportunityId
+
+  SUBSCRIBE REDIS channel
+  ON event
+    SEND event to client    # SSE or WebSocket
+  END ON
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 8 — COMPANY INTELLIGENCE
+# =============================================================================
+
+FUNCTION CompanyIntelService.lookupIssuer(user, query)
+  requirePermission(user, "intel.read")
+
+  cached = DB.findCompanySnapshot(user.orgId, query)
+  IF cached exists AND cached.age < 24h
+    RETURN cached
+  END IF
+
+  remote     = AI.generateCompanySnapshot(query)
+  financials = ExternalApi.fetchFinancials(query)    # FMP · SEC EDGAR
+  profile    = mergeIntel(remote, financials)
+
+  snapshot = DB.upsertCompanySnapshot({
+    orgId: user.orgId,
+    query,
+    profile,
+    fetchedAt: now()
+  })
+
+  audit(user, "intel.lookup", "CompanySnapshot", snapshot.id, { query })
+  RETURN snapshot
+END FUNCTION
+
+FUNCTION CompanyIntelService.attachIssuerToOpportunity(user, opportunityId, snapshotId)
+  requirePermission(user, "opportunity.update")
+  opportunity = DB.getOpportunity(opportunityId, user.orgId)
+  opportunity.issuerSnapshotId = snapshotId
+  DB.updateOpportunity(opportunity)
+  audit(user, "intel.attached", "Opportunity", opportunity.id)
+  RETURN opportunity
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 9 — PRICING & APPROVALS
+# =============================================================================
+
+FUNCTION CoreService.savePricingModel(user, opportunityId, lineItems)
+  requirePermission(user, "pricing.write")
+
+  model = DB.insertPricingModel({
+    opportunityId,
+    version: nextPricingVersion(opportunityId),
+    lineItems,
+    totalAmount: sum(lineItems.amount),
+    status: "draft"
+  })
+
+  audit(user, "pricing.saved", "PricingModel", model.id)
+  RETURN model
+END FUNCTION
+
+FUNCTION CoreService.submitPricingForApproval(user, pricingModelId)
+  requirePermission(user, "pricing.submit")
+  model = DB.getPricingModel(pricingModelId, user.orgId)
+  model.status = "pending_approval"
+  DB.updatePricingModel(model)
+
+  approvers = DB.getUsersByRole(user.orgId, "director")
+  NOTIFIER.notifyUsers(approvers, "Pricing approval required")
+  audit(user, "pricing.submitted", "PricingModel", model.id)
+  RETURN model
+END FUNCTION
+
+FUNCTION CoreService.approvePricing(user, pricingModelId)
+  requirePermission(user, "pricing.approve")
+  model = DB.getPricingModel(pricingModelId, user.orgId)
+  model.status = "approved"
+  model.approvedBy = user.id
+  DB.updatePricingModel(model)
+  audit(user, "pricing.approved", "PricingModel", model.id)
+  RETURN model
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 10 — COMPLIANCE, EXPORT & BID VAULT
+# =============================================================================
+
+FUNCTION CoreService.runComplianceCheck(user, opportunityId)
+  requirePermission(user, "compliance.read")
+  requirements = DB.listRequirements(opportunityId, user.orgId)
+  answers      = DB.listAnswersForOpportunity(opportunityId)
+
+  report = {
+    totalRequirements: len(requirements),
+    answered: countWhere(answers, status != null),
+    approved: countWhere(answers, status == "approved"),
+    missing: [],
+    risks: []
+  }
+
+  FOR EACH req IN requirements
+    answer = findAnswer(answers, req.id)
+    IF answer is null
+      report.missing.push(req.number)
+    ELSE IF answer.status != "approved"
+      report.risks.push({ requirement: req.number, issue: "not approved" })
+    ELSE IF NOT coversComplianceTags(answer, req.complianceTags)
+      report.risks.push({ requirement: req.number, issue: "tag mismatch" })
+    END IF
+  END FOR
+
+  RETURN report
+END FUNCTION
+
+FUNCTION DocumentService.requestExport(user, opportunityId, exportType)
+  requirePermission(user, "export.create")
+
+  compliance = CoreService.runComplianceCheck(user, opportunityId)
+  IF compliance.missing.length > 0 OR compliance.risks.length > 0
+    IF NOT user.hasPermission("export.override")
+      THROW ValidationError("Compliance check failed")
+    END IF
+  END IF
+
+  job = DB.insertExportJob({
+    opportunityId,
+    type: exportType,
+    status: "queued",
+    requestedBy: user.id,
+    createdAt: now()
+  })
+
+  QUEUE.enqueue("export_document", { jobId: job.id })
+  audit(user, "export.requested", "ExportJob", job.id, { exportType })
+  RETURN job
+END FUNCTION
+
+WORKER ExportWorker.handle(jobRef)
+  job = DB.getExportJob(jobRef.jobId)
+  job.status = "processing"
+  DB.updateExportJob(job)
+
+  opportunity = DB.getOpportunity(job.opportunityId)
+  workspace   = buildWorkspaceSnapshot(opportunity.id)
+
+  TRY
+    IF job.type == "docx_plain"
+      bytes = renderPlainDocx(workspace)
+    ELSE IF job.type == "docx_styled"
+      templateId = DB.getOrg(opportunity.orgId).branding.docxTemplateId
+      bytes = AI.mergeStyledTemplate(workspace, templateId)
+    ELSE IF job.type == "pptx"
+      bytes = AI.generateSlideDeck(workspace.contentHubSummary)
+    END IF
+
+    blobKey = S3.put(bytes, path = "exports/{job.id}")
+    job.status = "completed"
+    job.outputBlobKey = blobKey
+    DB.updateExportJob(job)
+
+    NOTIFIER.notifyUser(job.requestedBy, "Export ready")
+    audit(systemUser(), "export.completed", "ExportJob", job.id)
+
+  CATCH error
+    job.status = "failed"
+    job.error = error.message
+    DB.updateExportJob(job)
+    NOTIFIER.notifyUser(job.requestedBy, "Export failed: " + error.message)
+  END TRY
+END WORKER
+
+FUNCTION DocumentService.downloadExport(user, jobId)
+  requirePermission(user, "export.read")
+  job = DB.getExportJob(jobId, user.orgId)
+
+  IF job.status != "completed"
+    THROW NotReady("Export not ready")
+  END IF
+
+  RETURN S3.getSignedUrl(job.outputBlobKey, expiresIn = 15m)
+END FUNCTION
+
+FUNCTION CoreService.getBidVault(user, filters)
+  requirePermission(user, "bid_vault.read")
+  RETURN DB.listArchivedOpportunities(user.orgId, filters)
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 11 — CALENDAR & NOTIFICATIONS
+# =============================================================================
+
+FUNCTION CalendarService.syncDeadlines(opportunityId, extractedDates)
+  FOR EACH date IN extractedDates
+    DB.upsertCalendarEvent({
+      opportunityId,
+      title: date.label,
+      start: date.value,
+      type: "deadline",
+      source: "rfp_ai",
+      allDay: true
+    })
+  END FOR
+END FUNCTION
+
+FUNCTION CalendarService.createManualEvent(user, opportunityId, eventInput)
+  requirePermission(user, "calendar.write")
+  event = DB.insertCalendarEvent({
+    opportunityId,
+    ...eventInput,
+    source: "manual",
+    createdBy: user.id
+  })
+  audit(user, "calendar.event_created", "CalendarEvent", event.id)
+  RETURN event
+END FUNCTION
+
+FUNCTION CalendarService.listEvents(user, range)
+  requirePermission(user, "calendar.read")
+  RETURN DB.listCalendarEvents(user.orgId, range)
+END FUNCTION
+
+FUNCTION NotificationService.dispatch(event)
+  recipients = resolveRecipients(event)
+
+  FOR EACH user IN recipients
+    prefs = DB.getNotificationPrefs(user.id)
+
+    IF prefs.inApp
+      DB.insertInAppNotification(user.id, event)
+      REDIS.publish("notify:" + user.id, event)
+    END IF
+
+    IF prefs.email
+      EMAIL.send(user.email, renderTemplate(event))
+    END IF
+
+    IF prefs.webhook
+      WEBHOOK.post(prefs.webhookUrl, event)
+    END IF
+  END FOR
+END FUNCTION
+
+
+# =============================================================================
+# SECTION 12 — API GATEWAY ROUTES (TARGET)
+# =============================================================================
+
+ROUTER /api/v1
+
+  # Auth
+  POST   /auth/login
+  POST   /auth/sso/callback
+  POST   /auth/refresh
+  POST   /auth/logout
+  POST   /auth/mfa/verify
+
+  # Opportunities
+  GET    /opportunities
+  POST   /opportunities
+  GET    /opportunities/:id
+  PATCH  /opportunities/:id
+  POST   /opportunities/:id/qualify
+  POST   /opportunities/:id/submit
+  POST   /opportunities/:id/close
+
+  # Documents
+  POST   /opportunities/:id/documents
+  GET    /opportunities/:id/documents
+  GET    /documents/:id
+
+  # Workspace
+  GET    /opportunities/:id/workspace
+  PUT    /requirements/:id/answers
+  POST   /requirements/:id/ai-draft
+  POST   /answers/:id/submit
+
+  # Collaboration
+  POST   /requirements/:id/assign
+  POST   /answers/:id/review
+  POST   /requirements/:id/clarifications
+  POST   /clarifications/:id/reply
+  GET    /auditors/:id/dashboard
+  GET    /opportunities/:id/activity/stream       # SSE
+
+  # Content hub
+  GET    /content-hub/search
+  POST   /content-hub
+  POST   /answers/:id/promote
+
+  # Company intelligence
+  POST   /company-intelligence/lookup
+  POST   /opportunities/:id/issuer
+
+  # Pricing
+  POST   /opportunities/:id/pricing
+  POST   /pricing/:id/submit
+  POST   /pricing/:id/approve
+
+  # Compliance & export
+  GET    /opportunities/:id/compliance
+  POST   /opportunities/:id/exports
+  GET    /exports/:id
+  GET    /exports/:id/download
+
+  # Calendar
+  GET    /calendar/events
+  POST   /calendar/events
+  POST   /opportunities/:id/sync-deadlines
+
+  # Bid vault
+  GET    /bid-vault
+
+  # Admin
+  GET    /users
+  POST   /users
+  PATCH  /users/:id/roles
+  GET    /audit-events
+
+END ROUTER
+
+
+# =============================================================================
+# SECTION 13 — END-TO-END USER JOURNEYS
+# =============================================================================
+
+# --- Proposal Manager: full lifecycle ---
+
+PROGRAM ProposalManagerJourney(user, rfpFile, opportunityInput)
+
+  # Phase 1 — Capture & intel
+  opportunity = CoreService.createOpportunity(user, opportunityInput)
+  issuer      = CompanyIntelService.lookupIssuer(user, opportunityInput.issuerName)
+  CompanyIntelService.attachIssuerToOpportunity(user, opportunity.id, issuer.id)
+  opportunity = CoreService.qualifyOpportunity(user, opportunity.id, { summary: issuer.summary })
+
+  IF opportunity.status != "active"
+    RETURN { status: "not_qualified", opportunity }
+  END IF
+
+  # Phase 2 — Ingest & structure
+  upload = DocumentService.uploadRfp(user, opportunity.id, rfpFile)
+  WAIT UNTIL structure job completes FOR upload.document.id
+
+  workspace = CoreService.getWorkspace(user, opportunity.id)
+
+  # Phase 3 — Plan & assign
+  writers  = DB.getUsersByRole(user.orgId, "writer")
+  auditors = DB.getUsersByRole(user.orgId, "auditor")
+
+  FOR EACH requirement IN workspace.requirements
+    assignee = pickAssignee(requirement, writers, auditors)
+    CollabService.assignRequirement(user, requirement.id, assignee.id, opportunity.dueDate)
+  END FOR
+
+  # Phase 4 — PM drafts priority items
+  FOR EACH requirement IN topPriority(workspace.requirements, limit = 10)
+    CoreService.generateAiDraft(user, requirement.id,
+      { documentText: upload.document.extractedText })
+  END FOR
+
+  # Phase 5 — Monitor until compliance passes
+  LOOP
+    compliance = CoreService.runComplianceCheck(user, opportunity.id)
+    IF compliance.missing.length == 0 AND compliance.risks.length == 0
+      BREAK
+    END IF
+    WAIT 30s OR receive CollabService.streamActivity event
+  END LOOP
+
+  # Phase 6 — Pricing approval
+  pricing = CoreService.savePricingModel(user, opportunity.id, defaultLineItems())
+  CoreService.submitPricingForApproval(user, pricing.id)
+  WAIT UNTIL pricing.status == "approved"
+
+  # Phase 7 — Export & submit
+  exportJob = DocumentService.requestExport(user, opportunity.id, "docx_styled")
+  WAIT UNTIL exportJob.status == "completed"
+
+  downloadUrl = DocumentService.downloadExport(user, exportJob.id)
+  CoreService.markSubmitted(user, opportunity.id, { artifactUrl: downloadUrl })
+
+  # Phase 8 — Archive
+  CoreService.closeOpportunity(user, opportunity.id, "submitted", "Submitted on time")
+
+  RETURN { status: "complete", downloadUrl, opportunityId: opportunity.id }
+END PROGRAM
+
+
+# --- RFP Auditor: assigned work ---
+
+PROGRAM AuditorJourney(user)
+
+  dashboard = CollabService.getAuditorDashboard(user.id)
+
+  FOR EACH item IN dashboard.assignments
+    draft = CoreService.generateAiDraft(user, item.requirementId, item.context)
+    draft = applyUserEdits(draft)
+    CoreService.saveAnswerDraft(user, item.requirementId, draft.contentHtml)
+    CollabService.submitAnswer(user, draft.id)
+  END FOR
+
+  FOR EACH item IN dashboard.awaitingReview
+    answer   = DB.getAnswer(item.answerId, user.orgId)
+    analysis = AI.reviewForCompliance({
+      requirement: item.requirementText,
+      answer: answer.contentPlain,
+      policy: DB.getCompliancePolicy(user.orgId)
+    })
+
+    IF analysis.pass
+      CollabService.reviewAnswer(user, answer.id, "approved", analysis.summary)
+    ELSE
+      CollabService.reviewAnswer(user, answer.id, "changes_requested",
+        join(analysis.issues, "\n"))
+    END IF
+  END FOR
+
+  RETURN dashboard
+END PROGRAM
+
+
+# =============================================================================
+# SECTION 14 — AI ORCHESTRATOR (SERVER-SIDE ONLY)
+# =============================================================================
+
+MODULE AiOrchestrator
+
+  FUNCTION structureRequirements({ text, issuer })
+    prompt = buildStructurePrompt(text, issuer)
+    response = OPENAI.chat(prompt, model = "gpt-4.1", responseFormat = "json")
+    RETURN parseRequirementsJson(response)
+  END FUNCTION
+
+  FUNCTION extractImportantDates(text)
+    prompt = buildDateExtractionPrompt(text)
+    response = OPENAI.chat(prompt, model = "gpt-4.1", responseFormat = "json")
+    RETURN parseDatesJson(response)
+  END FUNCTION
+
+  FUNCTION generateAnswer({ question, rfpContext, companyProfile, reusableContent, tone })
+    prompt = buildAnswerPrompt(question, rfpContext, companyProfile, reusableContent, tone)
+    response = OPENAI.chat(prompt, model = "gpt-4.1")
+    RETURN { html: toHtml(response), plain: response }
+  END FUNCTION
+
+  FUNCTION generateCompanySnapshot(query)
+    prompt = buildCompanyIntelPrompt(query)
+    response = OPENAI.chat(prompt, model = "gpt-4.1", responseFormat = "json")
+    RETURN parseCompanyJson(response)
+  END FUNCTION
+
+  FUNCTION mergeStyledTemplate(workspace, templateId)
+    template = S3.get("templates/" + templateId)
+    mapping  = OPENAI.chat(buildStyledExportPrompt(workspace, template),
+      model = "gpt-4o", responseFormat = "json")
+    RETURN applyOoxmlMerge(template, mapping)
+  END FUNCTION
+
+  FUNCTION generateSlideDeck(contentSummary)
+    outline = OPENAI.chat(buildSlideOutlinePrompt(contentSummary), model = "gpt-4.1")
+    RETURN renderPptx(outline)
+  END FUNCTION
+
+  FUNCTION scoreCaptureFit({ issuer, rfpSummary, pastWins, capacity })
+    prompt = buildCaptureScorePrompt(issuer, rfpSummary, pastWins, capacity)
+    response = OPENAI.chat(prompt, model = "gpt-4.1", responseFormat = "json")
+    RETURN parseCaptureScore(response)
+  END FUNCTION
+
+  FUNCTION reviewForCompliance({ requirement, answer, policy })
+    prompt = buildComplianceReviewPrompt(requirement, answer, policy)
+    response = OPENAI.chat(prompt, model = "gpt-4.1", responseFormat = "json")
+    RETURN parseComplianceResult(response)
+  END FUNCTION
+
+END MODULE
+
+
+# =============================================================================
+# SECTION 15 — PROTOTYPE → TARGET MIGRATION MAP
+# =============================================================================
+
+# CURRENT (prototype)                    TARGET (completed)
+# -------------------------------------------------------------------------
+# localStorage rbac_users                AuthService + PostgreSQL + SSO
+# localStorage proposal_manager_*        CoreService + PostgreSQL + S3
+# POST /rfp-collab (in-memory Map)       CollabService + PostgreSQL + Redis SSE
+# GET /export-document (sync)            DocumentService + QUEUE + ExportWorker
+# Client-side OpenRouter (Sage AI)       AiOrchestrator server-side only
+# collaboration-runtime-state.json       PostgreSQL + S3 + Redis
+# Demo ERP dashboards (mock data)        Retired or API-backed optional modules
+# Single Express monolith (index.js)     API Gateway + domain services + workers
+# No immutable audit trail               AuditEvent table (immutable = true)
+# Vite proxy → localhost:3000            CDN SPA + VITE_API_URL → cloud API
+
+
+# =============================================================================
+# END OF FILE
+# =============================================================================

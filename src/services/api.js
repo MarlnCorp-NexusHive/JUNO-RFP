@@ -204,6 +204,17 @@ export const generateSlideDeck = async ({ question, content, issuerName }) => {
   return { blob, filename, slideCount: slideCount ? Number(slideCount) : null };
 };
 
+/* ================= TECHNICAL SOLUTIONING ================= */
+export const extractTechnicalReferencePatterns = async (assets) => {
+  const res = await API.post("/technical-solution/extract-patterns", { assets });
+  return res.data;
+};
+
+export const generateTechnicalSolutionDesign = async (payload) => {
+  const res = await API.post("/technical-solution/generate-design", payload);
+  return res.data;
+};
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {

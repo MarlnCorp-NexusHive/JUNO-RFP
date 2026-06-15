@@ -24,6 +24,7 @@ import {
 import { buildStyledWorkspaceDocx } from "./styledWorkspaceExport.js";
 import { initCalendar, calendarRouter } from "./calendar/index.js";
 import { generateSlideDeckFromContent } from "./slideDeckBuilder.js";
+import { registerTechnicalSolutioningRoutes } from "./technicalSolutioningService.js";
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ initCalendar();
 app.use("/rfp-collab", collaborationRouter);
 app.use("/calendar", calendarRouter);
 registerRfpAssistantEndpoints(app, openai);
+registerTechnicalSolutioningRoutes(app, openai);
 
 /* ================= MULTER ================= */
 const upload = multer({
@@ -529,6 +531,8 @@ app.listen(PORT, () => {
   console.log("POST /company-intelligence-remote");
   console.log("POST /generate-company-profile");
   console.log("POST /generate-slide-deck");
+  console.log("POST /technical-solution/extract-patterns");
+  console.log("POST /technical-solution/generate-design");
   console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
   console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines\n");
 });
