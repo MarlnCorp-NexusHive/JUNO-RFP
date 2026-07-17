@@ -2,6 +2,8 @@
  * Proposal Manager / Content Hub AI routes proxied from Vite.
  */
 
+import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
+
 const MAX_DOC_CHARS = 120_000;
 
 function parseJsonCompletion(content) {
@@ -69,14 +71,14 @@ export function registerRfpAssistantEndpoints(app, openai) {
         messages: [
           {
             role: "system",
-            content:
-              "Answer ONLY using the RFP/document context provided. If the answer is not in the document, say it is not stated in the document.",
+            content: DOCUMENT_QA_SYSTEM_PROMPT,
           },
           {
             role: "user",
             content: `DOCUMENT:\n${documentText}\n\nQUESTION:\n${question}`,
           },
         ],
+        temperature: 0.25,
       });
 
       res.json({ answer: response.choices[0]?.message?.content ?? "" });

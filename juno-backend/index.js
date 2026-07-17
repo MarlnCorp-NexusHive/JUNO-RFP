@@ -24,7 +24,9 @@ import {
 import { buildStyledWorkspaceDocx } from "./styledWorkspaceExport.js";
 import { initCalendar, calendarRouter } from "./calendar/index.js";
 import { generateSlideDeckFromContent } from "./slideDeckBuilder.js";
+import { buildWorkDocumentFromContent } from "./workDocumentBuilder.js";
 import { registerTechnicalSolutioningRoutes } from "./technicalSolutioningService.js";
+import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 
 dotenv.config();
 
@@ -298,19 +300,23 @@ app.post("/ask-with-file", upload.single("file"), async (req, res) => {
 
     const documentText = extracted.text.slice(0, 120000);
 
+    console.log(
+      `ask-with-file: extracted ${documentText.length} chars from ${file.originalname || "upload"} (${extracted.format})`,
+    );
+
     const response = await openai.chat.completions.create({
       model: "gpt-4.1",
       messages: [
         {
           role: "system",
-          content:
-            "Answer ONLY using the uploaded document excerpt below. If the answer is not in the document, say it is not stated in the document.",
+          content: DOCUMENT_QA_SYSTEM_PROMPT,
         },
         {
           role: "user",
           content: `DOCUMENT (extracted text):\n${documentText}\n\nQUESTION:\n${question}`,
         },
       ],
+      temperature: 0.25,
     });
 
     res.json({
@@ -464,6 +470,25 @@ app.get("/export-document/:workspaceId", async (req, res) => {
   }
 });
 
+/* ================= CONTENT HUB → WORK DOCUMENT (DOCX) ================= */
+
+app.post("/generate-work-document", async (req, res) => {
+  try {
+    const { question, content, issuerName } = req.body || {};
+    if (!content || typeof content !== "string" || !content.trim()) {
+      return res.status(400).json({ error: "content is required" });
+    }
+    const result = await buildWorkDocumentFromContent({ question, content, issuerName });
+    res.setHeader("Content-Type", result.contentType);
+    res.setHeader("Content-Disposition", attachmentContentDisposition(result.filename));
+    res.send(result.buffer);
+  } catch (err) {
+    console.error("WORK DOCUMENT ERROR:", err.message);
+    const code = err.statusCode || 500;
+    res.status(code).json({ error: err.message || "Work document generation failed" });
+  }
+});
+
 /* ================= CONTENT HUB → SLIDE DECK ================= */
 
 app.post("/generate-slide-deck", async (req, res) => {
@@ -530,6 +555,7 @@ app.listen(PORT, () => {
   console.log("POST /ask-with-context");
   console.log("POST /company-intelligence-remote");
   console.log("POST /generate-company-profile");
+  console.log("POST /generate-work-document");
   console.log("POST /generate-slide-deck");
   console.log("POST /technical-solution/extract-patterns");
   console.log("POST /technical-solution/generate-design");

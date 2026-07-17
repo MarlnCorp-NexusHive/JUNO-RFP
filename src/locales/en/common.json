@@ -612,10 +612,15 @@
       "loading": "Thinking…",
       "responseLabel": "Answer",
       "unknownError": "Something went wrong",
+      "extractError": "Could not read enough text from this file. Try a text-based PDF, Word (.docx), or plain .txt file. Scanned PDFs may take a moment to process.",
       "slideDeck": "Generate slide deck",
       "slideDeckLoading": "Building slides…",
       "slideDeckHint": "Turn this answer into a branded PowerPoint (.pptx) with speaker notes.",
-      "slideDeckError": "Could not generate slide deck."
+      "slideDeckError": "Could not generate slide deck.",
+      "workDocument": "Download Word Document",
+      "workDocumentLoading": "Building document…",
+      "workDocumentError": "Could not generate work document.",
+      "exportHint": "Export this answer as a Word document (.docx) or a branded PowerPoint deck (.pptx)."
     },
     "companyProfileGenerator": {
       "heading": "Company Profile Generator",

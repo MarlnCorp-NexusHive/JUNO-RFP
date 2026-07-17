@@ -38,6 +38,21 @@ const dashboardRoute = (user) => {
   return "/unauthorized";
 };
 
+const PRODUCT_HIGHLIGHT_KEYS = ["aiQa", "companyIntel", "exports", "collaboration"];
+
+function ProductHighlight({ label, darkTheme }) {
+  return (
+    <div className={`flex items-center gap-2 text-xs ${darkTheme ? "text-white/70" : "text-white/85"}`}>
+      <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-white/25">
+        <svg width="8" height="8" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      <span>{label}</span>
+    </div>
+  );
+}
+
 function LoginPageContent() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -270,6 +285,12 @@ function LoginPageContent() {
                 Reload demo credentials
               </button>
             </form>
+
+            <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-2.5">
+              {PRODUCT_HIGHLIGHT_KEYS.map((key) => (
+                <ProductHighlight key={key} label={t(`auth.highlights.${key}`)} darkTheme={darkTheme} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

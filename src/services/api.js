@@ -204,6 +204,32 @@ export const generateSlideDeck = async ({ question, content, issuerName }) => {
   return { blob, filename, slideCount: slideCount ? Number(slideCount) : null };
 };
 
+/* ================= WORK DOCUMENT (Content Hub) ================= */
+export const generateWorkDocument = async ({ question, content, issuerName }) => {
+  let res;
+  try {
+    res = await API.post(
+      "/generate-work-document",
+      { question, content, issuerName },
+      { responseType: "blob" },
+    );
+  } catch (err) {
+    const msg = await errorMessageFromBlobResponse(
+      err?.response?.data,
+      err?.message || "Work document request failed",
+    );
+    throw new Error(msg);
+  }
+  await assertBlobIsDocxOrThrow(res, "Work document");
+  const blob = res.data;
+  const disposition = res.headers?.["content-disposition"] || "";
+  const fnMatch = disposition.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+  const filename = fnMatch
+    ? decodeURIComponent(fnMatch[1].replace(/"/g, "").trim())
+    : "content-hub-work-doc.docx";
+  return { blob, filename };
+};
+
 /* ================= TECHNICAL SOLUTIONING ================= */
 export const extractTechnicalReferencePatterns = async (assets) => {
   const res = await API.post("/technical-solution/extract-patterns", { assets });

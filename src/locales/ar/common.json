@@ -612,10 +612,15 @@
       "loading": "جارٍ التفكير…",
       "responseLabel": "الإجابة",
       "unknownError": "حدث خطأ ما",
+      "extractError": "تعذّر قراءة نص كافٍ من هذا الملف. جرّب ملف PDF نصي أو Word (.docx) أو ملف .txt. قد تستغرق ملفات PDF الممسوحة ضوئياً وقتاً للمعالجة.",
       "slideDeck": "إنشاء عرض شرائح",
       "slideDeckLoading": "جاري إنشاء الشرائح…",
       "slideDeckHint": "حوّل هذه الإجابة إلى عرض PowerPoint (.pptx) بعلامة Marln وملاحظات المتحدث.",
-      "slideDeckError": "تعذّر إنشاء عرض الشرائح."
+      "slideDeckError": "تعذّر إنشاء عرض الشرائح.",
+      "workDocument": "تنزيل مستند Word",
+      "workDocumentLoading": "جاري إنشاء المستند…",
+      "workDocumentError": "تعذّر إنشاء مستند العمل.",
+      "exportHint": "صدّر هذه الإجابة كمستند Word (.docx) أو عرض شرائح PowerPoint (.pptx)."
     },
     "companyProfileGenerator": {
       "heading": "مولّد ملف الشركة",

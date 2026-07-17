@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
     "/export-document": prox(),
     "/calendar": prox(),
     "/generate-slide-deck": prox(),
+    "/generate-work-document": prox(),
     "/technical-solution": prox(),
     "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates)$":
       prox(),

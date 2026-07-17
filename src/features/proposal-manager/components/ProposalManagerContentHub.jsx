@@ -9,9 +9,12 @@ import {
 import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { useTranslation } from "react-i18next";
-import { generateAnswer, askWithFile, generateCompanyProfile, generateSlideDeck } from "../../../services/api.js";
+import { generateAnswer, askWithContext, generateCompanyProfile, generateSlideDeck, generateWorkDocument } from "../../../services/api.js";
+import { extractFromFile } from "../services/extractFromDocument.js";
 
 const MIN_SLIDE_CONTENT_CHARS = 120;
+const MIN_WORK_DOC_CHARS = 80;
+const MIN_EXTRACTED_DOC_CHARS = 80;
 
 const SUGGESTED_TAGS = [
   "Section L",
@@ -45,6 +48,8 @@ export default function ProposalManagerContentHub() {
   const [loading, setLoading] = useState(false);
   const [slideLoading, setSlideLoading] = useState(false);
   const [slideError, setSlideError] = useState("");
+  const [workDocLoading, setWorkDocLoading] = useState(false);
+  const [workDocError, setWorkDocError] = useState("");
   const aiFileInputRef = useRef(null);
   const [profileCompanyName, setProfileCompanyName] = useState("");
   const [profileWebsite, setProfileWebsite] = useState("");
@@ -127,8 +132,22 @@ export default function ProposalManagerContentHub() {
     setLoading(true);
     setResponse("");
     setSlideError("");
+    setWorkDocError("");
     try {
-      const answer = file ? await askWithFile(file, q) : await generateAnswer(q);
+      let answer;
+      if (file) {
+        const { text } = await extractFromFile(file);
+        const docText = String(text || "").trim();
+        if (docText.length < MIN_EXTRACTED_DOC_CHARS) {
+          setResponse(
+            `[Error] ${t("proposalManagerContentHub.aiAssistant.extractError")}`,
+          );
+          return;
+        }
+        answer = await askWithContext(q, docText);
+      } else {
+        answer = await generateAnswer(q);
+      }
       setResponse(answer);
       clearAiFile();
     } catch (err) {
@@ -172,6 +191,36 @@ export default function ProposalManagerContentHub() {
     response &&
     !response.startsWith("[Error]") &&
     response.trim().length >= MIN_SLIDE_CONTENT_CHARS;
+
+  const canGenerateWorkDocument =
+    response &&
+    !response.startsWith("[Error]") &&
+    response.trim().length >= MIN_WORK_DOC_CHARS;
+
+  const handleGenerateWorkDocument = async () => {
+    if (!canGenerateWorkDocument || workDocLoading) return;
+    setWorkDocLoading(true);
+    setWorkDocError("");
+    try {
+      const { blob, filename } = await generateWorkDocument({
+        question: question.trim(),
+        content: response,
+        issuerName: issuer?.name,
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setWorkDocError(err?.message || t("proposalManagerContentHub.aiAssistant.workDocumentError"));
+    } finally {
+      setWorkDocLoading(false);
+    }
+  };
 
   const handleGenerateSlides = async () => {
     if (!canGenerateSlides || slideLoading) return;
@@ -295,25 +344,55 @@ export default function ProposalManagerContentHub() {
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                   {t("proposalManagerContentHub.aiAssistant.responseLabel")}
                 </p>
-                {canGenerateSlides ? (
-                  <button
-                    type="button"
-                    onClick={handleGenerateSlides}
-                    disabled={slideLoading}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-xs font-medium"
-                  >
-                    {slideLoading ? (
-                      <FiRefreshCw className="w-3.5 h-3.5 animate-spin" aria-hidden />
-                    ) : (
-                      <FiDownload className="w-3.5 h-3.5" aria-hidden />
-                    )}
-                    {slideLoading
-                      ? t("proposalManagerContentHub.aiAssistant.slideDeckLoading")
-                      : t("proposalManagerContentHub.aiAssistant.slideDeck")}
-                  </button>
-                ) : null}
+                <div className="flex flex-wrap items-center gap-2">
+                  {canGenerateWorkDocument ? (
+                    <button
+                      type="button"
+                      onClick={handleGenerateWorkDocument}
+                      disabled={workDocLoading || slideLoading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-medium"
+                    >
+                      {workDocLoading ? (
+                        <FiRefreshCw className="w-3.5 h-3.5 animate-spin" aria-hidden />
+                      ) : (
+                        <FiFileText className="w-3.5 h-3.5" aria-hidden />
+                      )}
+                      {workDocLoading
+                        ? t("proposalManagerContentHub.aiAssistant.workDocumentLoading")
+                        : t("proposalManagerContentHub.aiAssistant.workDocument")}
+                    </button>
+                  ) : null}
+                  {canGenerateSlides ? (
+                    <button
+                      type="button"
+                      onClick={handleGenerateSlides}
+                      disabled={slideLoading || workDocLoading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-xs font-medium"
+                    >
+                      {slideLoading ? (
+                        <FiRefreshCw className="w-3.5 h-3.5 animate-spin" aria-hidden />
+                      ) : (
+                        <FiDownload className="w-3.5 h-3.5" aria-hidden />
+                      )}
+                      {slideLoading
+                        ? t("proposalManagerContentHub.aiAssistant.slideDeckLoading")
+                        : t("proposalManagerContentHub.aiAssistant.slideDeck")}
+                    </button>
+                  ) : null}
+                </div>
               </div>
               {response.startsWith("[Error]") ? response.replace(/^\[Error\]\s*/, "") : response}
+              {workDocLoading ? (
+                <p className="mt-3 text-xs font-medium text-indigo-700 dark:text-indigo-300 border-t border-indigo-200/60 dark:border-indigo-900/40 pt-2 flex items-center gap-2">
+                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
+                  {t("proposalManagerContentHub.aiAssistant.workDocumentLoading")}
+                </p>
+              ) : null}
+              {workDocError ? (
+                <p className="mt-3 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">
+                  {workDocError}
+                </p>
+              ) : null}
               {slideLoading ? (
                 <p className="mt-3 text-xs font-medium text-violet-700 dark:text-violet-300 border-t border-violet-200/60 dark:border-violet-900/40 pt-2 flex items-center gap-2">
                   <FiRefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden />
@@ -325,9 +404,9 @@ export default function ProposalManagerContentHub() {
                   {slideError}
                 </p>
               ) : null}
-              {canGenerateSlides && !slideLoading ? (
+              {(canGenerateWorkDocument || canGenerateSlides) && !slideLoading && !workDocLoading ? (
                 <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200/80 dark:border-gray-600 pt-2">
-                  {t("proposalManagerContentHub.aiAssistant.slideDeckHint")}
+                  {t("proposalManagerContentHub.aiAssistant.exportHint")}
                 </p>
               ) : null}
             </div>
