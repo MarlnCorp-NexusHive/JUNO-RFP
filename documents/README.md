@@ -1,5 +1,7 @@
 # Pre-uploaded Source Documents
 
+**Boilerplate (prospects / leads):** `boilerplate/` holds Marln / JUNO RFP winning-capability leave-behinds (HTML + DOCX). They appear in Source Docs as **Boilerplate — Winning RFP Capabilities**. Regenerate with `node scripts/generate-boilerplate-pack.mjs`.
+
 Place your RFP document files in this folder to show them as **pre-uploaded** on the Source Docs page (`/rbac/proposal-manager/source-docs`).
 
 **Supported formats:** PDF, DOC, DOCX, TXT, XLS, XLSX
