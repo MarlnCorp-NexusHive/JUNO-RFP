@@ -4,6 +4,15 @@
  * Shared so Workspace-extracted Q&As appear in Content Hub.
  */
 
+import {
+  BOILERPLATE_FOLDER_ID,
+  BOILERPLATE_FOLDER_NAME,
+  BOILERPLATE_PACK,
+  BOILERPLATE_QAS,
+  packToExtractedQAs,
+  packToPlainText,
+} from "../data/boilerplateCapabilities.js";
+
 const KEYS = {
   FOLDERS: "proposal_manager_workspace_folders",
   DOCUMENTS: "proposal_manager_workspace_documents",
@@ -166,4 +175,56 @@ export function setResponseSectionContent(sectionId, content) {
     sections.push({ id: sectionId, title: sectionId, content });
   }
   saveResponseSections(sections);
+}
+
+/** Idempotent seed: Workspace folder + docs + Content Hub Q&As for Marln/JUNO capability boilerplate. */
+export function ensureBoilerplateLibrary() {
+  const folders = getFolders();
+  if (!folders.some((f) => f.id === BOILERPLATE_FOLDER_ID)) {
+    folders.unshift({
+      id: BOILERPLATE_FOLDER_ID,
+      name: BOILERPLATE_FOLDER_NAME,
+      parentId: null,
+      createdAt: "2026-08-13T08:00:00.000Z",
+      seeded: true,
+    });
+    saveFolders(folders);
+  }
+
+  const docs = getDocuments();
+  let docsChanged = false;
+  for (const pack of BOILERPLATE_PACK) {
+    const docId = `doc_${pack.id}`;
+    if (docs.some((d) => d.id === docId)) continue;
+    docs.push({
+      id: docId,
+      folderId: BOILERPLATE_FOLDER_ID,
+      name: `${pack.fileBase}.docx`,
+      fileType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      documentTypeId: pack.documentTypeId,
+      uploadedAt: pack.uploadedAt,
+      extractedFacts: [],
+      extractedQAs: packToExtractedQAs(pack),
+      rawText: packToPlainText(pack),
+      seeded: true,
+    });
+    docsChanged = true;
+  }
+  if (docsChanged) saveDocuments(docs);
+
+  const qas = getContentHubQAs();
+  let qaChanged = false;
+  for (const row of BOILERPLATE_QAS) {
+    if (qas.some((q) => q.id === row.id)) continue;
+    qas.push({
+      id: row.id,
+      question: row.question,
+      answer: row.answer,
+      tags: [...row.tags],
+      sourceDocumentId: `doc_${BOILERPLATE_PACK[0].id}`,
+      createdAt: "2026-08-13T08:00:00.000Z",
+    });
+    qaChanged = true;
+  }
+  if (qaChanged) saveContentHubQAs(qas);
 }

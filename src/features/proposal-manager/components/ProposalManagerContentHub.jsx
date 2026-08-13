@@ -5,6 +5,7 @@ import {
   addContentHubQA,
   updateContentHubQA,
   deleteContentHubQA,
+  ensureBoilerplateLibrary,
 } from "../services/proposalManagerStorage";
 import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
@@ -73,6 +74,8 @@ export default function ProposalManagerContentHub() {
     "Company Intelligence": "companyIntelligence",
     Issuer: "issuer",
     General: "general",
+    Boilerplate: "boilerplate",
+    Capabilities: "capabilities",
   };
 
   const getTagLabel = (tagValue) => {
@@ -84,6 +87,7 @@ export default function ProposalManagerContentHub() {
 
   useEffect(() => {
     if (location.pathname.includes("content-hub")) {
+      ensureBoilerplateLibrary();
       setQas(getContentHubQAs());
     }
   }, [location.pathname]);

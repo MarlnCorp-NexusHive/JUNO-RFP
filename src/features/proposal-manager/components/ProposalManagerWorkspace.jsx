@@ -13,6 +13,7 @@ import {
   deleteDocument,
   appendExtractedQAs,
   replaceExtractedQAsInContentHub,
+  ensureBoilerplateLibrary,
 } from "../services/proposalManagerStorage";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
@@ -203,7 +204,10 @@ export default function ProposalManagerWorkspace() {
     if (issuer?.narrative) setIssuerBrief(issuer.narrative);
   }, [issuer?.linkedAt, issuer?.narrative]);
 
-  const [folders, setFolders] = useState(getFolders);
+  const [folders, setFolders] = useState(() => {
+    ensureBoilerplateLibrary();
+    return getFolders();
+  });
   const [documents, setDocuments] = useState(getDocuments);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [documentTypeId, setDocumentTypeId] = useState("solicitation");

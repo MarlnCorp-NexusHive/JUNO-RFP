@@ -554,6 +554,7 @@ app.listen(PORT, () => {
   console.log("POST /structure-rfp-requirements");
   console.log("POST /ask-with-context");
   console.log("POST /company-intelligence-remote");
+  console.log("POST /competitive-intelligence-enrich");
   console.log("POST /generate-company-profile");
   console.log("POST /generate-work-document");
   console.log("POST /generate-slide-deck");

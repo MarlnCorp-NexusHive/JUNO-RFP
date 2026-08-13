@@ -223,4 +223,132 @@ Use USD for financial values when you include them; use [] for series you cannot
       res.status(500).json({ error: err.message });
     }
   });
+
+  /**
+   * Competitive Intelligence: refresh datasheet + differentiators for a named peer SI.
+   * Returns the Competitive Intelligence sample shape used by the PM page.
+   */
+  app.post("/competitive-intelligence-enrich", async (req, res) => {
+    try {
+      const companyName = String(req.body?.companyName ?? req.body?.query ?? "").trim();
+      const segment = String(req.body?.segment ?? "").trim();
+      if (!companyName) {
+        return res.status(400).json({ error: "companyName is required" });
+      }
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4.1",
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: `You are a competitive intelligence analyst supporting RFP / proposal managers at a systems-integrator firm.
+Given a peer competitor company name (and optional segment hint), return ONLY valid JSON:
+
+{
+  "name": "canonical company name",
+  "shortName": "short brand name",
+  "hq": "HQ city/country or region",
+  "segment": "e.g. Global SI | Federal integrator | Big Four consulting",
+  "datasheet": {
+    "revenueUsdB": number or null,
+    "employeesK": number or null,
+    "operatingMarginPct": number or null,
+    "publicSectorSharePct": number or null,
+    "offshoreMixPct": number or null,
+    "growthYoYPct": number or null,
+    "keyVehicles": "comma-separated public contract vehicles / frameworks if known, else empty string"
+  },
+  "valueProposition": "1-2 sentences on how this firm wins RFPs / adds value vs peers",
+  "keyDifferentiators": ["3-5 bid-relevant differentiators"],
+  "typicalWinThemes": ["2-3 themes they typically sell"],
+  "source": "short source note e.g. Public filings & industry knowledge — verify",
+  "error": null
+}
+
+Rules:
+- Use approximate, well-known public figures in USD billions / percentages when widely reported; prefer null over inventing precise fake decimals.
+- keyDifferentiators and valueProposition must be useful for bid strategy (positioning, past performance posture, delivery model, clearance, commercials).
+- Set error to a string only if the name is not a recognizable company.
+- Do not invent classified or non-public contract details; use common public IDIQ/framework names only.`,
+          },
+          {
+            role: "user",
+            content: segment
+              ? `Company: ${companyName.slice(0, 200)}\nSegment hint: ${segment.slice(0, 120)}`
+              : `Company: ${companyName.slice(0, 200)}`,
+          },
+        ],
+        temperature: 0.25,
+        max_completion_tokens: 2048,
+      });
+
+      const parsed = parseJsonCompletion(response.choices[0]?.message?.content);
+      if (!parsed || typeof parsed !== "object") {
+        return res.status(500).json({ error: "Invalid model response" });
+      }
+
+      if (parsed.error && typeof parsed.error === "string") {
+        return res.json({
+          name: companyName,
+          shortName: companyName,
+          hq: null,
+          segment: segment || null,
+          datasheet: {
+            revenueUsdB: null,
+            employeesK: null,
+            operatingMarginPct: null,
+            publicSectorSharePct: null,
+            offshoreMixPct: null,
+            growthYoYPct: null,
+            keyVehicles: "",
+          },
+          valueProposition: "",
+          keyDifferentiators: [],
+          typicalWinThemes: [],
+          source: null,
+          error: parsed.error,
+          remote: true,
+        });
+      }
+
+      const ds = parsed.datasheet && typeof parsed.datasheet === "object" ? parsed.datasheet : {};
+      const numOrNull = (v) => {
+        if (v == null || v === "") return null;
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      };
+      const strList = (v) =>
+        Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean).slice(0, 6) : [];
+
+      res.json({
+        name: String(parsed.name || companyName).trim() || companyName,
+        shortName: String(parsed.shortName || parsed.name || companyName).trim() || companyName,
+        hq: parsed.hq != null ? String(parsed.hq) : null,
+        segment: parsed.segment != null ? String(parsed.segment) : segment || null,
+        datasheet: {
+          revenueUsdB: numOrNull(ds.revenueUsdB),
+          employeesK: numOrNull(ds.employeesK),
+          operatingMarginPct: numOrNull(ds.operatingMarginPct),
+          publicSectorSharePct: numOrNull(ds.publicSectorSharePct),
+          offshoreMixPct: numOrNull(ds.offshoreMixPct),
+          growthYoYPct: numOrNull(ds.growthYoYPct),
+          keyVehicles: ds.keyVehicles != null ? String(ds.keyVehicles) : "",
+        },
+        valueProposition:
+          typeof parsed.valueProposition === "string" ? parsed.valueProposition.trim() : "",
+        keyDifferentiators: strList(parsed.keyDifferentiators),
+        typicalWinThemes: strList(parsed.typicalWinThemes),
+        source:
+          typeof parsed.source === "string"
+            ? parsed.source
+            : "Live AI enrichment — verify before bid use",
+        error: null,
+        remote: true,
+      });
+    } catch (err) {
+      console.error("COMPETITIVE INTELLIGENCE ENRICH ERROR:", err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
 }

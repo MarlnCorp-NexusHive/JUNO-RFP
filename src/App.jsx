@@ -101,10 +101,14 @@ import DirectorWorkspace from './features/director/components/DirectorWorkspace'
 import DirectorSupport from './features/director/components/DirectorSupport';
 import ProposalManagerLayout from './features/proposal-manager/components/ProposalManagerLayout';
 import TechnicalSolutioningPage from './features/proposal-manager/components/TechnicalSolutioningPage';
+import TopologyPage from './features/proposal-manager/components/TopologyPage';
+import WinLossScoringPage from './features/proposal-manager/components/WinLossScoringPage';
+import WinSlidePage from './features/proposal-manager/components/WinSlidePage';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
 import CompanyIntelligencePage from './features/proposal-manager/components/CompanyIntelligencePage';
+import CompetitiveIntelligencePage from './features/proposal-manager/components/CompetitiveIntelligencePage';
 import ProposalManagerContentHub from './features/proposal-manager/components/ProposalManagerContentHub';
 import ProposalManagerCalendar from './features/proposal-manager/components/ProposalManagerCalendar';
 import RfpCollaborationPmHub from "./features/rfp-collaboration/RfpCollaborationPmHub.jsx";
@@ -230,8 +234,11 @@ export default function App() {
           <Route index element={<DirectorDashboard basePath="/rbac/proposal-manager" dashboardTitle="JUNO RFP Dashboard" welcomeMessage="Welcome to JUNO RFP - Audit-Ready. Submission-Ready. Win-Ready." />} />
           <Route path="source-docs" element={<SourceDocsPage />} />
           <Route path="company-intelligence" element={<CompanyIntelligencePage />} />
+          <Route path="competitive-intelligence" element={<CompetitiveIntelligencePage />} />
           <Route path="team" element={<MarketingHeadTeamManagement />} />
           <Route path="bid-vault" element={<DirectorAnalyticsReports />} />
+          <Route path="scoring" element={<WinLossScoringPage />} />
+          <Route path="win-slide" element={<WinSlidePage />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
           <Route path="content-hub" element={<ProposalManagerContentHub />} />
           <Route path="pricing" element={<ProposalPricingPage />} />
@@ -242,6 +249,7 @@ export default function App() {
           <Route path="rfp-collaboration" element={<RfpCollaborationPmHub />} />
           <Route path="rfp-collaboration/w/:workspaceId" element={<RfpCollaborationPmWorkspace />} />
           <Route path="technical-solutioning" element={<TechnicalSolutioningPage />} />
+          <Route path="topology" element={<TopologyPage />} />
           <Route path="workspace" element={<ProposalManagerWorkspace />} />
           <Route path="help-support" element={<DirectorSupport />} />
           <Route path="settings" element={<DirectorSettings />} />

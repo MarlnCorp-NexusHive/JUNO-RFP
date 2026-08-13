@@ -1,14 +1,57 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import mammoth from "mammoth";
+import * as XLSX from "xlsx";
 import { useProposalIssuer } from "./ProposalIssuerContext";
+import { ensureBoilerplateLibrary } from "../services/proposalManagerStorage.js";
+import { BOILERPLATE_PACK } from "../data/boilerplateCapabilities.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
 const MAX_PREVIEW_STORAGE_BYTES = 1.5 * 1024 * 1024;
 
+const BOILERPLATE_FOLDER = "boilerplate";
+
+const BOILERPLATE_FILE_META = {
+  "Marln-JUNO-RFP-Capability-Statement": { docx: 9913, html: 4152, shareDocx: "Capability Statement (Word)", shareHtml: "Capability Statement (web)" },
+  "Marln-JUNO-Winning-Differentiators": { docx: 9770, html: 3687, shareDocx: "Winning Differentiators (Word)", shareHtml: "Winning Differentiators (web)" },
+  "Marln-JUNO-RFP-Lifecycle-Capabilities": { docx: 9556, html: 3260, shareDocx: "Pursuit Lifecycle (Word)", shareHtml: "Pursuit Lifecycle (web)" },
+};
+
+const PREUPLOADED_BOILERPLATE_DOCS = BOILERPLATE_PACK.flatMap((pack) => {
+  const meta = BOILERPLATE_FILE_META[pack.fileBase] || { docx: 0, html: 0, shareDocx: pack.title, shareHtml: pack.title };
+  const htmlUrl = `/documents/boilerplate/${pack.fileBase}.html`;
+  return [
+    {
+      id: `${pack.id}-docx`,
+      name: `${pack.fileBase}.docx`,
+      url: `/documents/boilerplate/${pack.fileBase}.docx`,
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      size: meta.docx,
+      uploadedAt: pack.uploadedAt,
+      preUploaded: true,
+      folder: BOILERPLATE_FOLDER,
+      shareLabel: meta.shareDocx,
+      previewUrl: htmlUrl,
+    },
+    {
+      id: `${pack.id}-html`,
+      name: `${pack.fileBase}.html`,
+      url: htmlUrl,
+      type: "text/html",
+      size: meta.html,
+      uploadedAt: pack.uploadedAt,
+      preUploaded: true,
+      folder: BOILERPLATE_FOLDER,
+      shareLabel: meta.shareHtml,
+    },
+  ];
+});
+
 // Pre-uploaded documents: place files in public/documents/ and list them here. (sizes in bytes; uploadedAt ISO strings for sorting)
 const PREUPLOADED_DOCS = [
+  ...PREUPLOADED_BOILERPLATE_DOCS,
   { id: "pre-water-wastewater", name: "Final 2026 RFP- Water Wastewater Study.pdf", url: "/documents/Final 2026 RFP- Water Wastewater Study.pdf", type: "application/pdf", size: 310045, uploadedAt: "2025-02-10T14:22:00.000Z", preUploaded: true },
   { id: "pre-landscape-rfp", name: "CC Final-RFP for Landscape Maintenance Services 9-10-2024.pdf", url: "/documents/CC Final-RFP for Landscape Maintenance Services 9-10-2024.pdf", type: "application/pdf", size: 761095, uploadedAt: "2024-09-15T09:00:00.000Z", preUploaded: true },
   { id: "pre-balsitis-playground", name: "Balsitis Park Playground RFP.pdf", url: "/documents/Balsitis Park Playground RFP.pdf", type: "application/pdf", size: 4239018, uploadedAt: "2025-01-28T11:45:00.000Z", preUploaded: true },
@@ -26,58 +69,201 @@ function formatSize(bytes) {
 function getDocIcon(type) {
   const t = (type || "").toLowerCase();
   if (t.includes("pdf")) return "📄";
+  if (t.includes("html")) return "🌐";
   if (t.includes("word") || t.includes("doc")) return "📝";
   if (t.includes("sheet") || t.includes("excel") || t.includes("xls")) return "📊";
   return "📁";
 }
 
-function DocPreview({ doc }) {
+const PREVIEW_FRAME =
+  "mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 h-40";
+
+function fileKind(doc) {
+  const typeStr = (doc.type || "").toLowerCase();
+  const name = (doc.name || "").toLowerCase();
+  if (typeStr.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+  if (typeStr.includes("html") || name.endsWith(".html") || name.endsWith(".htm")) return "html";
+  if (typeStr.includes("word") || typeStr.includes("officedocument.wordprocessing") || name.endsWith(".docx") || name.endsWith(".doc")) return "word";
+  if (typeStr.includes("sheet") || typeStr.includes("excel") || name.endsWith(".xlsx") || name.endsWith(".xls")) return "excel";
+  if (typeStr.includes("text/plain") || typeStr.includes("text/") || name.endsWith(".txt")) return "text";
+  return "other";
+}
+
+async function readDocBuffer(doc) {
+  if (doc.dataUrl?.startsWith("data:")) {
+    const base64 = doc.dataUrl.split(",")[1];
+    if (!base64) return null;
+    const bytes = atob(base64);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return arr.buffer;
+  }
+  if (!doc.url) return null;
+  const res = await fetch(doc.url);
+  if (!res.ok) throw new Error("fetch failed");
+  return res.arrayBuffer();
+}
+
+function openHref(doc) {
+  if (doc.url) return doc.url;
+  if (doc.dataUrl?.startsWith("data:")) return doc.dataUrl;
+  return null;
+}
+
+function FallbackPreview({ doc }) {
   const { t } = useTranslation();
-  const { dataUrl, url, type, name } = doc;
-  const previewSrc = url || (dataUrl ? (dataUrl.startsWith("data:") ? dataUrl : null) : null);
-  const isUrl = !!url;
+  const href = openHref(doc);
+  const kind = fileKind(doc);
+  const label =
+    kind === "word"
+      ? t("proposalManagerSourceDocs.previewWord")
+      : kind === "excel"
+        ? t("proposalManagerSourceDocs.previewExcel")
+        : t("proposalManagerSourceDocs.previewGeneric");
 
-  if (!previewSrc) {
+  return (
+    <div className={`${PREVIEW_FRAME} flex flex-col items-center justify-center gap-2 px-3 text-center`}>
+      <span className="text-3xl" aria-hidden>
+        {getDocIcon(doc.type)}
+      </span>
+      <p className="text-xs font-medium text-gray-700 dark:text-gray-200">{label}</p>
+      {href ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={doc.name}
+          className="text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+        >
+          {t("proposalManagerSourceDocs.openFile")}
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+function ConvertedOfficePreview({ doc }) {
+  const { t } = useTranslation();
+  const kind = fileKind(doc);
+  const [html, setHtml] = useState("");
+  const [rows, setRows] = useState(null);
+  const [status, setStatus] = useState("loading");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const buf = await readDocBuffer(doc);
+        if (!buf) {
+          if (!cancelled) setStatus("fallback");
+          return;
+        }
+        if (kind === "word") {
+          const result = await mammoth.convertToHtml({ arrayBuffer: buf });
+          if (!cancelled) {
+            setHtml(result.value || "");
+            setStatus(result.value ? "ready" : "fallback");
+          }
+          return;
+        }
+        if (kind === "excel") {
+          const workbook = XLSX.read(buf, { type: "array" });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const table = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }).slice(0, 8);
+          if (!cancelled) {
+            setRows(table);
+            setStatus(table.length ? "ready" : "fallback");
+          }
+        }
+      } catch {
+        if (!cancelled) setStatus("fallback");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [doc.id, doc.url, doc.dataUrl, kind]);
+
+  if (status === "loading") {
     return (
-      <div className="mt-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 h-32 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-        {t("proposalManagerSourceDocs.previewNotAvailable")}
+      <div className={`${PREVIEW_FRAME} flex items-center justify-center text-xs text-gray-500 dark:text-gray-400`}>
+        {t("proposalManagerSourceDocs.previewLoading")}
       </div>
     );
   }
-  const typeStr = (type || "").toLowerCase();
-  const isPdf = typeStr.includes("pdf");
-  const isText = typeStr.includes("text/plain") || typeStr.includes("text/") || (name && name.toLowerCase().endsWith(".txt"));
+  if (status === "fallback") return <FallbackPreview doc={doc} />;
 
-  if (isPdf || (isUrl && isText)) {
+  if (kind === "word") {
     return (
-      <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 h-40">
-        <iframe title={name} src={previewSrc} className="w-full h-full" />
+      <div className={PREVIEW_FRAME}>
+        <iframe title={doc.name} srcDoc={html} className="w-full h-full bg-white" />
       </div>
     );
   }
-  if (isText && dataUrl) {
+
+  return (
+    <div className={`${PREVIEW_FRAME} overflow-auto bg-white dark:bg-gray-900`}>
+      <table className="min-w-full text-[10px] text-gray-700 dark:text-gray-200">
+        <tbody>
+          {(rows || []).map((row, i) => (
+            <tr key={i} className={i === 0 ? "bg-gray-50 dark:bg-gray-800 font-semibold" : ""}>
+              {(row || []).slice(0, 6).map((cell, j) => (
+                <td key={j} className="border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 whitespace-nowrap">
+                  {String(cell ?? "")}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function DocPreview({ doc }) {
+  const { dataUrl, url, type, name, previewUrl } = doc;
+  const kind = fileKind(doc);
+  const previewSrc = previewUrl || url || (dataUrl?.startsWith("data:") ? dataUrl : null);
+
+  if (previewUrl || kind === "pdf" || kind === "html") {
+    const src = previewUrl || previewSrc;
+    if (src) {
+      return (
+        <div className={PREVIEW_FRAME}>
+          <iframe title={name} src={src} className="w-full h-full" />
+        </div>
+      );
+    }
+  }
+
+  if (kind === "text" && dataUrl?.startsWith("data:")) {
     try {
       const base64 = dataUrl.split(",")[1];
       const text = atob(base64);
       const lines = text.split(/\r?\n/).slice(0, 6).join("\n");
       return (
-        <div className="mt-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-3 h-32 overflow-y-auto overflow-x-hidden overscroll-contain">
+        <div className={`${PREVIEW_FRAME} p-3 overflow-y-auto overflow-x-hidden overscroll-contain bg-gray-50 dark:bg-gray-800/50`}>
           <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans">{lines}</pre>
         </div>
       );
     } catch {
-      return (
-        <div className="mt-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 h-32 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-          {t("proposalManagerSourceDocs.previewNotAvailable")}
-        </div>
-      );
+      return <FallbackPreview doc={doc} />;
     }
   }
-  return (
-    <div className="mt-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 h-32 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-      {t("proposalManagerSourceDocs.previewNotAvailableFileType")}
-    </div>
-  );
+
+  if (kind === "text" && url) {
+    return (
+      <div className={PREVIEW_FRAME}>
+        <iframe title={name} src={url} className="w-full h-full" />
+      </div>
+    );
+  }
+
+  if (kind === "word" || kind === "excel") {
+    return <ConvertedOfficePreview doc={doc} />;
+  }
+
+  return <FallbackPreview doc={doc} />;
 }
 
 function loadStored() {
@@ -120,7 +306,12 @@ export default function SourceDocsPage() {
   const [dragging, setDragging] = useState(false);
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
+  const [copiedId, setCopiedId] = useState("");
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    ensureBoilerplateLibrary();
+  }, []);
 
   const sortedDocs = React.useMemo(() => {
     const list = [...docs];
@@ -139,6 +330,15 @@ export default function SourceDocsPage() {
     });
     return list;
   }, [docs, sortBy, sortOrder]);
+
+  const boilerplateDocs = React.useMemo(
+    () => sortedDocs.filter((d) => d.folder === BOILERPLATE_FOLDER),
+    [sortedDocs]
+  );
+  const libraryDocs = React.useMemo(
+    () => sortedDocs.filter((d) => d.folder !== BOILERPLATE_FOLDER),
+    [sortedDocs]
+  );
 
   useEffect(() => {
     saveStored(docs.filter((d) => !d.preUploaded));
@@ -226,10 +426,16 @@ export default function SourceDocsPage() {
     );
     if (!doc.dataUrl && doc.url) {
       const fullUrl = window.location.origin + doc.url;
+      const label = doc.shareLabel || fileName;
+      const mailSubject = doc.folder === BOILERPLATE_FOLDER
+        ? encodeURIComponent(`Marln JUNO RFP — ${label}`)
+        : subject;
       body = encodeURIComponent(
-        `Document: ${fileName}\nDownload: ${fullUrl}\n\n(Sent from JUNO RFP Source Docs)`
+        doc.folder === BOILERPLATE_FOLDER
+          ? `Sharing Marln / JUNO RFP boilerplate for your review:\n\n${label}\n${fullUrl}\n\nAudit-Ready. Submission-Ready. Win-Ready.`
+          : `Document: ${fileName}\nDownload: ${fullUrl}\n\n(Sent from JUNO RFP Source Docs)`
       );
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:?subject=${mailSubject}&body=${body}`;
       return;
     }
     const mailto = `mailto:?subject=${subject}&body=${body}`;
@@ -274,6 +480,81 @@ export default function SourceDocsPage() {
     setDragging(false);
     addFiles(e.dataTransfer.files);
   };
+
+  const copyShareLink = async (doc) => {
+    if (!doc.url) return;
+    const fullUrl = window.location.origin + doc.url;
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopiedId(doc.id);
+      setTimeout(() => setCopiedId(""), 2000);
+    } catch {
+      window.prompt(t("proposalManagerSourceDocs.copyLink"), fullUrl);
+    }
+  };
+
+  const emailBoilerplateFolder = () => {
+    const lines = boilerplateDocs.map((d) => {
+      const label = d.shareLabel || d.name;
+      return `${label}\n${window.location.origin}${d.url}`;
+    });
+    const subject = encodeURIComponent("Marln JUNO RFP — Winning capability boilerplate");
+    const body = encodeURIComponent(
+      `Please find Marln Corporation / JUNO RFP winning-capability boilerplate (share with any prospect or lead):\n\n${lines.join("\n\n")}\n\nAudit-Ready. Submission-Ready. Win-Ready.`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  const renderDocCard = (doc) => (
+    <li
+      key={doc.id}
+      className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm flex flex-col"
+    >
+      <div className="flex items-center gap-3">
+        <span className="text-2xl">{getDocIcon(doc.type)}</span>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-gray-900 dark:text-white truncate" title={doc.name}>
+            {doc.shareLabel || doc.name}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString()}
+          </p>
+        </div>
+        <div className="shrink-0 flex items-center gap-1">
+          {doc.url ? (
+            <button
+              type="button"
+              onClick={() => copyShareLink(doc)}
+              className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-xs font-medium"
+              title={t("proposalManagerSourceDocs.copyLink")}
+              aria-label={t("proposalManagerSourceDocs.copyLink")}
+            >
+              {copiedId === doc.id ? "✓" : "🔗"}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => handleEmail(doc)}
+            className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+            title={t("proposalManagerSourceDocs.emailTitle")}
+            aria-label={t("proposalManagerSourceDocs.emailAriaLabel")}
+          >
+            <span className="text-lg">✉️</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => removeDoc(doc.id)}
+            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            title={t("proposalManagerSourceDocs.removeTitle")}
+            aria-label={t("proposalManagerSourceDocs.removeAriaLabel")}
+          >
+            <span className="text-lg">🗑️</span>
+          </button>
+        </div>
+      </div>
+      <DocPreview doc={doc} />
+    </li>
+  );
 
   return (
     <div className="space-y-6">
@@ -323,10 +604,36 @@ export default function SourceDocsPage() {
         )}
       </div>
 
+      <section className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+              {t("proposalManagerSourceDocs.boilerplateEyebrow")}
+            </p>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t("proposalManagerSourceDocs.boilerplateTitle")}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">
+              {t("proposalManagerSourceDocs.boilerplateSubtitle")}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={emailBoilerplateFolder}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 shadow-sm"
+          >
+            ✉️ {t("proposalManagerSourceDocs.shareFolder")}
+          </button>
+        </div>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4">
+          {boilerplateDocs.map(renderDocCard)}
+        </ul>
+      </section>
+
       <section>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerSourceDocs.uploadedDocumentsTitle")}</h2>
-          {docs.length > 0 && (
+          {libraryDocs.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               <label className="text-sm text-gray-600 dark:text-gray-400">{t("proposalManagerSourceDocs.sortBy")}</label>
               <select
@@ -351,51 +658,13 @@ export default function SourceDocsPage() {
             </div>
           )}
         </div>
-        {docs.length === 0 ? (
+        {libraryDocs.length === 0 ? (
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-8 text-center text-gray-500 dark:text-gray-400">
             {t("proposalManagerSourceDocs.emptyState")}
           </div>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sortedDocs.map((doc) => (
-              <li
-                key={doc.id}
-                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm flex flex-col"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{getDocIcon(doc.type)}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white truncate" title={doc.name}>
-                      {doc.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="shrink-0 flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleEmail(doc)}
-                      className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-                      title={t("proposalManagerSourceDocs.emailTitle")}
-                      aria-label={t("proposalManagerSourceDocs.emailAriaLabel")}
-                    >
-                      <span className="text-lg">✉️</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeDoc(doc.id)}
-                      className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      title={t("proposalManagerSourceDocs.removeTitle")}
-                      aria-label={t("proposalManagerSourceDocs.removeAriaLabel")}
-                    >
-                      <span className="text-lg">🗑️</span>
-                    </button>
-                  </div>
-                </div>
-                <DocPreview doc={doc} />
-              </li>
-            ))}
+            {libraryDocs.map(renderDocCard)}
           </ul>
         )}
       </section>

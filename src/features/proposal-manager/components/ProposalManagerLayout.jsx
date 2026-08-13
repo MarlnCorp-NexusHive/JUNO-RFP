@@ -19,8 +19,11 @@ function AutoStartTour({ role }) {
     if (segments.includes('proposal-manager')) {
       if (segments.includes('source-docs')) return 'source-docs';
       if (segments.includes('company-intelligence')) return 'company-intelligence';
+      if (segments.includes('competitive-intelligence')) return 'competitive-intelligence';
       if (segments.includes('team')) return 'team';
       if (segments.includes('bid-vault')) return 'bid-vault';
+      if (segments.includes('scoring')) return 'scoring';
+      if (segments.includes('win-slide')) return 'win-slide';
       if (segments.includes('capture-strategy')) return 'capture-strategy';
       if (segments.includes('content-hub')) return 'content-hub';
       if (segments.includes('pricing')) return 'pricing';
@@ -30,6 +33,7 @@ function AutoStartTour({ role }) {
       if (segments.includes('user-management')) return 'user-management';
       if (segments.includes('rfp-collaboration')) return 'rfp-collaboration';
       if (segments.includes('technical-solutioning')) return 'technical-solutioning';
+      if (segments.includes('topology')) return 'topology';
       if (segments.includes('workspace')) return 'workspace';
       if (segments.includes('help-support')) return 'help-support';
       if (segments.includes('settings')) return 'settings';

@@ -14,7 +14,8 @@
     "deploy": "gh-pages -d dist",
     "deploy:netlify": "npm run build && npx --yes netlify-cli@17 deploy --prod --dir=dist",
     "vercel-build": "npm run build",
-    "refresh-companies": "node scripts/refresh-company-intelligence-samples.mjs"
+    "refresh-companies": "node scripts/refresh-company-intelligence-samples.mjs",
+    "generate-boilerplate": "node scripts/generate-boilerplate-pack.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

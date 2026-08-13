@@ -76,6 +76,15 @@ export const fetchCompanyIntelligenceRemote = async ({ query }) => {
   return res.data;
 };
 
+/* ================= COMPETITIVE INTELLIGENCE ================= */
+export const enrichCompetitiveIntelligence = async ({ companyName, segment }) => {
+  const res = await API.post("/competitive-intelligence-enrich", {
+    companyName,
+    segment: segment ?? "",
+  });
+  return res.data;
+};
+
 /* ================= COMPANY PROFILE ================= */
 export const generateCompanyProfile = async (payload) => {
   const res = await API.post("/generate-company-profile", {
