@@ -12,13 +12,14 @@ import {
   enrichCompetitorById,
   getCuratedCompetitor,
 } from "../../../services/competitiveIntelligenceService";
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const STORAGE_KEY = "juno_proposal_manager_competitive_intelligence";
 const MAX_SELECTED = 5;
 
 function loadPrefs() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(scopedStorageKey(STORAGE_KEY));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     return {
@@ -33,7 +34,7 @@ function loadPrefs() {
 function savePrefs(selectedIds, visibleMetrics) {
   try {
     localStorage.setItem(
-      STORAGE_KEY,
+      scopedStorageKey(STORAGE_KEY),
       JSON.stringify({ selectedIds, visibleMetrics, savedAt: new Date().toISOString() })
     );
   } catch {

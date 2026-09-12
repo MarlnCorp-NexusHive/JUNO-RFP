@@ -1,8 +1,12 @@
 /**
  * Persists the "linked" RFP issuer snapshot from Company Intelligence for use across Proposal Manager (Pricing, Workspace, etc.).
+ * Trial mode: namespaced by tenantId.
  */
 
-const KEY = "proposal_manager_linked_issuer";
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
+
+export const LINKED_ISSUER_BASE_KEY = "proposal_manager_linked_issuer";
+const KEY = LINKED_ISSUER_BASE_KEY;
 
 export function formatUsd(v) {
   if (v == null || typeof v !== "number") return "—";
@@ -57,7 +61,7 @@ export function buildSnapshotFromIntelligenceResult(result) {
 
 export function getLinkedIssuer() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(scopedStorageKey(KEY));
     if (!raw) return null;
     const data = JSON.parse(raw);
     return data && data.version === 1 ? data : null;
@@ -68,7 +72,7 @@ export function getLinkedIssuer() {
 
 export function setLinkedIssuer(snapshot) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(snapshot));
+    localStorage.setItem(scopedStorageKey(KEY), JSON.stringify(snapshot));
   } catch (e) {
     console.warn("proposalIssuerStorage set failed", e);
   }
@@ -76,7 +80,7 @@ export function setLinkedIssuer(snapshot) {
 
 export function clearLinkedIssuer() {
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(scopedStorageKey(KEY));
   } catch {
     /* ignore */
   }

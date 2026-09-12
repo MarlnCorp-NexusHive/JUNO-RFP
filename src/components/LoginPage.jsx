@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { localStorageService } from "../services/localStorageService";
 import { preloadDemoUsers } from "../data/preloadDemoUsers";
+import API from "../services/api.js";
+import {
+  clearTrialSession,
+  setTrialSession,
+  trialUserToRbacUser,
+} from "../services/trialAuthSession.js";
 import { LocalizationProvider } from "../hooks/useLocalization.jsx";
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
@@ -101,13 +107,36 @@ function LoginPageContent() {
     setError("");
     
     try {
-      preloadDemoUsers();
-      // Simulate loading delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const users = localStorageService.getUsers();
       const ident = username.trim().toLowerCase();
       const passIn = password.trim();
+
+      // 1) Trial tenants (backend) — same Netlify/Render deploy, isolated by tenantId
+      try {
+        const { data } = await API.post("/trial/auth/login", {
+          email: ident,
+          password: passIn,
+        });
+        setTrialSession(data);
+        localStorage.setItem("rbac_current_user", JSON.stringify(trialUserToRbacUser(data)));
+        navigate("/rbac/proposal-manager");
+        return;
+      } catch (trialErr) {
+        const code = trialErr?.response?.data?.code;
+        const msg = trialErr?.response?.data?.error;
+        if (code === "trial_expired" || code === "tenant_disabled") {
+          clearTrialSession();
+          setError(msg || t("auth.login.trialExpired", { defaultValue: "This trial has expired." }));
+          return;
+        }
+        // Network / 401 → fall through to demo accounts
+      }
+
+      // 2) Demo mode (unchanged) — clears any leftover trial session so storage stays unscoped
+      clearTrialSession();
+      preloadDemoUsers();
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const users = localStorageService.getUsers();
       const user = users.find((u) => {
         const uName = String(u.username || "").toLowerCase();
         const uMail = String(u.collabEmail || "").toLowerCase();

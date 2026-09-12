@@ -8,6 +8,38 @@ import { TourProvider } from "../../../components/tours/TourContext";
 import { useTour } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
+import { getTrialSession } from "../../../services/trialAuthSession.js";
+import { useTranslation } from "react-i18next";
+
+function TrialBanner() {
+  const { t } = useTranslation("common");
+  const session = getTrialSession();
+  const user = parseLocalStorageJson("rbac_current_user");
+  if (!session?.tenantId && !user?.isTrialUser) return null;
+
+  const company = session?.tenantName || user?.tenantName || t("proposalManagerTrial.tenant");
+  const ends = session?.trialEndsAt || user?.trialEndsAt;
+  let daysLeft = null;
+  if (ends) {
+    const ms = Date.parse(ends) - Date.now();
+    daysLeft = Number.isFinite(ms) ? Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000))) : null;
+  }
+
+  return (
+    <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm text-indigo-950 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-100">
+      <span className="font-semibold">{t("proposalManagerTrial.badge")}</span>
+      {" · "}
+      {company}
+      {daysLeft != null && (
+        <>
+          {" · "}
+          {t("proposalManagerTrial.daysLeft", { count: daysLeft })}
+        </>
+      )}
+      <span className="opacity-70"> · {t("proposalManagerTrial.isolatedHint")}</span>
+    </div>
+  );
+}
 
 function AutoStartTour({ role }) {
   const location = useLocation();
@@ -88,6 +120,7 @@ export default function ProposalManagerLayout() {
             : (isRTLMode ? 'mr-12' : 'ml-12')
         }`}>
           <AutoStartTour role="proposal-manager" />
+          <TrialBanner />
           <Outlet />
         </main>
 

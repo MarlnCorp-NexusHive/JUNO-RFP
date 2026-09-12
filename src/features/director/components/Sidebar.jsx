@@ -5,6 +5,7 @@ import { useLocalization } from "../../../hooks/useLocalization";
 import SidebarLanguageSwitcher from "../../../components/localization/SidebarLanguageSwitcher";
 import SmartTourButton from "../../../components/tours/SmartTourButton";
 import { clearCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
+import { clearTrialSession } from "../../../services/trialAuthSession.js";
 import SageAIButton from "../../../components/ui/SageAIButton";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
 
@@ -39,6 +40,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
   const handleLogout = () => {
     localStorage.removeItem("rbac_current_user");
     clearCollabSession();
+    clearTrialSession();
     navigate("/login");
   };
 

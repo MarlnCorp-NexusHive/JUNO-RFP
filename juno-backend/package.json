@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "create-trial": "node scripts/create-trial-tenant.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

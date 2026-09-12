@@ -8,6 +8,7 @@ import { SAMPLE_COMPANIES } from "../data/companyIntelligenceSamples";
 import { FiSearch, FiTrendingUp, FiDollarSign, FiUsers, FiGlobe, FiRefreshCw, FiAlertCircle, FiZap } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import FinancialTrendsChart from "./FinancialTrendsChart";
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const STORAGE_KEY = "juno_proposal_manager_company_intelligence_saved";
 const AUTO_SYNC_KEY = "proposal_manager_ci_auto_sync_forms";
@@ -52,7 +53,7 @@ const SECTOR_LABEL_KEYS = {
 
 function readAutoSyncPreference() {
   try {
-    const v = localStorage.getItem(AUTO_SYNC_KEY);
+    const v = localStorage.getItem(scopedStorageKey(AUTO_SYNC_KEY));
     if (v === null) return true;
     return v === "1";
   } catch {
@@ -64,7 +65,7 @@ const QUICK_PICK_TICKERS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TS
 
 function loadSaved() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(scopedStorageKey(STORAGE_KEY));
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -74,7 +75,7 @@ function loadSaved() {
 function saveCompany(entry) {
   const list = loadSaved().filter((c) => c.id !== entry.id);
   const next = [{ ...entry, savedAt: new Date().toISOString() }, ...list].slice(0, MAX_SAVED);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  localStorage.setItem(scopedStorageKey(STORAGE_KEY), JSON.stringify(next));
 }
 
 export default function CompanyIntelligencePage() {
@@ -305,7 +306,7 @@ export default function CompanyIntelligencePage() {
                 const on = e.target.checked;
                 setAutoSyncForms(on);
                 try {
-                  localStorage.setItem(AUTO_SYNC_KEY, on ? "1" : "0");
+                  localStorage.setItem(scopedStorageKey(AUTO_SYNC_KEY), on ? "1" : "0");
                 } catch {
                   /* ignore */
                 }

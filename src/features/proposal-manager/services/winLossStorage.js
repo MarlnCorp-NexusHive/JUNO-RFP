@@ -1,10 +1,11 @@
 import { WIN_LOSS_SAMPLES } from "../data/winLossSamples";
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const KEY = "proposal_manager_win_loss_records";
 
 function load(defaultValue = []) {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(scopedStorageKey(KEY));
     return raw ? JSON.parse(raw) : defaultValue;
   } catch {
     return defaultValue;
@@ -13,7 +14,7 @@ function load(defaultValue = []) {
 
 function save(records) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(records));
+    localStorage.setItem(scopedStorageKey(KEY), JSON.stringify(records));
   } catch (e) {
     console.warn("winLossStorage save failed", e);
   }

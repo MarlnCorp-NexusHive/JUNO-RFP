@@ -501,6 +501,13 @@
       "exportPreparing": "Preparing…"
     }
   },
+  "proposalManagerTrial": {
+    "badge": "Trial",
+    "tenant": "Tenant",
+    "daysLeft": "{{count}} days left",
+    "daysLeft_one": "{{count}} day left",
+    "isolatedHint": "Your workspace is isolated by tenant ID"
+  },
   "proposalManagerWinSlide": {
     "eyebrow": "Post-selection orals",
     "title": "Win Slide",

@@ -27,6 +27,26 @@ const API = axios.create({
   timeout: 600_000,
 });
 
+API.interceptors.request.use((config) => {
+  try {
+    const url = String(config.url || "");
+    // Collab uses its own Bearer user-id tokens; do not overwrite with trial session.
+    if (url.includes("/rfp-collab")) return config;
+    const raw = localStorage.getItem("juno_trial_session");
+    if (!raw) return config;
+    const session = JSON.parse(raw);
+    if (session?.token) {
+      config.headers = config.headers || {};
+      if (!config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${session.token}`;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  return config;
+});
+
 /** DOCX is a ZIP (PK…). If the server returned JSON/HTML, surface it as a normal Error. */
 async function assertBlobIsDocxOrThrow(response, label) {
   const blob = response.data;

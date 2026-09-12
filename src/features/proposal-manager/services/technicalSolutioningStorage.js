@@ -1,6 +1,9 @@
 /**
  * Technical Solutioning — reference asset library, indexed patterns, generated designs.
+ * Trial mode: namespaced by tenantId.
  */
+
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const KEYS = {
   ASSETS: "proposal_manager_tech_solution_assets",
@@ -113,7 +116,7 @@ Data mapping: JSON schema v2 with field-level validation`,
 
 function load(key, defaultValue = null) {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(scopedStorageKey(key));
     return raw ? JSON.parse(raw) : defaultValue;
   } catch {
     return defaultValue;
@@ -122,7 +125,7 @@ function load(key, defaultValue = null) {
 
 function save(key, data) {
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(scopedStorageKey(key), JSON.stringify(data));
   } catch (e) {
     console.warn("technicalSolutioningStorage save failed", key, e);
   }

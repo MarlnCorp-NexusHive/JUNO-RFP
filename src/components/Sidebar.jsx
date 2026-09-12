@@ -6,6 +6,7 @@ import SidebarLanguageSwitcher from "./localization/SidebarLanguageSwitcher";
 import SmartTourButton from '../components/tours/SmartTourButton';
 import SageAIButton from './ui/SageAIButton';
 import ThemeToggleButton from './ui/ThemeToggleButton';
+import { clearTrialSession } from '../services/trialAuthSession.js';
 import marlnLogo from "../assets/MARLN logo.png";
 
 export default function Sidebar({ features, userLabel }) {
@@ -39,6 +40,7 @@ export default function Sidebar({ features, userLabel }) {
 
   const handleLogout = () => {
     localStorage.removeItem("rbac_current_user");
+    clearTrialSession();
     navigate("/login");
   };
 

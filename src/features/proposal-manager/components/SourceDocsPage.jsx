@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { ensureBoilerplateLibrary } from "../services/proposalManagerStorage.js";
 import { BOILERPLATE_PACK } from "../data/boilerplateCapabilities.js";
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
@@ -268,7 +269,7 @@ function DocPreview({ doc }) {
 
 function loadStored() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(scopedStorageKey(STORAGE_KEY));
     if (!raw) return [];
     return JSON.parse(raw);
   } catch {
@@ -286,7 +287,7 @@ function saveStored(list) {
       }
       return d;
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    localStorage.setItem(scopedStorageKey(STORAGE_KEY), JSON.stringify(toSave));
   } catch (e) {
     console.warn("Could not persist source docs", e);
   }

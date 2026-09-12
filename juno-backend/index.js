@@ -27,6 +27,7 @@ import { generateSlideDeckFromContent } from "./slideDeckBuilder.js";
 import { buildWorkDocumentFromContent } from "./workDocumentBuilder.js";
 import { registerTechnicalSolutioningRoutes } from "./technicalSolutioningService.js";
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
+import { registerTrialSystem } from "./trial/index.js";
 
 dotenv.config();
 
@@ -68,6 +69,8 @@ app.use((req, res, next) => {
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+registerTrialSystem(app);
 
 initCollaboration(openai);
 initCalendar();
@@ -561,5 +564,6 @@ app.listen(PORT, () => {
   console.log("POST /technical-solution/extract-patterns");
   console.log("POST /technical-solution/generate-design");
   console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
-  console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines\n");
+  console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines");
+  console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)\n");
 });

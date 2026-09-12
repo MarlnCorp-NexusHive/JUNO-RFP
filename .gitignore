@@ -1,5 +1,8 @@
 # Runtime collaboration store (RFP team collab workspaces — survives backend restart)
 juno-backend/data/collaboration-runtime-state.json
+# Trial tenants / hashed passwords / sessions (provision via create-trial script)
+juno-backend/data/trial-tenants.json
+juno-backend/data/trial-tenants.json.tmp
 
 # Local styled-export smoke / test outputs
 juno-backend/_*.docx

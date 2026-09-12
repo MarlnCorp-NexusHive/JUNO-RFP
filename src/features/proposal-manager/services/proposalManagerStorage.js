@@ -2,6 +2,7 @@
  * Proposal Manager: localStorage-backed storage for Workspace (folders, documents, extracted data)
  * and Content Hub (Q&As with tags, response document sections).
  * Shared so Workspace-extracted Q&As appear in Content Hub.
+ * Trial mode: keys are namespaced by tenantId via scopedStorageKey.
  */
 
 import {
@@ -12,6 +13,7 @@ import {
   packToExtractedQAs,
   packToPlainText,
 } from "../data/boilerplateCapabilities.js";
+import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const KEYS = {
   FOLDERS: "proposal_manager_workspace_folders",
@@ -22,7 +24,7 @@ const KEYS = {
 
 function load(key, defaultValue = []) {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(scopedStorageKey(key));
     return raw ? JSON.parse(raw) : defaultValue;
   } catch {
     return defaultValue;
@@ -31,7 +33,7 @@ function load(key, defaultValue = []) {
 
 function save(key, data) {
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(scopedStorageKey(key), JSON.stringify(data));
   } catch (e) {
     console.warn("proposalManagerStorage save failed", key, e);
   }

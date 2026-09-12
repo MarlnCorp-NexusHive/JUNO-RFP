@@ -4,7 +4,9 @@ import {
   setLinkedIssuer as persistIssuer,
   clearLinkedIssuer as clearPersisted,
   buildSnapshotFromIntelligenceResult,
+  LINKED_ISSUER_BASE_KEY,
 } from "../services/proposalIssuerStorage";
+import { isScopedStorageEventKey } from "../../../services/tenantScopedStorage.js";
 
 const ProposalIssuerContext = createContext(null);
 
@@ -13,7 +15,7 @@ export function ProposalIssuerProvider({ children }) {
 
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key === "proposal_manager_linked_issuer") setIssuer(getLinkedIssuer());
+      if (isScopedStorageEventKey(e.key, LINKED_ISSUER_BASE_KEY)) setIssuer(getLinkedIssuer());
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);

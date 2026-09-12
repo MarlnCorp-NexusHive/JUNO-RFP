@@ -501,6 +501,17 @@
       "exportPreparing": "جارٍ التحضير…"
     }
   },
+  "proposalManagerTrial": {
+    "badge": "تجربة",
+    "tenant": "المستأجر",
+    "daysLeft": "{{count}} أيام متبقية",
+    "daysLeft_one": "يوم واحد متبقٍ",
+    "daysLeft_two": "يومان متبقيان",
+    "daysLeft_few": "{{count}} أيام متبقية",
+    "daysLeft_many": "{{count}} يوماً متبقياً",
+    "daysLeft_other": "{{count}} يوم متبقٍ",
+    "isolatedHint": "مساحة عملك معزولة بمعرّف المستأجر"
+  },
   "proposalManagerWinSlide": {
     "eyebrow": "عروض بعد الاختيار",
     "title": "شريحة الفوز",
