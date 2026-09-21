@@ -28,6 +28,7 @@ import { buildWorkDocumentFromContent } from "./workDocumentBuilder.js";
 import { registerTechnicalSolutioningRoutes } from "./technicalSolutioningService.js";
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
+import { registerGrantsGovRoutes } from "./grantsGovService.js";
 
 dotenv.config();
 
@@ -78,6 +79,7 @@ app.use("/rfp-collab", collaborationRouter);
 app.use("/calendar", calendarRouter);
 registerRfpAssistantEndpoints(app, openai);
 registerTechnicalSolutioningRoutes(app, openai);
+registerGrantsGovRoutes(app);
 
 /* ================= MULTER ================= */
 const upload = multer({
@@ -565,5 +567,6 @@ app.listen(PORT, () => {
   console.log("POST /technical-solution/generate-design");
   console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
   console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines");
-  console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)\n");
+  console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)");
+  console.log("Grants.gov: POST /grants/search, POST /grants/opportunity\n");
 });

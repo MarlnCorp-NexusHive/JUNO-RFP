@@ -29,6 +29,7 @@ export default defineConfig(({ mode }) => {
     "/technical-solution": prox(),
     "/competitive-intelligence-enrich": prox(),
     "/trial": prox(),
+    "/grants": prox(),
     "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates)$":
       prox(),
   };

@@ -56,6 +56,7 @@ function AutoStartTour({ role }) {
       if (segments.includes('bid-vault')) return 'bid-vault';
       if (segments.includes('scoring')) return 'scoring';
       if (segments.includes('win-slide')) return 'win-slide';
+      if (segments.includes('grants')) return 'grants';
       if (segments.includes('capture-strategy')) return 'capture-strategy';
       if (segments.includes('content-hub')) return 'content-hub';
       if (segments.includes('pricing')) return 'pricing';

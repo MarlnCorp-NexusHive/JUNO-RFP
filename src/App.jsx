@@ -104,6 +104,7 @@ import TechnicalSolutioningPage from './features/proposal-manager/components/Tec
 import TopologyPage from './features/proposal-manager/components/TopologyPage';
 import WinLossScoringPage from './features/proposal-manager/components/WinLossScoringPage';
 import WinSlidePage from './features/proposal-manager/components/WinSlidePage';
+import GrantsPage from './features/proposal-manager/components/GrantsPage';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
@@ -239,6 +240,7 @@ export default function App() {
           <Route path="bid-vault" element={<DirectorAnalyticsReports />} />
           <Route path="scoring" element={<WinLossScoringPage />} />
           <Route path="win-slide" element={<WinSlidePage />} />
+          <Route path="grants" element={<GrantsPage />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
           <Route path="content-hub" element={<ProposalManagerContentHub />} />
           <Route path="pricing" element={<ProposalPricingPage />} />

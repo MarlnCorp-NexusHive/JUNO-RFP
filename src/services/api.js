@@ -270,6 +270,17 @@ export const generateTechnicalSolutionDesign = async (payload) => {
   return res.data;
 };
 
+/* ================= US FEDERAL GRANTS (Grants.gov) ================= */
+export const searchFederalGrants = async (params = {}) => {
+  const res = await API.post("/grants/search", params);
+  return res.data;
+};
+
+export const fetchFederalGrantOpportunity = async (opportunityId) => {
+  const res = await API.post("/grants/opportunity", { opportunityId });
+  return res.data;
+};
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {
