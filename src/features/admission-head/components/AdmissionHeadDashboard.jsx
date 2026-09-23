@@ -8,14 +8,14 @@ import {
   FiUserCheck, FiUserX, FiPercent, FiTarget, FiGlobe, FiBook
 } from 'react-icons/fi';
 
-// Demo data for admission funnel
+// Demo data for recruitment funnel
 const getAdmissionFunnel = (t) => [
   { label: t('dashboard.admissionFunnel.stages.totalInquiries'), value: 5000, change: "+12%", trend: "up", icon: <FiUsers />, color: "blue" },
   { label: t('dashboard.admissionFunnel.stages.applicationsStarted'), value: 2500, change: "+8%", trend: "up", icon: <FiFileText />, color: "purple" },
   { label: t('dashboard.admissionFunnel.stages.applicationsSubmitted'), value: 1800, change: "+5%", trend: "up", icon: <FiCheckCircle />, color: "green" },
   { label: t('dashboard.admissionFunnel.stages.applicationsApproved'), value: 1200, change: "+15%", trend: "up", icon: <FiUserCheck />, color: "emerald" },
   { label: t('dashboard.admissionFunnel.stages.offersSent'), value: 1000, change: "+10%", trend: "up", icon: <FiTarget />, color: "amber" },
-  { label: t('dashboard.admissionFunnel.stages.admissionsConfirmed'), value: 800, change: "+20%", trend: "up", icon: <FiUserCheck />, color: "teal" },
+  { label: t('dashboard.admissionFunnel.stages.recruitmentsConfirmed'), value: 800, change: "+20%", trend: "up", icon: <FiUserCheck />, color: "teal" },
   { label: t('dashboard.admissionFunnel.stages.enrolledStudents'), value: 750, change: "+18%", trend: "up", icon: <FiUsers />, color: "indigo" },
 ];
 
@@ -89,7 +89,7 @@ const getPendingActions = (t) => [
 const getAlerts = (t) => [
   { type: t('dashboard.alerts.applicationSpike'), message: "Unusual increase in applications from Telangana region", severity: "info" },
   { type: t('dashboard.alerts.capacityAlert'), message: "Back end team nearing full capacity", severity: "warning" },
-  { type: t('dashboard.alerts.systemNotice'), message: "New admission policy update from Director", severity: "info" },
+  { type: t('dashboard.alerts.systemNotice'), message: "New recruitment policy update from Director", severity: "info" },
 ];
 
 export default function AdmissionHeadDashboard() {
@@ -118,7 +118,7 @@ export default function AdmissionHeadDashboard() {
   }
 
   return (
-    <div key={`${i18n.language}-${languageVersion}`} className="flex flex-col gap-6 animate-fade-in bg-transparent dark:bg-transparent" data-tour="1" data-tour-title-en="Dashboard Overview" data-tour-title-ar="نظرة عامة على لوحة التحكم" data-tour-content-en="Filters, KPIs, and quick actions for admissions." data-tour-content-ar="مرشحات ومؤشرات وإجراءات سريعة للقبول.">
+    <div key={`${i18n.language}-${languageVersion}`} className="flex flex-col gap-6 animate-fade-in bg-transparent dark:bg-transparent" data-tour="1" data-tour-title-en="Dashboard Overview" data-tour-title-ar="نظرة عامة على لوحة التحكم" data-tour-content-en="Filters, KPIs, and quick actions for recruitments." data-tour-content-ar="مرشحات ومؤشرات وإجراءات سريعة للقبول.">
       {/* Header with Filters */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50/60 to-purple-50/40 dark:from-gray-900 dark:to-gray-800 rounded-xl px-4 py-6" data-tour="2" data-tour-title-en="Header & Filters" data-tour-title-ar="الرأس والمرشحات" data-tour-content-en="Change department, time range, or export data." data-tour-content-ar="غيّر القسم، النطاق الزمني، أو صدّر البيانات.">
         <div>
@@ -154,7 +154,7 @@ export default function AdmissionHeadDashboard() {
       </div>
 
       {/* Admission Funnel */}
-      <section className="bg-gray-50 dark:bg-gray-800/80 dark:!bg-gray-800/80 rounded-xl shadow p-6" data-tour="3" data-tour-title-en="Admission Funnel" data-tour-title-ar="قمع القبول" data-tour-content-en="Track progress from inquiries to enrollments." data-tour-content-ar="تابع التقدم من الاستفسارات إلى التسجيل.">
+      <section className="bg-gray-50 dark:bg-gray-800/80 dark:!bg-gray-800/80 rounded-xl shadow p-6" data-tour="3" data-tour-title-en="Admission Funnel" data-tour-title-ar="قمع القبول" data-tour-content-en="Track progress from inquiries to qualified leads." data-tour-content-ar="تابع التقدم من الاستفسارات إلى التسجيل.">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <FiBarChart2 className="text-blue-500" />

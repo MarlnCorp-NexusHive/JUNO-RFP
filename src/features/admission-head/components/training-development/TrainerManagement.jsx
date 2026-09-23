@@ -33,13 +33,13 @@ const initialTrainers = [
     upcomingSessions: [
       {
         title: "CRM Masterclass",
-        date: "2026-08-01",
+        date: "2026-09-01",
         time: "10:00 AM",
         participants: 15
       },
       {
         title: "Policy Update Training",
-        date: "2026-08-03",
+        date: "2026-09-03",
         time: "2:00 PM",
         participants: 20
       }
@@ -50,14 +50,14 @@ const initialTrainers = [
         participant: "Ahmed Hassan",
         rating: 5,
         comment: "Excellent training session, very informative and engaging.",
-        date: "2026-07-25"
+        date: "2026-09-25"
       },
       {
         id: 2,
         participant: "Sarah Johnson",
         rating: 4,
         comment: "Great content, but could use more practical examples.",
-        date: "2026-07-20"
+        date: "2026-09-20"
       }
     ],
     evaluations: [
@@ -65,13 +65,13 @@ const initialTrainers = [
         id: 1,
         type: "Session Quality",
         score: 92,
-        date: "2026-07-30"
+        date: "2026-09-30"
       },
       {
         id: 2,
         type: "Content Relevance",
         score: 88,
-        date: "2026-07-25"
+        date: "2026-09-25"
       }
     ]
   },
@@ -90,7 +90,7 @@ const initialTrainers = [
     upcomingSessions: [
       {
         title: "Advanced CRM Features",
-        date: "2026-08-02",
+        date: "2026-09-02",
         time: "11:00 AM",
         participants: 12
       }
@@ -101,7 +101,7 @@ const initialTrainers = [
         participant: "Lisa Wang",
         rating: 5,
         comment: "Very technical but well explained. Great trainer!",
-        date: "2026-07-22"
+        date: "2026-09-22"
       }
     ],
     evaluations: [
@@ -109,7 +109,7 @@ const initialTrainers = [
         id: 1,
         type: "Technical Depth",
         score: 95,
-        date: "2026-07-22"
+        date: "2026-09-22"
       }
     ]
   }

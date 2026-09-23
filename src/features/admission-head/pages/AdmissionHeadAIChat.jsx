@@ -40,42 +40,42 @@ const AdmissionHeadAIChat = () => {
   }, [currentChatId]);
 
   // Admission-specific quick actions
-  const admissionQuickActions = [
+  const recruitmentQuickActions = [
     {
       id: 'application-review',
-      title: t('ai.admission.applicationReview'),
+      title: t('ai.recruitment.applicationReview'),
       icon: '??',
-      prompt: 'Help me review and prioritize pending applications based on admission criteria and deadlines.'
+      prompt: 'Help me review and prioritize pending applications based on recruitment criteria and deadlines.'
     },
     {
       id: 'enrollment-forecast',
-      title: t('ai.admission.enrollmentForecast'),
+      title: t('ai.recruitment.enrollmentForecast'),
       icon: '??',
-      prompt: 'Generate an enrollment forecast for the upcoming semester based on current application trends and historical data.'
+      prompt: 'Generate a pipeline forecast for the upcoming quarter based on current opportunity trends and historical win data.'
     },
     {
       id: 'document-verification',
-      title: t('ai.admission.documentVerification'),
+      title: t('ai.recruitment.documentVerification'),
       icon: '?',
       prompt: 'Create a checklist for document verification and identify common issues in application submissions.'
     },
     {
       id: 'waitlist-management',
-      title: t('ai.admission.waitlistManagement'),
+      title: t('ai.recruitment.waitlistManagement'),
       icon: '?',
       prompt: 'Help me manage the waitlist efficiently and create communication strategies for waitlisted students.'
     },
     {
       id: 'scholarship-allocation',
-      title: t('ai.admission.scholarshipAllocation'),
+      title: t('ai.recruitment.scholarshipAllocation'),
       icon: '??',
-      prompt: 'Analyze scholarship allocation strategies to maximize enrollment while staying within budget constraints.'
+      prompt: 'Analyze bid-resource allocation strategies to maximize win rate while staying within budget constraints.'
     },
     {
       id: 'compliance-check',
-      title: t('ai.admission.complianceCheck'),
+      title: t('ai.recruitment.complianceCheck'),
       icon: '??',
-      prompt: 'Review our admission processes for regulatory compliance and suggest improvements.'
+      prompt: 'Review our recruitment processes for regulatory compliance and suggest improvements.'
     }
   ];
 
@@ -265,21 +265,20 @@ const AdmissionHeadAIChat = () => {
     // Extract key words from the message to create a meaningful title
     const words = message.toLowerCase().split(' ');
     
-    // Common admission-related keywords
+    // Common recruitment-related keywords
     const keywords = {
       'application': 'Application Review',
-      'enrollment': 'Enrollment Analysis',
-      'admission': 'Admission Process',
+      'enrollment': 'Pipeline Analysis',
+      'recruitment': 'Opportunity Capture',
       'document': 'Document Verification',
       'waitlist': 'Waitlist Management',
-      'scholarship': 'Scholarship Allocation',
+      'scholarship': 'Incentive Allocation',
       'compliance': 'Compliance Review',
-      'forecast': 'Enrollment Forecast',
+      'forecast': 'Pipeline Forecast',
       'criteria': 'Admission Criteria',
       'deadline': 'Deadline Management',
       'verification': 'Document Verification',
-      'student': 'Student Management',
-      'recruitment': 'Student Recruitment',
+      'student': 'Opportunity Pipeline',
       'budget': 'Budget Planning',
       'regulatory': 'Regulatory Compliance'
     };
@@ -348,11 +347,11 @@ const AdmissionHeadAIChat = () => {
         )}
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {t('ai.admission.quickActions')}
+          {t('ai.recruitment.quickActions')}
         </h3>
         
         <div className="space-y-3">
-          {admissionQuickActions.map((action) => (
+          {recruitmentQuickActions.map((action) => (
             <button
               key={action.id}
               onClick={() => handleQuickAction(action)}
@@ -377,7 +376,7 @@ const AdmissionHeadAIChat = () => {
         {/* Admission Tools */}
         {/* <div className="mt-8">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {t('ai.admission.tools')}
+            {t('ai.recruitment.tools')}
           </h3>
           
           <div className="space-y-2">
@@ -386,7 +385,7 @@ const AdmissionHeadAIChat = () => {
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                 </svg>
-                <span className="text-sm font-medium">{t('ai.admission.applications')}</span>
+                <span className="text-sm font-medium">{t('ai.recruitment.applications')}</span>
               </div>
             </button>
             
@@ -395,7 +394,7 @@ const AdmissionHeadAIChat = () => {
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
                 </svg>
-                <span className="text-sm font-medium">{t('ai.admission.analytics')}</span>
+                <span className="text-sm font-medium">{t('ai.recruitment.analytics')}</span>
               </div>
             </button>
             
@@ -404,7 +403,7 @@ const AdmissionHeadAIChat = () => {
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
-                <span className="text-sm font-medium">{t('ai.admission.scholarships')}</span>
+                <span className="text-sm font-medium">{t('ai.recruitment.scholarships')}</span>
               </div>
             </button>
           </div>
@@ -454,7 +453,7 @@ const AdmissionHeadAIChat = () => {
                       {chat.title}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(chat.updatedAt).toLocaleDateString()} • {chat.messages.length} messages
+                      {new Date(chat.updatedAt).toLocaleDateString()} ï¿½ {chat.messages.length} messages
                     </p>
                   </div>
                 ))

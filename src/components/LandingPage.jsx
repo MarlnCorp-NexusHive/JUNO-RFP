@@ -290,16 +290,16 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                title: "Student Management",
+                title: "Opportunity Pipeline",
                 description: "Easily track student information, enrollment status, and academic progress."
               },
               {
-                title: "Faculty Collaboration",
+                title: "Proposal Collaboration",
                 description: "Enable seamless communication and collaboration between faculty members."
               },
               {
                 title: "Administrative Tools",
-                description: "Powerful tools for managing courses, schedules, and university resources."
+                description: "Powerful tools for managing pursuits, schedules, and capture resources."
               }
             ].map((feature, index) => (
               <div key={index} className="bg-background p-6 rounded-lg shadow-sm">
@@ -314,7 +314,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-20">
         <div className="bg-primary text-primary-foreground rounded-2xl p-12 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your University?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Capture Org?</h2>
           <p className="text-lg mb-8">Join leading organizations that trust MARLN ERP</p>
           <Button size="lg" variant="secondary">Get Started Now</Button>
         </div>

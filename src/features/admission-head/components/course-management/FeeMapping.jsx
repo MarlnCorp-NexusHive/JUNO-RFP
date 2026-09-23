@@ -16,7 +16,7 @@ import {
 const initialCourses = [
   {
     id: 1,
-    name: 'B.Tech Computer Science',
+    name: 'Cloud Migration RFP',
     code: 'CS101',
     fee: 120000,
     scholarship: true,
@@ -24,15 +24,15 @@ const initialCourses = [
   },
   {
     id: 2,
-    name: 'MBA Finance',
-    code: 'MBA201',
+    name: 'RFP Finance',
+    code: 'RFP201',
     fee: 180000,
     scholarship: false,
     paymentPlan: 'Full Payment',
   },
   {
     id: 3,
-    name: 'M.Sc Data Science',
+    name: 'Data Analytics Task Order',
     code: 'DS301',
     fee: 150000,
     scholarship: true,
@@ -60,7 +60,7 @@ const FeeMapping = () => {
     ));
   };
 
-  const handleScholarshipToggle = (id) => {
+  const handleIncentiveToggle = (id) => {
     setCourses(courses.map(course =>
       course.id === id ? { ...course, scholarship: !course.scholarship } : course
     ));
@@ -281,7 +281,7 @@ const FeeMapping = () => {
                     <input
                       type="checkbox"
                       checked={course.scholarship}
-                      onChange={() => handleScholarshipToggle(course.id)}
+                      onChange={() => handleIncentiveToggle(course.id)}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
                     />
                   </td>
@@ -369,7 +369,7 @@ const FeeMapping = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Scholarship Courses
+                Bonus Positions
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{scholarshipCount}</p>
             </div>

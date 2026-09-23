@@ -39,9 +39,9 @@ class RiskAssessmentService {
 
   // Build AI prompt for risk assessment
   buildRiskAssessmentPrompt(data, focusArea) {
-    const basePrompt = `As a university risk assessment expert, analyze the following university data and identify potential risks across different categories. Provide a comprehensive risk analysis with specific recommendations.
+    const basePrompt = `As an RFP organization risk assessment expert, analyze the following university data and identify potential risks across different categories. Provide a comprehensive risk analysis with specific recommendations.
 
-University Data:
+Capture Portfolio Data:
 ${JSON.stringify(data, null, 2)}
 
 Focus Area: ${focusArea}

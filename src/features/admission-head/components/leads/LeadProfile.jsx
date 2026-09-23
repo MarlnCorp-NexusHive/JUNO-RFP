@@ -42,14 +42,14 @@ export default function LeadProfile({ lead, onClose }) {
     {
       icon: FiMail,
       title: 'Initial Inquiry',
-      description: 'Submitted inquiry form for Computer Science program',
+      description: 'Submitted inquiry form for Federal IT program',
       time: '2 days ago',
       status: 'success'
     },
     {
       icon: FiPhone,
       title: 'First Contact',
-      description: 'Phone call with admission counselor',
+      description: 'Phone call with recruitment counselor',
       time: '1 day ago',
       status: 'success'
     },

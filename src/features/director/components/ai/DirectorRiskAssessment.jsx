@@ -70,14 +70,14 @@ const DirectorRiskAssessment = () => {
       },
       compliance: {
         accreditationStatus: 'Active',
-        lastAudit: '2026-01-15',
+        lastAudit: '2026-09-15',
         violations: 0,
         trainingCompletion: 94.2
       },
       market: {
         competition: 'High',
         marketShare: 12.5,
-        tuition: 25000,
+        contractRevenue: 25000,
         scholarships: 8500000,
         internationalStudents: 15.2
       }

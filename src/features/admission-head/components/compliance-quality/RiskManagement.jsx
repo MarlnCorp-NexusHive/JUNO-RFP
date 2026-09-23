@@ -17,7 +17,7 @@ const risks = [
     status: 'Active',
     mitigation: 'Automated verification system',
     owner: 'Noura Al-Zahra',
-    dueDate: '2026-08-15'
+    dueDate: '2026-09-15'
   },
   {
     id: 'RISK002',
@@ -27,7 +27,7 @@ const risks = [
     status: 'Mitigated',
     mitigation: 'Updated policy and staff training completed',
     owner: 'Aisha Al-Hassan',
-    dueDate: '2026-07-20'
+    dueDate: '2026-09-20'
   },
   {
     id: 'RISK003',
@@ -37,7 +37,7 @@ const risks = [
     status: 'Mitigated',
     mitigation: 'Enhanced security protocols',
     owner: 'Khalid Al-Sayed',
-    dueDate: '2026-08-30'
+    dueDate: '2026-09-30'
   },
   {
     id: 'RISK004',
@@ -47,7 +47,7 @@ const risks = [
     status: 'Mitigated',
     mitigation: 'Training sessions scheduled',
     owner: 'Omar Al-Mutairi',
-    dueDate: '2026-07-10'
+    dueDate: '2026-09-10'
   }
 ];
 

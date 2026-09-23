@@ -7,13 +7,13 @@ import AdmissionHeadApplicationProcessing from '../components/ai/AdmissionHeadAp
 
 // Mock data for applications
 const mockApplications = [
-  { id: 1, name: 'John Doe', applicationId: 'APP-001', program: 'Computer Science', submissionDate: '2026-03-15', statusKey: 'underReview', reviewer: 'Sarah Johnson', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', ai: { likelihood: 92, topPercentile: true } },
-  { id: 2, name: 'Jane Smith', applicationId: 'APP-002', program: 'Business Administration', submissionDate: '2026-03-14', statusKey: 'approved', reviewer: 'Michael Chen', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', ai: { likelihood: 88, topPercentile: false } },
-  { id: 3, name: 'Alice Johnson', applicationId: 'APP-003', program: 'Engineering', submissionDate: '2026-03-13', statusKey: 'rejected', reviewer: 'David Lee', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', ai: { likelihood: 23, topPercentile: false, duplicate: true } },
-  { id: 4, name: 'Bob Brown', applicationId: 'APP-004', program: 'Arts & Humanities', submissionDate: '2026-03-12', statusKey: 'pendingVerification', reviewer: 'Emily Davis', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', ai: { likelihood: 60, topPercentile: false } },
-  { id: 5, name: 'Charlie Wilson', applicationId: 'APP-005', program: 'Medical Sciences', submissionDate: '2026-03-11', statusKey: 'paymentPending', reviewer: 'Frank Miller', avatar: 'https://randomuser.me/api/portraits/men/5.jpg', ai: { likelihood: 70, topPercentile: false } },
-  { id: 6, name: 'Diana Evans', applicationId: 'APP-006', program: 'Law', submissionDate: '2026-03-10', statusKey: 'offersSent', reviewer: 'Grace Lee', avatar: 'https://randomuser.me/api/portraits/women/6.jpg', ai: { likelihood: 80, topPercentile: false } },
-  { id: 7, name: 'Ethan Harris', applicationId: 'APP-007', program: 'Design', submissionDate: '2026-03-09', statusKey: 'enrollmentsConfirmed', reviewer: 'Hannah White', avatar: 'https://randomuser.me/api/portraits/women/7.jpg', ai: { likelihood: 95, topPercentile: true } },
+  { id: 1, name: 'John Doe', applicationId: 'APP-001', program: 'Federal IT', submissionDate: '2026-09-15', statusKey: 'underReview', reviewer: 'Sarah Johnson', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', ai: { likelihood: 92, topPercentile: true } },
+  { id: 2, name: 'Jane Smith', applicationId: 'APP-002', program: 'Professional Services', submissionDate: '2026-09-14', statusKey: 'approved', reviewer: 'Michael Chen', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', ai: { likelihood: 88, topPercentile: false } },
+  { id: 3, name: 'Alice Johnson', applicationId: 'APP-003', program: 'Engineering', submissionDate: '2026-09-13', statusKey: 'rejected', reviewer: 'David Lee', avatar: 'https://randomuser.me/api/portraits/women/3.jpg', ai: { likelihood: 23, topPercentile: false, duplicate: true } },
+  { id: 4, name: 'Bob Brown', applicationId: 'APP-004', program: 'Arts & Humanities', submissionDate: '2026-09-12', statusKey: 'pendingVerification', reviewer: 'Emily Davis', avatar: 'https://randomuser.me/api/portraits/men/4.jpg', ai: { likelihood: 60, topPercentile: false } },
+  { id: 5, name: 'Charlie Wilson', applicationId: 'APP-005', program: 'Healthcare IT', submissionDate: '2026-09-11', statusKey: 'paymentPending', reviewer: 'Frank Miller', avatar: 'https://randomuser.me/api/portraits/men/5.jpg', ai: { likelihood: 70, topPercentile: false } },
+  { id: 6, name: 'Diana Evans', applicationId: 'APP-006', program: 'Law', submissionDate: '2026-09-10', statusKey: 'offersSent', reviewer: 'Grace Lee', avatar: 'https://randomuser.me/api/portraits/women/6.jpg', ai: { likelihood: 80, topPercentile: false } },
+  { id: 7, name: 'Ethan Harris', applicationId: 'APP-007', program: 'Design', submissionDate: '2026-09-09', statusKey: 'enrollmentsConfirmed', reviewer: 'Hannah White', avatar: 'https://randomuser.me/api/portraits/women/7.jpg', ai: { likelihood: 95, topPercentile: true } },
 ];
 
 // Animated Counter Hook

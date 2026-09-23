@@ -28,7 +28,7 @@ const AdmissionHeadInterviewScheduling = () => {
     {
       id: 1,
       name: "Ahmed Al-Rashid",
-      program: "Computer Science",
+      program: "Federal IT",
       applicationId: "APP-2026-001",
       status: "pending_interview",
       gpa: 3.8,
@@ -39,7 +39,7 @@ const AdmissionHeadInterviewScheduling = () => {
     {
       id: 2,
       name: "Fatima Al-Zahra",
-      program: "Business Administration",
+      program: "Professional Services",
       applicationId: "APP-2026-002",
       status: "scheduled",
       gpa: 3.9,
@@ -61,16 +61,16 @@ const AdmissionHeadInterviewScheduling = () => {
   ];
 
   const interviewTypes = [
-    { value: "academic", label: isRTLMode ? "مقابلة أكاديمية" : "Academic Interview" },
+    { value: "academic", label: isRTLMode ? "مقابلة قدرات" : "Capability Interview" },
     { value: "english", label: isRTLMode ? "مقابلة إتقان اللغة الإنجليزية" : "English Proficiency Interview" },
     { value: "technical", label: isRTLMode ? "مقابلة تقنية" : "Technical Interview" },
     { value: "general", label: isRTLMode ? "تقييم عام" : "General Assessment" },
-    { value: "scholarship", label: isRTLMode ? "مقابلة منحة دراسية" : "Scholarship Interview" }
+    { value: "scholarship", label: isRTLMode ? "مقابلة الحوافز" : "Oral Presentation Prep" }
   ];
 
   const programs = [
-    { value: "computer_science", label: isRTLMode ? "علوم الحاسوب" : "Computer Science" },
-    { value: "business", label: isRTLMode ? "إدارة الأعمال" : "Business Administration" },
+    { value: "computer_science", label: isRTLMode ? "علوم الحاسوب" : "Federal IT" },
+    { value: "business", label: isRTLMode ? "إدارة الأعمال" : "Professional Services" },
     { value: "engineering", label: isRTLMode ? "الهندسة" : "Engineering" },
     { value: "medicine", label: isRTLMode ? "الطب" : "Medicine" },
     { value: "law", label: isRTLMode ? "القانون" : "Law" },
@@ -88,9 +88,9 @@ const AdmissionHeadInterviewScheduling = () => {
       {
         id: 1,
         studentName: "Ahmed Al-Rashid",
-        program: "Computer Science",
+        program: "Federal IT",
         interviewType: "Technical Interview",
-        scheduledDate: "2026-01-20",
+        scheduledDate: "2026-09-20",
         scheduledTime: "10:00 AM",
         status: 'scheduled',
         aiRecommendations: isRTLMode ? "توصيات الذكاء الاصطناعي: مقابلة تقنية لمدة 60 دقيقة مع تركيز على مهارات البرمجة" : "AI Recommendations: 60-minute technical interview focusing on programming skills",
@@ -100,12 +100,12 @@ const AdmissionHeadInterviewScheduling = () => {
       {
         id: 2,
         studentName: "Fatima Al-Zahra",
-        program: "Business Administration",
-        interviewType: "Academic Interview",
-        scheduledDate: "2026-01-22",
+        program: "Professional Services",
+        interviewType: "Capability Interview",
+        scheduledDate: "2026-09-22",
         scheduledTime: "02:00 PM",
         status: 'scheduled',
-        aiRecommendations: isRTLMode ? "توصيات الذكاء الاصطناعي: مقابلة أكاديمية لمدة 45 دقيقة مع التركيز على الأهداف المهنية" : "AI Recommendations: 45-minute academic interview focusing on career goals",
+        aiRecommendations: isRTLMode ? "توصيات الذكاء الاصطناعي: مقابلة قدرات لمدة 45 دقيقة مع التركيز على الأهداف المهنية" : "AI Recommendations: 45-minute capability interview focusing on career goals",
         notes: isRTLMode ? "خبرة في التسويق وطموحة" : "Marketing experience and ambitious",
         createdAt: new Date().toISOString()
       }
@@ -140,7 +140,7 @@ const AdmissionHeadInterviewScheduling = () => {
    - إحضار الوثائق المطلوبة
 
 3. **الوثائق المطلوبة:**
-   - كشوف الدرجات الأكاديمية
+   - سجلات الأداء المهنية
    - وثيقة الهوية
    - نموذج الطلب
    - أي مواد إضافية خاصة بالبرنامج
@@ -153,7 +153,7 @@ const AdmissionHeadInterviewScheduling = () => {
    - تقييم المهارات التقنية (إن أمكن)
 
 6. **إجراءات المتابعة:**
-   - إرسال بريد إلكتروني تأكيدي للطالب
+   - إرسال بريد إلكتروني تأكيدي للمرشح
    - تحضير مواد المقابلة
    - جدولة اجتماع متابعة إذا لزم الأمر` :
         `AI Recommendations:
@@ -249,7 +249,7 @@ const AdmissionHeadInterviewScheduling = () => {
 4. لماذا اخترت هذا البرنامج؟
 
 **احتمالية النجاح: 78%**
-- خلفية أكاديمية قوية
+- خلفية مهنية قوية
 - خبرة ذات صلة
 - دوافع واضحة
 
@@ -279,7 +279,7 @@ const AdmissionHeadInterviewScheduling = () => {
 4. Why did you choose this program?
 
 **Success Probability: 78%**
-- Strong academic background
+- Strong professional background
 - Relevant experience
 - Clear motivation
 
@@ -401,14 +401,14 @@ const AdmissionHeadInterviewScheduling = () => {
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {isRTLMode ? "اسم الطالب" : "Student Name"}
+                        {isRTLMode ? "اسم المرشح" : "Candidate Name"}
                       </label>
                       <input
                         type="text"
                         value={newInterview.studentName}
                         onChange={(e) => setNewInterview(prev => ({ ...prev, studentName: e.target.value }))}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder={isRTLMode ? "أدخل اسم الطالب" : "Enter student name"}
+                        placeholder={isRTLMode ? "أدخل اسم المرشح" : "Enter student name"}
                       />
                     </div>
 
@@ -524,7 +524,7 @@ const AdmissionHeadInterviewScheduling = () => {
                       <div className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
                         <p>{isRTLMode ? "• مدة المقابلة المقترحة: 45-60 دقيقة" : "• Suggested interview duration: 45-60 minutes"}</p>
                         <p>{isRTLMode ? "• تحضير مواد المقابلة المطلوبة" : "• Prepare required interview materials"}</p>
-                        <p>{isRTLMode ? "• إرسال تأكيد للطالب" : "• Send confirmation to student"}</p>
+                        <p>{isRTLMode ? "• إرسال تأكيد للمرشح" : "• Send confirmation to student"}</p>
                         <p>{isRTLMode ? "• جدولة متابعة إذا لزم الأمر" : "• Schedule follow-up if needed"}</p>
                       </div>
                     </div>

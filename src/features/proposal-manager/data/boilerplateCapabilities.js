@@ -16,7 +16,7 @@ export const BOILERPLATE_PACK = [
     subtitle: "Audit-Ready. Submission-Ready. Win-Ready.",
     audience: "Prospects, capture leads, and proposal managers",
     documentTypeId: "past_performance",
-    uploadedAt: "2026-08-13T08:00:00.000Z",
+    uploadedAt: "2026-09-13T08:00:00.000Z",
     sections: [
       {
         heading: "Who we are",
@@ -63,7 +63,7 @@ export const BOILERPLATE_PACK = [
     subtitle: "Why proposal teams shortlist JUNO instead of generic GenAI or file shares",
     audience: "Capture and procurement stakeholders comparing solutions",
     documentTypeId: "past_performance",
-    uploadedAt: "2026-08-13T08:05:00.000Z",
+    uploadedAt: "2026-09-13T08:05:00.000Z",
     sections: [
       {
         heading: "Value proposition",
@@ -108,7 +108,7 @@ export const BOILERPLATE_PACK = [
     subtitle: "How a proposal team runs a bid from kickoff to submission",
     audience: "Proposal managers, capture leads, and reviewer / auditor teams",
     documentTypeId: "other",
-    uploadedAt: "2026-08-13T08:10:00.000Z",
+    uploadedAt: "2026-09-13T08:10:00.000Z",
     sections: [
       {
         heading: "1. Ingest & understand",

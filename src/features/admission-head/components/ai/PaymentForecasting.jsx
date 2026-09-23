@@ -30,7 +30,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
         growth: 8.0,
         confidence: 85,
         factors: [
-          isRTLMode ? "زيادة في طلبات القبول" : "Increase in admission applications",
+          isRTLMode ? "زيادة في طلبات القبول" : "Increase in recruitment applications",
           isRTLMode ? "موسم الدفع القادم" : "Upcoming payment season",
           isRTLMode ? "تحسينات في النظام" : "System improvements"
         ]
@@ -50,7 +50,7 @@ const PaymentForecasting = ({ paymentData, onForecastComplete }) => {
         growth: 15.2,
         confidence: 72,
         factors: [
-          isRTLMode ? "توسع في الحرم الجامعي" : "Campus expansion",
+          isRTLMode ? "توسع في المقر" : "Capture capacity expansion",
           isRTLMode ? "زيادة الطاقة الاستيعابية" : "Increased capacity",
           isRTLMode ? "تحسينات في التسويق" : "Marketing improvements"
         ]

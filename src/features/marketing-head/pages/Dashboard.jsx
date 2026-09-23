@@ -13,7 +13,7 @@ const funnelData = [
   { stage: 'Inquiries', value: 1200 },
   { stage: 'Leads', value: 800 },
   { stage: 'Applications', value: 400 },
-  { stage: 'Enrollments', value: 180 },
+  { stage: 'Pipelines', value: 180 },
 ];
 const dropOffRates = [33, 50, 55];
 const campaignChannels = [
@@ -23,9 +23,9 @@ const campaignChannels = [
   { name: 'Events', cpl: 40, cpa: 180, roi: 2.2, conversions: 30 },
 ];
 const geoData = [
-  { region: 'Riyadh', leads: 200, conversions: 50 },
-  { region: 'Jeddah', leads: 180, conversions: 40 },
-  { region: 'Dammam', leads: 150, conversions: 35 },
+  { region: 'Washington DC', leads: 200, conversions: 50 },
+  { region: 'New York', leads: 180, conversions: 40 },
+  { region: 'Chicago', leads: 150, conversions: 35 },
   { region: 'Mecca', leads: 120, conversions: 30 },
 ];
 const demographicData = [
@@ -38,7 +38,7 @@ const genderData = [
   { group: 'Female', value: 430 },
   { group: 'Other', value: 20 },
 ];
-const predictiveEnrollment = [
+const predictivePipeline = [
   { month: 'Apr', predicted: 150 },
   { month: 'May', predicted: 180 },
   { month: 'Jun', predicted: 210 },
@@ -60,7 +60,7 @@ const budgetData = [
   { channel: 'Events', budget: 30000, spent: 22000 },
 ];
 const eventCalendar = [
-  { event: 'Open House', date: '2026-11-10', status: 'Upcoming', expected: 120 },
+  { event: 'Industry Day', date: '2026-11-10', status: 'Upcoming', expected: 120 },
   { event: 'Webinar', date: '2026-11-15', status: 'Upcoming', expected: 80 },
   { event: 'Fair', date: '2026-12-20', status: 'Completed', turnout: 100 },
 ];
@@ -268,8 +268,8 @@ export default function Dashboard() {
           </Card>
           <Card className="p-4 hover:shadow-lg transition group cursor-pointer relative">
             <CardTitle className="mb-2 flex items-center gap-2">{t('dashboard.sections.predictiveAnalytics')} <FiInfo title='AI-powered forecast' className='text-blue-400' /></CardTitle>
-            <LineChart data={predictiveEnrollment.map((d, i) => ({ ...d, name: d.month }))} categories={['predicted']} />
-            <div className="mt-2 text-xs text-blue-600 animate-bounce">AI: Next month forecast is 250 enrollments</div>
+            <LineChart data={predictivePipeline.map((d, i) => ({ ...d, name: d.month }))} categories={['predicted']} />
+            <div className="mt-2 text-xs text-blue-600 animate-bounce">AI: Next month forecast is 250 qualified leads</div>
             <span className="absolute top-2 right-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" title={t('dashboard.buttons.drillDown')}><FiExternalLink /></span>
           </Card>
         </div>
@@ -282,7 +282,7 @@ export default function Dashboard() {
           <Card className="p-4">
             <CardTitle className="mb-2">Channel Performance</CardTitle>
             <BarChart data={campaignChannels} categories={['roi', 'conversions']} />
-            <div className="mt-2 text-xs text-green-600 animate-bounce">AI: Google is most cost-effective for Engineering programs</div>
+            <div className="mt-2 text-xs text-green-600 animate-bounce">AI: Google is most cost-effective for Engineering RFPs</div>
           </Card>
           <Card className="p-4">
             <CardTitle className="mb-2">CPL & CPA</CardTitle>
@@ -299,7 +299,7 @@ export default function Dashboard() {
           <Card className="p-4">
             <CardTitle className="mb-2">Location-wise Conversions</CardTitle>
             <BarChart data={geoData} categories={['leads', 'conversions']} />
-            <div className="mt-2 text-xs text-pink-600 animate-bounce">AI: Dammam is an untapped region with high potential</div>
+            <div className="mt-2 text-xs text-pink-600 animate-bounce">AI: Chicago is an untapped region with high potential</div>
           </Card>
           <Card className="p-4">
             <CardTitle className="mb-2">Demographics</CardTitle>
@@ -309,13 +309,13 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* 4. Predictive Enrollment Insights */}
+      {/* 4. Predictive Pipeline Insights */}
       <section>
-        <h2 className="text-xl font-bold mb-2 flex items-center gap-2">🧠 Predictive Enrollment Insights <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded animate-pulse">AI Forecast</span></h2>
+        <h2 className="text-xl font-bold mb-2 flex items-center gap-2">🧠 Predictive Pipeline Insights <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded animate-pulse">AI Forecast</span></h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="p-4">
             <CardTitle className="mb-2">Predicted Applications</CardTitle>
-            <LineChart data={predictiveEnrollment} categories={['predicted']} />
+            <LineChart data={predictivePipeline} categories={['predicted']} />
             <div className="mt-2 text-xs text-purple-600 animate-bounce">AI: Business dept. interest rising</div>
           </Card>
           <Card className="p-4">
@@ -333,7 +333,7 @@ export default function Dashboard() {
           <Card className="p-4">
             <CardTitle className="mb-2">Social Media</CardTitle>
             <BarChart data={brandEngagement} categories={['followers', 'engagement']} />
-            <div className="mt-2 text-xs text-yellow-600 animate-bounce">AI: Sentiment positive, trending keywords: "placements", "campus life"</div>
+            <div className="mt-2 text-xs text-yellow-600 animate-bounce">AI: Sentiment positive, trending keywords: "placements", "past performance"</div>
           </Card>
           <Card className="p-4">
             <CardTitle className="mb-2">Website Traffic</CardTitle>
@@ -374,7 +374,7 @@ export default function Dashboard() {
                 </li>
               ))}
             </ul>
-            <div className="mt-2 text-xs text-green-600 animate-bounce">AI: Open House expected to yield 30 enrollments</div>
+            <div className="mt-2 text-xs text-green-600 animate-bounce">AI: Industry Day expected to yield 30 qualified leads</div>
           </Card>
           <Card className="p-4">
             <CardTitle className="mb-2">Past Event Performance</CardTitle>

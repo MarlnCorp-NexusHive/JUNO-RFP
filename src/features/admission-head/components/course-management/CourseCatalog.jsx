@@ -24,9 +24,9 @@ const CourseCatalog = () => {
   const courses = [
     {
       id: 1,
-      name: 'B.Tech in AI & ML',
+      name: 'IT Modernization BPA',
       code: 'BTECH-AIML',
-      department: 'Computer Science',
+      department: 'Federal IT',
       college: 'Engineering',
       programType: 'UG',
       duration: '4 years',
@@ -34,12 +34,12 @@ const CourseCatalog = () => {
       status: 'Active',
       intakeCapacity: 120,
       fee: 250000,
-      lastUpdated: '2026-03-15',
+      lastUpdated: '2026-09-15',
     },
     {
       id: 2,
-      name: 'MBA in HR',
-      code: 'MBA-HR',
+      name: 'RFP — HR Services',
+      code: 'RFP-HR',
       department: 'Human Resources',
       college: 'Business',
       programType: 'PG',
@@ -48,11 +48,11 @@ const CourseCatalog = () => {
       status: 'Active',
       intakeCapacity: 60,
       fee: 350000,
-      lastUpdated: '2026-03-10',
+      lastUpdated: '2026-09-10',
     },
     {
       id: 3,
-      name: 'BSc Aviation',
+      name: 'Aviation Logistics IDIQ',
       code: 'BSC-AVI',
       department: 'Aviation',
       college: 'Science',
@@ -62,14 +62,14 @@ const CourseCatalog = () => {
       status: 'Upcoming',
       intakeCapacity: 40,
       fee: 400000,
-      lastUpdated: '2026-03-05',
+      lastUpdated: '2026-09-05',
     },
     // Add more mock courses as needed
   ];
 
   // Mock data for filter options
   const filterOptions = {
-    departments: ['Computer Science', 'Human Resources', 'Aviation', 'Mechanical', 'Electrical'],
+    departments: ['Federal IT', 'Human Resources', 'Aviation', 'Mechanical', 'Electrical'],
     colleges: ['Engineering', 'Business', 'Science', 'Arts'],
     programTypes: ['UG', 'PG', 'Diploma', 'Certificate'],
     durations: ['2 years', '3 years', '4 years', '5 years'],
@@ -148,7 +148,7 @@ const CourseCatalog = () => {
                 value={filters.college}
                 onChange={(e) => handleFilterChange('college', e.target.value)}
               >
-                <option value="">All Colleges</option>
+                <option value="">All Divisions</option>
                 {filterOptions.colleges.map(college => (
                   <option key={college} value={college}>{college}</option>
                 ))}

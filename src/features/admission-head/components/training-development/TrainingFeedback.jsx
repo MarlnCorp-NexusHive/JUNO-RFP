@@ -19,7 +19,7 @@ const initialFeedback = [
     id: 1,
     sessionTitle: "CRM Masterclass",
     trainer: "Dr. Noura Al-Zahra",
-    date: "2026-07-15",
+    date: "2026-09-15",
     participants: 15,
     averageRating: 4.7,
     categories: {
@@ -33,13 +33,13 @@ const initialFeedback = [
         author: "John Doe",
         rating: 5,
         comment: "Excellent session! The practical examples were very helpful.",
-        date: "2026-07-15"
+        date: "2026-09-15"
       },
       {
         author: "Jane Smith",
         rating: 4,
         comment: "Good content, but could use more hands-on practice.",
-        date: "2026-07-15"
+        date: "2026-09-15"
       }
     ]
   },
@@ -47,7 +47,7 @@ const initialFeedback = [
     id: 2,
     sessionTitle: "Policy Update Training",
     trainer: "Michael Chen",
-    date: "2026-07-10",
+    date: "2026-09-10",
     participants: 20,
     averageRating: 4.5,
     categories: {
@@ -61,7 +61,7 @@ const initialFeedback = [
         author: "Mike Johnson",
         rating: 5,
         comment: "Very informative session. Clear explanations of policy changes.",
-        date: "2026-07-10"
+        date: "2026-09-10"
       }
     ]
   }

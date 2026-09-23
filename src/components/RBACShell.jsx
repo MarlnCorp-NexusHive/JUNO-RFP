@@ -34,7 +34,7 @@ export default function RBACShell({ children }) {
       <div className="flex-1 flex flex-col">
         {/* Topbar */}
         <header className="h-16 bg-white flex items-center justify-between px-8 shadow-sm">
-          <div className="text-xl font-semibold text-[#4f3cc9] tracking-wide">University RBAC Demo</div>
+          <div className="text-xl font-semibold text-[#4f3cc9] tracking-wide">JUNO RFP RBAC Demo</div>
           <div className="flex items-center gap-4">
             <Button variant="outline">Login</Button>
             <div className="w-10 h-10 rounded-full bg-[#e0e7ff] flex items-center justify-center text-[#4f3cc9] font-bold">A</div>

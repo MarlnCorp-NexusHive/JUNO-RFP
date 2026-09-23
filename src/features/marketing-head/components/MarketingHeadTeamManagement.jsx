@@ -644,15 +644,15 @@ export default function MarketingHeadTeamManagement() {
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {(isProposalManagerTeam
                       ? [
-                          { task: "Technical volume draft – DoD IT Services", assigned: "Patricia Sullivan", status: "inProgress", progress: "65%", deadline: "2026-07-15" },
-                          { task: "Past Performance section", assigned: "Jennifer Thompson", status: "inProgress", progress: "80%", deadline: "2026-07-12" },
-                          { task: "Compliance matrix & checklist", assigned: "Karen Brooks", status: "completed", progress: "100%", deadline: "2026-07-08" },
-                          { task: "Pricing volume – GSA BPA", assigned: "Robert Mitchell", status: "pending", progress: "0%", deadline: "2026-07-20" }
+                          { task: "Technical volume draft – DoD IT Services", assigned: "Patricia Sullivan", status: "inProgress", progress: "65%", deadline: "2026-09-15" },
+                          { task: "Past Performance section", assigned: "Jennifer Thompson", status: "inProgress", progress: "80%", deadline: "2026-09-12" },
+                          { task: "Compliance matrix & checklist", assigned: "Karen Brooks", status: "completed", progress: "100%", deadline: "2026-09-08" },
+                          { task: "Pricing volume – GSA BPA", assigned: "Robert Mitchell", status: "pending", progress: "0%", deadline: "2026-09-20" }
                         ]
                       : [
-                          { task: "Launch Q2 Campaign", assigned: "Abdullah Al-Rashid", status: "inProgress", progress: "70%", deadline: "2026-07-10" },
-                          { task: "Write Blog Series", assigned: "Noura Al-Zahra", status: "pending", progress: "0%", deadline: "2026-07-12" },
-                          { task: "Social Media Audit", assigned: "Khalid Al-Sayed", status: "completed", progress: "100%", deadline: "2026-06-30" }
+                          { task: "Launch Q2 Campaign", assigned: "Abdullah Al-Rashid", status: "inProgress", progress: "70%", deadline: "2026-09-10" },
+                          { task: "Write Blog Series", assigned: "Noura Al-Zahra", status: "pending", progress: "0%", deadline: "2026-09-12" },
+                          { task: "Social Media Audit", assigned: "Khalid Al-Sayed", status: "completed", progress: "100%", deadline: "2026-10-30" }
                         ]
                     ).map((task, index) => (
                       <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">

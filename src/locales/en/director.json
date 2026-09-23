@@ -321,7 +321,7 @@
     },
     "riskTypes": {
       "dataSecurityBreach": "Data Security Breach",
-      "studentEnrollmentDecline": "Student Enrollment Decline",
+      "studentPipelineDecline": "Pipeline Opportunities Decline",
       "regulatoryCompliance": "Regulatory Compliance"
     },
     "categories": {
@@ -633,7 +633,7 @@
     "last6Months": "Last 6 Months",
     "lastYear": "Last Year",
     "tabs": {
-      "admissions": "Admissions",
+      "recruitments": "Admissions",
       "financial": "Financial",
       "academic": "Academic",
       "engagement": "Engagement",
@@ -641,12 +641,12 @@
       "compliance": "Compliance"
     },
     "sections": {
-      "admissions": {
+      "recruitments": {
         "admissionFunnel": "Ongoing Activities",
-        "programEnrollment": "Team Enrollment",
+        "programPipeline": "Team Pipeline",
         "geographicDistribution": "Geographic Distribution",
-        "applicationConversionRate": "Team Enrollment Conversions",
-        "enrollmentTrend": "Enrollment Trend",
+        "applicationConversionRate": "Team Pipeline Conversions",
+        "enrollmentTrend": "Pipeline Trend",
         "topSourceRegions": "Top Source Regions"
       },
       "financial": {
@@ -659,11 +659,11 @@
       },
       "academic": {
         "coursePerformance": "Course Performance",
-        "facultyPerformance": "Faculty Performance",
-        "studentDemographics": "Student Demographics",
+        "facultyPerformance": "Team Performance",
+        "studentDemographics": "Lead Demographics",
         "averageGPAByDepartment": "Average GPA by Department",
         "passRateTrend": "Pass Rate Trend",
-        "enrollmentByCourse": "Enrollment by Course"
+        "enrollmentByCourse": "Pipeline by Course"
       },
       "engagement": {
         "eventParticipation": "Event Participation",
@@ -671,7 +671,7 @@
         "staffAnalytics": "Staff Analytics",
         "eventParticipationRateOverTime": "Event Participation Rate Over Time",
         "topRatedFacilities": "Top Rated Facilities",
-        "studentSatisfactionTrend": "Student Satisfaction Trend"
+        "studentSatisfactionTrend": "Client Satisfaction Trend"
       },
       "placement": {
         "programPlacement": "Program Placement",
@@ -695,13 +695,13 @@
         "academics": "Academics",
         "hr": "HR",
         "finance": "Finance",
-        "admissions": "Admissions",
+        "recruitments": "Admissions",
         "it": "IT",
         "rd": "R&D"
       },
       "programs": {
-        "computerScience": "Computer Science",
-        "businessAdmin": "Business Admin",
+        "computerScience": "Federal IT",
+        "businessAdmin": "Professional Services",
         "engineering": "Engineering",
         "arts": "Arts",
         "medicine": "Medicine"
@@ -723,29 +723,31 @@
       "years": {
         "2019": "2019",
         "2020": "2020",
-        "2021": "2026",
-        "2022": "2026",
-        "2023": "2026",
-        "2024": "2026"
+        "2021": "2021",
+        "2022": "2022",
+        "2023": "2023",
+        "2024": "2024",
+        "2025": "2025",
+        "2026": "2026"
       },
       "stages": {
         "inquiries": "Inquiries",
         "applications": "Applications",
         "interviews": "Interviews",
         "offers": "Offers",
-        "enrollments": "Enrollments"
+        "qualifiedLeads": "Pipelines"
       },
       "categories": {
         "infrastructure": "Infrastructure",
-        "faculty": "Faculty",
+        "faculty": "Team",
         "admin": "Admin",
         "research": "Research",
-        "studentServices": "Student Services"
+        "studentServices": "Client Services"
       },
       "standards": {
-        "etec": "ETEC",
-        "moe": "MoE",
-        "scfhs": "SCFHS",
+        "etec": "FAR",
+        "moe": "GSA",
+        "scfhs": "NIST",
         "tvtc": "TVTC"
       },
       "areas": {
@@ -793,18 +795,18 @@
       "kpi": "KPI",
       "budget": "Budget",
       "revenue": "Revenue",
-      "tuition": "Tuition",
+      "contract revenue": "Contract Revenue",
       "grants": "Grants",
       "other": "Other",
       "cost": "Cost",
-      "perStudent": "Per Student",
+      "perBid": "Per Bid",
       "profit": "Profit",
       "allocated": "Allocated",
       "used": "Used",
       "expenses": "Expenses",
       "passRate": "Pass Rate",
       "avgGPA": "Avg GPA",
-      "enrollment": "Enrollment",
+      "enrollment": "Pipeline",
       "enrolled": "Enrolled",
       "capacity": "Capacity",
       "rating": "Rating",
@@ -855,7 +857,7 @@
       "departmentAchievements": "Department Achievements"
     },
     "metrics": {
-      "enrollments": "Employees",
+      "qualifiedLeads": "Employees",
       "passRate": "Completion Rate",
       "revenue": "Revenue",
       "faculty": "Team Size",
@@ -900,9 +902,9 @@
       "awardsRecognition": "Awards & Recognition"
     },
     "departmentNames": {
-      "computerScience": "Computer Science",
+      "computerScience": "Federal IT",
       "electronicsCommunication": "Electronics & Communication",
-      "businessAdministration": "Business Administration"
+      "businessAdministration": "Professional Services"
     }
   },
   "approvalCenter": {
@@ -911,7 +913,7 @@
     "categories": {
       "allCategories": "All Categories",
       "academic": "Academic",
-      "facultyHr": "Faculty & HR",
+      "facultyHr": "Team & HR",
       "financial": "Financial",
       "administrative": "Administrative",
       "complianceAudit": "Compliance & Audit"
@@ -939,7 +941,7 @@
     "requestTypes": {
       "newCourseProposal": "New Course Proposal",
       "curriculumRevision": "Curriculum Revision",
-      "facultyHiring": "Faculty Hiring",
+      "facultyHiring": "Capture Hiring",
       "researchGrant": "Research Grant",
       "eventApproval": "Event Approval",
       "accreditationDocumentation": "Accreditation Documentation"
@@ -969,10 +971,10 @@
       "dataScienceProfessor": "Senior Professor - Data Science",
       "aiResearchProject": "AI Research Project Funding",
       "techSymposium": "Tech Symposium 2026",
-      "etecReport": "ETEC Annual Report Submission"
+      "etecReport": "CMMC Evidence Package"
     },
     "departments": {
-      "computerScience": "Computer Science",
+      "computerScience": "Federal IT",
       "qualityAssurance": "Quality Assurance"
     },
     "faculty": {
@@ -986,10 +988,10 @@
     "descriptions": {
       "quantumComputing": "Proposal for a new undergraduate course in Quantum Computing",
       "aiSpecialization": "Update to AI specialization curriculum to include latest advancements",
-      "dataScienceProfessor": "New faculty position for Data Science specialization",
+      "dataScienceProfessor": "New capture hire for Data Science specialization",
       "aiResearchProject": "Research grant request for AI ethics project",
       "techSymposium": "Annual technical symposium with industry experts",
-      "etecReport": "Final approval for ETEC accreditation documentation"
+      "etecReport": "Final approval for FAR accreditation documentation"
     },
     "attachments": {
       "courseProposal": "Course_Proposal.pdf",
@@ -1002,7 +1004,7 @@
       "budgetBreakdown": "Budget_Breakdown.pdf",
       "eventPlan": "Event_Plan.pdf",
       "budgetProposal": "Budget_Proposal.pdf",
-      "etecReport": "ETEC_Report.pdf",
+      "etecReport": "FAR_Report.pdf",
       "supportingDocs": "Supporting_Docs.pdf"
     },
     "comments": {
@@ -1028,7 +1030,7 @@
     "filters": {
       "allDepartments": "All Departments",
       "departments": {
-        "computerScience": "Computer Science",
+        "computerScience": "Federal IT",
         "eee": "EEE",
         "mechanical": "Mechanical",
         "business": "Business",
@@ -1087,7 +1089,7 @@
       "mscDataSci": "Data Science Team",
       "bbaMarketing": "Marketing Team",
       "bscCs": "IT Team",
-      "mba": "Business Team"
+      "rfp": "Business Team"
     },
     "faculty": {
       "drChen": "Dr. Chen",
@@ -1115,7 +1117,7 @@
         "onlineCourseExpansion": "Online service expansion",
         "risingCompetition": "Rising competition",
         "changingRegulations": "Changing regulations",
-        "decliningEnrollment": "Declining onboarding in some teams",
+        "decliningPipeline": "Declining onboarding in some teams",
         "economicDownturn": "Economic downturn"
       }
     },
@@ -1185,7 +1187,7 @@
       "next7Days": "Next 7 days"
     },
     "kpis": {
-      "admissions": "Recruitment",
+      "recruitments": "Recruitment",
       "finance": "Finance ($)",
       "hr": "HR (Staff)",
       "academics": "Operations (Score)",
@@ -1201,7 +1203,7 @@
       "aiPoweredRevenue": "AI-Powered Revenue & Conversion Analytics"
     },
     "charts": {
-      "admissionsTrend": "Recruitment Trend",
+      "recruitmentsTrend": "Recruitment Trend",
       "financeOverview": "Finance Overview",
       "departmentPerformance": "Department Performance",
       "enrollmentGraduation": "Onboarding & Completion (Last 5 Years)",
@@ -1215,7 +1217,7 @@
       "academics": "Operations",
       "hr": "HR",
       "finance": "Finance",
-      "admissions": "Recruitment",
+      "recruitments": "Recruitment",
       "it": "IT",
       "rd": "R&D",
       "engineering": "Engineering Team",
@@ -1238,7 +1240,7 @@
     },
     "aiLabels": {
       "ai": "AI",
-      "nextSemesterIntake": "next semester intake expected",
+      "nextFiscal PeriodIntake": "next quarter intake expected",
       "highestGrowth": "Highest growth",
       "confidence": "Confidence",
       "model": "Model",
@@ -1252,11 +1254,11 @@
     },
     "alerts": {
       "pendingBudgetApprovals": "Pending Budget Approvals: 3",
-      "complianceAlert": "Compliance Alert: NCAAA Report Due",
+      "complianceAlert": "Compliance Alert: FAR/CMMC Review Due",
       "upcomingExamDeadline": "Upcoming Project Deadline: 15th July",
       "newFeedbackStudents": "New Feedback from Employees",
       "proposalManager": {
-        "rfpSubmissionDeadline": "RFP submission deadline in 3 days: DoD IT Services (Solicitation #2025-084)",
+        "rfpSubmissionDeadline": "RFP submission deadline in 3 days: DoD IT Services (Solicitation #2026-084)",
         "complianceReviewDue": "Compliance review due: 2 mandatory clauses need sign-off before submission",
         "bidApprovalPending": "Bid/No-Bid decision pending: 1 opportunity awaiting your approval",
         "teamAssignmentNeeded": "Team assignment needed: Capture Strategy lead not assigned for GSA BPA",
@@ -1282,7 +1284,7 @@
       "ambulances": "Ambulances",
       "convocation": "Convocation",
       "sportsMeet": "Sports Meet",
-      "facultyWorkshop": "Faculty Workshop",
+      "facultyWorkshop": "Capture Workshop",
       "daysLeft": "days left",
       "applicationsThisMonth": "Applications this month",
       "acceptanceRate": "Acceptance rate",

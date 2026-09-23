@@ -84,14 +84,14 @@ FORMAT AS JSON:
         - Be helpful and informative
       `,
       'program-introduction': `
-        This introduces a specific academic program.
+        This introduces a specific RFP offering.
         - Highlight program benefits
         - Mention career opportunities
         - Include program details
         - Encourage application
       `,
       'event-invitation': `
-        This invites to a university event.
+        This invites to an RFP organization event.
         - Describe the event
         - Highlight benefits of attending
         - Include date, time, location
@@ -107,7 +107,7 @@ FORMAT AS JSON:
       'welcome': `
         This welcomes a new lead.
         - Thank for interest
-        - Introduce university
+        - Introduce the capture organization
         - Provide next steps
         - Be welcoming and informative
       `

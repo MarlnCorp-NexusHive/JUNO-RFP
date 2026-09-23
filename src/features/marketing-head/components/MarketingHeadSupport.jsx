@@ -11,8 +11,8 @@ const supportTickets = [
     priority: 'High',
     status: 'Open',
     assignedTo: 'IT Support',
-    createdAt: '2026-03-15',
-    lastUpdated: '2026-03-15',
+    createdAt: '2026-09-15',
+    lastUpdated: '2026-09-15',
     description: 'Unable to access campaign analytics dashboard. Getting 404 error.'
   },
   {
@@ -22,8 +22,8 @@ const supportTickets = [
     priority: 'Medium',
     status: 'In Progress',
     assignedTo: 'System Admin',
-    createdAt: '2026-03-14',
-    lastUpdated: '2026-03-15',
+    createdAt: '2026-09-14',
+    lastUpdated: '2026-09-15',
     description: 'Need access to the new marketing automation tool for the team.'
   },
   {
@@ -33,8 +33,8 @@ const supportTickets = [
     priority: 'Low',
     status: 'Resolved',
     assignedTo: 'Development Team',
-    createdAt: '2026-03-10',
-    lastUpdated: '2026-03-12',
+    createdAt: '2026-09-10',
+    lastUpdated: '2026-09-12',
     description: 'Email template editor is not saving changes properly.'
   }
 ];
@@ -46,21 +46,21 @@ const knowledgeBaseArticles = [
     title: 'How to Create a New Campaign',
     category: 'Campaigns',
     views: 245,
-    lastUpdated: '2026-03-10'
+    lastUpdated: '2026-09-10'
   },
   {
     id: 2,
     title: 'Understanding Marketing Analytics',
     category: 'Analytics',
     views: 189,
-    lastUpdated: '2026-03-08'
+    lastUpdated: '2026-09-08'
   },
   {
     id: 3,
     title: 'Team Collaboration Guidelines',
     category: 'Team',
     views: 156,
-    lastUpdated: '2026-03-05'
+    lastUpdated: '2026-09-05'
   }
 ];
 
@@ -104,11 +104,11 @@ const DEMO_TICKETS = [
     description: "No internet connectivity in the IT Department office.",
     status: "In Progress",
     assignedTo: "IT Support Team",
-    submittedOn: "2026-06-30",
-    expectedResolution: "2026-07-01",
+    submittedOn: "2026-10-30",
+    expectedResolution: "2026-09-01",
     comments: [
-      { user: "IT Support", text: "We are looking into this.", date: "2026-06-30" },
-      { user: "Khalid Al-Sayed", text: "Please resolve ASAP.", date: "2026-06-30" },
+      { user: "IT Support", text: "We are looking into this.", date: "2026-10-30" },
+      { user: "Khalid Al-Sayed", text: "Please resolve ASAP.", date: "2026-10-30" },
     ],
     feedback: null,
   },
@@ -122,8 +122,8 @@ const DEMO_TICKETS = [
     description: "AC is not cooling properly.",
     status: "Pending",
     assignedTo: "Office Electrical Dept",
-    submittedOn: "2026-06-29",
-    expectedResolution: "2026-07-02",
+    submittedOn: "2026-10-29",
+    expectedResolution: "2026-09-02",
     comments: [],
     feedback: null,
   },

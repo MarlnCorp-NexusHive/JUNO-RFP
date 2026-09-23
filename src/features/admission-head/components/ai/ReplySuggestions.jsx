@@ -94,8 +94,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'follow-up-1',
           title: isRTLMode ? 'متابعة مهذبة' : 'Polite Follow-up',
           content: isRTLMode 
-            ? `مرحباً ${leadName}،\n\nأتمنى أن تكون بخير. أردت أن أتابع معك بخصوص استفسارك عن برنامجنا الأكاديمي.\n\nهل لديك أي أسئلة إضافية أو تحتاج إلى مزيد من المعلومات؟\n\nنتطلع لسماع منك قريباً.\n\nمع أطيب التحيات،\nفريق القبول`
-            : `Hi ${leadName},\n\nI hope you're doing well. I wanted to follow up with you regarding your inquiry about our academic program.\n\nDo you have any additional questions or need more information?\n\nLooking forward to hearing from you soon.\n\nBest regards,\nAdmissions Team`,
+            ? `مرحباً ${leadName}،\n\nأتمنى أن تكون بخير. أردت أن أتابع معك بخصوص استفسارك عن خدمات طلبات العروض.\n\nهل لديك أي أسئلة إضافية أو تحتاج إلى مزيد من المعلومات؟\n\nنتطلع لسماع منك قريباً.\n\nمع أطيب التحيات،\nفريق الالتقاط`
+            : `Hi ${leadName},\n\nI hope you're doing well. I wanted to follow up with you regarding your inquiry about our RFP services.\n\nDo you have any additional questions or need more information?\n\nLooking forward to hearing from you soon.\n\nBest regards,\nCapture Team`,
           explanation: isRTLMode 
             ? 'هذه الرسالة مهذبة ومهنية، تظهر الاهتمام بالعميل وتشجعه على التواصل'
             : 'This message is polite and professional, shows interest in the client and encourages communication'
@@ -104,8 +104,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'follow-up-2',
           title: isRTLMode ? 'متابعة مع معلومات إضافية' : 'Follow-up with Additional Info',
           content: isRTLMode 
-            ? `عزيزي/عزيزتي ${leadName}،\n\nشكراً لك على اهتمامك ببرنامجنا. أردت أن أشارك معك بعض المعلومات الإضافية التي قد تكون مفيدة:\n\n• مواعيد التقديم القادمة\n• المنح الدراسية المتاحة\n• جولة افتراضية في الحرم الجامعي\n\nهل تود تحديد موعد للحديث أكثر؟\n\nمع أطيب التحيات`
-            : `Dear ${leadName},\n\nThank you for your interest in our program. I wanted to share some additional information that might be helpful:\n\n• Upcoming application deadlines\n• Available scholarships\n• Virtual campus tour\n\nWould you like to schedule a time to discuss further?\n\nBest regards`,
+            ? `عزيزي/عزيزتي ${leadName}،\n\nشكراً لك على اهتمامك بخدمات طلبات العروض. أردت أن أشارك معك بعض المعلومات الإضافية التي قد تكون مفيدة:\n\n• مواعيد تقديم العروض القادمة\n• ملخصات الأداء السابق المتاحة\n• إحاطة قدرات افتراضية\n\nهل تود تحديد موعد للحديث أكثر؟\n\nمع أطيب التحيات`
+            : `Dear ${leadName},\n\nThank you for your interest in our RFP services. I wanted to share some additional information that might be helpful:\n\n• Upcoming proposal deadlines\n• Available past-performance briefs\n• Virtual capability briefing\n\nWould you like to schedule a time to discuss further?\n\nBest regards`,
           explanation: isRTLMode 
             ? 'توفر هذه الرسالة قيمة إضافية للعميل مع دعوة واضحة للعمل'
             : 'This message provides additional value to the client with a clear call to action'
@@ -116,8 +116,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'welcome-1',
           title: isRTLMode ? 'ترحيب دافئ' : 'Warm Welcome',
           content: isRTLMode 
-            ? `مرحباً ${leadName}،\n\nأهلاً وسهلاً بك في مجتمعنا الأكاديمي! نحن سعداء جداً لاهتمامك ببرنامجنا.\n\nفريقنا متاح لمساعدتك في كل خطوة من رحلتك الأكاديمية. لا تتردد في التواصل معنا في أي وقت.\n\nنتطلع لرؤيتك جزءاً من عائلتنا الأكاديمية.\n\nمع أطيب التحيات،\nفريق القبول`
-            : `Hello ${leadName},\n\nWelcome to our academic community! We're thrilled that you're interested in our program.\n\nOur team is here to help you every step of the way in your academic journey. Feel free to reach out to us anytime.\n\nWe look forward to having you as part of our academic family.\n\nBest regards,\nAdmissions Team`,
+            ? `مرحباً ${leadName}،\n\nأهلاً وسهلاً بك في JUNO RFP! نحن سعداء جداً لاهتمامك بخدمات العروض.\n\nفريقنا متاح لمساعدتك في كل خطوة من رحلة الالتقاط. لا تتردد في التواصل معنا في أي وقت.\n\nنتطلع للشراكة معك في عرضك القادم.\n\nمع أطيب التحيات،\nفريق الالتقاط`
+            : `Hello ${leadName},\n\nWelcome to JUNO RFP! We're thrilled that you're interested in our proposal services.\n\nOur team is here to help you every step of the way in your capture journey. Feel free to reach out to us anytime.\n\nWe look forward to partnering with you on your next bid.\n\nBest regards,\nCapture Team`,
           explanation: isRTLMode 
             ? 'رسالة ترحيب دافئة ومشجعة تخلق انطباعاً إيجابياً أولياً'
             : 'A warm and encouraging welcome message that creates a positive first impression'
@@ -126,8 +126,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'welcome-2',
           title: isRTLMode ? 'ترحيب مع معلومات أساسية' : 'Welcome with Basic Info',
           content: isRTLMode 
-            ? `عزيزي/عزيزتي ${leadName}،\n\nمرحباً بك في جامعةنا! شكراً لك على اهتمامك ببرنامجنا الأكاديمي.\n\nفيما يلي بعض المعلومات الأساسية:\n\n• متطلبات القبول\n• الرسوم الدراسية\n• الخدمات الطلابية\n• الحياة في الحرم الجامعي\n\nهل تود معرفة المزيد عن أي من هذه النقاط؟\n\nمع أطيب التحيات`
-            : `Dear ${leadName},\n\nWelcome to our university! Thank you for your interest in our academic program.\n\nHere are some basic information:\n\n• Admission requirements\n• Tuition fees\n• Student services\n• Campus life\n\nWould you like to know more about any of these points?\n\nBest regards`,
+            ? `عزيزي/عزيزتي ${leadName}،\n\nمرحباً بك في JUNO RFP! شكراً لك على اهتمامك بخدمات العروض.\n\nفيما يلي بعض المعلومات الأساسية:\n\n• متطلبات الالتقاط\n• خيارات تسعير العقود\n• خدمات العملاء\n• أبرز الأداء السابق\n\nهل تود معرفة المزيد عن أي من هذه النقاط؟\n\nمع أطيب التحيات`
+            : `Dear ${leadName},\n\nWelcome to JUNO RFP! Thank you for your interest in our proposal services.\n\nHere is some basic information:\n\n• Capture requirements\n• Contract pricing options\n• Client services\n• Past performance highlights\n\nWould you like to know more about any of these points?\n\nBest regards`,
           explanation: isRTLMode 
             ? 'ترحيب شامل مع معلومات مفيدة للبداية'
             : 'Comprehensive welcome with useful information to get started'
@@ -138,8 +138,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'reminder-1',
           title: isRTLMode ? 'تذكير لطيف' : 'Gentle Reminder',
           content: isRTLMode 
-            ? `عزيزي/عزيزتي ${leadName}،\n\nأتمنى أن تكون بخير. أردت أن أذكرك بأن موعد التقديم لبرنامجنا يقترب.\n\nإذا كنت بحاجة إلى أي مساعدة في إكمال طلبك، فنحن هنا لمساعدتك.\n\nلا تتردد في التواصل معنا إذا كان لديك أي أسئلة.\n\nمع أطيب التحيات،\nفريق القبول`
-            : `Dear ${leadName},\n\nI hope you're doing well. I wanted to remind you that our program application deadline is approaching.\n\nIf you need any help completing your application, we're here to assist you.\n\nDon't hesitate to contact us if you have any questions.\n\nBest regards,\nAdmissions Team`,
+            ? `عزيزي/عزيزتي ${leadName}،\n\nأتمنى أن تكون بخير. أردت أن أذكرك بأن موعد تقديم العرض يقترب.\n\nإذا كنت بحاجة إلى أي مساعدة في إكمال حزمة الرد، فنحن هنا لمساعدتك.\n\nلا تتردد في التواصل معنا إذا كان لديك أي أسئلة.\n\nمع أطيب التحيات،\nفريق الالتقاط`
+            : `Dear ${leadName},\n\nI hope you're doing well. I wanted to remind you that our proposal submission deadline is approaching.\n\nIf you need any help completing your response package, we're here to assist you.\n\nDon't hesitate to contact us if you have any questions.\n\nBest regards,\nCapture Team`,
           explanation: isRTLMode 
             ? 'تذكير مهذب ومفيد دون إلحاح مفرط'
             : 'Polite and helpful reminder without being overly pushy'
@@ -160,8 +160,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'closing-1',
           title: isRTLMode ? 'إنهاء مهذب' : 'Polite Closing',
           content: isRTLMode 
-            ? `عزيزي/عزيزتي ${leadName}،\n\nشكراً لك على وقتك واهتمامك ببرنامجنا.\n\nنحن نقدر اهتمامك ونتمنى لك التوفيق في رحلتك الأكاديمية.\n\nإذا قررت التقديم في المستقبل، سنكون سعداء لمساعدتك.\n\nمع أطيب التحيات،\nفريق القبول`
-            : `Dear ${leadName},\n\nThank you for your time and interest in our program.\n\nWe appreciate your interest and wish you success in your academic journey.\n\nIf you decide to apply in the future, we'll be happy to help you.\n\nBest regards,\nAdmissions Team`,
+            ? `عزيزي/عزيزتي ${leadName}،\n\nشكراً لك على وقتك واهتمامك بخدمات طلبات العروض.\n\nنحن نقدر اهتمامك ونتمنى لك التوفيق في رحلة الالتقاط.\n\nإذا قررت المتابعة معنا في المستقبل، سنكون سعداء لمساعدتك.\n\nمع أطيب التحيات،\nفريق الالتقاط`
+            : `Dear ${leadName},\n\nThank you for your time and interest in our RFP services.\n\nWe appreciate your interest and wish you success in your capture journey.\n\nIf you decide to pursue an opportunity with us in the future, we'll be happy to help you.\n\nBest regards,\nCapture Team`,
           explanation: isRTLMode 
             ? 'إنهاء مهذب يترك الباب مفتوحاً للتواصل المستقبلي'
             : 'Polite closing that leaves the door open for future communication'
@@ -170,8 +170,8 @@ const ReplySuggestions = ({ leadContext, onSelectSuggestion, className = '' }) =
           id: 'closing-2',
           title: isRTLMode ? 'إنهاء مع دعوة' : 'Closing with Invitation',
           content: isRTLMode 
-            ? `مرحباً ${leadName}،\n\nشكراً لك على التواصل معنا. نحن نقدر اهتمامك ببرنامجنا.\n\nنود أن ندعوك لحضور فعالياتنا القادمة أو جولات الحرم الجامعي.\n\nتابعنا على وسائل التواصل الاجتماعي للحصول على آخر الأخبار.\n\nمع أطيب التحيات،\nفريق القبول`
-            : `Hello ${leadName},\n\nThank you for reaching out to us. We appreciate your interest in our program.\n\nWe'd like to invite you to our upcoming events or campus tours.\n\nFollow us on social media for the latest news.\n\nBest regards,\nAdmissions Team`,
+            ? `مرحباً ${leadName}،\n\nشكراً لك على التواصل معنا. نحن نقدر اهتمامك بخدمات العروض.\n\nنود أن ندعوك لحضور فعاليات يوم الصناعة القادمة أو إحاطات القدرات.\n\nتابعنا على وسائل التواصل الاجتماعي للحصول على آخر الأخبار.\n\nمع أطيب التحيات،\nفريق الالتقاط`
+            : `Hello ${leadName},\n\nThank you for reaching out to us. We appreciate your interest in our program.\n\nWe'd like to invite you to our upcoming events or capability briefings.\n\nFollow us on social media for the latest news.\n\nBest regards,\nCapture Team`,
           explanation: isRTLMode 
             ? 'إنهاء إيجابي مع دعوة للمشاركة في الأنشطة'
             : 'Positive closing with invitation to participate in activities'

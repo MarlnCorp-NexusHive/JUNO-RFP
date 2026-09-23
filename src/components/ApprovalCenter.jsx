@@ -11,17 +11,17 @@ const approvalRequests = [
     category: "Academic",
     type: "New Course Proposal",
     title: "Introduction to Quantum Computing",
-    department: "Computer Science",
+    department: "Federal IT",
     requestedBy: "Dr. Sarah Johnson",
     amount: 0,
     status: "Pending",
     priority: "High",
-    date: "2026-03-15",
+    date: "2026-09-15",
     description: "Proposal for a new undergraduate course in Quantum Computing",
     attachments: ["Course_Proposal.pdf", "Syllabus_Draft.pdf"],
     comments: [
-      { user: "Dr. Sarah Johnson", text: "Course aligned with industry demands", date: "2026-03-15" },
-      { user: "Academic Committee", text: "Under review", date: "2026-03-16" }
+      { user: "Dr. Sarah Johnson", text: "Course aligned with industry demands", date: "2026-09-15" },
+      { user: "Academic Committee", text: "Under review", date: "2026-09-16" }
     ]
   },
   {
@@ -29,34 +29,34 @@ const approvalRequests = [
     category: "Academic",
     type: "Curriculum Revision",
     title: "AI Specialization Update",
-    department: "Computer Science",
+    department: "Federal IT",
     requestedBy: "Dr. Michael Chen",
     amount: 0,
     status: "Pending",
     priority: "Medium",
-    date: "2026-03-14",
+    date: "2026-09-14",
     description: "Update to AI specialization curriculum to include latest advancements",
     attachments: ["Curriculum_Changes.pdf", "Industry_Feedback.pdf"],
     comments: [
-      { user: "Dr. Michael Chen", text: "Updated based on industry requirements", date: "2026-03-14" }
+      { user: "Dr. Michael Chen", text: "Updated based on industry requirements", date: "2026-09-14" }
     ]
   },
-  // Faculty & HR Approvals
+  // Team & HR Approvals
   {
     id: 3,
     category: "HR",
-    type: "Faculty Hiring",
-    title: "Senior Professor - Data Science",
-    department: "Computer Science",
+    type: "Capture Hiring",
+    title: "Senior Capture Lead - Data Science",
+    department: "Federal IT",
     requestedBy: "Dr. Emily Brown",
     amount: 150000,
     status: "Pending",
     priority: "High",
-    date: "2026-03-13",
-    description: "New faculty position for Data Science specialization",
+    date: "2026-09-13",
+    description: "New capture hire for Data Science specialization",
     attachments: ["Job_Description.pdf", "Candidate_Profile.pdf"],
     comments: [
-      { user: "HR Team", text: "Position requirements reviewed", date: "2026-03-13" }
+      { user: "HR Team", text: "Position requirements reviewed", date: "2026-09-13" }
     ]
   },
   // Financial Approvals
@@ -65,16 +65,16 @@ const approvalRequests = [
     category: "Finance",
     type: "Research Grant",
     title: "AI Research Project Funding",
-    department: "Computer Science",
+    department: "Federal IT",
     requestedBy: "Dr. Robert Williams",
     amount: 250000,
     status: "Pending",
     priority: "High",
-    date: "2026-03-12",
+    date: "2026-09-12",
     description: "Research grant request for AI ethics project",
     attachments: ["Project_Proposal.pdf", "Budget_Breakdown.pdf"],
     comments: [
-      { user: "Finance Team", text: "Budget review in progress", date: "2026-03-12" }
+      { user: "Finance Team", text: "Budget review in progress", date: "2026-09-12" }
     ]
   },
   // Administrative Approvals
@@ -83,16 +83,16 @@ const approvalRequests = [
     category: "Admin",
     type: "Event Approval",
     title: "Tech Symposium 2026",
-    department: "Computer Science",
+    department: "Federal IT",
     requestedBy: "Dr. Lisa Anderson",
     amount: 50000,
     status: "Pending",
     priority: "Medium",
-    date: "2026-03-11",
+    date: "2026-09-11",
     description: "Annual technical symposium with industry experts",
     attachments: ["Event_Plan.pdf", "Budget_Proposal.pdf"],
     comments: [
-      { user: "Event Committee", text: "Venue and speakers confirmed", date: "2026-03-11" }
+      { user: "Event Committee", text: "Venue and speakers confirmed", date: "2026-09-11" }
     ]
   },
   // Compliance Approvals
@@ -100,17 +100,17 @@ const approvalRequests = [
     id: 6,
     category: "Compliance",
     type: "Accreditation Documentation",
-    title: "ETEC Annual Report Submission",
+    title: "CMMC Evidence Package",
     department: "Quality Assurance",
     requestedBy: "Dr. James Wilson",
     amount: 0,
     status: "Pending",
     priority: "High",
-    date: "2026-03-10",
-    description: "Final approval for ETEC accreditation documentation",
-    attachments: ["ETEC_Report.pdf", "Supporting_Docs.pdf"],
+    date: "2026-09-10",
+    description: "Final approval for FAR accreditation documentation",
+    attachments: ["FAR_Report.pdf", "Supporting_Docs.pdf"],
     comments: [
-      { user: "QA Team", text: "All required documents compiled", date: "2026-03-10" }
+      { user: "QA Team", text: "All required documents compiled", date: "2026-09-10" }
     ]
   }
 ];
@@ -128,7 +128,7 @@ export default function ApprovalCenter() {
   const categories = [
     { id: "All", label: "All Categories" },
     { id: "Academic", label: "Academic" },
-    { id: "HR", label: "Faculty & HR" },
+    { id: "HR", label: "Team & HR" },
     { id: "Finance", label: "Financial" },
     { id: "Admin", label: "Administrative" },
     { id: "Compliance", label: "Compliance & Audit" }

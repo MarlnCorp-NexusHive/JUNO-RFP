@@ -27,10 +27,10 @@ const AdmissionHeadApplicationProcessing = () => {
         id: 1,
         name: "Ahmed Al-Rashid",
         email: "ahmed.rashid@email.com",
-        phone: "+966501234567",
-        program: "Computer Science",
+        phone: "+12025551234567",
+        program: "Federal IT",
         status: "pending",
-        submittedDate: "2026-01-15",
+        submittedDate: "2026-09-15",
         documents: ["High School Certificate", "Identity Document", "English Proficiency"],
         gpa: 3.8,
         experience: "2 years software development",
@@ -40,10 +40,10 @@ const AdmissionHeadApplicationProcessing = () => {
         id: 2,
         name: "Fatima Al-Zahra",
         email: "fatima.zahra@email.com",
-        phone: "+966507654321",
-        program: "Business Administration",
+        phone: "+12025557654321",
+        program: "Professional Services",
         status: "under_review",
-        submittedDate: "2026-01-14",
+        submittedDate: "2026-09-14",
         documents: ["High School Certificate", "Identity Document"],
         gpa: 3.9,
         experience: "1 year marketing internship",
@@ -53,10 +53,10 @@ const AdmissionHeadApplicationProcessing = () => {
         id: 3,
         name: "Omar Hassan",
         email: "omar.hassan@email.com",
-        phone: "+966509876543",
+        phone: "+12025559876543",
         program: "Engineering",
         status: "approved",
-        submittedDate: "2026-01-13",
+        submittedDate: "2026-09-13",
         documents: ["High School Certificate", "Identity Document", "English Proficiency", "Portfolio"],
         gpa: 3.7,
         experience: "3 years engineering projects",
@@ -78,7 +78,7 @@ const AdmissionHeadApplicationProcessing = () => {
     setProcessingStatus('processing');
     try {
       const prompt = `
-        Analyze this university application:
+        Analyze this RFP application:
         Name: ${selectedApplication.name}
         Program: ${selectedApplication.program}
         GPA: ${selectedApplication.gpa}
@@ -106,7 +106,7 @@ const AdmissionHeadApplicationProcessing = () => {
 This candidate shows strong potential for the ${selectedApplication.program} program. The application demonstrates solid academic performance and relevant experience.
 
 **Key Strengths:**
-- Strong academic record with GPA of ${selectedApplication.gpa}
+- Strong professional record with score of ${selectedApplication.gpa}
 - Relevant experience in the field
 - Clear motivation and career goals
 - Complete documentation
@@ -116,14 +116,14 @@ This candidate shows strong potential for the ${selectedApplication.program} pro
 - Consider additional extracurricular activities
 - Motivation statement could be more specific
 
-**Recommendation:** Based on the overall assessment, this candidate is suitable for admission with some conditions.`;
+**Recommendation:** Based on the overall assessment, this candidate is suitable for recruitment with some conditions.`;
       }
 
       setAiAnalysis({
         suitabilityScore: Math.floor(Math.random() * 40) + 60, // 60-100
         recommendation: ['approve', 'reject', 'waitlist'][Math.floor(Math.random() * 3)],
         strengths: [
-          "Strong academic performance",
+          "Strong professional performance",
           "Relevant experience in field",
           "Clear motivation and goals",
           "Complete documentation"
@@ -257,8 +257,8 @@ This candidate shows strong potential for the ${selectedApplication.program} pro
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="all">All Programs</option>
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Business Administration">Business Administration</option>
+                  <option value="Federal IT">Federal IT</option>
+                  <option value="Professional Services">Professional Services</option>
                   <option value="Engineering">Engineering</option>
                 </select>
               </div>

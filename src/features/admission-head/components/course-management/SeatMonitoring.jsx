@@ -23,60 +23,60 @@ ChartJS.register(
 
 const SeatMonitoring = () => {
   const [selectedDepartment, setSelectedDepartment] = useState('all');
-  const [selectedCycle, setSelectedCycle] = useState('2026-2026');
+  const [selectedCycle, setSelectedCycle] = useState('2026-2027');
 
   // Mock data for courses
   const courses = [
     {
       id: 1,
-      name: 'B.Tech in AI & ML',
+      name: 'IT Modernization BPA',
       code: 'BTECH-AIML',
-      department: 'Computer Science',
+      department: 'Federal IT',
       totalSeats: 120,
       confirmedAdmissions: 94,
       pendingApplications: 18,
       openSeats: 8,
-      admissionCycle: '2026-2026',
+      admissionCycle: '2026-2027',
     },
     {
       id: 2,
-      name: 'MBA in HR',
-      code: 'MBA-HR',
+      name: 'RFP — HR Services',
+      code: 'RFP-HR',
       department: 'Human Resources',
       totalSeats: 60,
       confirmedAdmissions: 45,
       pendingApplications: 10,
       openSeats: 5,
-      admissionCycle: '2026-2026',
+      admissionCycle: '2026-2027',
     },
     {
       id: 3,
-      name: 'BSc Aviation',
+      name: 'Aviation Logistics IDIQ',
       code: 'BSC-AVI',
       department: 'Aviation',
       totalSeats: 40,
       confirmedAdmissions: 35,
       pendingApplications: 3,
       openSeats: 2,
-      admissionCycle: '2026-2026',
+      admissionCycle: '2026-2027',
     },
   ];
 
   // Mock data for departments
   const departments = [
     'All Departments',
-    'Computer Science',
+    'Federal IT',
     'Human Resources',
     'Aviation',
     'Mechanical',
     'Electrical',
   ];
 
-  // Mock data for admission cycles
+  // Mock data for capture cycles
   const admissionCycles = [
-    '2026-2026',
-    '2026-2026',
+    '2025-2026',
     '2026-2027',
+    '2027-2028',
   ];
 
   const filteredCourses = courses.filter(course => 

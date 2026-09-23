@@ -229,7 +229,7 @@ const DirectorOperationalExcellence = ({
             {getTranslation('operationalExcellence.title', 'Operational Excellence')}
           </h1>
           <p className="text-gray-600 mt-1">
-            {getTranslation('operationalExcellence.subtitle', 'AI-powered operational analysis and optimization insights for university operations')}
+            {getTranslation('operationalExcellence.subtitle', 'AI-powered operational analysis and optimization insights for RFP and proposal operations')}
           </p>
         </div>
         

@@ -23,8 +23,8 @@ export const tourData = {
             ar: "مركز القيادة الخاص بك"
       
           content: {
-            en: "Welcome to your university's nerve center! Here you can monitor student enrollment, track financial health, and oversee all departments. The dashboard provides real-time insights into your institution's performance.",
-            ar: "مرحباً بك في مركز أعصاب جامعتك! هنا يمكنك مراقبة تسجيل الطلاب وتتبع الصحة المالية والإشراف على جميع الأقسام. توفر لوحة التحكم رؤى فورية حول أداء مؤسستك."
+            en: "Welcome to your capture command center! Here you can monitor pipeline opportunities, track financial health, and oversee all departments. The dashboard provides real-time insights into your institution's performance.",
+            ar: "مرحباً بك في مركز أعصاب جامعتك! هنا يمكنك مراقبة تسجيل المرشحون وتتبع الصحة المالية والإشراف على جميع الأقسام. توفر لوحة التحكم رؤى فورية حول أداء مؤسستك."
       
           position: "bottom"
     
@@ -36,8 +36,8 @@ export const tourData = {
             ar: "مؤشرات الأداء الرئيسية"
       
           content: {
-            en: "These cards give you instant insights into university performance. Click any card to see detailed analytics. Track enrollment trends, monitor budget health, and identify areas needing attention - all in one glance.",
-            ar: "تعطيك هذه البطاقات رؤى فورية حول أداء الجامعة. انقر على أي بطاقة لرؤية التحليلات التفصيلية. تتبع اتجاهات التسجيل وراقب صحة الميزانية وحدد المجالات التي تحتاج إلى اهتمام - كل ذلك في لمحة واحدة."
+            en: "These cards give you instant insights into capture portfolio performance. Click any card to see detailed analytics. Track enrollment trends, monitor budget health, and identify areas needing attention - all in one glance.",
+            ar: "تعطيك هذه البطاقات رؤى فورية حول أداء المؤسسة. انقر على أي بطاقة لرؤية التحليلات التفصيلية. تتبع اتجاهات التسجيل وراقب صحة الميزانية وحدد المجالات التي تحتاج إلى اهتمام - كل ذلك في لمحة واحدة."
       
           position: "top"
     
@@ -74,8 +74,8 @@ export const tourData = {
             ar: "مركز رؤى البيانات"
       
           content: {
-            en: "Welcome to your analytics command center! Here you can generate comprehensive reports, analyze trends, and make data-driven decisions for your university.",
-            ar: "مرحباً بك في مركز قيادة التحليلات! هنا يمكنك إنشاء تقارير شاملة وتحليل الاتجاهات واتخاذ قرارات مدروسة لجامعتك."
+            en: "Welcome to your analytics command center! Here you can generate comprehensive reports, analyze trends, and make data-driven decisions for your capture organization.",
+            ar: "مرحباً بك في مركز قيادة التحليلات! هنا يمكنك إنشاء تقارير شاملة وتحليل الاتجاهات واتخاذ قرارات مدروسة لمؤسستك."
       
           position: "bottom"
     
@@ -100,8 +100,8 @@ export const tourData = {
         ar: "إدارة الأقسام"
   
       description: {
-        en: "Manage university departments and organizational structure",
-        ar: "إدارة أقسام الجامعة والهيكل التنظيمي"
+        en: "Manage capture divisions and organizational structure",
+        ar: "إدارة أقسام المؤسسة والهيكل التنظيمي"
   
       steps: [
         {
@@ -112,8 +112,8 @@ export const tourData = {
             ar: "نظرة عامة على التنظيم"
       
           content: {
-            en: "Manage your university's organizational structure from this central hub. View department hierarchies, manage staff assignments, and monitor performance across all academic units.",
-            ar: "أدر الهيكل التنظيمي لجامعتك من هذا المركز. اعرض التسلسل الهرمي للأقسام وأدر تعيينات الموظفين وراقب الأداء عبر جميع الوحدات الأكاديمية."
+            en: "Manage your capture organization's organizational structure from this central hub. View department hierarchies, manage staff assignments, and monitor performance across all proposal units.",
+            ar: "أدر الهيكل التنظيمي لمؤسستك من هذا المركز. اعرض التسلسل الهرمي للأقسام وأدر تعيينات الموظفين وراقب الأداء عبر جميع وحدات العروض."
       
           position: "bottom"
         }
@@ -158,8 +158,8 @@ export const tourData = {
         ar: "مرحباً بك في لوحة تحكم القبول"
   
       description: {
-        en: "Let's explore your admission pipeline and student applications",
-        ar: "دعنا نستكشف خط أنابيب القبول وطلبات الطلاب"
+        en: "Let's explore your recruitment pipeline and student applications",
+        ar: "دعنا نستكشف خط أنابيب القبول وطلبات المرشحون"
   
       steps: [
         {
@@ -170,7 +170,7 @@ export const tourData = {
             ar: "نظرة عامة على القبول"
       
           content: {
-            en: "Monitor applications, track leads, and manage the admission process",
+            en: "Monitor applications, track leads, and manage the recruitment process",
             ar: "راقب الطلبات وتتبع العملاء المحتملين وأدر عملية القبول"
       
           position: "bottom"

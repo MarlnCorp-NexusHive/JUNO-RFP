@@ -46,7 +46,7 @@ const DirectorPerformanceForecasting = () => {
         expenses: 41000000,
         reserves: 8500000,
         debt: 12000000,
-        tuition: 25000,
+        contractRevenue: 25000,
         fees: 3500,
         grants: 8500000,
         donations: 3200000,
@@ -84,7 +84,7 @@ const DirectorPerformanceForecasting = () => {
       market: {
         competition: 'High',
         marketShare: 12.5,
-        tuition: 25000,
+        contractRevenue: 25000,
         scholarships: 8500000,
         internationalStudents: 15.2,
         marketGrowth: 3.8,
@@ -242,7 +242,7 @@ const DirectorPerformanceForecasting = () => {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
               {[
                 { type: 'revenue', icon: '💰', name: getTranslation('ai.performanceForecasting.revenue', 'Revenue') },
-                { type: 'enrollment', icon: '👥', name: getTranslation('ai.performanceForecasting.enrollment', 'Enrollment') },
+                { type: 'enrollment', icon: '👥', name: getTranslation('ai.performanceForecasting.enrollment', 'Pipeline') },
                 { type: 'financial', icon: '📊', name: getTranslation('ai.performanceForecasting.financial', 'Financial') },
                 { type: 'academic', icon: '🎓', name: getTranslation('ai.performanceForecasting.academic', 'Academic') },
                 { type: 'operational', icon: '⚙️', name: getTranslation('ai.performanceForecasting.operational', 'Operational') }

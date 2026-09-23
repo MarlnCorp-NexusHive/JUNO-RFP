@@ -27,9 +27,9 @@ class StrategicInsightsService {
   buildInsightsPrompt(params) {
     const { period, focus, context } = params;
     
-    return `As a university strategic planning expert, analyze the following university data and provide comprehensive strategic insights.
+    return `As an RFP organization strategic planning expert, analyze the following capture portfolio data and provide comprehensive strategic insights.
 
-University Context: ${context || 'General university operations'}
+Capture Context: ${context || 'General RFP and proposal operations'}
 
 Analysis Focus: ${focus}
 Time Period: ${period}
@@ -93,13 +93,13 @@ Format your response as structured JSON with this exact structure:
   // Get strategic guidance based on focus area
   getStrategicGuidance(focus) {
     const guidance = {
-      'academic': 'Focus on academic excellence, curriculum development, faculty quality, and student outcomes.',
+      'academic': 'Focus on capture excellence, capability development, team quality, and win outcomes.',
       'financial': 'Analyze financial health, budget optimization, revenue streams, and cost management.',
       'operational': 'Review operational efficiency, process optimization, and resource utilization.',
       'technology': 'Assess technology infrastructure, digital transformation, and innovation initiatives.',
       'enrollment': 'Examine enrollment trends, student recruitment, retention strategies, and market positioning.',
       'research': 'Evaluate research capabilities, funding opportunities, and academic partnerships.',
-      'overall': 'Provide comprehensive strategic analysis across all university functions.'
+      'overall': 'Provide comprehensive strategic analysis across all capture functions.'
     };
     return guidance[focus] || guidance['overall'];
   }
@@ -458,17 +458,17 @@ Format your response as structured JSON with this exact structure:
   // Fallback insights when AI fails
   getFallbackInsights(params) {
     return {
-      executiveSummary: `Based on ${params.period} analysis focusing on ${params.focus}, the university shows strong potential for strategic growth and operational optimization. Key areas for improvement include academic excellence, financial sustainability, and technological advancement.`,
+      executiveSummary: `Based on ${params.period} analysis focusing on ${params.focus}, the capture organization shows strong potential for strategic growth and operational optimization. Key areas for improvement include proposal excellence, financial sustainability, and technological advancement.`,
       keyMetrics: [
         {
-          metric: "Student Enrollment",
+          metric: "Pipeline Opportunities",
           value: "12,500",
           trend: "improving",
           target: "15,000",
           priority: "high"
         },
         {
-          metric: "Graduation Rate",
+          metric: "Win Rate",
           value: "78%",
           trend: "stable",
           target: "85%",
@@ -482,7 +482,7 @@ Format your response as structured JSON with this exact structure:
           priority: "medium"
         },
         {
-          metric: "Faculty Satisfaction",
+          metric: "Team Satisfaction",
           value: "4.2/5",
           trend: "stable",
           target: "4.5/5",
@@ -505,7 +505,7 @@ Format your response as structured JSON with this exact structure:
       ],
       insights: [
         {
-          category: "Academic Excellence",
+          category: "Capture Excellence",
           title: "Curriculum Modernization Opportunity",
           description: "Current curriculum shows gaps in emerging technologies and industry-relevant skills. Modernization could significantly improve graduate employability.",
           impact: "high",
@@ -514,7 +514,7 @@ Format your response as structured JSON with this exact structure:
         {
           category: "Financial Sustainability",
           title: "Revenue Diversification Potential",
-          description: "Heavy reliance on tuition revenue presents risk. Diversification through research partnerships and continuing education could improve financial stability.",
+          description: "Heavy reliance on contract revenue presents risk. Diversification through research partnerships and continuing education could improve financial stability.",
           impact: "high",
           urgency: "medium-term"
         },
@@ -528,7 +528,7 @@ Format your response as structured JSON with this exact structure:
       ],
       risks: [
         {
-          risk: "Enrollment Decline",
+          risk: "Pipeline Decline",
           probability: "medium",
           impact: "high",
           mitigation: "Implement comprehensive recruitment strategy and improve student experience"
@@ -630,11 +630,11 @@ Format your response as structured JSON with this exact structure:
   getFocusAreas() {
     return [
       { value: 'overall', label: 'Overall Strategic Analysis' },
-      { value: 'academic', label: 'Academic Excellence' },
+      { value: 'academic', label: 'Capture Excellence' },
       { value: 'financial', label: 'Financial Management' },
       { value: 'operational', label: 'Operational Efficiency' },
       { value: 'technology', label: 'Technology & Innovation' },
-      { value: 'enrollment', label: 'Enrollment & Student Success' },
+      { value: 'enrollment', label: 'Pipeline & Student Success' },
       { value: 'research', label: 'Research & Development' }
     ];
   }

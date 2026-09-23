@@ -262,7 +262,7 @@
       "dropOffPoints": "نقاط الانسحاب",
       "inquiry": "استفسار",
       "application": "تطبيق",
-      "admission": "قبول",
+      "recruitment": "قبول",
       "source": "المصدر",
       "leads": "العملاء المحتملون",
       "conversion": "التحويل",
@@ -354,7 +354,7 @@
       "referrals": "الإحالات",
       "springEmailBlast": "انفجار البريد الإلكتروني الربيعي",
       "summerGoogleAds": "إعلانات جوجل الصيفية",
-      "campusEvent": "حدث الحرم الجامعي",
+      "campusEvent": "حدث المقر",
       "email": "البريد الإلكتروني",
       "paidAds": "إعلانات مدفوعة",
       "event": "الحدث",
@@ -365,7 +365,7 @@
       "desktop": "سطح المكتب",
       "inquiry": "استفسار",
       "application": "تطبيق",
-      "admission": "قبول"
+      "recruitment": "قبول"
     }
   },
   "communication": {
@@ -497,16 +497,16 @@
       "pleaseReviewMetrics": "يرجى مراجعة أحدث مقاييس الحملة",
       "teamMeetingAgenda": "تم تحديث جدول أعمال اجتماع الفريق",
       "newClientPresentation": "عرض العميل الجديد جاهز",
-      "interestedInMbaProgram": "مهتم ببرنامج الماجستير في إدارة الأعمال",
+      "interestedInMbaProgram": "مهتم بدعم طلبات العروض",
       "requestedBrochure": "طلب كتيب",
       "sentApplicationLink": "تم إرسال رابط التطبيق",
-      "mbaCampaign": "حملة الماجستير في إدارة الأعمال",
+      "mbaCampaign": "خطوط أنابيب طلبات العروض الأسبوعية",
       "socialMedia": "وسائل التواصل الاجتماعي",
       "events": "الأحداث",
       "designReadyForReview": "التصميم جاهز للمراجعة",
       "scheduledNextPost": "تم جدولة المنشور التالي",
       "venueConfirmed": "تم تأكيد المكان",
-      "mbaCampaignKickoff": "اجتماع انطلاق حملة الماجستير في إدارة الأعمال الساعة 3 مساءً.",
+      "mbaCampaignKickoff": "اجتماع انطلاق خطوط أنابيب طلبات العروض الأسبوعية الساعة 3 مساءً.",
       "socialMediaCalendarUpdated": "تم تحديث تقويم وسائل التواصل الاجتماعي.",
       "springBlast": "انفجار الربيع",
       "eventReminder": "تذكير الحدث",
@@ -518,9 +518,9 @@
       "printer": "طابعة",
       "sentInvoice": "تم إرسال الفاتورة",
       "sharedCreative": "تم مشاركة الإبداع",
-      "mbaEmailBlast": "انفجار بريد الماجستير في إدارة الأعمال",
+      "mbaEmailBlast": "دفعة بريد طلبات العروض",
       "openDayReminder": "تذكير اليوم المفتوح",
-      "leadViewedBrochure": "العميل المحتمل السعودية شاهد الكتيب 3 مرات",
+      "leadViewedBrochure": "العميل المحتمل من الولايات المتحدة شاهد الكتيب 3 مرات",
       "springBlastSent": "تم إرسال انفجار الربيع بنجاح",
       "replyPending": "رد معلق من فريق التصميم",
       "opened": "مفتوح",
@@ -610,7 +610,8 @@
       "trainingROIEstimator": "مقدر عائد الاستثمار للتدريب بالذكاء الاصطناعي"
     },
     "calendar": {
-      "april2025": "نوفمبر 2026",
+      "april2025": "سبتمبر 2026",
+      "september2026": "سبتمبر 2026",
       "today": "اليوم",
       "upcoming": "قادم",
       "pending": "في الانتظار",
@@ -827,7 +828,7 @@
       "vendorPartnerManagement": "إدارة الموردين والشركاء",
       "resourceUtilizationDashboard": "لوحة تحكم استخدام الموارد",
       "approvalWorkflow": "سير عمل الموافقة",
-      "academicCompliance": "الامتثال الأكاديمي",
+      "academicCompliance": "امتثال العروض",
       "aiFeatures": "ميزات الذكاء الاصطناعي في إدارة الموارد"
     },
     "aiFeatures": {
@@ -1157,7 +1158,7 @@
         "quickInsights": "رؤى سريعة",
         "recommendedActions": "الإجراءات الموصى بها",
         "insights": {
-          "mbaLeads": "عملاء MBA يظهرون تفاعلاً أعلى بنسبة 45%",
+          "mbaLeads": "عملاء طلبات العروض يظهرون تفاعلاً أعلى بنسبة 45%",
           "counselorsNeedFollowUp": "3 مستشارين يحتاجون مساعدة في المتابعة",
           "engineeringLeadsDropping": "عملاء برنامج الهندسة يتسربون"
         },
@@ -1267,11 +1268,11 @@
       "engagement": "التفاعل",
       "aiExplanation": "شرح الذكاء الاصطناعي",
       "explanationText": "هذا العميل المحتمل يطابق معايير البحث الخاصة بك ويظهر إمكانية تفاعل عالية.",
-      "leadsFromRiyadh": "إليك عملاءك المحتملين من الرياض (بيانات تجريبية)",
+      "leadsFromRiyadh": "إليك عملاءك المحتملين من واشنطن (بيانات تجريبية)",
       "highEngagementProspects": "إليك عملاءك المحتملين عاليي التفاعل (بيانات تجريبية)",
       "lowConversionCampaigns": "إليك الحملات ذات معدلات التحويل المنخفضة (بيانات تجريبية)",
       "engineeringLeads": "إليك العملاء المحتملين المهتمين بالهندسة (بيانات تجريبية)",
-      "recentInquiriesJeddah": "إليك الاستفسارات الحديثة من جدة (بيانات تجريبية)",
+      "recentInquiriesJeddah": "إليك الاستفسارات الحديثة من نيويورك (بيانات تجريبية)",
       "highPriorityFollowUps": "إليك المتابعات عالية الأولوية المطلوبة (بيانات تجريبية)"
     },
     "buttons": {
@@ -1284,11 +1285,11 @@
     "suggestions": {
       "recentSearches": "البحث الأخير",
       "tryTheseQueries": "جرب هذه الاستعلامات",
-      "leadsFromRiyadh": "جرب: \"أظهر لي العملاء المحتملين من الرياض\"",
+      "leadsFromRiyadh": "جرب: \"أظهر لي العملاء المحتملين من واشنطن\"",
       "highEngagementProspects": "جرب: \"ابحث عن العملاء المحتملين عاليي التفاعل\"",
       "lowConversionCampaigns": "جرب: \"الحملات ذات التحويل المنخفض\"",
       "engineeringLeads": "جرب: \"العملاء المحتملون المهتمون بالهندسة\"",
-      "recentInquiriesJeddah": "جرب: \"الاستفسارات الحديثة من جدة\"",
+      "recentInquiriesJeddah": "جرب: \"الاستفسارات الحديثة من نيويورك\"",
       "highPriorityFollowUps": "جرب: \"المتابعات عالية الأولوية المطلوبة\""
     },
     "errors": {

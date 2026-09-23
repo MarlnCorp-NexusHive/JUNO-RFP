@@ -4,13 +4,13 @@ import Sidebar from "./Sidebar";
 import { directorFeatures } from './directorFeatures';
 
 // Demo data for filters
-const departments = ["All Departments", "Computer Science", "EEE", "Mechanical", "Business", "Biotech"];
-const years = ["2026", "2026", "2026", "2027", "2028"];
+const departments = ["All Departments", "Federal IT", "EEE", "Mechanical", "Business", "Biotech"];
+const years = ["2024", "2025", "2026", "2027", "2028"];
 
 // Demo data for KPIs
 const kpis = [
-  { label: "Student-Faculty Ratio", value: 18, target: 15, unit: ":1" },
-  { label: "Publications/Faculty", value: 2.8, target: 3.5 },
+  { label: "Capture-to-Writer Ratio", value: 18, target: 15, unit: ":1" },
+  { label: "Proposals/Team", value: 2.8, target: 3.5 },
   { label: "Retention Rate", value: 92, target: 95, unit: "%" },
   { label: "Placement Rate", value: 81, target: 90, unit: "%" },
 ];
@@ -20,20 +20,20 @@ const goals = [
   { label: "Research Output", progress: 70 },
   { label: "Accreditation Status", progress: 85 },
   { label: "Placements", progress: 81 },
-  { label: "Faculty Hiring", progress: 60 },
+  { label: "Capture Hiring", progress: 60 },
 ];
 
 // Demo data for Gantt chart (strategic roadmap)
 const roadmap = [
-  { name: "NCAAA Prep", start: "2026", end: "2026" },
-  { name: "New BSc AI Program", start: "2026", end: "2026" },
+  { name: "CMMC Prep", start: "2026", end: "2026" },
+  { name: "New Federal AI RFP Program", start: "2026", end: "2026" },
   { name: "Office Expansion", start: "2026", end: "2028" },
   { name: "Green Office Initiative", start: "2026", end: "2027" },
 ];
 
 // Demo data for trend analysis
 const trends = [
-  { label: "Enrollment", values: [1200, 1300, 1400, 1550, 1700] },
+  { label: "Pipeline", values: [1200, 1300, 1400, 1550, 1700] },
   { label: "Placements", values: [800, 900, 950, 1100, 1200] },
   { label: "Research Funding ($K)", values: [200, 250, 300, 350, 400] },
 ];
@@ -143,7 +143,7 @@ export default function StrategicPlanning() {
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow flex flex-col gap-2">
               <h3 className="font-semibold mb-2">AI-Powered Insights</h3>
               <div className="bg-blue-50 dark:bg-blue-900 text-blue-900 dark:text-blue-200 rounded-lg p-3 text-sm mb-2">📈 Projected 25% enrollment rise in CSE dept. by 2026 – consider lab & staff expansion.</div>
-              <div className="bg-yellow-50 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-200 rounded-lg p-3 text-sm mb-2">🧾 NCAAA due in 18 months – initiate curriculum audit next quarter.</div>
+              <div className="bg-yellow-50 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-200 rounded-lg p-3 text-sm mb-2">🧾 GSA Schedule renewal due in 18 months – initiate curriculum audit next quarter.</div>
               <div className="bg-red-50 dark:bg-red-900 text-red-900 dark:text-red-200 rounded-lg p-3 text-sm">💼 Research output in EEE down by 20% YoY – consider internal funding push.</div>
             </div>
           </div>
@@ -182,29 +182,29 @@ export default function StrategicPlanning() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>BSc AI</td><td>Proposal</td><td>Dr. Noura Al-Zahra</td></tr>
-                  <tr><td>MBA FinTech</td><td>Review</td><td>Dr. Abdullah Al-Rashid</td></tr>
-                  <tr><td>BSc EEE</td><td>Ongoing</td><td>Dr. Khalid Al-Sayed</td></tr>
+                  <tr><td>Federal AI RFP</td><td>Proposal</td><td>Dr. Noura Al-Zahra</td></tr>
+                  <tr><td>RFP FinTech</td><td>Review</td><td>Dr. Abdullah Al-Rashid</td></tr>
+                  <tr><td>Energy Grid RFP</td><td>Ongoing</td><td>Dr. Khalid Al-Sayed</td></tr>
                 </tbody>
               </table>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
               <h3 className="font-semibold mb-2">Program Evaluation Cycle</h3>
               <ul className="text-xs list-disc ml-4">
-                <li>BSc CS: Review in 2026</li>
-                <li>MBA: Review in 2026</li>
-                <li>BSc EEE: Review in 2027</li>
+                <li>IT Services RFP: Review in 2026</li>
+                <li>RFP: Review in 2026</li>
+                <li>Energy Grid RFP: Review in 2027</li>
               </ul>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
               <h3 className="font-semibold mb-2">New Program Feasibility Reports</h3>
-              <div className="text-xs">BSc AI: High demand, ROI 3.2x, peer avg. 2.7x</div>
+              <div className="text-xs">Federal AI RFP: High demand, ROI 3.2x, peer avg. 2.7x</div>
               <div className="text-xs">BBA Digital: Moderate demand, ROI 2.1x, peer avg. 2.0x</div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
-              <h3 className="font-semibold mb-2">Faculty Hiring Plan</h3>
+              <h3 className="font-semibold mb-2">Capture Team Hiring Plan</h3>
               <div className="text-xs">CSE: +4 faculty needed by 2026</div>
               <div className="text-xs">EEE: +2 faculty needed by 2027</div>
             </div>
@@ -255,8 +255,8 @@ export default function StrategicPlanning() {
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
               <h3 className="font-semibold mb-2">Grant Strategy Board</h3>
-              <div className="text-xs">ETEC: $200K (2026)</div>
-              <div className="text-xs">NCAAA: $150K (2026)</div>
+              <div className="text-xs">FAR: $200K (2026)</div>
+              <div className="text-xs">CMMC: $150K (2026)</div>
               <div className="text-xs">CSR: $100K (2027)</div>
             </div>
           </div>
@@ -295,7 +295,7 @@ export default function StrategicPlanning() {
                 <tbody>
                   <tr><td>Infosys</td><td>Internships</td><td>Active</td></tr>
                   <tr><td>Siemens</td><td>Lab Setup</td><td>Renewal Due</td></tr>
-                  <tr><td>Google</td><td>Faculty Training</td><td>Active</td></tr>
+                  <tr><td>Google</td><td>Capture Training</td><td>Active</td></tr>
                 </tbody>
               </table>
             </div>

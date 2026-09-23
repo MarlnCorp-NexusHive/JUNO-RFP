@@ -381,7 +381,7 @@ export default function MarketingHeadDashboard() {
         data-tour="2"
         data-tour-title-en="KPI Summary"
         data-tour-title-ar="ملخص مؤشرات الأداء"
-        data-tour-content-en="Track qualified leads, conversion rate, active campaigns, team size, and ROI."
+        data-tour-content-en="Track qualifiedLeads, conversion rate, active campaigns, team size, and ROI."
         data-tour-content-ar="تتبع العملاء المحتملين المؤهلين، معدل التحويل، الحملات النشطة، حجم الفريق، والعائد على الاستثمار."
         data-tour-position="bottom"
       >

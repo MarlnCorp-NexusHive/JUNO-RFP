@@ -5,8 +5,8 @@ import { directorFeatures } from './directorFeatures';
 
 const roles = [
   { name: "CFO", count: 5, permissions: ["Financial Oversight", "Department Management", "Budget Approval"], color: "#6366f1", description: "Senior financial leadership role responsible for finance and budget oversight" },
-  { name: "HoD", count: 12, permissions: ["Department Operations", "Faculty Management", "Course Planning"], color: "#22c55e", description: "Department head managing academic and administrative operations" },
-  { name: "Professor", count: 45, permissions: ["Course Management", "Student Evaluation", "Research Oversight"], color: "#f59e42", description: "Senior faculty member responsible for teaching and research" },
+  { name: "Capture Lead", count: 12, permissions: ["Division Operations", "Team Management", "Pursuit Planning"], color: "#22c55e", description: "Division lead managing capture and proposal operations" },
+  { name: "Proposal Writer", count: 45, permissions: ["Volume Management", "Proposal Review", "Research Oversight"], color: "#f59e42", description: "Senior writer responsible for proposal content and compliance" },
   { name: "Admin Staff", count: 20, permissions: ["Administrative Tasks", "Document Management", "Student Support"], color: "#a21caf", description: "Support staff handling administrative and operational tasks" },
   { name: "IT Staff", count: 8, permissions: ["System Maintenance", "Technical Support", "Security Management"], color: "#ef4444", description: "Technical staff managing IT infrastructure and support" },
 ];
@@ -20,10 +20,10 @@ const departments = [
 ];
 
 const users = [
-  { id: 1, name: "Dr. Sarah Ahmed", role: "CFO", department: "Finance", email: "sarah.ahmed@university.edu", status: "Active", lastActive: "2026-03-15 14:30" },
-  { id: 2, name: "Prof. Mohammed Ali", role: "HoD", department: "Engineering", email: "mohammed.ali@university.edu", status: "Active", lastActive: "2026-03-15 13:45" },
-  { id: 3, name: "Dr. Fatima Khan", role: "Professor", department: "Business", email: "fatima.khan@university.edu", status: "Inactive", lastActive: "2026-03-14 16:20" },
-  { id: 4, name: "Ahmed Hassan", role: "Admin Staff", department: "Admissions", email: "ahmed.hassan@university.edu", status: "Active", lastActive: "2026-03-15 15:10" },
+  { id: 1, name: "Dr. Sarah Ahmed", role: "CFO", department: "Finance", email: "sarah.ahmed@marln.com", status: "Active", lastActive: "2026-09-15 14:30" },
+  { id: 2, name: "Prof. Mohammed Ali", role: "HoD", department: "Engineering", email: "mohammed.ali@marln.com", status: "Active", lastActive: "2026-09-15 13:45" },
+  { id: 3, name: "Dr. Fatima Khan", role: "Professor", department: "Business", email: "fatima.khan@marln.com", status: "Inactive", lastActive: "2026-09-14 16:20" },
+  { id: 4, name: "Ahmed Hassan", role: "Admin Staff", department: "Admissions", email: "ahmed.hassan@marln.com", status: "Active", lastActive: "2026-09-15 15:10" },
 ];
 
 const permissions = [
@@ -34,10 +34,10 @@ const permissions = [
 ];
 
 const activityLogs = [
-  { user: "Dr. Sarah Ahmed", action: "Updated course curriculum", timestamp: "2026-03-15 14:30", status: "Success" },
-  { user: "Prof. Mohammed Ali", action: "Approved department budget", timestamp: "2026-03-15 13:45", status: "Success" },
-  { user: "Dr. Fatima Khan", action: "Modified student grades", timestamp: "2026-03-14 16:20", status: "Failed" },
-  { user: "Ahmed Hassan", action: "Generated admission report", timestamp: "2026-03-15 15:10", status: "Success" },
+  { user: "Dr. Sarah Ahmed", action: "Updated course curriculum", timestamp: "2026-09-15 14:30", status: "Success" },
+  { user: "Prof. Mohammed Ali", action: "Approved department budget", timestamp: "2026-09-15 13:45", status: "Success" },
+  { user: "Dr. Fatima Khan", action: "Modified student grades", timestamp: "2026-09-14 16:20", status: "Failed" },
+  { user: "Ahmed Hassan", action: "Generated recruitment report", timestamp: "2026-09-15 15:10", status: "Success" },
 ];
 
 const userStats = {

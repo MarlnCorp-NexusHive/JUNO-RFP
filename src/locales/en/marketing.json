@@ -262,7 +262,7 @@
       "dropOffPoints": "Drop-off Points",
       "inquiry": "Inquiry",
       "application": "Application",
-      "admission": "Admission",
+      "recruitment": "Admission",
       "source": "Source",
       "leads": "Leads",
       "conversion": "Conversion",
@@ -354,7 +354,7 @@
       "referrals": "Referrals",
       "springEmailBlast": "Spring Email Blast",
       "summerGoogleAds": "Summer Google Ads",
-      "campusEvent": "Campus Event",
+      "campusEvent": "Industry Day",
       "email": "Email",
       "paidAds": "Paid Ads",
       "event": "Event",
@@ -365,7 +365,7 @@
       "desktop": "Desktop",
       "inquiry": "Inquiry",
       "application": "Application",
-      "admission": "Admission"
+      "recruitment": "Admission"
     }
   },
   "communication": {
@@ -497,16 +497,16 @@
       "pleaseReviewMetrics": "Please review the latest campaign metrics",
       "teamMeetingAgenda": "Team meeting agenda has been updated",
       "newClientPresentation": "New client presentation is ready",
-      "interestedInMbaProgram": "Interested in MBA program",
+      "interestedInMbaProgram": "Interested in RFP support",
       "requestedBrochure": "Requested brochure",
       "sentApplicationLink": "Sent application link",
-      "mbaCampaign": "MBA Campaign",
+      "mbaCampaign": "Weekly RFP Pipelines",
       "socialMedia": "Social Media",
       "events": "Events",
       "designReadyForReview": "Design ready for review",
       "scheduledNextPost": "Scheduled next post",
       "venueConfirmed": "Venue confirmed",
-      "mbaCampaignKickoff": "MBA campaign kickoff meeting at 3pm.",
+      "mbaCampaignKickoff": "Weekly RFP pipeline kickoff meeting at 3pm.",
       "socialMediaCalendarUpdated": "Social media calendar updated.",
       "springBlast": "Spring Blast",
       "eventReminder": "Event Reminder",
@@ -518,9 +518,9 @@
       "printer": "Printer",
       "sentInvoice": "Sent invoice",
       "sharedCreative": "Shared creative",
-      "mbaEmailBlast": "MBA Email Blast",
-      "openDayReminder": "Open Day Reminder",
-      "leadViewedBrochure": "Lead Saudi Arabia viewed brochure 3 times",
+      "mbaEmailBlast": "RFP Email Blast",
+      "openDayReminder": "Industry Day Reminder",
+      "leadViewedBrochure": "Lead United States viewed brochure 3 times",
       "springBlastSent": "Spring Blast sent successfully",
       "replyPending": "Reply pending from design team",
       "opened": "Opened",
@@ -575,7 +575,8 @@
       "trainingROIEstimator": "AI Training ROI Estimator"
     },
     "calendar": {
-      "april2025": "November 2026",
+      "april2025": "September 2026",
+      "september2026": "September 2026",
       "today": "Today",
       "upcoming": "Upcoming",
       "pending": "Pending",
@@ -795,7 +796,7 @@
         "leadQualityDistribution": "Lead Quality Distribution",
         "conversionFunnel": "Conversion Funnel",
         "campaignPerformance": "Campaign Performance",
-        "counselorPerformance": "Counselor Performance"
+        "counselorPerformance": "Capture Owner Performance"
       }
     },
     "sections": {
@@ -924,13 +925,13 @@
         "quickInsights": "Quick Insights",
         "recommendedActions": "Recommended Actions",
         "insights": {
-          "mbaLeads": "MBA leads showing 45% higher engagement",
-          "counselorsNeedFollowUp": "3 counselors need follow-up assistance",
-          "engineeringLeadsDropping": "Engineering program leads dropping off"
+          "mbaLeads": "RFP leads showing 45% higher engagement",
+          "counselorsNeedFollowUp": "3 owners need follow-up assistance",
+          "engineeringLeadsDropping": "Engineering RFP leads dropping off"
         },
         "actions": {
           "scheduleFollowUp": "Schedule follow-up for 12 high-potential leads",
-          "adjustCampaignTargeting": "Adjust campaign targeting for Engineering program",
+          "adjustCampaignTargeting": "Adjust campaign targeting for Engineering RFP",
           "reviewLeadScoring": "Review and update lead scoring criteria"
         }
       }
@@ -992,7 +993,7 @@
     "createModal": {
       "title": "Create New Campaign",
       "campaignName": "Campaign Name",
-      "campaignNamePlaceholder": "e.g. Summer Enrollment Drive",
+      "campaignNamePlaceholder": "e.g. Summer Pipeline Drive",
       "type": "Type",
       "typePlaceholder": "e.g. Digital, Social, Multi-channel",
       "status": "Status",
@@ -1004,7 +1005,7 @@
       "expectedResultsPlaceholder": "e.g. 5x ROI, 1000 leads, 200 conversions",
       "hardBenefits": "Hard Benefits",
       "tangibleMeasurable": "Tangible, measurable",
-      "hardBenefitsPlaceholder": "e.g. Increased revenue, more enrollments, cost savings",
+      "hardBenefitsPlaceholder": "e.g. Increased revenue, more qualified leads, cost savings",
       "softBenefits": "Soft Benefits",
       "intangibleQualitative": "Intangible, qualitative",
       "softBenefitsPlaceholder": "e.g. Brand awareness, team morale, market reputation",
@@ -1270,11 +1271,11 @@
       "engagement": "Engagement",
       "aiExplanation": "AI Explanation",
       "explanationText": "This lead matches your search criteria and shows high engagement potential.",
-      "leadsFromRiyadh": "Here are your leads from Riyadh (Demo Data)",
+      "leadsFromRiyadh": "Here are your leads from Washington DC (Demo Data)",
       "highEngagementProspects": "Here are your high-engagement prospects (Demo Data)",
       "lowConversionCampaigns": "Here are campaigns with low conversion rates (Demo Data)",
       "engineeringLeads": "Here are leads interested in engineering (Demo Data)",
-      "recentInquiriesJeddah": "Here are recent inquiries from Jeddah (Demo Data)",
+      "recentInquiriesJeddah": "Here are recent inquiries from New York (Demo Data)",
       "highPriorityFollowUps": "Here are high-priority follow-ups needed (Demo Data)"
     },
     "buttons": {
@@ -1287,11 +1288,11 @@
     "suggestions": {
       "recentSearches": "Recent Searches",
       "tryTheseQueries": "Try these queries",
-      "leadsFromRiyadh": "Try: \"Show me leads from Riyadh\"",
+      "leadsFromRiyadh": "Try: \"Show me leads from Washington DC\"",
       "highEngagementProspects": "Try: \"Find high-engagement prospects\"",
       "lowConversionCampaigns": "Try: \"Campaigns with low conversion\"",
       "engineeringLeads": "Try: \"Leads interested in engineering\"",
-      "recentInquiriesJeddah": "Try: \"Recent inquiries from Jeddah\"",
+      "recentInquiriesJeddah": "Try: \"Recent inquiries from New York\"",
       "highPriorityFollowUps": "Try: \"High-priority follow-ups needed\""
     },
     "errors": {

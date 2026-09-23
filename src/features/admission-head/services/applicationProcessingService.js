@@ -79,7 +79,7 @@ Please respond with a JSON object containing:
     "urgencyScore": 60,
     "priority": "Medium",
     "factors": {
-      "academic": "Strong academic background",
+      "academic": "Strong professional background",
       "profile": "Good extracurricular activities",
       "urgency": "Standard application timeline"
     }
@@ -261,7 +261,7 @@ Please respond with a JSON object containing:
         urgencyScore: this.extractValue(jsonString, "urgencyScore", 60),
         priority: this.extractValue(jsonString, "priority", "Medium"),
         factors: {
-          academic: this.extractValue(jsonString, "academic", "Good academic background"),
+          academic: this.extractValue(jsonString, "academic", "Good professional background"),
           profile: this.extractValue(jsonString, "profile", "Standard profile"),
           urgency: this.extractValue(jsonString, "urgency", "Normal timeline")
         }
@@ -404,7 +404,7 @@ Please respond with a JSON object containing:
         urgencyScore: 60,
         priority: "Medium",
         factors: {
-          academic: "Strong academic background",
+          academic: "Strong professional background",
           profile: "Good extracurricular activities",
           urgency: "Standard application timeline"
         }

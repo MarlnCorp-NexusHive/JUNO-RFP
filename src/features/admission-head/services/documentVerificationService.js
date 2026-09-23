@@ -106,10 +106,10 @@ class DocumentVerificationService {
       `${index + 1}. ${criterion}`
     ).join('\n');
 
-    return `As an AI document verification system for university admissions, please verify the following document:
+    return `As an AI document verification system for proposal compliance, please verify the following document:
 
 **Document Information:**
-- Student Name: ${documentData.studentName || 'Not provided'}
+- Candidate Name: ${documentData.studentName || 'Not provided'}
 - Document Type: ${documentData.documentType}
 - Document Number: ${documentData.documentNumber || 'Not provided'}
 - File Name: ${documentData.fileName || 'Not provided'}

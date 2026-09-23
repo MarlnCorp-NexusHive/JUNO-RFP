@@ -21,7 +21,7 @@ const metrics = [
 ];
 
 const courseData = {
-  labels: ['B.Tech CS', 'MBA Finance', 'M.Sc Data Science'],
+  labels: ['Cloud Migration RFP', 'RFP Finance', 'Data Analytics Task Order'],
   datasets: [
     {
       label: 'Pass Rate (%)',
@@ -52,7 +52,7 @@ const options = {
     },
     title: { 
       display: true, 
-      text: 'Academic Metrics by Course',
+      text: 'Pipeline Metrics by Course',
       color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
     },
   },

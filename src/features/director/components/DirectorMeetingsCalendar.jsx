@@ -88,17 +88,17 @@ export default function DirectorMeetingsCalendar() {
   const priorityLabel = (priority) => t(`support.priorities.${priority}`, { defaultValue: priority });
 
   const pmMeetings = [
-    { id: 1, date: "2026-03-15", time: "10:00", duration: "2h", title: "Water Wastewater RFP – Kickoff", participants: "Capture Manager, Proposal Manager, Writers", statusKey: "status.scheduled", agenda: "RFP review, assignments, schedule", location: "Conference Room A", type: "kickoff", priority: "high", attendees: 8 },
-    { id: 2, date: "2026-03-17", time: "14:00", duration: "1.5h", title: "Landscape Maintenance – Color Team Review", participants: "Proposal Manager, Technical Lead, Pricing", statusKey: "status.scheduled", agenda: "Draft review, compliance check", location: "Project Center", type: "review", priority: "medium", attendees: 5 },
-    { id: 3, date: "2026-03-20", time: "09:30", duration: "1h", title: "Airport Restaurant – Red Team", participants: "Proposal Manager, Compliance, Graphics", statusKey: "status.completed", agenda: "Final review before submission", location: "Main Conference", type: "red-team", priority: "high", attendees: 6 },
-    { id: 4, date: "2026-03-22", time: "11:00", duration: "3h", title: "Submission Deadline – Balsitis Playground", participants: "Full proposal team", statusKey: "status.scheduled", agenda: "Final packaging, upload, sign-off", location: "War Room", type: "deadline", priority: "high", attendees: 12 },
+    { id: 1, date: "2026-09-15", time: "10:00", duration: "2h", title: "Water Wastewater RFP – Kickoff", participants: "Capture Manager, Proposal Manager, Writers", statusKey: "status.scheduled", agenda: "RFP review, assignments, schedule", location: "Conference Room A", type: "kickoff", priority: "high", attendees: 8 },
+    { id: 2, date: "2026-09-17", time: "14:00", duration: "1.5h", title: "Landscape Maintenance – Color Team Review", participants: "Proposal Manager, Technical Lead, Pricing", statusKey: "status.scheduled", agenda: "Draft review, compliance check", location: "Project Center", type: "review", priority: "medium", attendees: 5 },
+    { id: 3, date: "2026-09-20", time: "09:30", duration: "1h", title: "Airport Restaurant – Red Team", participants: "Proposal Manager, Compliance, Graphics", statusKey: "status.completed", agenda: "Final review before submission", location: "Main Conference", type: "red-team", priority: "high", attendees: 6 },
+    { id: 4, date: "2026-09-22", time: "11:00", duration: "3h", title: "Submission Deadline – Balsitis Playground", participants: "Full proposal team", statusKey: "status.scheduled", agenda: "Final packaging, upload, sign-off", location: "War Room", type: "deadline", priority: "high", attendees: 12 },
   ];
 
   // Meetings data using translation keys
   const directorMeetings = [
     { 
       id: 1, 
-      date: "2026-03-15", 
+      date: "2026-09-15", 
       time: "10:00", 
       duration: "2h",
       titleKey: "meetingTitles.boardMeeting", 
@@ -112,7 +112,7 @@ export default function DirectorMeetingsCalendar() {
     },
     { 
       id: 2, 
-      date: "2026-03-17", 
+      date: "2026-09-17", 
       time: "14:00", 
       duration: "1.5h",
       titleKey: "meetingTitles.researchCommittee", 
@@ -126,7 +126,7 @@ export default function DirectorMeetingsCalendar() {
     },
     { 
       id: 3, 
-      date: "2026-03-20", 
+      date: "2026-09-20", 
       time: "09:30", 
       duration: "1h",
       titleKey: "meetingTitles.studentCouncil", 
@@ -140,7 +140,7 @@ export default function DirectorMeetingsCalendar() {
     },
     { 
       id: 4, 
-      date: "2026-03-22", 
+      date: "2026-09-22", 
       time: "11:00", 
       duration: "3h",
       titleKey: "meetingTitles.facultyMeeting", 
@@ -156,18 +156,18 @@ export default function DirectorMeetingsCalendar() {
   const meetings = isPM ? pmMeetings : directorMeetings;
 
   const pmCalendarEvents = [
-    { date: "2026-03-15", label: "Water Wastewater Kickoff", type: "meeting" },
-    { date: "2026-03-17", label: "Landscape Color Team", type: "meeting" },
-    { date: "2026-03-20", label: "Airport Restaurant Red Team", type: "meeting" },
-    { date: "2026-03-22", label: "Balsitis Submission Deadline", type: "event" },
-    { date: "2026-03-25", label: "Surplus Tanks Go/No-Go", type: "event" },
+    { date: "2026-09-15", label: "Water Wastewater Kickoff", type: "meeting" },
+    { date: "2026-09-17", label: "Landscape Color Team", type: "meeting" },
+    { date: "2026-09-20", label: "Airport Restaurant Red Team", type: "meeting" },
+    { date: "2026-09-22", label: "Balsitis Submission Deadline", type: "event" },
+    { date: "2026-09-25", label: "Surplus Tanks Go/No-Go", type: "event" },
   ];
   const directorCalendarEvents = [
-    { date: "2026-03-15", labelKey: "meetingTitles.boardMeeting", type: "meeting" },
-    { date: "2026-03-17", labelKey: "meetingTitles.researchCommittee", type: "meeting" },
-    { date: "2026-03-20", labelKey: "meetingTitles.studentCouncil", type: "meeting" },
-    { date: "2026-03-22", labelKey: "events.ncaaaAudit", type: "event" },
-    { date: "2026-03-25", labelKey: "events.graduationCeremony", type: "event" },
+    { date: "2026-09-15", labelKey: "meetingTitles.boardMeeting", type: "meeting" },
+    { date: "2026-09-17", labelKey: "meetingTitles.researchCommittee", type: "meeting" },
+    { date: "2026-09-20", labelKey: "meetingTitles.studentCouncil", type: "meeting" },
+    { date: "2026-09-22", labelKey: "events.ncaaaAudit", type: "event" },
+    { date: "2026-09-25", labelKey: "events.graduationCeremony", type: "event" },
   ];
   const calendarEvents = isPM ? pmCalendarEvents : directorCalendarEvents;
 

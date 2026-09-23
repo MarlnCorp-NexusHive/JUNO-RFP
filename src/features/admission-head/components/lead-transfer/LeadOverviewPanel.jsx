@@ -12,44 +12,44 @@ const LeadOverviewPanel = ({ filters, setFilters }) => {
       id: 1,
       name: "Abdullah Al-Rashid",
       email: "abdullah.rashid@example.com",
-      phone: "+966 50 123 4567",
-      program: "MBA",
+      phone: "+1 (202) 555-123 4567",
+      program: "RFP",
       status: "Active",
       assignedTo: "Noura Al-Zahra",
-      lastContact: "2026-03-15",
+      lastContact: "2026-09-15",
       notes: "Interested in full-time program"
     },
     {
       id: 2,
       name: "Mohammed Al-Saud",
       email: "mohammed.alsaud@example.com",
-      phone: "+966 50 234 5678",
-      program: "B.Tech Computer Science",
+      phone: "+1 (202) 555-234 5678",
+      program: "Cloud Migration RFP",
       status: "Pending",
       assignedTo: "Khalid Al-Sayed",
-      lastContact: "2026-03-10",
+      lastContact: "2026-09-10",
       notes: "Waiting for document verification"
     },
     {
       id: 3,
       name: "Layla Al-Mansour",
       email: "layla.mansour@example.com",
-      phone: "+966 50 345 6789",
-      program: "MBA",
+      phone: "+1 (202) 555-345 6789",
+      program: "RFP",
       status: "Active",
       assignedTo: "Aisha Al-Hassan",
-      lastContact: "2026-03-12",
+      lastContact: "2026-09-12",
       notes: "Scheduled for interview"
     },
     {
       id: 4,
       name: "Fatima Al-Rashid",
       email: "fatima.rashid@example.com",
-      phone: "+966 50 456 7890",
-      program: "B.Tech Mechanical",
+      phone: "+1 (202) 555-456 7890",
+      program: "Facilities Maintenance RFP",
       status: "Inactive",
       assignedTo: "Omar Al-Mutairi",
-      lastContact: "2026-03-08",
+      lastContact: "2026-09-08",
       notes: "No response after initial contact"
     }
   ];
@@ -118,17 +118,17 @@ const LeadOverviewPanel = ({ filters, setFilters }) => {
               </select>
             </div>
 
-            {/* Assigned Counselor */}
+            {/* Assigned Capture Lead */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Assigned Counselor
+                Assigned Capture Lead
               </label>
               <select
                 value={filters.assignedCounselor}
                 onChange={(e) => setFilters({ ...filters, assignedCounselor: e.target.value })}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >
-                <option value="all">All Counselors</option>
+                <option value="all">All Capture Leads</option>
                 {counselors.map(counselor => (
                   <option key={counselor} value={counselor}>{counselor}</option>
                 ))}

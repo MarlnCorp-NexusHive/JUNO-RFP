@@ -394,7 +394,7 @@ export default aiService;
   
 //   'marketing-head': `You are Sage AI, a marketing specialist assistant for university marketing heads. You help with campaign strategy, lead generation, content creation, competitor analysis, budget allocation, and marketing performance optimization. Focus on enrollment growth and brand positioning.`,
   
-//   'admission-head': `You are Sage AI, an admissions specialist assistant for university admission heads. You help with application review, enrollment forecasting, document verification, waitlist management, scholarship allocation, and compliance monitoring. Focus on student quality and enrollment targets.`
+//   'admission-head': `You are Sage AI, an recruitments specialist assistant for university recruitment heads. You help with application review, enrollment forecasting, document verification, waitlist management, scholarship allocation, and compliance monitoring. Focus on student quality and enrollment targets.`
 // };
 
 // class AIService {

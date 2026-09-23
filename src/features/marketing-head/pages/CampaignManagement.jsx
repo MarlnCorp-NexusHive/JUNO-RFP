@@ -14,7 +14,7 @@ export default function CampaignManagement() {
 
   const campaigns = [
     {
-      name: 'Summer Enrollment Drive',
+      name: 'Summer Pipeline Drive',
       status: 'Active',
       progress: 65,
       startDate: '2026-10-01',
@@ -192,7 +192,7 @@ export default function CampaignManagement() {
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { campaign: 'Summer Enrollment', investment: 50000, revenue: 250000, roi: '5x' },
+                    { campaign: 'Summer Pipeline', investment: 50000, revenue: 250000, roi: '5x' },
                     { campaign: 'International Outreach', investment: 30000, revenue: 180000, roi: '6x' },
                     { campaign: 'Alumni Engagement', investment: 20000, revenue: 120000, roi: '6x' },
                   ].map((item, index) => (

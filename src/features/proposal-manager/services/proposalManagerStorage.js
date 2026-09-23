@@ -187,7 +187,7 @@ export function ensureBoilerplateLibrary() {
       id: BOILERPLATE_FOLDER_ID,
       name: BOILERPLATE_FOLDER_NAME,
       parentId: null,
-      createdAt: "2026-08-13T08:00:00.000Z",
+      createdAt: "2026-09-13T08:00:00.000Z",
       seeded: true,
     });
     saveFolders(folders);
@@ -224,7 +224,7 @@ export function ensureBoilerplateLibrary() {
       answer: row.answer,
       tags: [...row.tags],
       sourceDocumentId: `doc_${BOILERPLATE_PACK[0].id}`,
-      createdAt: "2026-08-13T08:00:00.000Z",
+      createdAt: "2026-09-13T08:00:00.000Z",
     });
     qaChanged = true;
   }

@@ -71,7 +71,7 @@ export default function DirectorCommunicationHub() {
 
   const archiveDemo = [
     { 
-      date: "2026-03-10", 
+      date: "2026-09-10", 
       roleKey: "groups.deans", 
       topicKey: "archiveData.annualReport.topic", 
       subjectKey: "archiveData.annualReport.subject", 
@@ -79,7 +79,7 @@ export default function DirectorCommunicationHub() {
       priority: "high"
     },
     { 
-      date: "2026-03-08", 
+      date: "2026-09-08", 
       roleKey: "groups.employees", 
       topicKey: "archiveData.feeUpdate.topic", 
       subjectKey: "archiveData.feeUpdate.subject", 
@@ -87,7 +87,7 @@ export default function DirectorCommunicationHub() {
       priority: "medium"
     },
     { 
-      date: "2026-03-05", 
+      date: "2026-09-05", 
       roleKey: "groups.team", 
       topicKey: "archiveData.policy.topic", 
       subjectKey: "archiveData.policy.subject", 

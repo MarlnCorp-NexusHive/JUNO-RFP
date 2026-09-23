@@ -11,14 +11,14 @@ const mockRecipients = [
   { name: 'Noura Al-Zahra', role: 'Team' },
 ];
 const mockOutgoing = [
-  { id: 1, recipient: mockRecipients[0], type: 'Email', subject: 'Application Received', preview: 'Dear Abdullah, your application...', date: '2026-06-10', time: '10:00', sentBy: 'User', status: 'Delivered' },
-  { id: 2, recipient: mockRecipients[1], type: 'SMS', subject: 'Document Verification', preview: 'Dear Layla, please submit...', date: '2026-06-09', time: '14:30', sentBy: 'System', status: 'Sent' },
-  { id: 3, recipient: mockRecipients[2], type: 'WhatsApp', subject: 'Interview Schedule', preview: 'Hi Noura, your interview is...', date: '2026-06-08', time: '16:45', sentBy: 'User', status: 'Read' },
+  { id: 1, recipient: mockRecipients[0], type: 'Email', subject: 'Application Received', preview: 'Dear Abdullah, your application...', date: '2026-10-10', time: '10:00', sentBy: 'User', status: 'Delivered' },
+  { id: 2, recipient: mockRecipients[1], type: 'SMS', subject: 'Document Verification', preview: 'Dear Layla, please submit...', date: '2026-10-09', time: '14:30', sentBy: 'System', status: 'Sent' },
+  { id: 3, recipient: mockRecipients[2], type: 'WhatsApp', subject: 'Interview Schedule', preview: 'Hi Noura, your interview is...', date: '2026-10-08', time: '16:45', sentBy: 'User', status: 'Read' },
 ];
 const mockIncoming = [
-  { id: 1, sender: mockRecipients[0], type: 'Email', subject: 'Re: Application', preview: 'Thank you for the update...', date: '2026-06-10', time: '10:30', status: 'Needs Follow-up', tags: ['Scholarship Query'] },
-  { id: 2, sender: mockRecipients[1], type: 'SMS', subject: 'Parent Query', preview: 'Can I reschedule...', date: '2026-06-10', time: '11:10', status: 'Escalated', tags: ['Deadline Confusion'] },
-  { id: 3, sender: mockRecipients[2], type: 'WhatsApp', subject: 'Agent Docs', preview: 'Documents attached...', date: '2026-06-09', time: '15:20', status: 'Replied', tags: [] },
+  { id: 1, sender: mockRecipients[0], type: 'Email', subject: 'Re: Application', preview: 'Thank you for the update...', date: '2026-10-10', time: '10:30', status: 'Needs Follow-up', tags: ['Incentive Query'] },
+  { id: 2, sender: mockRecipients[1], type: 'SMS', subject: 'Parent Query', preview: 'Can I reschedule...', date: '2026-10-10', time: '11:10', status: 'Escalated', tags: ['Deadline Confusion'] },
+  { id: 3, sender: mockRecipients[2], type: 'WhatsApp', subject: 'Agent Docs', preview: 'Documents attached...', date: '2026-10-09', time: '15:20', status: 'Replied', tags: [] },
 ];
 const mockTemplates = [
   { id: 1, name: 'Application Acknowledgment', type: 'Email', content: 'Dear {Name}, your application {ApplicationID} has been received.', lang: 'EN', approved: true },
@@ -29,8 +29,8 @@ const mockNotes = [
   { id: 2, candidate: 'Layla Al-Mansour', note: 'Parent concerned about accommodation.', tags: ['Parent', 'Accommodation'], private: true },
 ];
 const mockCalls = [
-  { id: 1, caller: 'Abdullah Al-Rashid', type: 'Incoming', duration: '3:20', notes: 'Discussed scholarship.', aiSummary: 'Asked about scholarship eligibility.', date: '2026-06-10', status: 'Completed' },
-  { id: 2, caller: 'Layla Al-Mansour', type: 'Outgoing', duration: '5:15', notes: 'Follow-up on application.', aiSummary: 'Confirmed document submission.', date: '2026-06-09', status: 'Completed' },
+  { id: 1, caller: 'Abdullah Al-Rashid', type: 'Incoming', duration: '3:20', notes: 'Discussed incentive options.', aiSummary: 'Asked about incentive eligibility.', date: '2026-10-10', status: 'Completed' },
+  { id: 2, caller: 'Layla Al-Mansour', type: 'Outgoing', duration: '5:15', notes: 'Follow-up on application.', aiSummary: 'Confirmed document submission.', date: '2026-10-09', status: 'Completed' },
 ];
 const mockChannels = [
   { name: 'Email', icon: FiMail, enabled: true },
@@ -45,12 +45,12 @@ const dummyEmailTemplates = [
   {
     id: 1,
     emailType: 'follow-up',
-    subject: 'Follow-up: Computer Science Program at Our University',
+    subject: 'Follow-up: GSA IT Schedule Opportunity',
     greeting: 'Dear Abdullah,',
-    body: 'Thank you for your interest in our Computer Science program. We wanted to follow up and provide you with additional information that might be helpful in your decision-making process.\n\nOur university offers excellent opportunities in Computer Science, and we believe you would be a great fit for our program. We\'d love to schedule a personal consultation to discuss your goals and answer any questions you might have.',
-    callToAction: 'Schedule a consultation call with our admissions team',
+    body: 'Thank you for your interest in our Federal IT program. We wanted to follow up and provide you with additional information that might be helpful in your decision-making process.\n\nOur firm offers excellent opportunities in Federal IT, and we believe you would be a great fit for our program. We\'d love to schedule a personal consultation to discuss your goals and answer any questions you might have.',
+    callToAction: 'Schedule a consultation call with our recruitments team',
     closing: 'Best regards,',
-    signature: 'University Admissions Team',
+    signature: 'JUNO Capture Team',
     personalization: 'Program interest and name',
     tone: 'Professional',
     wordCount: 45,
@@ -60,12 +60,12 @@ const dummyEmailTemplates = [
   {
     id: 2,
     emailType: 'program-introduction',
-    subject: 'Discover Our Computer Science Program',
+    subject: 'Discover Our Federal IT Program',
     greeting: 'Dear Abdullah,',
-    body: 'We\'re excited to introduce you to our Computer Science program, which has been designed to provide students with comprehensive knowledge and practical skills in this field.\n\nOur program offers:\n• Expert faculty with industry experience\n• State-of-the-art facilities\n• Career placement assistance\n• Flexible scheduling options\n\nWe believe this program aligns perfectly with your interests and career goals.',
+    body: 'We\'re excited to introduce you to our Federal IT program, which has been designed to provide students with comprehensive knowledge and practical skills in this field.\n\nOur program offers:\n• Expert faculty with industry experience\n• State-of-the-art facilities\n• Career placement assistance\n• Flexible scheduling options\n\nWe believe this program aligns perfectly with your interests and career goals.',
     callToAction: 'Learn more about our program and application process',
     closing: 'Warm regards,',
-    signature: 'Academic Programs Team',
+    signature: 'Capture Solutions Team',
     personalization: 'Program interest and name',
     tone: 'Warm',
     wordCount: 52,
@@ -75,10 +75,10 @@ const dummyEmailTemplates = [
   {
     id: 3,
     emailType: 'event-invitation',
-    subject: 'You\'re Invited: University Open House',
+    subject: 'You\'re Invited: Agency Industry Day',
     greeting: 'Dear Abdullah,',
-    body: 'We\'re delighted to invite you to our upcoming University Open House, where you can explore our campus, meet faculty, and learn more about our Computer Science program.\n\nThis is a great opportunity to:\n• Tour our facilities\n• Meet current students\n• Speak with faculty\n• Get your questions answered\n\nWe\'d love to see you there!',
-    callToAction: 'RSVP for the Open House event',
+    body: 'We\'re delighted to invite you to our upcoming Agency Industry Day, where you can review our capabilities, meet the capture team, and learn more about our Federal IT offering.\n\nThis is a great opportunity to:\n• Tour our facilities\n• Meet current clients\n• Speak with capture leads\n• Get your questions answered\n\nWe\'d love to see you there!',
+    callToAction: 'RSVP for the Industry Day event',
     closing: 'Looking forward to seeing you,',
     signature: 'Events Team',
     personalization: 'Program interest and name',
@@ -122,10 +122,10 @@ export default function Communication() {
     };
   }, [i18n]);
 
-  // Force load admission namespace
+  // Force load recruitment namespace
   useEffect(() => {
     if (ready && i18n.language) {
-      i18n.loadNamespaces(['admission']);
+      i18n.loadNamespaces(['recruitment']);
     }
   }, [ready, i18n.language, i18n]);
 
@@ -185,7 +185,7 @@ export default function Communication() {
   }
 
   // Dashboard metrics
-  const weekComms = outgoing.filter(m => m.date >= '2026-06-03').length;
+  const weekComms = outgoing.filter(m => m.date >= '2026-10-03').length;
   const monthComms = outgoing.length;
   const emailsSent = outgoing.filter(m => m.type === 'Email').length;
   const smsSent = outgoing.filter(m => m.type === 'SMS').length;
@@ -209,7 +209,7 @@ export default function Communication() {
       data-tour-position="bottom"
     >
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-tour="2" data-tour-title-en="Page Title" data-tour-title-ar="عنوان الصفحة" data-tour-content-en="Communication & Logs module for admission team." data-tour-content-ar="وحدة التواصل والسجلات لفريق القبول.">
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-tour="2" data-tour-title-en="Page Title" data-tour-title-ar="عنوان الصفحة" data-tour-content-en="Communication & Logs module for recruitment team." data-tour-content-ar="وحدة التواصل والسجلات لفريق القبول.">
           {translate('communication.title')}
         </h1>
         <div className="flex gap-3">
@@ -252,9 +252,9 @@ export default function Communication() {
               <ReplySuggestions 
                 leadContext={selectedMessageForAI || {
                   name: 'Abdullah Al-Rashid',
-                  program: 'Computer Science',
+                  program: 'Federal IT',
                   status: 'Inquiry',
-                  lastContact: '2026-06-10',
+                  lastContact: '2026-10-10',
                   message: selectedMessageForAI?.preview || 'Thank you for the update on my application status.'
                 }}
                 onSelectSuggestion={handleAIReplyComplete}
@@ -286,7 +286,7 @@ export default function Communication() {
               <EmailTemplates 
                 lead={{
                   name: 'Abdullah Al-Rashid',
-                  program: 'Computer Science',
+                  program: 'Federal IT',
                   applicationId: 'APP-2026-001',
                   email: 'abdullah@email.com',
                   status: 'Inquiry'

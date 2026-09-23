@@ -95,12 +95,12 @@ export default function DirectorApprovalCenter() {
       amount: 0,
       status: "Pending",
       priority: "High",
-      date: "2026-03-15",
+      date: "2026-09-15",
       description: t('approvalCenter.descriptions.quantumComputing'),
       attachments: [t('approvalCenter.attachments.courseProposal'), t('approvalCenter.attachments.syllabusDraft')],
       comments: [
-        { user: t('approvalCenter.faculty.drNoura'), text: t('approvalCenter.comments.courseAligned'), date: "2026-03-15" },
-        { user: t('approvalCenter.teams.academicCommittee'), text: t('approvalCenter.comments.underReview'), date: "2026-03-16" }
+        { user: t('approvalCenter.faculty.drNoura'), text: t('approvalCenter.comments.courseAligned'), date: "2026-09-15" },
+        { user: t('approvalCenter.teams.academicCommittee'), text: t('approvalCenter.comments.underReview'), date: "2026-09-16" }
       ],
       trend: "up",
       urgency: "high",
@@ -118,11 +118,11 @@ export default function DirectorApprovalCenter() {
       amount: 0,
       status: "Pending",
       priority: "Medium",
-      date: "2026-03-14",
+      date: "2026-09-14",
       description: t('approvalCenter.descriptions.aiSpecialization'),
       attachments: [t('approvalCenter.attachments.curriculumChanges'), t('approvalCenter.attachments.industryFeedback')],
       comments: [
-        { user: t('approvalCenter.faculty.drKhalid'), text: t('approvalCenter.comments.updatedRequirements'), date: "2026-03-14" }
+        { user: t('approvalCenter.faculty.drKhalid'), text: t('approvalCenter.comments.updatedRequirements'), date: "2026-09-14" }
       ],
       trend: "stable",
       urgency: "medium",
@@ -130,7 +130,7 @@ export default function DirectorApprovalCenter() {
       categoryIcon: FiBookOpen,
       categoryColor: "blue"
     },
-    // Faculty & HR Approvals
+    // Team & HR Approvals
     {
       id: 3,
       category: "HR",
@@ -141,11 +141,11 @@ export default function DirectorApprovalCenter() {
       amount: 150000,
       status: "Pending",
       priority: "High",
-      date: "2026-03-13",
+      date: "2026-09-13",
       description: t('approvalCenter.descriptions.dataScienceProfessor'),
       attachments: [t('approvalCenter.attachments.jobDescription'), t('approvalCenter.attachments.candidateProfile')],
       comments: [
-        { user: t('approvalCenter.teams.hrTeam'), text: t('approvalCenter.comments.positionReviewed'), date: "2026-03-13" }
+        { user: t('approvalCenter.teams.hrTeam'), text: t('approvalCenter.comments.positionReviewed'), date: "2026-09-13" }
       ],
       trend: "up",
       urgency: "high",
@@ -164,11 +164,11 @@ export default function DirectorApprovalCenter() {
       amount: 250000,
       status: "Pending",
       priority: "High",
-      date: "2026-03-12",
+      date: "2026-09-12",
       description: t('approvalCenter.descriptions.aiResearchProject'),
       attachments: [t('approvalCenter.attachments.projectProposal'), t('approvalCenter.attachments.budgetBreakdown')],
       comments: [
-        { user: t('approvalCenter.teams.financeTeam'), text: t('approvalCenter.comments.budgetReview'), date: "2026-03-12" }
+        { user: t('approvalCenter.teams.financeTeam'), text: t('approvalCenter.comments.budgetReview'), date: "2026-09-12" }
       ],
       trend: "up",
       urgency: "high",
@@ -187,11 +187,11 @@ export default function DirectorApprovalCenter() {
       amount: 50000,
       status: "Pending",
       priority: "Medium",
-      date: "2026-03-11",
+      date: "2026-09-11",
       description: t('approvalCenter.descriptions.techSymposium'),
       attachments: [t('approvalCenter.attachments.eventPlan'), t('approvalCenter.attachments.budgetProposal')],
       comments: [
-        { user: t('approvalCenter.teams.eventCommittee'), text: t('approvalCenter.comments.venueSpeakers'), date: "2026-03-11" }
+        { user: t('approvalCenter.teams.eventCommittee'), text: t('approvalCenter.comments.venueSpeakers'), date: "2026-09-11" }
       ],
       trend: "down",
       urgency: "low",
@@ -210,11 +210,11 @@ export default function DirectorApprovalCenter() {
       amount: 0,
       status: "Pending",
       priority: "High",
-      date: "2026-03-10",
+      date: "2026-09-10",
       description: t('approvalCenter.descriptions.etecReport'),
       attachments: [t('approvalCenter.attachments.etecReport'), t('approvalCenter.attachments.supportingDocs')],
       comments: [
-        { user: t('approvalCenter.teams.qaTeam'), text: t('approvalCenter.comments.documentsCompiled'), date: "2026-03-10" }
+        { user: t('approvalCenter.teams.qaTeam'), text: t('approvalCenter.comments.documentsCompiled'), date: "2026-09-10" }
       ],
       trend: "up",
       urgency: "high",

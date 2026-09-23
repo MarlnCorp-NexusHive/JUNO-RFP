@@ -10,29 +10,29 @@ const complianceDomains = [
   { label: "Legal", value: 90, color: "#a21caf" },
 ];
 const checklist = [
-  { body: "ETEC", status: "Compliant" },
-  { body: "MoE", status: "Compliant" },
-  { body: "SCFHS", status: "Pending" },
+  { body: "FAR", status: "Compliant" },
+  { body: "GSA", status: "Compliant" },
+  { body: "NIST", status: "Pending" },
   { body: "TVTC", status: "Compliant" },
 ];
 const pendingItems = [
-  { item: "SCFHS annual renewal", due: "2026-06-30" },
-  { item: "Faculty contract updates", due: "2026-05-15" },
+  { item: "CMMC Level 2 renewal", due: "2026-10-30" },
+  { item: "Contract staffing updates", due: "2026-10-15" },
 ];
 const riskAlerts = [
-  { alert: "SCFHS compliance pending", severity: "High" },
+  { alert: "NIST compliance pending", severity: "High" },
   { alert: "Late fee policy update overdue", severity: "Medium" },
 ];
 const auditLogs = [
-  { date: "2026-04-10", user: "CFO Finance", action: "Budget change approved" },
-  { date: "2026-04-09", user: "Finance Admin", action: "Fund disbursement approved" },
+  { date: "2026-09-10", user: "CFO Finance", action: "Budget change approved" },
+  { date: "2026-09-09", user: "Finance Admin", action: "Fund disbursement approved" },
 ];
 const accessLogs = [
-  { date: "2026-04-10", user: "HoD EEE", module: "Finance" },
-  { date: "2026-04-09", user: "CFO Finance", module: "Finance" },
+  { date: "2026-09-10", user: "Capture Lead — Energy", module: "Finance" },
+  { date: "2026-09-09", user: "CFO Finance", module: "Finance" },
 ];
 const configChanges = [
-  { date: "2026-04-08", user: "Director", change: "Updated attendance policy" },
+  { date: "2026-09-08", user: "Director", change: "Updated attendance policy" },
 ];
 const anomaly = "Multiple logins from same staff ID across regions detected (AI flagged)";
 const policies = [
@@ -40,15 +40,15 @@ const policies = [
   { name: "HR Policy 2026", version: "v1.3", acknowledged: 6 },
 ];
 const auditCalendar = [
-  { type: "Academic", date: "2026-05-10", team: "Internal" },
-  { type: "Finance", date: "2026-06-15", team: "External" },
+  { type: "Academic", date: "2026-10-10", team: "Internal" },
+  { type: "Finance", date: "2026-10-15", team: "External" },
 ];
 const violations = [
-  { area: "Library", issue: "Fire safety non-compliance", status: "Escalated", due: "2026-04-30" },
-  { area: "Transport", issue: "Driver background check overdue", status: "Open", due: "2026-05-05" },
+  { area: "Library", issue: "Fire safety non-compliance", status: "Escalated", due: "2026-09-30" },
+  { area: "Transport", issue: "Driver background check overdue", status: "Open", due: "2026-10-05" },
 ];
 const reports = [
-  { name: "Compliance Report Q1 2026", type: "PDF" },
+  { name: "Compliance Report Q3 2026", type: "PDF" },
   { name: "Audit Summary 2026", type: "Excel" },
 ];
 const scores = [
@@ -57,7 +57,7 @@ const scores = [
   { dept: "Business", score: 91 },
 ];
 const aiSuggestions = [
-  "SCFHS renewal overdue – prioritize documentation.",
+  "NIST renewal overdue – prioritize documentation.",
   "Library fire safety non-compliance – escalate to CFO Infrastructure.",
 ];
 const accessMatrix = [

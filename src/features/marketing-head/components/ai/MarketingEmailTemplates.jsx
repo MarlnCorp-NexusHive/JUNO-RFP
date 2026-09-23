@@ -17,7 +17,7 @@ const MarketingEmailTemplates = ({ onEmailSent }) => {
     {
       id: 1,
       name: 'Ahmed Al-Rashid',
-      location: 'Riyadh',
+      location: 'Washington DC',
       interest: 'Computer Science',
       engagement: 'High',
       lastContact: '2026-11-15',
@@ -28,7 +28,7 @@ const MarketingEmailTemplates = ({ onEmailSent }) => {
     {
       id: 2,
       name: 'Fatima Al-Sheikh',
-      location: 'Jeddah',
+      location: 'New York',
       interest: 'Business Administration',
       engagement: 'Medium',
       lastContact: '2026-11-10',
@@ -39,7 +39,7 @@ const MarketingEmailTemplates = ({ onEmailSent }) => {
     {
       id: 3,
       name: 'Omar Al-Mansouri',
-      location: 'Dammam',
+      location: 'Chicago',
       interest: 'Engineering',
       engagement: 'Low',
       lastContact: '2026-11-05',

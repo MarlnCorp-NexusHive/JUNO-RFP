@@ -18,7 +18,7 @@ const auditLogs = [
     details: 'Re-verified document for ID-ADM3421',
     user: 'Noura Al-Zahra',
     role: 'Document Verifier',
-    timestamp: '2026-07-21 15:45:23',
+    timestamp: '2026-09-21 15:45:23',
     category: 'Document',
     status: 'Completed'
   },
@@ -28,7 +28,7 @@ const auditLogs = [
     details: 'Updated candidate application status to "Under Review"',
     user: 'Khalid Al-Sayed',
     role: 'Recruitment Specialist',
-    timestamp: '2026-07-21 14:30:12',
+    timestamp: '2026-09-21 14:30:12',
     category: 'Application',
     status: 'Completed'
   },
@@ -38,7 +38,7 @@ const auditLogs = [
     details: 'Uploaded new income certificate',
     user: 'Aisha Al-Hassan',
     role: 'Candidate',
-    timestamp: '2026-07-21 13:15:45',
+    timestamp: '2026-09-21 13:15:45',
     category: 'Document',
     status: 'Pending Review'
   },
@@ -48,7 +48,7 @@ const auditLogs = [
     details: 'Updated recruitment criteria for Engineering Team',
     user: 'Omar Al-Mutairi',
     role: 'Recruitment Head',
-    timestamp: '2026-07-21 11:20:33',
+    timestamp: '2026-09-21 11:20:33',
     category: 'Policy',
     status: 'Completed'
   },
@@ -58,7 +58,7 @@ const auditLogs = [
     details: 'Processed recruitment processing fee payment',
     user: 'Fatima Al-Rashid',
     role: 'Finance Officer',
-    timestamp: '2026-07-21 10:45:18',
+    timestamp: '2026-09-21 10:45:18',
     category: 'Payment',
     status: 'Completed'
   }

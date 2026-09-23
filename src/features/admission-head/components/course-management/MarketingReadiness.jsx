@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 const initialCourses = [
   {
     id: 1,
-    name: 'B.Tech Computer Science',
+    name: 'Cloud Migration RFP',
     checklist: {
       brochure: true,
       website: true,
@@ -13,7 +13,7 @@ const initialCourses = [
   },
   {
     id: 2,
-    name: 'MBA Finance',
+    name: 'RFP Finance',
     checklist: {
       brochure: false,
       website: true,
@@ -22,7 +22,7 @@ const initialCourses = [
   },
   {
     id: 3,
-    name: 'M.Sc Data Science',
+    name: 'Data Analytics Task Order',
     checklist: {
       brochure: true,
       website: false,

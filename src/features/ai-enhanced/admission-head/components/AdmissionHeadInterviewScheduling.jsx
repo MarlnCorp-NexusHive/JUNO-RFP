@@ -73,8 +73,8 @@ const AdmissionHeadInterviewScheduling = () => {
   ];
 
   const programs = [
-    "Computer Science",
-    "Business Administration",
+    "Federal IT",
+    "Professional Services",
     "Engineering",
     "Medicine",
     "Law",
@@ -94,7 +94,7 @@ const AdmissionHeadInterviewScheduling = () => {
 
     setIsLoading(true);
     try {
-      const prompt = `As an AI interview scheduling assistant for university admissions, please help schedule an interview with the following details:
+      const prompt = `As an AI interview scheduling assistant for proposal compliance, please help schedule an interview with the following details:
 
 Candidate Name: ${newInterview.candidateName}
 Program: ${newInterview.program}
@@ -233,7 +233,7 @@ try {
 4. Why did you choose this program?
 
 **Success Probability: 78%**
-- Strong academic background
+- Strong professional background
 - Relevant experience
 - Clear motivation
 

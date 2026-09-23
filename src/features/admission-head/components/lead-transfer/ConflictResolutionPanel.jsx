@@ -15,52 +15,52 @@ const ConflictResolutionPanel = () => {
       id: 1,
       leadName: "Abdullah Al-Rashid",
       applicationId: "APP001",
-      program: "B.Tech Computer Science",
+      program: "Cloud Migration RFP",
       currentOwners: ["Noura Al-Zahra", "Khalid Al-Sayed"],
-      lastInteraction: "2026-03-15",
+      lastInteraction: "2026-09-15",
       daysSinceLastInteraction: 5,
       conflictType: "Duplicate Entry",
       currentOwner: "Noura Al-Zahra",
       conflictingOwner: "Khalid Al-Sayed",
-      conflictDate: "2026-06-10",
+      conflictDate: "2026-10-10",
       resolution: "Pending"
     },
     {
       id: 2,
       leadName: "Mohammed Al-Saud",
       applicationId: "APP002",
-      program: "MBA",
+      program: "RFP",
       currentOwner: "Noura Al-Zahra",
-      lastInteraction: "2026-03-10",
+      lastInteraction: "2026-09-10",
       daysSinceLastInteraction: 10,
       conflictType: "Territory Overlap",
       conflictingOwner: "Layla Al-Mansour",
-      conflictDate: "2026-06-09",
+      conflictDate: "2026-10-09",
       resolution: "Resolved"
     },
     {
       id: 3,
       leadName: "Layla Al-Mansour",
       applicationId: "APP003",
-      program: "B.Tech Mechanical",
+      program: "Facilities Maintenance RFP",
       currentOwners: ["Noura Al-Zahra", "Khalid Al-Sayed"],
-      lastInteraction: "2026-03-12",
+      lastInteraction: "2026-09-12",
       daysSinceLastInteraction: 8,
       conflictType: "Multiple Assignments",
-      conflictDate: "2026-06-08",
+      conflictDate: "2026-10-08",
       resolution: "Pending"
     },
     {
       id: 4,
       leadName: "Fatima Al-Rashid",
       applicationId: "APP004",
-      program: "B.Tech Civil",
+      program: "Civil Engineering A&E",
       currentOwner: "Aisha Al-Hassan",
-      lastInteraction: "2026-03-08",
+      lastInteraction: "2026-09-08",
       daysSinceLastInteraction: 12,
       conflictType: "Duplicate Entry",
       conflictingOwner: "Omar Al-Mutairi",
-      conflictDate: "2026-06-07",
+      conflictDate: "2026-10-07",
       resolution: "Resolved"
     }
   ];
@@ -168,7 +168,7 @@ const ConflictResolutionPanel = () => {
                           className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                         />
                         <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                          Notify affected counselors
+                          Notify affected owners
                         </label>
                       </div>
 

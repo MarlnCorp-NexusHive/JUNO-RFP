@@ -101,18 +101,18 @@ export default function DirectorUserManagement() {
   }
 
   const pmInitialUsers = [
-    { id: 1, name: "Michael Anderson", role: "Proposal Manager", department: "Proposals", statusKey: "userStatuses.active", email: "michael.anderson@company.com", lastLogin: "2026-03-10", avatar: "MA", permissions: 12, joinDate: "2026-01-15" },
-    { id: 2, name: "David Reynolds", role: "Capture Manager", department: "Capture", statusKey: "userStatuses.active", email: "david.reynolds@company.com", lastLogin: "2026-03-09", avatar: "DR", permissions: 10, joinDate: "2025-11-20" },
-    { id: 3, name: "Sarah Chen", role: "Proposal Writer", department: "Proposals", statusKey: "userStatuses.active", email: "sarah.chen@company.com", lastLogin: "2026-03-11", avatar: "SC", permissions: 6, joinDate: "2026-02-01" },
-    { id: 4, name: "James Wilson", role: "Technical Lead", department: "Proposals", statusKey: "userStatuses.active", email: "james.wilson@company.com", lastLogin: "2026-03-08", avatar: "JW", permissions: 8, joinDate: "2025-09-15" },
-    { id: 5, name: "Emily Martinez", role: "Pricing Lead", department: "Proposals", statusKey: "userStatuses.inactive", email: "emily.martinez@company.com", lastLogin: "2026-02-28", avatar: "EM", permissions: 7, joinDate: "2025-06-10" },
+    { id: 1, name: "Michael Anderson", role: "Proposal Manager", department: "Proposals", statusKey: "userStatuses.active", email: "michael.anderson@company.com", lastLogin: "2026-09-10", avatar: "MA", permissions: 12, joinDate: "2026-09-15" },
+    { id: 2, name: "David Reynolds", role: "Capture Manager", department: "Capture", statusKey: "userStatuses.active", email: "david.reynolds@company.com", lastLogin: "2026-09-09", avatar: "DR", permissions: 10, joinDate: "2026-10-20" },
+    { id: 3, name: "Sarah Chen", role: "Proposal Writer", department: "Proposals", statusKey: "userStatuses.active", email: "sarah.chen@company.com", lastLogin: "2026-09-11", avatar: "SC", permissions: 6, joinDate: "2026-09-01" },
+    { id: 4, name: "James Wilson", role: "Technical Lead", department: "Proposals", statusKey: "userStatuses.active", email: "james.wilson@company.com", lastLogin: "2026-09-08", avatar: "JW", permissions: 8, joinDate: "2026-10-15" },
+    { id: 5, name: "Emily Martinez", role: "Pricing Lead", department: "Proposals", statusKey: "userStatuses.inactive", email: "emily.martinez@company.com", lastLogin: "2026-09-28", avatar: "EM", permissions: 7, joinDate: "2026-09-10" },
   ];
   const directorInitialUsers = [
-    { id: 1, nameKey: "demoUsers.johnDoe", roleKey: "roles.dean", departmentKey: "departments.science", statusKey: "userStatuses.active", email: "john.doe@company.com", lastLogin: "2026-03-10", avatar: "JD", permissions: 12, joinDate: "2026-01-15" },
-    { id: 2, nameKey: "demoUsers.janeSmith", roleKey: "roles.hod", departmentKey: "departments.eee", statusKey: "userStatuses.active", email: "jane.smith@company.com", lastLogin: "2026-03-09", avatar: "JS", permissions: 8, joinDate: "2026-03-20" },
-    { id: 3, nameKey: "demoUsers.mikeJohnson", roleKey: "roles.faculty", departmentKey: "departments.math", statusKey: "userStatuses.inactive", email: "mike.johnson@company.com", lastLogin: "2026-02-28", avatar: "MJ", permissions: 5, joinDate: "2026-06-10" },
-    { id: 4, nameKey: "demoUsers.sarahWilson", roleKey: "roles.faculty", departmentKey: "departments.computer", statusKey: "userStatuses.active", email: "sarah.wilson@company.com", lastLogin: "2026-03-11", avatar: "SW", permissions: 6, joinDate: "2026-08-15" },
-    { id: 5, nameKey: "demoUsers.davidBrown", roleKey: "roles.student", departmentKey: "departments.engineering", statusKey: "userStatuses.active", email: "david.brown@company.com", lastLogin: "2026-03-12", avatar: "DB", permissions: 3, joinDate: "2026-09-01" },
+    { id: 1, nameKey: "demoUsers.johnDoe", roleKey: "roles.dean", departmentKey: "departments.science", statusKey: "userStatuses.active", email: "john.doe@company.com", lastLogin: "2026-09-10", avatar: "JD", permissions: 12, joinDate: "2026-09-15" },
+    { id: 2, nameKey: "demoUsers.janeSmith", roleKey: "roles.hod", departmentKey: "departments.eee", statusKey: "userStatuses.active", email: "jane.smith@company.com", lastLogin: "2026-09-09", avatar: "JS", permissions: 8, joinDate: "2026-09-20" },
+    { id: 3, nameKey: "demoUsers.mikeJohnson", roleKey: "roles.faculty", departmentKey: "departments.math", statusKey: "userStatuses.inactive", email: "mike.johnson@company.com", lastLogin: "2026-09-28", avatar: "MJ", permissions: 5, joinDate: "2026-10-10" },
+    { id: 4, nameKey: "demoUsers.sarahWilson", roleKey: "roles.faculty", departmentKey: "departments.computer", statusKey: "userStatuses.active", email: "sarah.wilson@company.com", lastLogin: "2026-09-11", avatar: "SW", permissions: 6, joinDate: "2026-09-15" },
+    { id: 5, nameKey: "demoUsers.davidBrown", roleKey: "roles.student", departmentKey: "departments.engineering", statusKey: "userStatuses.active", email: "david.brown@company.com", lastLogin: "2026-09-12", avatar: "DB", permissions: 3, joinDate: "2026-09-01" },
   ];
   const initialUsers = isPM ? pmInitialUsers : directorInitialUsers;
   const [users, setUsers] = useState(initialUsers);

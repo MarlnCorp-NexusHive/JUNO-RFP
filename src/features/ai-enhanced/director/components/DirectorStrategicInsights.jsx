@@ -28,7 +28,7 @@ const DirectorStrategicInsights = ({ onInsightsGenerated }) => {
         focus: selectedFocus,
         context: {
           university: 'MARLN Corporation',
-          location: 'Saudi Arabia',
+          location: 'United States',
           type: 'Higher Education'
         }
       });
@@ -48,10 +48,10 @@ const DirectorStrategicInsights = ({ onInsightsGenerated }) => {
 
   // Get focus options
   const focusOptions = [
-    { value: 'overall', label: 'Overall Performance', description: 'Comprehensive university performance analysis' },
-    { value: 'academic', label: 'Academic Excellence', description: 'Academic programs and student success metrics' },
+    { value: 'overall', label: 'Overall Performance', description: 'Comprehensive capture portfolio performance analysis' },
+    { value: 'academic', label: 'Capture Excellence', description: 'Proposal programs and candidate success metrics' },
     { value: 'financial', label: 'Financial Health', description: 'Revenue, costs, and financial sustainability' },
-    { value: 'enrollment', label: 'Enrollment Trends', description: 'Student recruitment and retention analysis' },
+    { value: 'enrollment', label: 'Pipeline Trends', description: 'Candidate recruitment and retention analysis' },
     { value: 'reputation', label: 'Reputation & Brand', description: 'Market position and brand strength' },
     { value: 'operations', label: 'Operational Efficiency', description: 'Process optimization and resource utilization' }
   ];

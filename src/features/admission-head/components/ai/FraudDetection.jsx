@@ -101,7 +101,7 @@ const FraudDetection = ({ paymentData, onAnalysisComplete }) => {
         item: isRTLMode ? "التحقق من معلومات المتقدمين" : "Verify applicant information",
         priority: "Medium",
         timeline: isRTLMode ? "خلال 24 ساعة" : "Within 24 hours",
-        assigned: isRTLMode ? "فريق القبول" : "Admissions Team"
+        assigned: isRTLMode ? "فريق القبول" : "Capture Team"
       },
       {
         item: isRTLMode ? "تحديث قواعد الكشف" : "Update detection rules",

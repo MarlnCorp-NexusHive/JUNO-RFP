@@ -17,7 +17,7 @@ const alerts = [
     status: 'Open',
     action: 'Automated verification system in progress',
     owner: 'Noura Al-Zahra',
-    dueDate: '2026-08-15'
+    dueDate: '2026-09-15'
   },
   {
     id: 'ALERT002',
@@ -27,7 +27,7 @@ const alerts = [
     status: 'Resolved',
     action: 'Updated policy and staff training completed',
     owner: 'Khalid Al-Sayed',
-    dueDate: '2026-07-20'
+    dueDate: '2026-09-20'
   },
   {
     id: 'ALERT003',
@@ -37,7 +37,7 @@ const alerts = [
     status: 'Open',
     action: 'Enhanced encryption and access controls',
     owner: 'Aisha Al-Hassan',
-    dueDate: '2026-08-30'
+    dueDate: '2026-09-30'
   },
   {
     id: 'ALERT004',
@@ -47,7 +47,7 @@ const alerts = [
     status: 'Resolved',
     action: 'Training sessions scheduled',
     owner: 'Omar Al-Mutairi',
-    dueDate: '2026-07-10'
+    dueDate: '2026-09-10'
   }
 ];
 

@@ -9,24 +9,24 @@ import FraudDetection from "../components/ai/FraudDetection";
 import PaymentForecasting from "../components/ai/PaymentForecasting";
 // Mock data
 const mockApplicants = [
-  { id: 'A001', name: 'Abdullah Al-Rashid', dept: 'Engineering', program: 'B.Tech', nationality: 'Saudi' },
-  { id: 'A002', name: 'Layla Al-Mansour', dept: 'Business', program: 'MBA', nationality: 'Saudi' },
-  { id: 'A003', name: 'Omar Al-Mutairi', dept: 'Engineering', program: 'M.Tech', nationality: 'Saudi' },
+  { id: 'A001', name: 'Abdullah Al-Rashid', dept: 'Engineering', program: 'IT Services BPA', nationality: 'American' },
+  { id: 'A002', name: 'Layla Al-Mansour', dept: 'Business', program: 'RFP', nationality: 'American' },
+  { id: 'A003', name: 'Omar Al-Mutairi', dept: 'Engineering', program: 'Technical Services TO', nationality: 'American' },
 ];
 
 // Mock data will be localized in the component
 const mockInvoices = [
-  { id: 'INV001', applicant: mockApplicants[0], type: 'Application Fee', amount: 1500, status: 'Paid', date: '2026-06-10', due: '2026-06-15', mode: 'Online', notes: '', discount: 0 },
-  { id: 'INV002', applicant: mockApplicants[1], type: 'Admission Fee', amount: 50000, status: 'Unpaid', date: '2026-06-09', due: '2026-06-20', mode: '', notes: '', discount: 5000 },
-  { id: 'INV003', applicant: mockApplicants[2], type: 'Security Deposit', amount: 10000, status: 'Partial', date: '2026-06-08', due: '2026-06-18', mode: 'Bank Transfer', notes: '', discount: 0 },
+  { id: 'INV001', applicant: mockApplicants[0], type: 'Application Fee', amount: 1500, status: 'Paid', date: '2026-10-10', due: '2026-10-15', mode: 'Online', notes: '', discount: 0 },
+  { id: 'INV002', applicant: mockApplicants[1], type: 'Admission Fee', amount: 50000, status: 'Unpaid', date: '2026-10-09', due: '2026-10-20', mode: '', notes: '', discount: 5000 },
+  { id: 'INV003', applicant: mockApplicants[2], type: 'Security Deposit', amount: 10000, status: 'Partial', date: '2026-10-08', due: '2026-10-18', mode: 'Bank Transfer', notes: '', discount: 0 },
 ];
 const mockPayments = [
-  { id: 'PAY001', invoice: 'INV001', applicant: mockApplicants[0], type: 'Application Fee', amount: 1500, status: 'Success', date: '2026-06-10', mode: 'Card', ref: 'TXN123', receipt: true },
-  { id: 'PAY002', invoice: 'INV003', applicant: mockApplicants[2], type: 'Security Deposit', amount: 5000, status: 'Pending', date: '2026-06-09', mode: 'UPI', ref: 'TXN124', receipt: false },
-  { id: 'PAY003', invoice: 'INV003', applicant: mockApplicants[2], type: 'Security Deposit', amount: 5000, status: 'Success', date: '2026-06-10', mode: 'Bank Transfer', ref: 'TXN125', receipt: true },
+  { id: 'PAY001', invoice: 'INV001', applicant: mockApplicants[0], type: 'Application Fee', amount: 1500, status: 'Success', date: '2026-10-10', mode: 'Card', ref: 'TXN123', receipt: true },
+  { id: 'PAY002', invoice: 'INV003', applicant: mockApplicants[2], type: 'Security Deposit', amount: 5000, status: 'Pending', date: '2026-10-09', mode: 'UPI', ref: 'TXN124', receipt: false },
+  { id: 'PAY003', invoice: 'INV003', applicant: mockApplicants[2], type: 'Security Deposit', amount: 5000, status: 'Success', date: '2026-10-10', mode: 'Bank Transfer', ref: 'TXN125', receipt: true },
 ];
 const mockRefunds = [
-  { id: 'RF001', applicant: mockApplicants[1], amount: 5000, status: 'Requested', mode: 'Original', date: '2026-06-11', reason: 'Overpayment' },
+  { id: 'RF001', applicant: mockApplicants[1], amount: 5000, status: 'Requested', mode: 'Original', date: '2026-10-11', reason: 'Overpayment' },
 ];
 const mockReports = [
   { id: 1, label: 'June 2026', collected: 66500, pending: 50000, refunds: 5000 },
@@ -52,14 +52,14 @@ export default function Payments() {
   
   // Localized mock data
   const localizedInvoices = [
-    { id: 'INV001', applicant: mockApplicants[0], type: t('payments.types.applicationFee'), amount: 1500, status: t('payments.status.paid'), date: '2026-06-10', due: '2026-06-15', mode: t('payments.modes.online'), notes: '', discount: 0 },
-    { id: 'INV002', applicant: mockApplicants[1], type: t('payments.types.admissionFee'), amount: 50000, status: t('payments.status.unpaid'), date: '2026-06-09', due: '2026-06-20', mode: '', notes: '', discount: 5000 },
-    { id: 'INV003', applicant: mockApplicants[2], type: t('payments.types.securityDeposit'), amount: 10000, status: t('payments.status.partial'), date: '2026-06-08', due: '2026-06-18', mode: t('payments.modes.bankTransfer'), notes: '', discount: 0 },
+    { id: 'INV001', applicant: mockApplicants[0], type: t('payments.types.applicationFee'), amount: 1500, status: t('payments.status.paid'), date: '2026-10-10', due: '2026-10-15', mode: t('payments.modes.online'), notes: '', discount: 0 },
+    { id: 'INV002', applicant: mockApplicants[1], type: t('payments.types.admissionFee'), amount: 50000, status: t('payments.status.unpaid'), date: '2026-10-09', due: '2026-10-20', mode: '', notes: '', discount: 5000 },
+    { id: 'INV003', applicant: mockApplicants[2], type: t('payments.types.securityDeposit'), amount: 10000, status: t('payments.status.partial'), date: '2026-10-08', due: '2026-10-18', mode: t('payments.modes.bankTransfer'), notes: '', discount: 0 },
   ];
   const localizedPayments = [
-    { id: 'PAY001', invoice: 'INV001', applicant: mockApplicants[0], type: t('payments.types.applicationFee'), amount: 1500, status: 'Success', date: '2026-06-10', mode: t('payments.modes.card'), ref: 'TXN123', receipt: true },
-    { id: 'PAY002', invoice: 'INV003', applicant: mockApplicants[2], type: t('payments.types.securityDeposit'), amount: 5000, status: 'Pending', date: '2026-06-09', mode: 'UPI', ref: 'TXN124', receipt: false },
-    { id: 'PAY003', invoice: 'INV003', applicant: mockApplicants[2], type: t('payments.types.securityDeposit'), amount: 5000, status: 'Success', date: '2026-06-10', mode: t('payments.modes.bankTransfer'), ref: 'TXN125', receipt: true },
+    { id: 'PAY001', invoice: 'INV001', applicant: mockApplicants[0], type: t('payments.types.applicationFee'), amount: 1500, status: 'Success', date: '2026-10-10', mode: t('payments.modes.card'), ref: 'TXN123', receipt: true },
+    { id: 'PAY002', invoice: 'INV003', applicant: mockApplicants[2], type: t('payments.types.securityDeposit'), amount: 5000, status: 'Pending', date: '2026-10-09', mode: 'UPI', ref: 'TXN124', receipt: false },
+    { id: 'PAY003', invoice: 'INV003', applicant: mockApplicants[2], type: t('payments.types.securityDeposit'), amount: 5000, status: 'Success', date: '2026-10-10', mode: t('payments.modes.bankTransfer'), ref: 'TXN125', receipt: true },
   ];
   
   // State
@@ -73,8 +73,8 @@ export default function Payments() {
   const [toast, setToast] = useState(null);
 
   // Dashboard metrics
-  const todayCollected = payments.filter(p => p.date === '2026-06-10' && p.status === 'Success').reduce((a, b) => a + b.amount, 0);
-  const monthCollected = payments.filter(p => p.date >= '2026-06-01' && p.status === 'Success').reduce((a, b) => a + b.amount, 0);
+  const todayCollected = payments.filter(p => p.date === '2026-10-10' && p.status === 'Success').reduce((a, b) => a + b.amount, 0);
+  const monthCollected = payments.filter(p => p.date >= '2026-10-01' && p.status === 'Success').reduce((a, b) => a + b.amount, 0);
   const ytdCollected = payments.filter(p => p.status === 'Success').reduce((a, b) => a + b.amount, 0);
   const pendingInvoices = invoices.filter(i => i.status !== 'Paid').length;
   const awaitingConfirmation = payments.filter(p => p.status === 'Pending').length;
@@ -180,7 +180,7 @@ export default function Payments() {
       data-tour-position="bottom"
       dir={isRTLMode ? 'rtl' : 'ltr'}
     >
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8 tracking-tight" data-tour="2" data-tour-title-en="Page Title" data-tour-title-ar="عنوان الصفحة" data-tour-content-en="Payments Management for admissions." data-tour-content-ar="إدارة المدفوعات للقبول.">
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8 tracking-tight" data-tour="2" data-tour-title-en="Page Title" data-tour-title-ar="عنوان الصفحة" data-tour-content-en="Payments Management for recruitments." data-tour-content-ar="إدارة المدفوعات للقبول.">
         {isRTLMode ? 'إدارة المدفوعات' : t('payments.title')}
       </h1>
 

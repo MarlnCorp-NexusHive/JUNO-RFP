@@ -55,7 +55,7 @@ Deployment:
 - IaC via Terraform, CI/CD GitHub Actions with automated tests
 - RPO 1h, RTO 4h, multi-AZ active-passive failover`,
     isDemo: true,
-    uploadedAt: "2025-11-01T10:00:00.000Z",
+    uploadedAt: "2026-10-01T10:00:00.000Z",
   },
   {
     id: "demo_product_rfp_module",
@@ -84,7 +84,7 @@ Performance targets:
 - Styled export: < 8 min for 200-section response
 - Concurrent users: 50+ per tenant on standard tier`,
     isDemo: true,
-    uploadedAt: "2025-11-01T10:00:00.000Z",
+    uploadedAt: "2026-10-01T10:00:00.000Z",
   },
   {
     id: "demo_integration_erp",
@@ -110,7 +110,7 @@ Auth: OAuth2 client credentials per tenant
 Error handling: idempotent webhook delivery with retry (exponential backoff, max 24h)
 Data mapping: JSON schema v2 with field-level validation`,
     isDemo: true,
-    uploadedAt: "2025-11-01T10:00:00.000Z",
+    uploadedAt: "2026-10-01T10:00:00.000Z",
   },
 ];
 

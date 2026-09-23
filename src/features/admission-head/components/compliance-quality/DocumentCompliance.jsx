@@ -57,7 +57,7 @@ const pendingDocuments = [
     candidate: 'John Doe',
     documentType: 'Nationality Proof',
     status: 'Pending',
-    uploadedDate: '2026-07-15',
+    uploadedDate: '2026-09-15',
     expiryDate: '2026-12-31',
     department: 'Engineering Team',
     priority: 'High'
@@ -67,8 +67,8 @@ const pendingDocuments = [
     candidate: 'Jane Smith',
     documentType: 'Caste Certificate',
     status: 'Expired',
-    uploadedDate: '2026-06-20',
-    expiryDate: '2026-07-01',
+    uploadedDate: '2026-10-20',
+    expiryDate: '2026-09-01',
     department: 'Sales Team',
     priority: 'Critical'
   },

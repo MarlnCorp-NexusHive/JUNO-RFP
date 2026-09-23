@@ -180,7 +180,7 @@
   "sortBy": "Sort by",
   "allCategories": "All Categories",
   "revenue": "Revenue",
-  "enrollment": "Enrollment",
+  "enrollment": "Pipeline",
   "financial": "Financial",
   "academic": "Academic",
   "operational": "Operational",
@@ -217,7 +217,7 @@
   "viewHistoryDesc": "Review past forecasts and trends",
   "forecastTypes": "Forecast Types",
   "revenueDesc": "Revenue forecasting",
-  "enrollmentDesc": "Enrollment forecasting",
+  "enrollmentDesc": "Pipeline forecasting",
   "financialDesc": "Financial forecasting",
   "academicDesc": "Academic forecasting",
   "operationalDesc": "Operational forecasting",
@@ -356,7 +356,7 @@
 }
 
 },
-"admission": {
+"recruitment": {
   "dashboard": {
     "title": "Admission Head Dashboard",
     "subtitle": "AI-Enhanced Admission Management",
@@ -378,7 +378,7 @@
     "latestApplicationProcessing": "Latest Application Processing",
     "latestDocumentVerification": "Latest Document Verification",
     "latestInterviewScheduling": "Latest Interview Scheduling",
-    "studentName": "Student Name",
+    "studentName": "Candidate Name",
     "program": "Program",
     "status": "Status",
     "score": "Score",
@@ -395,7 +395,7 @@
   },
   "documentVerification": {
     "title": "Document Verification",
-    "subtitle": "Use AI to verify the authenticity and completeness of admission documents",
+    "subtitle": "Use AI to verify the authenticity and completeness of recruitment documents",
     "documents": "Documents",
     "verification": "Verification",
     "history": "History",
@@ -420,7 +420,7 @@
     "scheduled": "Scheduled",
     "history": "History",
     "scheduleNewInterview": "Schedule New Interview",
-    "studentName": "Student Name",
+    "studentName": "Candidate Name",
     "enterStudentName": "Enter student name",
     "program": "Program",
     "selectProgram": "Select program",

@@ -57,10 +57,10 @@ const employeeDemographics = {
 };
 
 const teamAnalytics = [
-  { year: "2019", FullTime: 400, PartTime: 200, Contract: 50 },
-  { year: "2020", FullTime: 420, PartTime: 210, Contract: 60 },
-  { year: "2026", FullTime: 430, PartTime: 220, Contract: 70 },
-  { year: "2026", FullTime: 440, PartTime: 230, Contract: 80 },
+  { year: "2022", FullTime: 400, PartTime: 200, Contract: 50 },
+  { year: "2023", FullTime: 420, PartTime: 210, Contract: 60 },
+  { year: "2024", FullTime: 430, PartTime: 220, Contract: 70 },
+  { year: "2025", FullTime: 440, PartTime: 230, Contract: 80 },
   { year: "2026", FullTime: 450, PartTime: 240, Contract: 90 },
 ];
 
@@ -72,7 +72,7 @@ const recruitmentMetrics = {
     { stage: "Offers", count: 1200, conversion: 24 },
     { stage: "Onboarding", count: 1000, conversion: 20 },
   ],
-  teamEnrollment: [
+  teamPipeline: [
     { team: "IT Team", onboarded: 250, capacity: 300, trend: "up" },
     { team: "Sales Team", onboarded: 180, capacity: 200, trend: "up" },
     { team: "Engineering Team", onboarded: 150, capacity: 200, trend: "down" },
@@ -131,8 +131,8 @@ const financialMetrics = {
     { department: "Marketing Team", allocated: 8000000, used: 7200000 },
   ],
   yearOverYear: [
-    { year: "2026", revenue: 20000000, cost: 15000000 },
-    { year: "2026", revenue: 23000000, cost: 17000000 },
+    { year: "2024", revenue: 20000000, cost: 15000000 },
+    { year: "2025", revenue: 23000000, cost: 17000000 },
     { year: "2026", revenue: 25000000, cost: 18000000 },
   ],
 };
@@ -239,8 +239,8 @@ const clientMetrics = {
     { team: "Marketing Team", rate: 98 },
   ],
   avgRevenueTrend: [
-    { year: "2026", avgRevenue: 700000 },
-    { year: "2026", avgRevenue: 800000 },
+    { year: "2024", avgRevenue: 700000 },
+    { year: "2025", avgRevenue: 800000 },
     { year: "2026", avgRevenue: 900000 },
   ],
   topClients: [
@@ -254,9 +254,9 @@ const clientMetrics = {
 
 const complianceMetrics = {
   accreditationStatus: [
-    { standard: "ETEC", score: 4.2, status: "Accredited", nextReview: "2026" },
-    { standard: "MoE", score: 4.0, status: "Accredited", nextReview: "2026" },
-    { standard: "SCFHS", score: 4.5, status: "Accredited", nextReview: "2026" },
+    { standard: "FAR", score: 4.2, status: "Accredited", nextReview: "2026" },
+    { standard: "GSA", score: 4.0, status: "Accredited", nextReview: "2026" },
+    { standard: "NIST", score: 4.5, status: "Accredited", nextReview: "2026" },
     { standard: "TVTC", score: 4.3, status: "Accredited", nextReview: "2026" },
   ],
   auditStatus: [
@@ -343,10 +343,10 @@ const contentHubData = {
     { category: "Research", projects: 6, reuseRate: 78 },
   ],
   boilerplateUsage: [
-    { section: "Technical Approach", uses: 45, lastUpdated: "2026-02" },
-    { section: "Management", uses: 38, lastUpdated: "2026-01" },
-    { section: "Past Performance", uses: 52, lastUpdated: "2026-02" },
-    { section: "Pricing", uses: 28, lastUpdated: "2025-12" },
+    { section: "Technical Approach", uses: 45, lastUpdated: "2026-09" },
+    { section: "Management", uses: 38, lastUpdated: "2026-09" },
+    { section: "Past Performance", uses: 52, lastUpdated: "2026-09" },
+    { section: "Pricing", uses: 28, lastUpdated: "2026-10" },
   ],
   contentLibrary: [
     { type: "Resumes", count: 120, updated: 35 },
@@ -454,7 +454,7 @@ export default function DirectorAnalyticsReports() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.admissions.admissionFunnel')}</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.recruitments.admissionFunnel')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={recruitmentMetrics.conversionFunnel} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -466,16 +466,16 @@ export default function DirectorAnalyticsReports() {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Program-wise Enrollment */}
+        {/* Program-wise Pipeline */}
         <motion.div data-tour="4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.admissions.programEnrollment')}</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.recruitments.programPipeline')}</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <ComposedChart data={recruitmentMetrics.teamEnrollment} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <ComposedChart data={recruitmentMetrics.teamPipeline} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="team" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
@@ -493,7 +493,7 @@ export default function DirectorAnalyticsReports() {
           transition={{ delay: 0.2 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.admissions.geographicDistribution')}</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.recruitments.geographicDistribution')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie
@@ -523,7 +523,7 @@ export default function DirectorAnalyticsReports() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.admissions.applicationConversionRate')}</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.recruitments.applicationConversionRate')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={recruitmentMetrics.conversionRateByTeam} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -534,14 +534,14 @@ export default function DirectorAnalyticsReports() {
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
-        {/* Enrollment Trend */}
+        {/* Pipeline Trend */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.admissions.enrollmentTrend')}</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.recruitments.enrollmentTrend')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={recruitmentMetrics.onboardingTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -559,7 +559,7 @@ export default function DirectorAnalyticsReports() {
           transition={{ delay: 0.2 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
         >
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.admissions.topSourceRegions')}</h3>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{t('analyticsReports.sections.recruitments.topSourceRegions')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={recruitmentMetrics.topSourceRegions} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -739,7 +739,7 @@ export default function DirectorAnalyticsReports() {
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
-        {/* Faculty Performance */}
+        {/* Team Performance */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -758,7 +758,7 @@ export default function DirectorAnalyticsReports() {
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
-        {/* Student Demographics */}
+        {/* Lead Demographics */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -824,7 +824,7 @@ export default function DirectorAnalyticsReports() {
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
-        {/* Enrollment by Course */}
+        {/* Pipeline by Course */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -944,7 +944,7 @@ export default function DirectorAnalyticsReports() {
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
-        {/* Student Satisfaction Trend */}
+        {/* Client Satisfaction Trend */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1462,7 +1462,7 @@ export default function DirectorAnalyticsReports() {
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
                 <option value="All">{t('analyticsReports.allDepartments')}</option>
-                {recruitmentMetrics.teamEnrollment.map((dept) => (
+                {recruitmentMetrics.teamPipeline.map((dept) => (
                   <option key={dept.team} value={dept.team}>
                     {dept.team}
                   </option>

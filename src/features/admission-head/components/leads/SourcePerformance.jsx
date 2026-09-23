@@ -15,7 +15,7 @@ const sourceData = [
     trendValue: '12%',
     quality: 'high',
     recentLeads: [
-      { name: 'Abdullah Al-Rashid', program: 'MBA', status: 'Qualified', time: '2h ago' },
+      { name: 'Abdullah Al-Rashid', program: 'RFP', status: 'Qualified', time: '2h ago' },
       { name: 'Layla Al-Mansour', program: 'MS CS', status: 'Contacted', time: '3h ago' },
       { name: 'Khalid Al-Sayed', program: 'PhD', status: 'New', time: '5h ago' }
     ]
@@ -31,7 +31,7 @@ const sourceData = [
     trendValue: '8%',
     quality: 'medium',
     recentLeads: [
-      { name: 'Omar Al-Mutairi', program: 'MBA', status: 'Qualified', time: '1h ago' },
+      { name: 'Omar Al-Mutairi', program: 'RFP', status: 'Qualified', time: '1h ago' },
       { name: 'Aisha Al-Hassan', program: 'MS DS', status: 'Contacted', time: '4h ago' },
       { name: 'Fatima Al-Rashid', program: 'PhD', status: 'New', time: '6h ago' }
     ]
@@ -47,7 +47,7 @@ const sourceData = [
     trendValue: '15%',
     quality: 'high',
     recentLeads: [
-      { name: 'Noura Al-Zahra', program: 'MBA', status: 'Qualified', time: '2h ago' },
+      { name: 'Noura Al-Zahra', program: 'RFP', status: 'Qualified', time: '2h ago' },
       { name: 'Yousef Al-Harbi', program: 'MS CS', status: 'Contacted', time: '3h ago' },
       { name: 'Maha Al-Shehri', program: 'PhD', status: 'New', time: '4h ago' }
     ]
@@ -63,7 +63,7 @@ const sourceData = [
     trendValue: '5%',
     quality: 'medium',
     recentLeads: [
-      { name: 'Sami Al-Shammari', program: 'MBA', status: 'Qualified', time: '1h ago' },
+      { name: 'Sami Al-Shammari', program: 'RFP', status: 'Qualified', time: '1h ago' },
       { name: 'Dina Al-Rashid', program: 'MS DS', status: 'Contacted', time: '2h ago' },
       { name: 'Tariq Al-Mansour', program: 'PhD', status: 'New', time: '3h ago' }
     ]

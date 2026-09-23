@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 export default function AdmissionSpocDashboard() {
   const { t } = useTranslation('welcome');
   const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
-  const welcomeMessage = t(user?.username || 'admission_spoc');
+  const welcomeMessage = t(user?.username || 'recruitment_spoc');
   return (
     <>
       <h1 className="text-3xl font-bold text-primary mb-2">Welcome, {user?.displayName || 'Admission SPOC'}!</h1>
@@ -25,13 +25,13 @@ export default function AdmissionSpocDashboard() {
         <div className="bg-card rounded-2xl shadow p-6 flex flex-col items-start">
           <span className="text-2xl mb-2">📊</span>
           <div className="font-semibold text-lg mb-1 text-foreground">Reports</div>
-          <div className="text-muted-foreground mb-4">Analyze admission statistics and results.</div>
+          <div className="text-muted-foreground mb-4">Analyze recruitment statistics and results.</div>
           <button className="text-primary font-semibold hover:underline">Go to Reports</button>
         </div>
         <div className="bg-card rounded-2xl shadow p-6 flex flex-col items-start">
           <span className="text-2xl mb-2">⚙️</span>
           <div className="font-semibold text-lg mb-1 text-foreground">Settings</div>
-          <div className="text-muted-foreground mb-4">Configure admission preferences.</div>
+          <div className="text-muted-foreground mb-4">Configure recruitment preferences.</div>
           <button className="text-primary font-semibold hover:underline">Settings</button>
         </div>
       </div>

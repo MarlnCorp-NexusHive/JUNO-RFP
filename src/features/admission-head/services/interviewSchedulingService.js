@@ -5,19 +5,19 @@ class InterviewSchedulingService {
   constructor() {
     this.scheduledInterviews = [];
     this.interviewTypes = [
-      "Academic Interview",
+      "Capability Interview",
       "English Proficiency Interview", 
       "Technical Interview",
       "General Assessment",
-      "Scholarship Interview",
+      "Oral Presentation Prep",
       "Admission Committee Interview",
-      "Faculty Interview",
+      "Panel Interview",
       "Program-Specific Interview"
     ];
     
     this.programs = [
-      "Computer Science",
-      "Business Administration", 
+      "Federal IT",
+      "Professional Services", 
       "Engineering",
       "Medicine",
       "Law",
@@ -72,10 +72,10 @@ class InterviewSchedulingService {
 
   // Build AI prompt for interview scheduling
   buildSchedulingPrompt(interviewData, language) {
-    return `As an AI interview scheduling assistant for university admissions, please help schedule an interview with the following details:
+    return `As an AI interview scheduling assistant for proposal compliance, please help schedule an interview with the following details:
 
 **Student Information:**
-- Student Name: ${interviewData.studentName}
+- Candidate Name: ${interviewData.studentName}
 - Program: ${interviewData.program}
 - Interview Type: ${interviewData.interviewType || 'General Assessment'}
 - Preferred Date: ${interviewData.preferredDate || 'Not specified'}
@@ -281,7 +281,7 @@ Respond in ${language === 'ar' ? 'Arabic' : 'English'} with detailed recommendat
       requiredDocuments: [
         language === 'ar' ? 
           'الوثائق المطلوبة للقبول' :
-          'Required admission documents'
+          'Required recruitment documents'
       ],
       interviewDuration: 60,
       specialConsiderations: [],

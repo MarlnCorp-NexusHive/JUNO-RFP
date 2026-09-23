@@ -36,21 +36,21 @@ const BulkTransferPanel = ({ selectedLeads, setSelectedLeads }) => {
       id: 1,
       name: "Abdullah Al-Rashid",
       applicationId: "APP001",
-      program: "B.Tech Computer Science",
+      program: "Cloud Migration RFP",
       currentOwner: "Noura Al-Zahra"
     },
     {
       id: 2,
       name: "Layla Al-Mansour",
       applicationId: "APP002",
-      program: "MBA",
+      program: "RFP",
       currentOwner: "Khalid Al-Sayed"
     },
     {
       id: 3,
       name: "Omar Al-Mutairi",
       applicationId: "APP003",
-      program: "B.Tech Mechanical",
+      program: "Facilities Maintenance RFP",
       currentOwner: "Aisha Al-Hassan"
     }
   ];

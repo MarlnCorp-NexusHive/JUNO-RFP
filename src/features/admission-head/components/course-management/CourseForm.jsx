@@ -20,7 +20,7 @@ const CourseForm = () => {
     visibility: 'Internal',
   });
 
-  const [scholarships, setScholarships] = useState([
+  const [scholarships, setIncentives] = useState([
     { type: '', amount: '', criteria: '' }
   ]);
 
@@ -32,18 +32,18 @@ const CourseForm = () => {
     }));
   };
 
-  const handleScholarshipChange = (index, field, value) => {
-    const newScholarships = [...scholarships];
-    newScholarships[index][field] = value;
-    setScholarships(newScholarships);
+  const handleIncentiveChange = (index, field, value) => {
+    const newIncentives = [...scholarships];
+    newIncentives[index][field] = value;
+    setIncentives(newIncentives);
   };
 
-  const addScholarship = () => {
-    setScholarships([...scholarships, { type: '', amount: '', criteria: '' }]);
+  const addIncentive = () => {
+    setIncentives([...scholarships, { type: '', amount: '', criteria: '' }]);
   };
 
-  const removeScholarship = (index) => {
-    setScholarships(scholarships.filter((_, i) => i !== index));
+  const removeIncentive = (index) => {
+    setIncentives(scholarships.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e) => {
@@ -197,17 +197,17 @@ const CourseForm = () => {
             </div>
           </div>
 
-          {/* Scholarships */}
+          {/* Incentives */}
           <div className="mt-6">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Scholarships</h4>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Incentives</h4>
               <button
                 type="button"
-                onClick={addScholarship}
+                onClick={addIncentive}
                 className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200"
               >
                 <PlusIcon className="h-4 w-4 mr-1" />
-                Add Scholarship
+                Add Incentive
               </button>
             </div>
             {scholarships.map((scholarship, index) => (
@@ -217,7 +217,7 @@ const CourseForm = () => {
                     type="text"
                     placeholder="Type"
                     value={scholarship.type}
-                    onChange={(e) => handleScholarshipChange(index, 'type', e.target.value)}
+                    onChange={(e) => handleIncentiveChange(index, 'type', e.target.value)}
                     className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
@@ -226,7 +226,7 @@ const CourseForm = () => {
                     type="number"
                     placeholder="Amount"
                     value={scholarship.amount}
-                    onChange={(e) => handleScholarshipChange(index, 'amount', e.target.value)}
+                    onChange={(e) => handleIncentiveChange(index, 'amount', e.target.value)}
                     className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
@@ -235,12 +235,12 @@ const CourseForm = () => {
                     type="text"
                     placeholder="Criteria"
                     value={scholarship.criteria}
-                    onChange={(e) => handleScholarshipChange(index, 'criteria', e.target.value)}
+                    onChange={(e) => handleIncentiveChange(index, 'criteria', e.target.value)}
                     className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                   <button
                     type="button"
-                    onClick={() => removeScholarship(index)}
+                    onClick={() => removeIncentive(index)}
                     className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                   >
                     <XMarkIcon className="h-5 w-5" />

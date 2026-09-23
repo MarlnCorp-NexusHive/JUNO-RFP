@@ -4,16 +4,16 @@ import { useTranslation } from 'react-i18next';
 
 // Demo data for each module
 const teamMembers = [
-  { id: 1, name: "Saudi Arabia", role: "Field Marketer", assigned: "Trade Fair", geo: "Riyadh", workload: 90 },
-  { id: 2, name: "Saudi Arabia", role: "Digital Marketer", assigned: "Social Media Campaign", geo: "Remote", workload: 60 },
-  { id: 3, name: "Saudi Arabia", role: "Designer", assigned: "Brochure Design", geo: "Jeddah", workload: 40 },
-  { id: 4, name: "Saudi Arabia", role: "Content Creator", assigned: "Blog Series", geo: "Remote", workload: 30 },
-  { id: 5, name: "Saudi Arabia", role: "Intern", assigned: "Data Entry", geo: "Dammam", workload: 20 },
+  { id: 1, name: "United States", role: "Field Marketer", assigned: "Trade Fair", geo: "Washington DC", workload: 90 },
+  { id: 2, name: "United States", role: "Digital Marketer", assigned: "Social Media Campaign", geo: "Remote", workload: 60 },
+  { id: 3, name: "United States", role: "Designer", assigned: "Brochure Design", geo: "New York", workload: 40 },
+  { id: 4, name: "United States", role: "Content Creator", assigned: "Blog Series", geo: "Remote", workload: 30 },
+  { id: 5, name: "United States", role: "Intern", assigned: "Data Entry", geo: "Chicago", workload: 20 },
 ];
 
 const campaignPlanner = [
-  { id: 1, campaign: "Business Solutions", start: "2026-06-15", end: "2026-07-15", status: "On Track", tasks: 12, completed: 8 },
-  { id: 2, campaign: "Engineering Outreach", start: "2026-06-20", end: "2026-07-30", status: "Delayed", tasks: 10, completed: 5 },
+  { id: 1, campaign: "Business Solutions", start: "2026-10-15", end: "2026-09-15", status: "On Track", tasks: 12, completed: 8 },
+  { id: 2, campaign: "Engineering Outreach", start: "2026-10-20", end: "2026-09-30", status: "Delayed", tasks: 10, completed: 5 },
 ];
 
 const budgetData = [
@@ -23,21 +23,21 @@ const budgetData = [
 ];
 
 const tools = [
-  { id: 1, name: "Mailchimp", type: "Email Tool", users: 5, renewal: "2026-07-01", usage: 80, yearlySubscription: "$1,200" },
-  { id: 2, name: "HubSpot", type: "CRM Plugin", users: 8, renewal: "2026-08-15", usage: 60, yearlySubscription: "$2,400" },
-  { id: 3, name: "Canva", type: "Design Tool", users: 3, renewal: "2026-06-20", usage: 30, yearlySubscription: "$600" },
+  { id: 1, name: "Mailchimp", type: "Email Tool", users: 5, renewal: "2026-09-01", usage: 80, yearlySubscription: "$1,200" },
+  { id: 2, name: "HubSpot", type: "CRM Plugin", users: 8, renewal: "2026-09-15", usage: 60, yearlySubscription: "$2,400" },
+  { id: 3, name: "Canva", type: "Design Tool", users: 3, renewal: "2026-10-20", usage: 30, yearlySubscription: "$600" },
 ];
 
 const assets = [
-  { id: 1, name: "MBA Brochure.pdf", type: "Brochure", version: "v2.1", downloads: 120, lastUsed: "2026-06-10" },
-  { id: 2, name: "Logo.png", type: "Logo", version: "v1.0", downloads: 200, lastUsed: "2026-06-09" },
-  { id: 3, name: "Office Tour.mp4", type: "Video", version: "v1.3", downloads: 80, lastUsed: "2026-06-08" },
+  { id: 1, name: "RFP_Overview.pdf", type: "Brochure", version: "v2.1", downloads: 120, lastUsed: "2026-10-10" },
+  { id: 2, name: "Logo.png", type: "Logo", version: "v1.0", downloads: 200, lastUsed: "2026-10-09" },
+  { id: 3, name: "Office Tour.mp4", type: "Video", version: "v1.3", downloads: 80, lastUsed: "2026-10-08" },
 ];
 
 const vendors = [
-  { id: 1, name: "Saudi Arabia", type: "Ad Agency", rating: 4.5, contracts: 3, lastInvoice: "2026-06-07" },
-  { id: 2, name: "Saudi Arabia", type: "Printer", rating: 4.0, contracts: 2, lastInvoice: "2026-06-06" },
-  { id: 3, name: "Saudi Arabia", type: "Event Vendor", rating: 4.8, contracts: 5, lastInvoice: "2026-06-05" },
+  { id: 1, name: "United States", type: "Ad Agency", rating: 4.5, contracts: 3, lastInvoice: "2026-10-07" },
+  { id: 2, name: "United States", type: "Printer", rating: 4.0, contracts: 2, lastInvoice: "2026-10-06" },
+  { id: 3, name: "United States", type: "Event Vendor", rating: 4.8, contracts: 5, lastInvoice: "2026-10-05" },
 ];
 
 const utilization = {
@@ -49,16 +49,16 @@ const utilization = {
 };
 
 const approvals = [
-  { id: 1, type: "Budget", item: "Business Solutions", status: "Pending", approver: "Saudi Arabia" },
-  { id: 2, type: "Content", item: "Campus Tour Video", status: "Approved", approver: "Saudi Arabia" },
-  { id: 3, type: "Vendor Payment", item: "Saudi Arabia", status: "Pending", approver: "Saudi Arabia" },
+  { id: 1, type: "Budget", item: "Business Solutions", status: "Pending", approver: "United States" },
+  { id: 2, type: "Content", item: "Capability Briefing Video", status: "Approved", approver: "United States" },
+  { id: 3, type: "Vendor Payment", item: "United States", status: "Pending", approver: "United States" },
 ];
 
-// Academic compliance demo data (example Saudi Arabian names)
+// Academic compliance demo data (example American names)
 const businessCompliances = [
-  { id: 1, name: "Faisal Al Saud", compliance: "Accreditation Renewal", status: "Completed", date: "2026-04-10" },
-  { id: 2, name: "Aisha Al Rashid", compliance: "Curriculum Update", status: "Pending", date: "2026-04-15" },
-  { id: 3, name: "Omar Al Zahrani", compliance: "Faculty Training", status: "In Progress", date: "2026-04-12" },
+  { id: 1, name: "Faisal Al Saud", compliance: "Accreditation Renewal", status: "Completed", date: "2026-09-10" },
+  { id: 2, name: "Aisha Al Rashid", compliance: "Curriculum Update", status: "Pending", date: "2026-09-15" },
+  { id: 3, name: "Omar Al Zahrani", compliance: "Capture Training", status: "In Progress", date: "2026-09-12" },
 ];
 
 export default function MarketingHeadResourceManagement() {

@@ -42,17 +42,17 @@ class PerformanceForecastingService {
   buildForecastingPrompt(data, forecastType, timeHorizon) {
     const basePrompt = `As a corporate performance forecasting expert, analyze the following corporate data and generate comprehensive performance predictions across multiple scenarios.
 
-University Data:
+Capture Portfolio Data:
 ${JSON.stringify(data, null, 2)}
 
 Forecast Type: ${forecastType}
 Time Horizon: ${timeHorizon}
 
 Please provide detailed forecasts for:
-1. Revenue Forecasting - Tuition, fees, grants, donations, research funding
-2. Enrollment Forecasting - Student numbers, retention, new admissions
+1. Revenue Forecasting - Contract Revenue, fees, grants, donations, research funding
+2. Pipeline Forecasting - Student numbers, retention, new recruitments
 3. Financial Performance - Budget, expenses, profitability, cash flow
-4. Academic Performance - Program success, faculty metrics, research output
+4. Proposal Quality - Program success, faculty metrics, research output
 5. Operational Performance - Efficiency, resource utilization, cost management
 
 For each forecast, provide:
@@ -226,13 +226,13 @@ Format your response as structured JSON with this exact structure:
         },
         growthRate: 6.7,
         confidence: "Medium",
-        keyDrivers: ["Enrollment growth", "Tuition increases", "Research funding"],
+        keyDrivers: ["Pipeline growth", "Contract Revenue increases", "Research funding"],
         risks: ["Economic downturn", "Competition", "Regulatory changes"],
         recommendations: ["Diversify revenue streams", "Optimize pricing strategy", "Enhance research programs"]
       },
       {
         id: "forecast_002",
-        metric: "Student Enrollment",
+        metric: "Pipeline Opportunities",
         category: "enrollment",
         currentValue: 8500,
         unit: "count",
@@ -266,7 +266,7 @@ Format your response as structured JSON with this exact structure:
       },
       {
         id: "forecast_004",
-        metric: "Graduation Rate",
+        metric: "Win Rate",
         category: "academic",
         currentValue: 78.5,
         unit: "percentage",
@@ -277,13 +277,13 @@ Format your response as structured JSON with this exact structure:
         },
         growthRate: 1.9,
         confidence: "High",
-        keyDrivers: ["Student support", "Academic quality", "Retention programs"],
-        risks: ["Student challenges", "Resource constraints", "External factors"],
-        recommendations: ["Enhance student support", "Improve academic programs", "Strengthen retention"]
+        keyDrivers: ["Client support", "Proposal quality", "Win-rate programs"],
+        risks: ["Client challenges", "Resource constraints", "External factors"],
+        recommendations: ["Enhance client support", "Improve proposal quality", "Strengthen retention"]
       },
       {
         id: "forecast_005",
-        metric: "Cost per Student",
+        metric: "Cost per Bid",
         category: "operational",
         currentValue: 4823,
         unit: "currency",
@@ -335,7 +335,7 @@ Format your response as structured JSON with this exact structure:
       },
       forecasts: fallbackForecasts,
       trends: {
-        increasing: ["Revenue growth", "Enrollment", "Graduation rates"],
+        increasing: ["Revenue growth", "Pipeline", "Graduation rates"],
         stable: ["Operating efficiency", "Student satisfaction"],
         decreasing: ["Cost per student", "Administrative overhead"]
       },

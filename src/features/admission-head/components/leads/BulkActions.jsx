@@ -248,7 +248,7 @@ const BulkActions = ({ selectedLeads, onClearSelection }) => {
                 Tags
               </label>
               <div className="mt-1 flex flex-wrap gap-2">
-                {['High Priority', 'Follow Up', 'International', 'Scholarship', 'Transfer'].map((tag) => (
+                {['High Priority', 'Follow Up', 'International', 'Incentive', 'Transfer'].map((tag) => (
                   <label
                     key={tag}
                     className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600"

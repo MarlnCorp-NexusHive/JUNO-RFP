@@ -14,8 +14,8 @@ const reports = [
     title: 'Monthly Recruitment Report',
     type: 'Monthly',
     status: 'Submitted',
-    dueDate: '2026-06-30',
-    submittedDate: '2026-06-28',
+    dueDate: '2026-10-30',
+    submittedDate: '2026-10-28',
     owner: 'Noura Al-Zahra',
     approvedBy: 'Dr. Abdullah Al-Rashid'
   },
@@ -24,7 +24,7 @@ const reports = [
     title: 'Quarterly Compliance Report',
     type: 'Quarterly',
     status: 'Pending',
-    dueDate: '2026-07-15',
+    dueDate: '2026-09-15',
     submittedDate: null,
     owner: 'Khalid Al-Sayed',
     approvedBy: null
@@ -34,8 +34,8 @@ const reports = [
     title: 'Policy Compliance Check',
     type: 'Policy',
     status: 'Submitted',
-    dueDate: '2026-07-10',
-    submittedDate: '2026-07-05',
+    dueDate: '2026-09-10',
+    submittedDate: '2026-09-05',
     owner: 'Aisha Al-Hassan',
     doc: 'Policy_Compliance_Check.pdf'
   },
@@ -44,7 +44,7 @@ const reports = [
     title: 'Risk Assessment Report',
     type: 'Risk',
     status: 'Pending',
-    dueDate: '2026-07-20',
+    dueDate: '2026-09-20',
     submittedDate: null,
     owner: 'Omar Al-Mutairi',
     doc: null

@@ -61,7 +61,7 @@ const AdmissionHeadDocumentVerification = () => {
       // AI Analysis
       try {
         const prompt = `
-          Analyze this ${documentType} for university admission:
+          Analyze this ${documentType} for capture recruitment:
           
           Document Type: ${documentType}
           Applicant: ${applicantName}
@@ -75,7 +75,7 @@ const AdmissionHeadDocumentVerification = () => {
           5. Overall verification status (approved/rejected/needs_review)
           6. Risk assessment and fraud detection
           7. Document quality analysis
-          8. Compliance with university standards
+          8. Compliance with capture standards
         `;
 
         const response = await aiService.generateResponse(prompt);
@@ -107,7 +107,7 @@ const AdmissionHeadDocumentVerification = () => {
             isRTL ? "لغة ومصطلحات مناسبة" : "Appropriate language and terminology"
           ],
           complianceCheck: [
-            isRTL ? "يلبي معايير وثائق الجامعة" : "Meets university document standards",
+            isRTL ? "يلبي معايير وثائق المؤسسة" : "Meets capture document standards",
             isRTL ? "الحقول المطلوبة مكتملة" : "Required fields completed",
             isRTL ? "تنسيق وتخطيط مناسب" : "Proper formatting and layout"
           ],
@@ -158,7 +158,7 @@ const AdmissionHeadDocumentVerification = () => {
             isRTL ? "معلومات متسقة" : "Consistent information"
           ],
           complianceCheck: [
-            isRTL ? "يلبي معايير وثائق الجامعة" : "Meets university document standards",
+            isRTL ? "يلبي معايير وثائق المؤسسة" : "Meets capture document standards",
             isRTL ? "الحقول المطلوبة مكتملة" : "Required fields completed"
           ],
           aiResponse: isRTL ? "تم تحليل الذكاء الاصطناعي (بيانات وهمية - خدمة الذكاء الاصطناعي غير متاحة)" : "AI analysis completed (mock data - AI service unavailable)",
@@ -358,7 +358,7 @@ const AdmissionHeadDocumentVerification = () => {
   - الوثيقة تلبي جميع معايير الجودة
   
   **تحليل الامتثال المفصل:**
-  - متوافق بالكامل مع معايير الجامعة
+  - متوافق بالكامل مع معايير المؤسسة
   - جميع الحقول المطلوبة مكتملة بشكل صحيح
   - التنسيق يلبي متطلبات المؤسسة
   - لم يتم تحديد أي مشاكل في الامتثال
@@ -406,7 +406,7 @@ const AdmissionHeadDocumentVerification = () => {
   - Document meets all quality standards
   
   **Detailed Compliance Analysis:**
-  - Fully compliant with university standards
+  - Fully compliant with capture standards
   - All required fields completed properly
   - Format meets institutional requirements
   - No compliance issues identified
@@ -464,7 +464,7 @@ const AdmissionHeadDocumentVerification = () => {
   **كشف الاحتيال:** 85/100 - الوثيقة تبدو أصلية
   **ثقة الأصالة:** 90% - ثقة عالية في صحة الوثيقة
   **المخاطر الأمنية:** منخفضة - لم يتم تحديد أي مخاوف أمنية
-  **مستوى الامتثال:** 95% - يلبي جميع معايير الجامعة
+  **مستوى الامتثال:** 95% - يلبي جميع معايير المؤسسة
   
   **التوصيات:**
   - الوثيقة تبدو أصلية
@@ -478,7 +478,7 @@ const AdmissionHeadDocumentVerification = () => {
   **Fraud Detection:** 85/100 - Document appears authentic
   **Authenticity Confidence:** 90% - High confidence in document validity
   **Security Risk:** Low - No security concerns identified
-  **Compliance Level:** 95% - Meets all university standards
+  **Compliance Level:** 95% - Meets all capture standards
   
   **Recommendations:**
   - Document appears to be authentic

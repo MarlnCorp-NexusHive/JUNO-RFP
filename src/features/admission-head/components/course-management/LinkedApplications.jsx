@@ -23,45 +23,45 @@ const LinkedApplications = () => {
     {
       id: 'APP001',
       studentName: 'Abdullah Al-Rashid',
-      course: 'B.Tech Computer Science',
-      department: 'Computer Science',
+      course: 'Cloud Migration RFP',
+      department: 'Federal IT',
       college: 'Engineering',
       programType: 'Undergraduate',
       status: 'Under Review',
-      admissionCycle: '2026-2026',
-      appliedDate: '2026-02-15'
+      admissionCycle: '2026-2027',
+      appliedDate: '2026-09-15'
     },
     {
       id: 'APP002',
       studentName: 'Mohammed Al-Saud',
-      course: 'MBA Finance',
+      course: 'RFP Finance',
       department: 'Business',
       college: 'Management',
       programType: 'Postgraduate',
       status: 'Accepted',
-      admissionCycle: '2026-2026',
-      appliedDate: '2026-02-10'
+      admissionCycle: '2026-2027',
+      appliedDate: '2026-09-10'
     },
     {
       id: 'APP003',
       studentName: 'Sarah Johnson',
-      course: 'M.Sc Data Science',
-      department: 'Computer Science',
+      course: 'Data Analytics Task Order',
+      department: 'Federal IT',
       college: 'Science',
       programType: 'Postgraduate',
       status: 'Pending',
-      admissionCycle: '2026-2026',
-      appliedDate: '2026-02-20'
+      admissionCycle: '2026-2027',
+      appliedDate: '2026-09-20'
     }
   ];
 
   // Mock data for filter options
   const filterOptions = {
-    departments: ['Computer Science', 'Business', 'Science', 'Engineering'],
+    departments: ['Federal IT', 'Business', 'Science', 'Engineering'],
     colleges: ['Engineering', 'Management', 'Science', 'Arts'],
     programTypes: ['Undergraduate', 'Postgraduate', 'PhD'],
     statuses: ['Under Review', 'Accepted', 'Pending', 'Rejected'],
-    admissionCycles: ['2026-2026', '2026-2026']
+    admissionCycles: ['2025-2026', '2026-2027']
   };
 
   const handleFilterChange = (filterType, value) => {
@@ -133,7 +133,7 @@ const LinkedApplications = () => {
             onChange={(e) => handleFilterChange('college', e.target.value)}
             className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-600 dark:text-white"
           >
-            <option value="all">All Colleges</option>
+            <option value="all">All Divisions</option>
             {filterOptions.colleges.map(college => (
               <option key={college} value={college}>{college}</option>
             ))}
@@ -166,7 +166,7 @@ const LinkedApplications = () => {
             onChange={(e) => handleFilterChange('admissionCycle', e.target.value)}
             className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-600 dark:text-white"
           >
-            <option value="all">All Admission Cycles</option>
+            <option value="all">All Capture Cycles</option>
             {filterOptions.admissionCycles.map(cycle => (
               <option key={cycle} value={cycle}>{cycle}</option>
             ))}
@@ -180,7 +180,7 @@ const LinkedApplications = () => {
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Application ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Candidate Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">College</th>

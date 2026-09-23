@@ -4,11 +4,11 @@ class AISearchService {
   constructor() {
     this.searchHistory = [];
     this.suggestions = [
-      'Show me leads from Riyadh',
+      'Show me leads from Washington DC',
       'Find high-engagement prospects',
       'Campaigns with low conversion',
       'Leads interested in engineering',
-      'Recent inquiries from Jeddah',
+      'Recent inquiries from New York',
       'High-priority follow-ups needed'
     ];
   }
@@ -152,9 +152,9 @@ matchesLocation(query, location) {
   
   // Check for city variations
   const cityVariations = {
-    'riyadh': ['riyad', 'riyadha'],
-    'jeddah': ['jiddah', 'jidda'],
-    'dammam': ['damam', 'dahran']
+    'washington dc': ['washington', 'dc', 'd.c.'],
+    'new york': ['nyc', 'ny'],
+    'chicago': ['chi']
   };
   
   for (const [city, variations] of Object.entries(cityVariations)) {
@@ -186,7 +186,7 @@ matchesEngagement(query, engagement) {
         id: 1,
         name: "Ahmed Al-Rashid",
         email: "ahmed.rashid@example.com",
-        location: "Riyadh",
+        location: "Washington DC",
         interest: "Engineering",
         engagement: "High",
         lastContact: "2026-11-15",
@@ -196,7 +196,7 @@ matchesEngagement(query, engagement) {
         id: 2,
         name: "Sara Al-Mansouri",
         email: "sara.mansouri@example.com",
-        location: "Jeddah",
+        location: "New York",
         interest: "Business",
         engagement: "Medium",
         lastContact: "2026-11-10",
@@ -206,7 +206,7 @@ matchesEngagement(query, engagement) {
         id: 3,
         name: "Mohammed Al-Zahra",
         email: "mohammed.zahra@example.com",
-        location: "Riyadh",
+        location: "Washington DC",
         interest: "Medicine",
         engagement: "High",
         lastContact: "2026-11-12",
@@ -216,7 +216,7 @@ matchesEngagement(query, engagement) {
         id: 4,
         name: "Fatima Al-Sheikh",
         email: "fatima.sheikh@example.com",
-        location: "Dammam",
+        location: "Chicago",
         interest: "Engineering",
         engagement: "Low",
         lastContact: "2026-11-08",
@@ -226,7 +226,7 @@ matchesEngagement(query, engagement) {
         id: 5,
         name: "Omar Al-Hassan",
         email: "omar.hassan@example.com",
-        location: "Jeddah",
+        location: "New York",
         interest: "Business",
         engagement: "High",
         lastContact: "2026-11-14",

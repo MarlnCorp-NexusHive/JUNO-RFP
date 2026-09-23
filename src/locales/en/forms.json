@@ -27,11 +27,11 @@
       "department": "Department",
       "position": "Position",
       "employeeId": "Employee ID",
-      "studentId": "Student ID",
+      "studentId": "Opportunity ID",
       "course": "Course",
       "program": "Program",
-      "semester": "Semester",
-      "academicYear": "Academic Year"
+      "semester": "Fiscal Period",
+      "academicYear": "Fiscal Year"
     },
     "placeholders": {
       "enterFirstName": "Enter your first name",
@@ -63,8 +63,8 @@
       "enterStudentId": "Enter your student ID",
       "selectCourse": "Select a course",
       "selectProgram": "Select a program",
-      "selectSemester": "Select a semester",
-      "selectAcademicYear": "Select academic year"
+      "selectFiscal Period": "Select a semester",
+      "selectAcademicYear": "Select fiscal year"
     },
     "validation": {
       "required": "This field is required",

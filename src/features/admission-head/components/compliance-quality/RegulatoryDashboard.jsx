@@ -41,25 +41,25 @@ const complianceMetrics = {
 // Mock data for regulatory bodies
 const regulatoryBodies = [
   {
-    name: 'NCAAA',
+    name: 'CMMC',
     status: 'Compliant',
-    lastAudit: '2026-06-15',
+    lastAudit: '2026-10-15',
     nextAudit: '2026-12-15',
     requirements: 25,
     met: 25
   },
   {
-    name: 'NCAAA',
+    name: 'CMMC',
     status: 'Compliant',
-    lastAudit: '2026-05-20',
+    lastAudit: '2026-10-20',
     nextAudit: '2026-11-20',
     requirements: 30,
     met: 30
   },
   {
-    name: 'MoE',
+    name: 'GSA',
     status: 'In Progress',
-    lastAudit: '2026-03-10',
+    lastAudit: '2026-09-10',
     nextAudit: '2026-09-10',
     requirements: 40,
     met: 35
@@ -67,7 +67,7 @@ const regulatoryBodies = [
   {
     name: 'State Govt',
     status: 'Compliant',
-    lastAudit: '2026-04-05',
+    lastAudit: '2026-09-05',
     nextAudit: '2026-10-05',
     requirements: 20,
     met: 20
@@ -75,15 +75,15 @@ const regulatoryBodies = [
   {
     name: 'SEVIS',
     status: 'Compliant',
-    lastAudit: '2026-06-01',
+    lastAudit: '2026-10-01',
     nextAudit: '2026-12-01',
     requirements: 15,
     met: 15
   },
   {
-    name: 'ETEC',
+    name: 'FAR',
     status: 'Compliant',
-    lastAudit: '2026-06-01',
+    lastAudit: '2026-10-01',
     nextAudit: '2026-12-01',
     requirements: 15,
     met: 15

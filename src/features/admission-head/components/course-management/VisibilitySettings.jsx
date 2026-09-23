@@ -14,7 +14,7 @@ function classNames(...classes) {
 }
 
 const VisibilitySettings = () => {
-  const [selectedCycle, setSelectedCycle] = useState('2026-2026');
+  const [selectedCycle, setSelectedCycle] = useState('2026-2027');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const { t } = useTranslation();
 
@@ -22,54 +22,54 @@ const VisibilitySettings = () => {
   const courses = [
     {
       id: 1,
-      name: 'B.Tech in AI & ML',
+      name: 'IT Modernization BPA',
       code: 'BTECH-AIML',
-      department: 'Computer Science',
+      department: 'Federal IT',
       isVisible: true,
       visibleToCounselors: true,
       visibleOnWebsite: true,
       visibleInCampaigns: true,
-      admissionCycles: ['2026-2026', '2026-2026'],
+      admissionCycles: ['2025-2026', '2026-2027'],
     },
     {
       id: 2,
-      name: 'MBA in HR',
-      code: 'MBA-HR',
+      name: 'RFP — HR Services',
+      code: 'RFP-HR',
       department: 'Human Resources',
       isVisible: true,
       visibleToCounselors: true,
       visibleOnWebsite: false,
       visibleInCampaigns: true,
-      admissionCycles: ['2026-2026'],
+      admissionCycles: ['2026-2027'],
     },
     {
       id: 3,
-      name: 'BSc Aviation',
+      name: 'Aviation Logistics IDIQ',
       code: 'BSC-AVI',
       department: 'Aviation',
       isVisible: false,
       visibleToCounselors: false,
       visibleOnWebsite: false,
       visibleInCampaigns: false,
-      admissionCycles: ['2026-2026'],
+      admissionCycles: ['2026-2027'],
     },
   ];
 
   // Mock data for departments
   const departments = [
     'All Departments',
-    'Computer Science',
+    'Federal IT',
     'Human Resources',
     'Aviation',
     'Mechanical',
     'Electrical',
   ];
 
-  // Mock data for admission cycles
+  // Mock data for capture cycles
   const admissionCycles = [
-    '2026-2026',
-    '2026-2026',
+    '2025-2026',
     '2026-2027',
+    '2027-2028',
   ];
 
   const handleVisibilityChange = (courseId, field) => {
@@ -238,7 +238,7 @@ const VisibilitySettings = () => {
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             <CalendarIcon className="h-5 w-5 mr-2" />
-            Update Admission Cycles
+            Update Capture Cycles
           </button>
         </div>
       </div>

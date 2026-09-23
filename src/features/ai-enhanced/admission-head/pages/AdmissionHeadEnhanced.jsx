@@ -66,10 +66,10 @@ const getTranslation = (key, fallback) => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {getTranslation('admission.dashboard.title', 'Admission Head Dashboard')}
+              {getTranslation('recruitment.dashboard.title', 'Admission Head Dashboard')}
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
-              {getTranslation('admission.dashboard.subtitle', 'AI-Enhanced Admission Management')}
+              {getTranslation('recruitment.dashboard.subtitle', 'AI-Enhanced Admission Management')}
             </p>
           </div>
           
@@ -92,7 +92,7 @@ const getTranslation = (key, fallback) => {
                     <rect x="10" y="10" width="4" height="4" />
                   </svg>
                 </div>
-                {getTranslation('admission.dashboard.aiFeatures', 'AI Features')}
+                {getTranslation('recruitment.dashboard.aiFeatures', 'AI Features')}
               </div>
             </button>
           </div>
@@ -107,7 +107,7 @@ const getTranslation = (key, fallback) => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
               <div className="flex items-center gap-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {getTranslation('admission.dashboard.selectFeature', 'Select AI Feature')}
+                  {getTranslation('recruitment.dashboard.selectFeature', 'Select AI Feature')}
                 </h3>
                 <div className="flex gap-2 flex-wrap">
                   <button
@@ -118,7 +118,7 @@ const getTranslation = (key, fallback) => {
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
-                    {getTranslation('admission.dashboard.applicationProcessing', 'Application Processing')}
+                    {getTranslation('recruitment.dashboard.applicationProcessing', 'Application Processing')}
                   </button>
                   <button
                     onClick={() => setActiveFeature('document-verification')}
@@ -128,7 +128,7 @@ const getTranslation = (key, fallback) => {
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
-                    {getTranslation('admission.dashboard.documentVerification', 'Document Verification')}
+                    {getTranslation('recruitment.dashboard.documentVerification', 'Document Verification')}
                   </button>
                   <button
                     onClick={() => setActiveFeature('interview-scheduling')}
@@ -138,7 +138,7 @@ const getTranslation = (key, fallback) => {
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
-                    {getTranslation('admission.dashboard.interviewScheduling', 'Interview Scheduling')}
+                    {getTranslation('recruitment.dashboard.interviewScheduling', 'Interview Scheduling')}
                   </button>
                 </div>
               </div>
@@ -171,7 +171,7 @@ const getTranslation = (key, fallback) => {
         <div className="mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('admission.dashboard.quickActions', 'Quick Actions')}
+              {getTranslation('recruitment.dashboard.quickActions', 'Quick Actions')}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -184,10 +184,10 @@ const getTranslation = (key, fallback) => {
                   </div>
                   <div className="text-left">
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {getTranslation('admission.dashboard.manageApplications', 'Manage Applications')}
+                      {getTranslation('recruitment.dashboard.manageApplications', 'Manage Applications')}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {getTranslation('admission.dashboard.reviewApplications', 'Review applications')}
+                      {getTranslation('recruitment.dashboard.reviewApplications', 'Review applications')}
                     </div>
                   </div>
                 </div>
@@ -202,10 +202,10 @@ const getTranslation = (key, fallback) => {
                   </div>
                   <div className="text-left">
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {getTranslation('admission.dashboard.verifyDocuments', 'Verify Documents')}
+                      {getTranslation('recruitment.dashboard.verifyDocuments', 'Verify Documents')}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {getTranslation('admission.dashboard.documentVerification', 'Document verification')}
+                      {getTranslation('recruitment.dashboard.documentVerification', 'Document verification')}
                     </div>
                   </div>
                 </div>
@@ -233,10 +233,10 @@ const getTranslation = (key, fallback) => {
                       </div>
                       <div className="text-left">
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {getTranslation('admission.dashboard.aiApplicationProcessing', 'AI Application Processing')}
+                          {getTranslation('recruitment.dashboard.aiApplicationProcessing', 'AI Application Processing')}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {getTranslation('admission.dashboard.smartProcessing', 'Smart processing')}
+                          {getTranslation('recruitment.dashboard.smartProcessing', 'Smart processing')}
                         </div>
                       </div>
                     </div>
@@ -258,10 +258,10 @@ const getTranslation = (key, fallback) => {
                       </div>
                       <div className="text-left">
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {getTranslation('admission.dashboard.aiDocumentVerification', 'AI Document Verification')}
+                          {getTranslation('recruitment.dashboard.aiDocumentVerification', 'AI Document Verification')}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {getTranslation('admission.dashboard.automatedVerification', 'Automated verification')}
+                          {getTranslation('recruitment.dashboard.automatedVerification', 'Automated verification')}
                         </div>
                       </div>
                     </div>
@@ -283,10 +283,10 @@ const getTranslation = (key, fallback) => {
                       </div>
                       <div className="text-left">
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {getTranslation('admission.dashboard.aiInterviewScheduling', 'AI Interview Scheduling')}
+                          {getTranslation('recruitment.dashboard.aiInterviewScheduling', 'AI Interview Scheduling')}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {getTranslation('admission.dashboard.smartScheduling', 'Smart scheduling')}
+                          {getTranslation('recruitment.dashboard.smartScheduling', 'Smart scheduling')}
                         </div>
                       </div>
                     </div>
@@ -301,15 +301,15 @@ const getTranslation = (key, fallback) => {
         {applicationProcessing && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('admission.dashboard.latestApplicationProcessing', 'Latest Application Processing')}
+              {getTranslation('recruitment.dashboard.latestApplicationProcessing', 'Latest Application Processing')}
             </h2>
             <div className="text-gray-600 dark:text-gray-300">
-              <p><strong>{getTranslation('admission.dashboard.studentName', 'Student Name')}:</strong> {applicationProcessing.studentName}</p>
-              <p><strong>{getTranslation('admission.dashboard.program', 'Program')}:</strong> {applicationProcessing.program}</p>
-              <p><strong>{getTranslation('admission.dashboard.status', 'Status')}:</strong> {applicationProcessing.status}</p>
-              <p><strong>{getTranslation('admission.dashboard.score', 'Score')}:</strong> {applicationProcessing.overallScore || 0}/100</p>
-              <p><strong>{getTranslation('admission.dashboard.recommendation', 'Recommendation')}:</strong> {applicationProcessing.recommendation || 'N/A'}</p>
-              <p><strong>{getTranslation('admission.dashboard.processedAt', 'Processed At')}:</strong> {new Date(applicationProcessing.processedAt || Date.now()).toLocaleString()}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.studentName', 'Candidate Name')}:</strong> {applicationProcessing.studentName}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.program', 'Program')}:</strong> {applicationProcessing.program}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.status', 'Status')}:</strong> {applicationProcessing.status}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.score', 'Score')}:</strong> {applicationProcessing.overallScore || 0}/100</p>
+              <p><strong>{getTranslation('recruitment.dashboard.recommendation', 'Recommendation')}:</strong> {applicationProcessing.recommendation || 'N/A'}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.processedAt', 'Processed At')}:</strong> {new Date(applicationProcessing.processedAt || Date.now()).toLocaleString()}</p>
             </div>
           </div>
         )}
@@ -318,15 +318,15 @@ const getTranslation = (key, fallback) => {
         {documentVerification && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('admission.dashboard.latestDocumentVerification', 'Latest Document Verification')}
+              {getTranslation('recruitment.dashboard.latestDocumentVerification', 'Latest Document Verification')}
             </h2>
             <div className="text-gray-600 dark:text-gray-300">
-              <p><strong>{getTranslation('admission.dashboard.studentName', 'Student Name')}:</strong> {documentVerification.studentName}</p>
-              <p><strong>{getTranslation('admission.dashboard.documentType', 'Document Type')}:</strong> {documentVerification.documentType}</p>
-              <p><strong>{getTranslation('admission.dashboard.status', 'Status')}:</strong> {documentVerification.status}</p>
-              <p><strong>{getTranslation('admission.dashboard.authenticityScore', 'Authenticity Score')}:</strong> {documentVerification.scores?.authenticity || 0}/100</p>
-              <p><strong>{getTranslation('admission.dashboard.completenessScore', 'Completeness Score')}:</strong> {documentVerification.scores?.completeness || 0}/100</p>
-              <p><strong>{getTranslation('admission.dashboard.verifiedAt', 'Verified At')}:</strong> {new Date(documentVerification.verifiedAt || Date.now()).toLocaleString()}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.studentName', 'Candidate Name')}:</strong> {documentVerification.studentName}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.documentType', 'Document Type')}:</strong> {documentVerification.documentType}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.status', 'Status')}:</strong> {documentVerification.status}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.authenticityScore', 'Authenticity Score')}:</strong> {documentVerification.scores?.authenticity || 0}/100</p>
+              <p><strong>{getTranslation('recruitment.dashboard.completenessScore', 'Completeness Score')}:</strong> {documentVerification.scores?.completeness || 0}/100</p>
+              <p><strong>{getTranslation('recruitment.dashboard.verifiedAt', 'Verified At')}:</strong> {new Date(documentVerification.verifiedAt || Date.now()).toLocaleString()}</p>
             </div>
           </div>
         )}
@@ -335,16 +335,16 @@ const getTranslation = (key, fallback) => {
         {interviewScheduling && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('admission.dashboard.latestInterviewScheduling', 'Latest Interview Scheduling')}
+              {getTranslation('recruitment.dashboard.latestInterviewScheduling', 'Latest Interview Scheduling')}
             </h2>
             <div className="text-gray-600 dark:text-gray-300">
-              <p><strong>{getTranslation('admission.dashboard.studentName', 'Student Name')}:</strong> {interviewScheduling.studentName}</p>
-              <p><strong>{getTranslation('admission.dashboard.program', 'Program')}:</strong> {interviewScheduling.program}</p>
-              <p><strong>{getTranslation('admission.dashboard.interviewType', 'Interview Type')}:</strong> {interviewScheduling.interviewType}</p>
-              <p><strong>{getTranslation('admission.dashboard.scheduledDate', 'Scheduled Date')}:</strong> {interviewScheduling.scheduledDate}</p>
-              <p><strong>{getTranslation('admission.dashboard.scheduledTime', 'Scheduled Time')}:</strong> {interviewScheduling.scheduledTime}</p>
-              <p><strong>{getTranslation('admission.dashboard.status', 'Status')}:</strong> {interviewScheduling.status}</p>
-              <p><strong>{getTranslation('admission.dashboard.scheduledAt', 'Scheduled At')}:</strong> {new Date(interviewScheduling.createdAt || Date.now()).toLocaleString()}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.studentName', 'Candidate Name')}:</strong> {interviewScheduling.studentName}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.program', 'Program')}:</strong> {interviewScheduling.program}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.interviewType', 'Interview Type')}:</strong> {interviewScheduling.interviewType}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.scheduledDate', 'Scheduled Date')}:</strong> {interviewScheduling.scheduledDate}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.scheduledTime', 'Scheduled Time')}:</strong> {interviewScheduling.scheduledTime}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.status', 'Status')}:</strong> {interviewScheduling.status}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.scheduledAt', 'Scheduled At')}:</strong> {new Date(interviewScheduling.createdAt || Date.now()).toLocaleString()}</p>
             </div>
           </div>
         )}

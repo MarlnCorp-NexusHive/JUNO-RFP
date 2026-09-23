@@ -27,7 +27,7 @@
       "department": "القسم",
       "position": "المنصب",
       "employeeId": "رقم الموظف",
-      "studentId": "رقم الطالب",
+      "studentId": "رقم المرشح",
       "course": "المقرر",
       "program": "البرنامج",
       "semester": "الفصل الدراسي",
@@ -60,10 +60,10 @@
       "selectDepartment": "اختر قسمك",
       "enterPosition": "أدخل منصبك",
       "enterEmployeeId": "أدخل رقم موظفك",
-      "enterStudentId": "أدخل رقم طالبك",
+      "enterStudentId": "أدخل رقم مرشحك",
       "selectCourse": "اختر مقرراً",
       "selectProgram": "اختر برنامجاً",
-      "selectSemester": "اختر فصلاً دراسياً",
+      "selectFiscal Period": "اختر فصلاً دراسياً",
       "selectAcademicYear": "اختر سنة دراسية"
     },
     "validation": {

@@ -7,18 +7,18 @@ const settingsCategories = [
   {
     label: "Institutional Settings",
     options: [
-      { label: "University Name", value: "University of Technology" },
-      { label: "Address", value: "123 Education St, Tech City" },
-      { label: "Contact Email", value: "contact@univ.edu" },
+      { label: "Company Name", value: "MARLN Corporation" },
+      { label: "Address", value: "1200 G Street NW, Washington, D.C." },
+      { label: "Contact Email", value: "contact@marln.com" },
       { label: "Phone Number", value: "+1-234-567-8900" },
     ],
   },
   {
-    label: "Academic Configuration",
+    label: "Fiscal Configuration",
     options: [
-      { label: "Academic Year", value: "2026-2026" },
-      { label: "Semester Start Date", value: "August 1, 2026" },
-      { label: "Semester End Date", value: "December 15, 2026" },
+      { label: "Fiscal Year", value: "2026-2027" },
+      { label: "Fiscal Period Start", value: "August 1, 2026" },
+      { label: "Fiscal Period End", value: "December 15, 2026" },
       { label: "Grading System", value: "Percentage" },
     ],
   },
@@ -26,8 +26,8 @@ const settingsCategories = [
     label: "Access Permissions",
     options: [
       { label: "Admin Access", value: "Enabled" },
-      { label: "Faculty Access", value: "Enabled" },
-      { label: "Student Access", value: "Enabled" },
+      { label: "Capture Team Access", value: "Enabled" },
+      { label: "Contributor Access", value: "Enabled" },
       { label: "Guest Access", value: "Disabled" },
     ],
   },

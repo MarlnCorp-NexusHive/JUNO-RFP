@@ -61,7 +61,7 @@ const AdmissionHeadDocumentVerification = () => {
       // AI Analysis
       try {
         const prompt = `
-          Analyze this ${documentType} for university admission:
+          Analyze this ${documentType} for capture recruitment:
           
           Document Type: ${documentType}
           Applicant: ${applicantName}
@@ -75,7 +75,7 @@ const AdmissionHeadDocumentVerification = () => {
           5. Overall verification status (approved/rejected/needs_review)
           6. Risk assessment and fraud detection
           7. Document quality analysis
-          8. Compliance with university standards
+          8. Compliance with capture standards
         `;
 
         const response = await aiService.generateResponse(prompt);
@@ -107,7 +107,7 @@ const AdmissionHeadDocumentVerification = () => {
             "Appropriate language and terminology"
           ],
           complianceCheck: [
-            "Meets university document standards",
+            "Meets capture document standards",
             "Required fields completed",
             "Proper formatting and layout"
           ],
@@ -158,7 +158,7 @@ const AdmissionHeadDocumentVerification = () => {
             "Consistent information"
           ],
           complianceCheck: [
-            "Meets university document standards",
+            "Meets capture document standards",
             "Required fields completed"
           ],
           aiResponse: "AI analysis completed (mock data - AI service unavailable)",
@@ -358,7 +358,7 @@ aiResponse = response.content; // Extract content from response object
   - Document meets all quality standards
   
   **Detailed Compliance Analysis:**
-  - Fully compliant with university standards
+  - Fully compliant with capture standards
   - All required fields completed properly
   - Format meets institutional requirements
   - No compliance issues identified
@@ -416,7 +416,7 @@ aiResponse = response.content; // Extract content from response object
   **Fraud Detection:** 85/100 - Document appears authentic
   **Authenticity Confidence:** 90% - High confidence in document validity
   **Security Risk:** Low - No security concerns identified
-  **Compliance Level:** 95% - Meets all university standards
+  **Compliance Level:** 95% - Meets all capture standards
   
   **Recommendations:**
   - Document appears to be authentic

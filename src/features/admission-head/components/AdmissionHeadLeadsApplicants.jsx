@@ -53,18 +53,18 @@ export default function AdmissionHeadLeadsApplicants() {
     {
       id: 'A001',
       name: 'Abdullah Al-Rashid',
-      program: t('leadsApplicants.programs.mba'),
+      program: t('leadsApplicants.programs.rfp'),
       source: t('leadsApplicants.sources.website'),
       status: 'New',
       officer: 'Noura Al-Zahra',
       engagement: 'High',
       history: ['Inquiry', 'Contacted'],
-      tags: ['Scholarship Interested'],
-      contact: { email: 'abdullah@email.com', phone: '+966 50 123 4567' },
-      geo: { country: 'Saudi Arabia', state: 'Riyadh', city: 'Riyadh' },
+      tags: ['Incentive Interested'],
+      contact: { email: 'abdullah@email.com', phone: '+1 (202) 555-123 4567' },
+      geo: { country: 'United States', state: 'Virginia', city: 'Arlington' },
       timeline: [
-        { type: 'Inquiry', date: '2026-06-10' },
-        { type: 'Contacted', date: '2026-06-09' },
+        { type: 'Inquiry', date: '2026-10-10' },
+        { type: 'Contacted', date: '2026-10-09' },
       ],
       docs: [],
       notes: 'Very interested in AI specialization.',
@@ -79,12 +79,12 @@ export default function AdmissionHeadLeadsApplicants() {
       engagement: 'Medium',
       history: ['Inquiry', 'Contacted', 'Application Started'],
       tags: ['Sports Quota'],
-      contact: { email: 'layla@email.com', phone: '+966 50 234 5678' },
-      geo: { country: 'Saudi Arabia', state: 'Riyadh', city: 'Riyadh' },
+      contact: { email: 'layla@email.com', phone: '+1 (202) 555-234 5678' },
+      geo: { country: 'United States', state: 'Virginia', city: 'Arlington' },
       timeline: [
-        { type: 'Inquiry', date: '2026-06-09' },
-        { type: 'Contacted', date: '2026-06-08' },
-        { type: 'Application Started', date: '2026-06-07' },
+        { type: 'Inquiry', date: '2026-10-09' },
+        { type: 'Contacted', date: '2026-10-08' },
+        { type: 'Application Started', date: '2026-10-07' },
       ],
       docs: ['Resume.pdf'],
       notes: '',
@@ -142,11 +142,11 @@ export default function AdmissionHeadLeadsApplicants() {
         <select className="px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onChange={e => setFilters(f => ({ ...f, program: e.target.value }))}>
           <option value="">{t('leadsApplicants.filters.program')}</option>
           <option value={t('leadsApplicants.programs.btech')} className="text-gray-900 dark:text-white">{t('leadsApplicants.programs.btech')}</option>
-          <option value={t('leadsApplicants.programs.mba')} className="text-gray-900 dark:text-white">{t('leadsApplicants.programs.mba')}</option>
+          <option value={t('leadsApplicants.programs.rfp')} className="text-gray-900 dark:text-white">{t('leadsApplicants.programs.rfp')}</option>
         </select>
         <select className="px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onChange={e => setFilters(f => ({ ...f, geo: e.target.value }))}>
           <option value="">{t('leadsApplicants.filters.state')}</option>
-          <option value="Riyadh" className="text-gray-900 dark:text-white">Riyadh</option>
+          <option value="Virginia" className="text-gray-900 dark:text-white">Virginia</option>
         </select>
         <select className="px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" onChange={e => setFilters(f => ({ ...f, officer: e.target.value }))}>
           <option value="">{t('leadsApplicants.filters.officer')}</option>

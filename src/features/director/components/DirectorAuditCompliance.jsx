@@ -95,15 +95,15 @@ export default function DirectorAuditCompliance() {
   }
 
   const pmAuditLogs = [
-    { id: 1, date: "2026-03-10", time: "14:30", action: "Proposal section updated", user: "Proposal Writer", statusKey: "auditStatuses.success", details: "Technical Approach – Water Wastewater RFP", priority: "low" },
-    { id: 2, date: "2026-03-09", time: "09:15", action: "Compliance checklist signed", user: "Compliance Specialist", statusKey: "auditStatuses.success", details: "FAR 52.219-9 – Landscape RFP", priority: "medium" },
-    { id: 3, date: "2026-03-08", time: "16:45", action: "Pricing export attempted", user: "Pricing Lead", statusKey: "auditStatuses.failed", details: "Insufficient permissions", priority: "high" },
-    { id: 4, date: "2026-03-07", time: "11:20", action: "Source document accessed", user: "Proposal Manager", statusKey: "auditStatuses.success", details: "Airport Restaurant RFP – Source Docs", priority: "medium" },
+    { id: 1, date: "2026-09-10", time: "14:30", action: "Proposal section updated", user: "Proposal Writer", statusKey: "auditStatuses.success", details: "Technical Approach – Water Wastewater RFP", priority: "low" },
+    { id: 2, date: "2026-09-09", time: "09:15", action: "Compliance checklist signed", user: "Compliance Specialist", statusKey: "auditStatuses.success", details: "FAR 52.219-9 – Landscape RFP", priority: "medium" },
+    { id: 3, date: "2026-09-08", time: "16:45", action: "Pricing export attempted", user: "Pricing Lead", statusKey: "auditStatuses.failed", details: "Insufficient permissions", priority: "high" },
+    { id: 4, date: "2026-09-07", time: "11:20", action: "Source document accessed", user: "Proposal Manager", statusKey: "auditStatuses.success", details: "Airport Restaurant RFP – Source Docs", priority: "medium" },
   ];
   const directorAuditLogs = [
     { 
       id: 1, 
-      date: "2026-03-10", 
+      date: "2026-09-10", 
       time: "14:30",
       actionKey: "auditActions.userLogin", 
       userKey: "auditUsers.deanScience", 
@@ -114,7 +114,7 @@ export default function DirectorAuditCompliance() {
     },
     { 
       id: 2, 
-      date: "2026-03-09", 
+      date: "2026-09-09", 
       time: "09:15",
       actionKey: "auditActions.dataExport", 
       userKey: "auditUsers.hodEEE", 
@@ -125,7 +125,7 @@ export default function DirectorAuditCompliance() {
     },
     { 
       id: 3, 
-      date: "2026-03-08", 
+      date: "2026-09-08", 
       time: "16:45",
       actionKey: "auditActions.policyUpdate", 
       userKey: "auditUsers.director", 
@@ -136,7 +136,7 @@ export default function DirectorAuditCompliance() {
     },
     { 
       id: 4, 
-      date: "2026-03-07", 
+      date: "2026-09-07", 
       time: "11:20",
       actionKey: "auditActions.dataAccess", 
       userKey: "auditUsers.adminIT", 
@@ -149,10 +149,10 @@ export default function DirectorAuditCompliance() {
   const auditLogs = isPM ? pmAuditLogs : directorAuditLogs;
 
   const pmComplianceStatus = [
-    { areaKey: "FAR Conformance", statusKey: "complianceStatuses.compliant", lastAudit: "2026-02-01", score: 95, icon: FiCheckCircle, color: "green" },
-    { areaKey: "RFP Requirements Matrix", statusKey: "complianceStatuses.pending", lastAudit: "2026-02-15", score: 78, icon: FiClock, color: "yellow" },
-    { areaKey: "Proposal Audit Trail", statusKey: "complianceStatuses.compliant", lastAudit: "2026-01-20", score: 92, icon: FiCheckCircle, color: "green" },
-    { areaKey: "Past Performance Refs", statusKey: "complianceStatuses.compliant", lastAudit: "2026-02-10", score: 88, icon: FiCheckCircle, color: "green" },
+    { areaKey: "FAR Conformance", statusKey: "complianceStatuses.compliant", lastAudit: "2026-09-01", score: 95, icon: FiCheckCircle, color: "green" },
+    { areaKey: "RFP Requirements Matrix", statusKey: "complianceStatuses.pending", lastAudit: "2026-09-15", score: 78, icon: FiClock, color: "yellow" },
+    { areaKey: "Proposal Audit Trail", statusKey: "complianceStatuses.compliant", lastAudit: "2026-09-20", score: 92, icon: FiCheckCircle, color: "green" },
+    { areaKey: "Past Performance Refs", statusKey: "complianceStatuses.compliant", lastAudit: "2026-09-10", score: 88, icon: FiCheckCircle, color: "green" },
   ];
   const directorComplianceStatus = [
     { 
@@ -174,7 +174,7 @@ export default function DirectorAuditCompliance() {
     { 
       areaKey: "complianceAreas.moe", 
       statusKey: "complianceStatuses.compliant", 
-      lastAudit: "2026-01-20",
+      lastAudit: "2026-09-20",
       score: 92,
       icon: FiCheckCircle,
       color: "green"

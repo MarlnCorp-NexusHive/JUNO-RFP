@@ -12,7 +12,7 @@ const templates = [
     name: 'Missing Documents Reminder',
     type: 'email',
     subject: 'Complete Your Application - Documents Required',
-    body: 'Dear {name},\n\nWe noticed that some required documents are still pending for your application. Please upload them at your earliest convenience to avoid any delays in processing.\n\nRequired documents:\n- ID Proof\n- Academic Records\n- Address Proof\n\nBest regards,\nAdmissions Team',
+    body: 'Dear {name},\n\nWe noticed that some required documents are still pending for your application. Please upload them at your earliest convenience to avoid any delays in processing.\n\nRequired documents:\n- ID Proof\n- Past Performance Docs\n- Address Proof\n\nBest regards,\nCapture Team',
     aiSuggestions: ['Best time to send: 10 AM', 'Personalize with program details', 'Include direct upload link']
   },
   {
@@ -27,7 +27,7 @@ const templates = [
     name: 'Interview Invitation',
     type: 'email',
     subject: 'Interview Invitation - {program}',
-    body: 'Dear {name},\n\nCongratulations! You have been shortlisted for an interview for the {program} program.\n\nDate: {interview_date}\nTime: {interview_time}\nMode: {interview_mode}\n\nPlease confirm your attendance by clicking the link below.\n\nBest regards,\nAdmissions Team',
+    body: 'Dear {name},\n\nCongratulations! You have been shortlisted for an interview for the {program} program.\n\nDate: {interview_date}\nTime: {interview_time}\nMode: {interview_mode}\n\nPlease confirm your attendance by clicking the link below.\n\nBest regards,\nCapture Team',
     aiSuggestions: ['Schedule 3 days in advance', 'Include preparation tips', 'Send calendar invite']
   },
   {
@@ -35,7 +35,7 @@ const templates = [
     name: 'Personalized Follow-up',
     type: 'email',
     subject: 'Quick Check-in - {program} Application',
-    body: 'Hi {name},\n\nI noticed you were interested in our {program} program. Do you have any questions I can help with? I\'d be happy to discuss:\n\n- Program details\n- Career opportunities\n- Admission process\n- Scholarship options\n\nBest regards,\n{admission_officer}',
+    body: 'Hi {name},\n\nI noticed you were interested in our {program} program. Do you have any questions I can help with? I\'d be happy to discuss:\n\n- Program details\n- Career opportunities\n- Admission process\n- Incentive options\n\nBest regards,\n{recruitment_officer}',
     aiSuggestions: ['Use engagement history', 'Reference specific interests', 'Offer one-on-one call']
   }
 ];

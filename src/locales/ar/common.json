@@ -75,8 +75,8 @@
       "pm": "م"
     },
     "units": {
-      "students": "الطلاب",
-      "faculty": "أعضاء هيئة التدريس",
+      "students": "المرشحون",
+      "faculty": "فريق العروض",
       "departments": "الأقسام",
       "courses": "المقررات",
       "applications": "الطلبات",
@@ -157,7 +157,7 @@
     "adminHead": "رئيس الإدارة",
     "director": "المدير",
     "marketingHead": "رئيس التسويق",
-    "admissionHead": "رئيس القبول",
+    "recruitmentHead": "رئيس القبول",
     "hrHead": "رئيس الموارد البشرية"
   },
   "director": {
@@ -175,7 +175,7 @@
     "workspace": "مساحة العمل",
     "helpSupport": "المساعدة والدعم"
   },
-  "admissionHead": {
+  "recruitmentHead": {
     "dashboard": "لوحة التحكم",
     "leadsApplicants": "العملاء المحتملون / المتقدمون",
     "team": "الفريق",
@@ -231,7 +231,7 @@
     "rfpCollaboration": "تعاون الفريق",
     "technicalSolutioning": "الحلول التقنية",
     "topology": "الطوبولوجيا",
-    "grants": "المنح"
+    "grants": "الحوافز"
   },
   "proposalManagerCalendar": {
     "title": "اجتماعات العروض والتقويم",
@@ -504,8 +504,8 @@
   },
   "proposalManagerGrants": {
     "eyebrow": "فيدرالي أمريكي · Grants.gov",
-    "title": "المنح",
-    "subtitle": "فرص المنح الفيدرالية الأمريكية المباشرة من Grants.gov. تصفّح المنح المفتوحة والمتوقعة ثم اعرض التفاصيل المنشورة كاملة — المبالغ والمواعيد والأهلية وجهات الاتصال والمرفقات.",
+    "title": "الحوافز",
+    "subtitle": "فرص الحوافز الفيدرالية الأمريكية المباشرة من Grants.gov. تصفّح الحوافز المفتوحة والمتوقعة ثم اعرض التفاصيل المنشورة كاملة — المبالغ والمواعيد والأهلية وجهات الاتصال والمرفقات.",
     "keyword": "كلمة مفتاحية",
     "keywordPlaceholder": "ابحث بالعنوان أو الجهة أو الموضوع…",
     "statusFilter": "الحالة",
@@ -535,7 +535,7 @@
     "postingDate": "تاريخ النشر",
     "closeDate": "موعد التقديم / الإغلاق",
     "archiveDate": "تاريخ الأرشفة",
-    "numberOfAwards": "عدد المنح",
+    "numberOfAwards": "عدد الحوافز",
     "costSharing": "مشاركة التكلفة",
     "yes": "نعم",
     "no": "لا",
@@ -555,7 +555,7 @@
     "retry": "إعادة المحاولة",
     "pagination": "تصفح النتائج",
     "showingRange": "عرض {{start}}–{{end}} من {{count}}",
-    "resultsList": "فرص المنح",
+    "resultsList": "فرص الحوافز",
     "resultsAnnounce": "تم العثور على {{count}} فرصة",
     "emptyHint": "جرّب كلمة أو حالة أو رمز جهة آخر.",
     "detailEmptyTitle": "اختر منحة",
@@ -566,14 +566,14 @@
     "pastDue": "منتهية",
     "showMore": "عرض المزيد",
     "showLess": "عرض أقل",
-    "shortcutsHint": "تلميح: Ctrl/⌘ K للبحث · Esc لطي المنحة المفتوحة",
+    "shortcutsHint": "تلميح: Ctrl/⌘ K للبحث · Esc لطي الحوافزة المفتوحة",
     "showDetails": "عرض التفاصيل",
     "hideDetails": "إخفاء التفاصيل",
     "alnMore": "+{{count}} المزيد",
     "forecastNotice": "هذه الفرصة متوقعة. المبالغ والمواعيد وجهات الاتصال أدناه من سجل التوقّع في Grants.gov — الحقول التي لم تنشرها الجهة بعد تبقى فارغة عمداً.",
-    "amountsNotPublished": "لم تُنشر مبالغ المنحة بعد على Grants.gov لهذه الفرصة.",
+    "amountsNotPublished": "لم تُنشر مبالغ الحوافزة بعد على Grants.gov لهذه الفرصة.",
     "estSynopsisPosting": "تاريخ النشر التقديري للملخص",
-    "estAwardDate": "تاريخ المنح التقديري",
+    "estAwardDate": "تاريخ الحوافز التقديري",
     "estProjectStart": "بدء المشروع التقديري",
     "fiscalYear": "السنة المالية",
     "statusOptions": {
@@ -588,7 +588,47 @@
       "forecasted": "متوقع",
       "closed": "مغلق",
       "archived": "مؤرشف"
-    }
+    },
+    "modeTabs": "مصدر الفرص",
+    "modeGrants": "Grants.gov",
+    "modeContracts": "عقود SAM.gov"
+  },
+  "proposalManagerSam": {
+    "eyebrow": "فيدرالي أمريكي · SAM.gov (مقتطفات)",
+    "title": "فرص العقود",
+    "subtitle": "مقتطفات منسّقة من إعلانات العقود العامة على SAM.gov — بدون مفتاح API. اجمع الكلمة المفتاحية + NAICS + PSC + الجهة + الحجز + نوع الإعلان لإيجاد فرص تقنية وسحابة وأمن سيبراني.",
+    "curatedFrom": "{{source}} · لقطة {{date}}",
+    "keyword": "كلمة مفتاحية",
+    "keywordPlaceholder": "العنوان، رقم الإعلان، سيبراني، سحابة…",
+    "naics": "NAICS",
+    "psc": "PSC",
+    "agency": "الجهة",
+    "noticeType": "نوع الإعلان",
+    "setAside": "الحجز",
+    "anyNoticeType": "أي نوع إعلان",
+    "anySetAside": "أي حجز",
+    "quickAgencies": "جهة:",
+    "quickNaics": "NAICS:",
+    "results": "{{count}} فرصة عقد",
+    "combineHint": "المرشحات تُجمع معاً (AND) — NAICS + PSC + كلمة + جهة + حجز",
+    "empty": "لا توجد عقود SAM مطابقة لهذه المرشحات.",
+    "emptyHint": "امسح مرشحاً أو جرّب NAICS 541512 / PSC DA01.",
+    "openOnSam": "فتح على SAM.gov",
+    "copyNoticeId": "نسخ رقم الإعلان",
+    "awardCeiling": "السقف / القيمة",
+    "awardFloor": "الحد الأدنى / التقدير المنخفض",
+    "period": "فترة الأداء",
+    "department": "الوزارة",
+    "subtier": "الجهة الفرعية",
+    "office": "المكتب",
+    "posted": "تاريخ النشر",
+    "responseDue": "موعد العروض / الرد",
+    "noDeadline": "لا يوجد موعد (مفتوح / بحث سوق)",
+    "place": "مكان الأداء",
+    "description": "الوصف",
+    "contacts": "جهات الاتصال",
+    "attachments": "المرفقات (كما نُشرت)",
+    "attachmentsHint": "أسماء الملفات من إعلان SAM.gov العام. حمّل الحزم من SAM.gov."
   },
   "proposalManagerTrial": {
     "badge": "تجربة",

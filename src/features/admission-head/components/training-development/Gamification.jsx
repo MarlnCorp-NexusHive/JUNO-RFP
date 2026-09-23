@@ -18,7 +18,7 @@ const initialLeaderboard = [
   {
     id: 1,
     name: "John Doe",
-    role: "Senior Counselor",
+    role: "Senior Capture Lead",
     points: 1250,
     level: "Gold",
     achievements: [
@@ -27,8 +27,8 @@ const initialLeaderboard = [
       { name: "Perfect Attendance", points: 200 }
     ],
     recentActivity: [
-      { type: "Completed", title: "Advanced CRM Training", points: 100, date: "2026-07-20" },
-      { type: "Achieved", title: "Policy Expert", points: 300, date: "2026-07-15" }
+      { type: "Completed", title: "Advanced CRM Training", points: 100, date: "2026-09-20" },
+      { type: "Achieved", title: "Policy Expert", points: 300, date: "2026-09-15" }
     ]
   },
   {
@@ -42,8 +42,8 @@ const initialLeaderboard = [
       { name: "Quick Learner", points: 200 }
     ],
     recentActivity: [
-      { type: "Completed", title: "Document Verification Course", points: 150, date: "2026-07-18" },
-      { type: "Achieved", title: "Quick Learner", points: 200, date: "2026-07-10" }
+      { type: "Completed", title: "Document Verification Course", points: 150, date: "2026-09-18" },
+      { type: "Achieved", title: "Quick Learner", points: 200, date: "2026-09-10" }
     ]
   },
   {
@@ -57,8 +57,8 @@ const initialLeaderboard = [
       { name: "Team Player", points: 150 }
     ],
     recentActivity: [
-      { type: "Completed", title: "Basic CRM Training", points: 200, date: "2026-07-19" },
-      { type: "Achieved", title: "Team Player", points: 150, date: "2026-07-12" }
+      { type: "Completed", title: "Basic CRM Training", points: 200, date: "2026-09-19" },
+      { type: "Achieved", title: "Team Player", points: 150, date: "2026-09-12" }
     ]
   }
 ];

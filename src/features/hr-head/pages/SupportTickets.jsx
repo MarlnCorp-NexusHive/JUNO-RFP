@@ -21,8 +21,8 @@ const SupportTickets = () => {
       status: 'open',
       priority: 'high',
       department: 'Finance',
-      createdAt: '2026-03-15 10:30:00',
-      lastUpdated: '2026-03-15 11:45:00',
+      createdAt: '2026-09-15 10:30:00',
+      lastUpdated: '2026-09-15 11:45:00',
     },
     {
       id: 'TICK-002',
@@ -31,8 +31,8 @@ const SupportTickets = () => {
       status: 'in-progress',
       priority: 'medium',
       department: 'IT',
-      createdAt: '2026-03-14 15:20:00',
-      lastUpdated: '2026-03-15 09:15:00',
+      createdAt: '2026-09-14 15:20:00',
+      lastUpdated: '2026-09-15 09:15:00',
     },
     {
       id: 'TICK-003',
@@ -41,8 +41,8 @@ const SupportTickets = () => {
       status: 'resolved',
       priority: 'low',
       department: 'Training',
-      createdAt: '2026-03-13 14:00:00',
-      lastUpdated: '2026-03-14 16:30:00',
+      createdAt: '2026-09-13 14:00:00',
+      lastUpdated: '2026-09-14 16:30:00',
     },
   ];
 

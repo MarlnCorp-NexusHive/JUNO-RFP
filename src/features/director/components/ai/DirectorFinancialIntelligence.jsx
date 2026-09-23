@@ -53,7 +53,7 @@ const DirectorFinancialIntelligence = () => {
         netIncome: 1000000
       },
       revenue: {
-        tuition: 32000000,
+        contractRevenue: 32000000,
         fees: 3500000,
         grants: 8500000,
         donations: 3200000,
@@ -89,7 +89,7 @@ const DirectorFinancialIntelligence = () => {
         revenueGrowth: 5.2,
         expenseGrowth: 4.8,
         enrollmentGrowth: 3.7,
-        tuitionGrowth: 4.5
+        contractRevenueGrowth: 4.5
       },
       benchmarks: {
         industryAverage: {

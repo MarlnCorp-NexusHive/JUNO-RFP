@@ -5,17 +5,17 @@
     "established": "2018",
     "type": "Enterprise Business Corporation",
     "accreditation": "ISO 9001 Certified",
-    "location": "Riyadh, Kingdom of Saudi Arabia",
+    "location": "Washington, D.C., United States",
     "website": "www.marln.com",
-    "phone": "+966 11 520 0000",
+    "phone": "+1 (202) 555-0100",
     "email": "info@marln.com",
-    "vision2030": "Vision 2030 Initiative",
+    "vision2030": "National Growth Initiative",
     "campusAlt": "MARLN Headquarters",
     "campusViewAlt": "MARLN Corporate Office",
     "logoAlt": "MARLN Logo",
     "bannerText": {
       "excellence": "Excellence in Business Operations",
-      "shaping": "Shaping Future Business Leaders of Saudi Arabia"
+      "shaping": "Shaping Future Business Leaders of United States"
     },
     "navigation": {
       "back": "Back",
@@ -53,9 +53,9 @@
     },
     "about": {
       "title": "About MARLN",
-      "description1": "MARLN Corporation is a premier business organization in the heart of Riyadh, established as part of Saudi Arabia's Vision 2030 initiative. We are committed to developing world-class business leaders who will drive the Kingdom's economic transformation.",
+      "description1": "MARLN Corporation is a premier business organization in the heart of Washington, D.C., established as part of America's economic growth initiatives. We are committed to developing world-class business leaders who will drive U.S. economic growth.",
       "description2": "Our corporation offers cutting-edge business solutions designed to meet the evolving needs of the global business landscape. With state-of-the-art facilities and partnerships with leading international organizations, MARLN provides an exceptional business environment.",
-      "description3": "Rooted in Saudi Arabian values while embracing global business practices, MARLN prepares employees to excel in both local and international markets, contributing to the Kingdom's ambitious economic goals.",
+      "description3": "Rooted in American values while embracing global business practices, MARLN prepares employees to excel in both local and international markets, contributing to America's ambitious economic goals.",
       "details": {
         "type": "Type:",
         "location": "Location:",
@@ -67,7 +67,7 @@
       "title": "Our Departments & Projects",
       "list": [
         {
-          "name": "Business Administration Department",
+          "name": "Professional Services Department",
           "programs": 12,
           "students": 1200
         },
@@ -98,7 +98,7 @@
     "achievements": {
       "title": "Corporate Achievements",
       "list": [
-        "Ranked #1 Business Corporation in Saudi Arabia",
+        "Ranked #1 Business Corporation in United States",
         "ISO 9001 International Certification",
         "Winner of Best Innovation Award 2026",
         "Partnership with Leading Global Corporations",

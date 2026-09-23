@@ -13,7 +13,7 @@ const trainingPrograms = [
     participants: 25,
     completion: 80,
     instructor: "Abdullah Al-Rashid",
-    startDate: "2026-04-01",
+    startDate: "2026-09-01",
     endDate: "応24-05-31",
     modules: [
       "Introduction to Digital Marketing",
@@ -32,8 +32,8 @@ const trainingPrograms = [
     participants: 15,
     completion: 0,
     instructor: "Noura Al-Zahra",
-    startDate: "2026-05-15",
-    endDate: "2026-05-16",
+    startDate: "2026-10-15",
+    endDate: "2026-10-16",
     modules: [
       "Lead Scoring",
       "CRM Management",
@@ -50,8 +50,8 @@ const trainingPrograms = [
     participants: 20,
     completion: 100,
     instructor: "Khalid Al-Sayed",
-    startDate: "2026-01-01",
-    endDate: "2026-03-31",
+    startDate: "2026-09-01",
+    endDate: "2026-09-30",
     modules: [
       "Campaign Planning",
       "Budget Management",
@@ -71,9 +71,9 @@ const teamProgress = [
 
 // Demo data for each module
 const trainingSessions = [
-  { id: 1, title: "Google Ads Basics", date: "2026-04-20", status: "Upcoming", attendees: 8 },
-  { id: 2, title: "CRM Lead Nurturing", date: "2026-04-10", status: "Completed", attendees: 10 },
-  { id: 3, title: "Meta Ads Certification", date: "2026-04-15", status: "Pending", attendees: 5 },
+  { id: 1, title: "Google Ads Basics", date: "2026-09-20", status: "Upcoming", attendees: 8 },
+  { id: 2, title: "CRM Lead Nurturing", date: "2026-09-10", status: "Completed", attendees: 10 },
+  { id: 3, title: "Meta Ads Certification", date: "2026-09-15", status: "Pending", attendees: 5 },
 ];
 
 const teamTrainingStatus = [
@@ -345,7 +345,7 @@ export default function MarketingHeadTrainingDevelopment() {
           <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded animate-pulse">{t('training.aiFeatures.remindersNudges')}</span>
         </div>
         <div className="h-56 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex flex-col items-center justify-start text-blue-700 dark:text-blue-300 font-bold mb-4 p-4">
-          <div className="text-lg font-semibold mb-2 text-center">{t('training.calendar.april2026')}</div>
+          <div className="text-lg font-semibold mb-2 text-center">{t('training.calendar.september2026')}</div>
           <div className="grid grid-cols-7 gap-1 text-xs text-center w-full mb-2">
             <div className="font-bold">Sun</div>
             <div className="font-bold">Mon</div>
@@ -354,14 +354,14 @@ export default function MarketingHeadTrainingDevelopment() {
             <div className="font-bold">Thu</div>
             <div className="font-bold">Fri</div>
             <div className="font-bold">Sat</div>
-            {/* April 2026 starts on Tuesday, so 2 empty cells for Sunday and Monday */}
+            {/* September 2026 starts on Tuesday, so 2 empty cells for Sunday and Monday */}
             <div></div>
             <div></div>
             {/* Days 1-30 */}
             {Array.from({ length: 30 }, (_, i) => {
               const day = i + 1;
               const today = new Date();
-              const isToday = today.getFullYear() === 2026 && today.getMonth() === 3 && today.getDate() === day;
+              const isToday = today.getFullYear() === 2026 && today.getMonth() === 8 && today.getDate() === day;
               return (
                 <div
                   key={day}

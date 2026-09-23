@@ -69,7 +69,7 @@ const AdmissionHeadWorkspace = () => {
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-gray-900 dark:text-white">{t('workspace.trainingDevelopment.teamTraining.admissionProcess')}</span>
+                  <span className="text-gray-900 dark:text-white">{t('workspace.trainingDevelopment.teamTraining.recruitmentProcess')}</span>
                   <span className="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 rounded-full">
                     {t('workspace.status.inProgress')}
                   </span>
@@ -100,7 +100,7 @@ const AdmissionHeadWorkspace = () => {
               <div className="space-y-3">
                 <a href="#" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                   <FiEye className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  <span className="text-gray-900 dark:text-white">{t('workspace.trainingDevelopment.knowledgeManagement.admissionGuidelines')}</span>
+                  <span className="text-gray-900 dark:text-white">{t('workspace.trainingDevelopment.knowledgeManagement.recruitmentGuidelines')}</span>
                 </a>
                 <a href="#" className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                   <FiEye className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -140,7 +140,7 @@ const AdmissionHeadWorkspace = () => {
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-gray-900 dark:text-white">{t('workspace.complianceQuality.qualityAssurance.admissionQualitySelfAssessment')}</span>
+                  <span className="text-gray-900 dark:text-white">{t('workspace.complianceQuality.qualityAssurance.recruitmentQualitySelfAssessment')}</span>
                   <button className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     {t('workspace.complianceQuality.qualityAssurance.start')}
                   </button>

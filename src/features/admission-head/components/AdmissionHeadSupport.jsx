@@ -30,11 +30,11 @@ const DEMO_TICKETS = [
     description: "Getting 500 error when accessing the dashboard.",
     status: "In Progress",
     assignedTo: "IT Support Team",
-    submittedOn: "2026-07-01",
-    expectedResolution: "2026-07-02",
+    submittedOn: "2026-09-01",
+    expectedResolution: "2026-09-02",
     comments: [
-      { user: "IT Support", text: "Issue acknowledged. Working on a fix.", date: "2026-07-01" },
-      { user: "Admissions Head", text: "Please resolve urgently.", date: "2026-07-01" },
+      { user: "IT Support", text: "Issue acknowledged. Working on a fix.", date: "2026-09-01" },
+      { user: "Admissions Head", text: "Please resolve urgently.", date: "2026-09-01" },
     ],
     feedback: null,
   },
@@ -48,8 +48,8 @@ const DEMO_TICKETS = [
     description: "Applicants are unable to upload documents during application.",
     status: "Pending",
     assignedTo: "ERP Team",
-    submittedOn: "2026-06-30",
-    expectedResolution: "2026-07-03",
+    submittedOn: "2026-10-30",
+    expectedResolution: "2026-09-03",
     comments: [],
     feedback: null,
   },
@@ -62,21 +62,21 @@ const knowledgeBaseArticles = [
     title: 'How to Review Applications',
     category: 'Applications',
     views: 120,
-    lastUpdated: '2026-06-25'
+    lastUpdated: '2026-10-25'
   },
   {
     id: 2,
     title: 'Managing Admission Cycles',
     category: 'Admissions',
     views: 98,
-    lastUpdated: '2026-06-20'
+    lastUpdated: '2026-10-20'
   },
   {
     id: 3,
     title: 'Uploading and Verifying Documents',
     category: 'Documents',
     views: 75,
-    lastUpdated: '2026-06-18'
+    lastUpdated: '2026-10-18'
   }
 ];
 

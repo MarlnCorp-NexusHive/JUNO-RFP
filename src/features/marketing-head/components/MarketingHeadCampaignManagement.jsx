@@ -10,7 +10,7 @@ import MarketingCampaignPrediction from './ai/MarketingCampaignPrediction';
 const campaigns = [
   {
     id: 1,
-    name: "Summer Enrollment Drive",
+    name: "Summer Pipeline Drive",
     type: "Digital",
     status: "Active",
     budget: 50000,
@@ -19,8 +19,8 @@ const campaigns = [
     conversions: 45,
     channels: ["Social Media", "Email", "PPC"],
     team: ["John Doe", "Jane Smith"],
-    startDate: "2026-05-01",
-    endDate: "2026-07-31",
+    startDate: "2026-10-01",
+    endDate: "2026-09-30",
   },
   {
     id: 2,
@@ -33,8 +33,8 @@ const campaigns = [
     conversions: 0,
     channels: ["Social Media", "Email"],
     team: ["Mike Johnson"],
-    startDate: "2026-06-01",
-    endDate: "2026-08-31",
+    startDate: "2026-10-01",
+    endDate: "2026-09-30",
   },
   {
     id: 3,
@@ -47,8 +47,8 @@ const campaigns = [
     conversions: 120,
     channels: ["Social Media", "Email", "PPC", "Events"],
     team: ["John Doe", "Jane Smith", "Mike Johnson"],
-    startDate: "2026-01-01",
-    endDate: "2026-03-31",
+    startDate: "2026-09-01",
+    endDate: "2026-09-30",
   },
 ];
 

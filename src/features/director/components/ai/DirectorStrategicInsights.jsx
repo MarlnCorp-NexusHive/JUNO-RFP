@@ -28,7 +28,7 @@ const DirectorStrategicInsights = ({ onInsightsGenerated }) => {
         focus: selectedFocus,
         context: {
           university: 'MARLN Corporation',
-          location: 'Saudi Arabia',
+          location: 'United States',
           type: 'Higher Education'
         }
       });
@@ -48,10 +48,10 @@ const DirectorStrategicInsights = ({ onInsightsGenerated }) => {
 
   // Get focus options with localization
   const focusOptions = [
-    { value: 'overall', label: isRTLMode ? 'الأداء الشامل' : 'Overall Performance', description: isRTLMode ? 'تحليل شامل لأداء الجامعة' : 'Comprehensive university performance analysis' },
-    { value: 'academic', label: isRTLMode ? 'التميز الأكاديمي' : 'Academic Excellence', description: isRTLMode ? 'البرامج الأكاديمية ومقاييس نجاح الطلاب' : 'Academic programs and student success metrics' },
+    { value: 'overall', label: isRTLMode ? 'الأداء الشامل' : 'Overall Performance', description: isRTLMode ? 'تحليل شامل لأداء المؤسسة' : 'Comprehensive capture portfolio performance analysis' },
+    { value: 'academic', label: isRTLMode ? 'تميز الاستحواذ' : 'Capture Excellence', description: isRTLMode ? 'برامج العروض ومقاييس نجاح المرشحين' : 'Proposal programs and candidate success metrics' },
     { value: 'financial', label: isRTLMode ? 'الصحة المالية' : 'Financial Health', description: isRTLMode ? 'الإيرادات والتكاليف والاستدامة المالية' : 'Revenue, costs, and financial sustainability' },
-    { value: 'enrollment', label: isRTLMode ? 'اتجاهات التسجيل' : 'Enrollment Trends', description: isRTLMode ? 'تحليل تجنيد الطلاب والاحتفاظ بهم' : 'Student recruitment and retention analysis' },
+    { value: 'enrollment', label: isRTLMode ? 'اتجاهات التسجيل' : 'Pipeline Trends', description: isRTLMode ? 'تحليل تجنيد المرشحون والاحتفاظ بهم' : 'Candidate recruitment and retention analysis' },
     { value: 'reputation', label: isRTLMode ? 'السمعة والعلامة التجارية' : 'Reputation & Brand', description: isRTLMode ? 'الموقع في السوق وقوة العلامة التجارية' : 'Market position and brand strength' },
     { value: 'operations', label: isRTLMode ? 'الكفاءة التشغيلية' : 'Operational Efficiency', description: isRTLMode ? 'تحسين العمليات واستخدام الموارد' : 'Process optimization and resource utilization' }
   ];

@@ -20,11 +20,11 @@ const mockDocs = [
   { id: 4, applicant: mockApplicants[2], type: 'Photo', status: 'Rejected', file: 'photo_a003.jpg', uploaded: true, verified: false, rejected: true },
 ];
 const mockTemplates = [
-  { id: 1, name: 'onboarding', file: 'onboarding.pdf', version: 'v2', expires: '2026-06-01', downloads: 120 },
-  { id: 2, name: 'SOP', file: 'SOP.pdf', version: 'v1', expires: '2026-06-01', downloads: 80 },
+  { id: 1, name: 'onboarding', file: 'onboarding.pdf', version: 'v2', expires: '2026-10-01', downloads: 120 },
+  { id: 2, name: 'SOP', file: 'SOP.pdf', version: 'v1', expires: '2026-10-01', downloads: 80 },
 ];
 const mockArchive = [
-  { id: 1, applicant: mockApplicants[0], doc: 'form_a001.pdf', date: '2026-06-10', access: 2 },
+  { id: 1, applicant: mockApplicants[0], doc: 'form_a001.pdf', date: '2026-10-10', access: 2 },
 ];
 
 export default function Documents() {
@@ -101,7 +101,7 @@ export default function Documents() {
              data-tour="2" 
              data-tour-title-en="Page Title" 
              data-tour-title-ar="عنوان الصفحة" 
-             data-tour-content-en="Documents & Verification for admissions." 
+             data-tour-content-en="Documents & Verification for recruitments." 
              data-tour-content-ar="الوثائق والتحقق للقبول.">
           <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-8 text-white">
             <div className="flex items-center gap-3 mb-4">

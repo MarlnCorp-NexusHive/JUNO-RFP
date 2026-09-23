@@ -29,8 +29,8 @@ const initialCertifications = [
       {
         name: "John Doe",
         status: "Certified",
-        issueDate: "2026-01-15",
-        expiryDate: "2026-01-15",
+        issueDate: "2026-09-15",
+        expiryDate: "2026-09-15",
         score: 95
       },
       {
@@ -44,7 +44,7 @@ const initialCertifications = [
         status: "Not Started"
       }
     ],
-    expiryDate: "2026-01-15",
+    expiryDate: "2026-09-15",
     participants: 15,
     status: "Active"
   },
@@ -62,15 +62,15 @@ const initialCertifications = [
       {
         name: "John Doe",
         status: "Certified",
-        issueDate: "2026-03-01",
-        expiryDate: "2026-03-01",
+        issueDate: "2026-09-01",
+        expiryDate: "2026-09-01",
         score: 92
       },
       {
         name: "Jane Smith",
         status: "Certified",
-        issueDate: "2026-02-15",
-        expiryDate: "2026-02-15",
+        issueDate: "2026-09-15",
+        expiryDate: "2026-09-15",
         score: 88
       },
       {
@@ -80,7 +80,7 @@ const initialCertifications = [
         remainingRequirements: ["Process 100 Documents"]
       }
     ],
-    expiryDate: "2026-03-01",
+    expiryDate: "2026-09-01",
     participants: 10,
     status: "Inactive"
   }

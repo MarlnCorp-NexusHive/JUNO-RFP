@@ -9,7 +9,7 @@ function getCanonicalDemoUsers() {
     { id: 3, username: "marketing_manager", password: "marketing123", displayName: "Marketing Manager", team: "Marketing Team", role: "Manager", createdAt: Date.now() },
     // Recruitment Team
     { id: 4, username: "recruitment_head", password: "Recruitment@2026", displayName: "Recruitment Head", team: "Recruitment Team", role: "Head", createdAt: Date.now() },
-    { id: 5, username: "admission_spoc", password: "admission123", displayName: "Admission SPOC", team: "Admission Team", role: "SPOC", createdAt: Date.now() },
+    { id: 5, username: "recruitment_spoc", password: "recruitment123", displayName: "Admission SPOC", team: "Admission Team", role: "SPOC", createdAt: Date.now() },
     // HR & Payroll Team
     { id: 6, username: "hr_head", password: "hr123", displayName: "HR Head", team: "HR & PayRoll Team", role: "CFO/Head", createdAt: Date.now() },
     { id: 7, username: "hr_manager", password: "hr123", displayName: "HR Manager", team: "HR & PayRoll Team", role: "Manager", createdAt: Date.now() },

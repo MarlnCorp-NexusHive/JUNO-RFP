@@ -101,19 +101,19 @@ const proposalQualityIntelligenceData = [
 
 // Business Operations Insights demo data
 const businessTrends = [
-  { year: '2019', Onboarded: 11000, Completed: 9500 },
-  { year: '2020', Onboarded: 11500, Completed: 9800 },
-  { year: '2026', Onboarded: 12000, Completed: 10200 },
-  { year: '2026', Onboarded: 12200, Completed: 11000 },
+  { year: '2022', Onboarded: 11000, Completed: 9500 },
+  { year: '2023', Onboarded: 11500, Completed: 9800 },
+  { year: '2024', Onboarded: 12000, Completed: 10200 },
+  { year: '2025', Onboarded: 12200, Completed: 11000 },
   { year: '2026', Onboarded: 12400, Completed: 11500 },
 ];
 // Section M–Driven Scoring Optimization (Proposal Manager): 7 intelligence metrics, spread across range for clarity
 const sectionMScoringData = [
-  { period: '2021', competitiveIntelligence: 88, competitiveDifferentiation: 42, incumbentAdvantage: 91, priceTechnical: 55, bidDensity: 28, agencyWinPattern: 78, discriminatorStrength: 64 },
-  { period: '2022', competitiveIntelligence: 89, competitiveDifferentiation: 48, incumbentAdvantage: 90, priceTechnical: 58, bidDensity: 35, agencyWinPattern: 80, discriminatorStrength: 68 },
-  { period: '2023', competitiveIntelligence: 90, competitiveDifferentiation: 54, incumbentAdvantage: 92, priceTechnical: 62, bidDensity: 41, agencyWinPattern: 82, discriminatorStrength: 71 },
-  { period: '2024', competitiveIntelligence: 91, competitiveDifferentiation: 59, incumbentAdvantage: 91, priceTechnical: 66, bidDensity: 46, agencyWinPattern: 84, discriminatorStrength: 74 },
-  { period: '2025', competitiveIntelligence: 92, competitiveDifferentiation: 63, incumbentAdvantage: 93, priceTechnical: 70, bidDensity: 52, agencyWinPattern: 86, discriminatorStrength: 77 },
+  { period: '2022', competitiveIntelligence: 88, competitiveDifferentiation: 42, incumbentAdvantage: 91, priceTechnical: 55, bidDensity: 28, agencyWinPattern: 78, discriminatorStrength: 64 },
+  { period: '2023', competitiveIntelligence: 89, competitiveDifferentiation: 48, incumbentAdvantage: 90, priceTechnical: 58, bidDensity: 35, agencyWinPattern: 80, discriminatorStrength: 68 },
+  { period: '2024', competitiveIntelligence: 90, competitiveDifferentiation: 54, incumbentAdvantage: 92, priceTechnical: 62, bidDensity: 41, agencyWinPattern: 82, discriminatorStrength: 71 },
+  { period: '2025', competitiveIntelligence: 91, competitiveDifferentiation: 59, incumbentAdvantage: 91, priceTechnical: 66, bidDensity: 46, agencyWinPattern: 84, discriminatorStrength: 74 },
+  { period: '2026', competitiveIntelligence: 92, competitiveDifferentiation: 63, incumbentAdvantage: 93, priceTechnical: 70, bidDensity: 52, agencyWinPattern: 86, discriminatorStrength: 77 },
 ];
 const SECTION_M_COLORS = {
   competitiveIntelligence: '#6366f1',
@@ -153,11 +153,11 @@ const operationalQualityData = [
   { name: "Rework & Iteration Density Index", score: 73 },
 ];
 const operationalQualityTrend = [
-  { period: "2021", Readiness: 72, Velocity: 68 },
-  { period: "2022", Readiness: 76, Velocity: 74 },
-  { period: "2023", Readiness: 79, Velocity: 77 },
-  { period: "2024", Readiness: 82, Velocity: 80 },
-  { period: "2025", Readiness: 84, Velocity: 83 },
+  { period: "2022", Readiness: 72, Velocity: 68 },
+  { period: "2023", Readiness: 76, Velocity: 74 },
+  { period: "2024", Readiness: 79, Velocity: 77 },
+  { period: "2025", Readiness: 82, Velocity: 80 },
+  { period: "2026", Readiness: 84, Velocity: 83 },
 ];
 // Competitive Intelligence (Proposal Manager): 6 metrics, score 0–100
 const competitiveIntelligenceData = [
@@ -169,11 +169,11 @@ const competitiveIntelligenceData = [
   { name: "Discriminator Strength Benchmarking", score: 69 },
 ];
 const competitiveIntelligenceTrend = [
-  { period: "2021", Position: 58 },
-  { period: "2022", Position: 63 },
-  { period: "2023", Position: 67 },
-  { period: "2024", Position: 72 },
-  { period: "2025", Position: 76 },
+  { period: "2022", Position: 58 },
+  { period: "2023", Position: 63 },
+  { period: "2024", Position: 67 },
+  { period: "2025", Position: 72 },
+  { period: "2026", Position: 76 },
 ];
 // Financial Overview demo data
 const monthlyFees = [
@@ -192,33 +192,33 @@ const budgetUsage = [
 ];
 // HR & Team Analytics demo data
 const teamTypes = [
-  { year: '2019', FullTime: 400, PartTime: 200, Contract: 50 },
-  { year: '2020', FullTime: 420, PartTime: 210, Contract: 60 },
-  { year: '2026', FullTime: 430, PartTime: 220, Contract: 70 },
-  { year: '2026', FullTime: 440, PartTime: 230, Contract: 80 },
+  { year: '2022', FullTime: 400, PartTime: 200, Contract: 50 },
+  { year: '2023', FullTime: 420, PartTime: 210, Contract: 60 },
+  { year: '2024', FullTime: 430, PartTime: 220, Contract: 70 },
+  { year: '2025', FullTime: 440, PartTime: 230, Contract: 80 },
   { year: '2026', FullTime: 450, PartTime: 240, Contract: 90 },
 ];
 const attritionTrend = [
-  { year: '2019', Attrition: 4.2 },
-  { year: '2020', Attrition: 4.5 },
-  { year: '2026', Attrition: 4.1 },
-  { year: '2026', Attrition: 3.8 },
+  { year: '2022', Attrition: 4.2 },
+  { year: '2023', Attrition: 4.5 },
+  { year: '2024', Attrition: 4.1 },
+  { year: '2025', Attrition: 3.8 },
   { year: '2026', Attrition: 3.5 },
 ];
 // Proposal Manager: Capture & Pipeline analytics (replaces HR & Team in this section)
 const proposalPipelineByStage = [
-  { period: '2021', Pending: 18, InProgress: 7, Approved: 4, Delivered: 3 },
-  { period: '2022', Pending: 12, InProgress: 14, Approved: 5, Delivered: 6 },
-  { period: '2023', Pending: 22, InProgress: 9, Approved: 8, Delivered: 4 },
-  { period: '2024', Pending: 15, InProgress: 16, Approved: 6, Delivered: 9 },
-  { period: '2025', Pending: 19, InProgress: 12, Approved: 11, Delivered: 7 },
+  { period: '2022', Pending: 18, InProgress: 7, Approved: 4, Delivered: 3 },
+  { period: '2023', Pending: 12, InProgress: 14, Approved: 5, Delivered: 6 },
+  { period: '2024', Pending: 22, InProgress: 9, Approved: 8, Delivered: 4 },
+  { period: '2025', Pending: 15, InProgress: 16, Approved: 6, Delivered: 9 },
+  { period: '2026', Pending: 19, InProgress: 12, Approved: 11, Delivered: 7 },
 ];
 const proposalWinRateTrend = [
-  { period: '2021', WinRate: 28 },
-  { period: '2022', WinRate: 31 },
-  { period: '2023', WinRate: 29 },
-  { period: '2024', WinRate: 34 },
-  { period: '2025', WinRate: 37 },
+  { period: '2022', WinRate: 28 },
+  { period: '2023', WinRate: 31 },
+  { period: '2024', WinRate: 29 },
+  { period: '2025', WinRate: 34 },
+  { period: '2026', WinRate: 37 },
 ];
 // Alerts & Notifications demo data - will be generated dynamically with translations
 
@@ -489,7 +489,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   // KPI cards: Proposal Manager = bid/compliance row; Director = translated KPIs
   const directorKpis = [
-    { label: t('dashboard.kpis.admissions'), value: 1240, icon: "🎓", color: "bg-blue-100 text-blue-700" },
+    { label: t('dashboard.kpis.recruitments'), value: 1240, icon: "🎓", color: "bg-blue-100 text-blue-700" },
     { label: t('dashboard.kpis.finance'), value: 98500, icon: "💰", color: "bg-green-100 text-green-700" },
     { label: t('dashboard.kpis.hr'), value: 210, icon: "👥", color: "bg-purple-100 text-purple-700" },
     { label: t('dashboard.kpis.academics'), value: 8.2, icon: "📚", color: "bg-yellow-100 text-yellow-700" },
@@ -603,7 +603,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         <ul className="text-sm mb-2 list-disc ml-5">
           <li>Convocation: 2 days left</li>
           <li>Sports Meet: 5 days left</li>
-          <li>Faculty Workshop: 6 days left</li>
+          <li>Capture Workshop: 6 days left</li>
         </ul>
       );
       insight = <div className="text-xs text-orange-600 dark:text-orange-300 mb-2">Busy week ahead! 7 major events scheduled in the next 7 days.</div>;
@@ -776,7 +776,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     const isPM = basePath === '/rbac/proposal-manager';
     let content = null;
     if (!chartId) return null;
-    if (chartId === 'admission') {
+    if (chartId === 'recruitment') {
       content = (
         <div className="w-[90vw] max-w-3xl h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
           <h3 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">{isPM ? pmText('Submission Forecast', 'توقعات التقديم') : 'Predictive Recruitment Forecast'}</h3>
@@ -832,9 +832,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <h3 className="text-lg font-bold mb-2 text-indigo-700 dark:text-indigo-300">Placement Success Forecast</h3>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={[
-              { year: '2026', Actual: 88, Forecast: 88 },
-              { year: '2026', Actual: 90, Forecast: 90 },
-              { year: '2026', Actual: 91, Forecast: 91 },
+              { year: '2023', Actual: 88, Forecast: 88 },
+              { year: '2024', Actual: 90, Forecast: 90 },
+              { year: '2025', Actual: 91, Forecast: 91 },
               { year: '2026', Actual: null, Forecast: 92 },
             ]} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -967,7 +967,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 Instantly spot most/least profitable subjects.
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">94%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Enrollment, Tuition, Operating Costs</span></div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Pipeline, Contract Revenue, Operating Costs</span></div>
             </div>
                             <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                   <span>{t('dashboard.aiLabels.interactiveBarChart')}</span>
@@ -1280,7 +1280,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               </>
             ) : (
               <>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('dashboard.charts.admissionsTrend')}</h3>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{t('dashboard.charts.recruitmentsTrend')}</h3>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={recruitmentTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -1369,8 +1369,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           data-tour="6"
           data-tour-title-en="Academic Insights"
           data-tour-content-en="Longer-term academic trends and top departments."
-          data-tour-title-ar="رؤى أكاديمية"
-          data-tour-content-ar="اتجاهات أكاديمية طويلة الأجل وأفضل الأقسام."
+          data-tour-title-ar="رؤى المحفظة"
+          data-tour-content-ar="اتجاهات محفظة طويلة الأجل وأفضل الأقسام."
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -1378,7 +1378,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             <h2 className="text-lg font-bold tracking-wide" title={basePath === "/rbac/proposal-manager" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : undefined}>{basePath === "/rbac/proposal-manager" ? pmText("Core Evaluation Intelligence", "ذكاء التقييم الأساسي") : t('dashboard.sections.academicInsights')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Multi-year Enrollment/Graduation Chart */}
+            {/* Multi-year Pipeline/Graduation Chart */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-3">
               <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : t('dashboard.charts.enrollmentGraduation')}</h3>
               <ResponsiveContainer width="100%" height={basePath === "/rbac/proposal-manager" ? 340 : 180}>
@@ -1687,7 +1687,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Submission Forecast */}
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
-                  <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('admission')} title={t('dashboard.aiLabels.clickToEnlarge')}>
+                  <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('recruitment')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                     <ResponsiveContainer width="100%" height={140}>
                       <LineChart data={proposalSubmissionForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -1896,7 +1896,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Predictive Admission Forecast */}
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
-                  <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('admission')} title={t('dashboard.aiLabels.clickToEnlarge')}>
+                  <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('recruitment')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                     <ResponsiveContainer width="100%" height={140}>
                       <LineChart data={forecastData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -1916,7 +1916,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        <span className="font-bold text-green-600 dark:text-green-400">1,320</span> {t('dashboard.aiLabels.nextSemesterIntake')} <span className="text-xs">(+8%)</span>.<br />
+                        <span className="font-bold text-green-600 dark:text-green-400">1,320</span> {t('dashboard.aiLabels.nextFiscal PeriodIntake')} <span className="text-xs">(+8%)</span>.<br />
                         {t('dashboard.aiLabels.highestGrowth')}: <span className="font-semibold">Engineering, Business</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">92%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
@@ -1951,7 +1951,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <span className="px-2 py-0.5 rounded bg-pink-100 dark:bg-pink-900 text-xs text-pink-700 dark:text-pink-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        Dropout rate expected to decrease to <span className="font-bold text-red-600 dark:text-red-400">3.1%</span> next semester.<br />
+                        Dropout rate expected to decrease to <span className="font-bold text-red-600 dark:text-red-400">3.1%</span> next quarter.<br />
                         Highest risk: <span className="font-semibold">Law Dept</span>.
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">88%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
@@ -2103,8 +2103,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     Underperforming: <span className="font-semibold">Law, Arts</span>.
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">92%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Enrollment, Tuition, Grants</span></div>
-                  <div className="text-xs text-indigo-600 dark:text-indigo-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +20% scholarships → -$1.2M revenue</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Pipeline, Contract Revenue, Grants</span></div>
+                  <div className="text-xs text-indigo-600 dark:text-indigo-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +20% bid volume → +$1.2M pipeline</div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                   <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
@@ -2435,7 +2435,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       Instantly spot outliers and growth areas.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">92%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Enrollment, Tuition, Grants</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Pipeline, Contract Revenue, Grants</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.interactiveRadar')}</span>
@@ -2469,7 +2469,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       Instantly spot most/least profitable subjects.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">94%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Enrollment, Tuition, Operating Costs</span></div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Pipeline, Contract Revenue, Operating Costs</span></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.interactiveRadar')}</span>
@@ -2503,8 +2503,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       Underperforming: <span className="font-semibold">Law, Arts</span>.
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">92%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Enrollment, Tuition, Grants</span></div>
-                    <div className="text-xs text-indigo-600 dark:text-indigo-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +20% scholarships → -$1.2M revenue</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">Pipeline, Contract Revenue, Grants</span></div>
+                    <div className="text-xs text-indigo-600 dark:text-indigo-300 mb-1">{t('dashboard.aiLabels.whatIf')}: +20% bid volume → +$1.2M pipeline</div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>

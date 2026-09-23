@@ -47,7 +47,7 @@ class OperationalExcellenceService {
   buildOperationalAnalysisPrompt(data, analysisType, timePeriod) {
     const basePrompt = `As a corporate operational excellence expert, analyze the following corporate operational data and provide comprehensive operational insights and optimization recommendations.
 
-University Operational Data:
+Capture Operational Data:
 ${JSON.stringify(data, null, 2)}
 
 Analysis Type: ${analysisType}
@@ -607,7 +607,7 @@ Format your response as structured JSON with this exact structure:
         overallEfficiency: 78,
         bottlenecks: [
           {
-            process: "Student Registration",
+            process: "Opportunity Intake",
             severity: "Medium",
             impact: "Medium",
             solutions: ["Digital automation", "Process streamlining"]
@@ -627,7 +627,7 @@ Format your response as structured JSON with this exact structure:
             timeline: "Short-term"
           },
           {
-            area: "Student Services",
+            area: "Client Services",
             potential: 20,
             priority: "Medium",
             timeline: "Medium-term"
@@ -710,7 +710,7 @@ Format your response as structured JSON with this exact structure:
         complianceRate: 92,
         qualityAreas: [
           {
-            area: "Academic Processes",
+            area: "Proposal Processes",
             score: 9.0,
             status: "Excellent",
             improvements: ["Continuous monitoring", "Staff training"]
@@ -722,7 +722,7 @@ Format your response as structured JSON with this exact structure:
             improvements: ["Process standardization", "Quality controls"]
           },
           {
-            area: "Student Services",
+            area: "Client Services",
             score: 8.5,
             status: "Good",
             improvements: ["Service delivery", "Response times"]
@@ -738,7 +738,7 @@ Format your response as structured JSON with this exact structure:
         automationPotential: 35,
         opportunities: [
           {
-            process: "Student Registration",
+            process: "Opportunity Intake",
             automationLevel: "High",
             savings: 150000,
             implementation: "Medium",

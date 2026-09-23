@@ -29,10 +29,10 @@ class EmailTemplatesService {
   getEmailTypeDescription(emailType) {
     const descriptions = {
       'follow-up': 'Follow up after initial contact with additional information',
-      'program-introduction': 'Introduce specific academic programs and benefits',
-      'event-invitation': 'Invite to university events and open houses',
+      'program-introduction': 'Introduce specific RFP offerings and benefits',
+      'event-invitation': 'Invite to industry days and capability briefings',
       'application-reminder': 'Remind about application deadlines and requirements',
-      'welcome': 'Welcome new leads to the university community'
+      'welcome': 'Welcome new leads to the JUNO RFP community'
     };
     return descriptions[emailType] || 'Generate personalized email content';
   }
@@ -85,7 +85,7 @@ class EmailTemplatesService {
 
     const emailTypeInstructions = this.getEmailTypeInstructions(emailType);
     
-    return `You are an expert email marketing AI for a university. Generate a professional, personalized email for a prospective student.
+    return `You are an expert email marketing AI for an RFP organization. Generate a professional, personalized email for a prospective student.
 
 LEAD INFORMATION:
 ${JSON.stringify(leadData, null, 2)}
@@ -99,7 +99,7 @@ REQUIREMENTS:
 1. Professional and warm tone
 2. Personalized based on lead data
 3. Clear call-to-action
-4. University-appropriate language
+4. Professional capture language
 5. 150-300 words
 6. Include subject line
 7. Include greeting and closing
@@ -113,7 +113,7 @@ FORMAT AS JSON:
   "body": "Main email content with paragraphs",
   "callToAction": "Specific next step",
   "closing": "Professional closing",
-  "signature": "University signature",
+  "signature": "Company signature",
   "personalization": "What was personalized",
   "tone": "Professional/Warm/Urgent"
 }`;
@@ -130,14 +130,14 @@ FORMAT AS JSON:
         - Be helpful and informative
       `,
       'program-introduction': `
-        This introduces a specific academic program.
+        This introduces a specific RFP offering.
         - Highlight program benefits
         - Mention career opportunities
         - Include program details
         - Encourage application
       `,
       'event-invitation': `
-        This invites to a university event.
+        This invites to an RFP organization event.
         - Describe the event
         - Highlight benefits of attending
         - Include date, time, location
@@ -153,7 +153,7 @@ FORMAT AS JSON:
       'welcome': `
         This welcomes a new lead.
         - Thank for interest
-        - Introduce university
+        - Introduce the capture organization
         - Provide next steps
         - Be welcoming and informative
       `
@@ -193,7 +193,7 @@ FORMAT AS JSON:
         body: emailData.body,
         callToAction: emailData.callToAction || 'Contact us for more information',
         closing: emailData.closing || 'Best regards,',
-        signature: emailData.signature || 'University Admissions Team',
+        signature: emailData.signature || 'JUNO Capture Team',
         personalization: emailData.personalization || 'Name and program interest',
         tone: emailData.tone || 'Professional',
         leadId: lead.id || 'unknown',
@@ -217,12 +217,12 @@ FORMAT AS JSON:
     
     const templates = {
       'follow-up': {
-        subject: `Follow-up: ${program} Program at Our University`,
+        subject: `Follow-up: ${program} Offering at Our Firm`,
         greeting: `Dear ${leadName},`,
-        body: `Thank you for your interest in our ${program} program. We wanted to follow up and provide you with additional information that might be helpful in your decision-making process.\n\nOur university offers excellent opportunities in ${program}, and we believe you would be a great fit for our program. We'd love to schedule a personal consultation to discuss your goals and answer any questions you might have.`,
-        callToAction: 'Schedule a consultation call with our admissions team',
+        body: `Thank you for your interest in our ${program} program. We wanted to follow up and provide you with additional information that might be helpful in your decision-making process.\n\nOur firm offers excellent opportunities in ${program}, and we believe you would be a great fit for our program. We'd love to schedule a personal consultation to discuss your goals and answer any questions you might have.`,
+        callToAction: 'Schedule a consultation call with our recruitments team',
         closing: 'Best regards,',
-        signature: 'University Admissions Team',
+        signature: 'JUNO Capture Team',
         personalization: 'Program interest and name',
         tone: 'Professional'
       },
@@ -232,15 +232,15 @@ FORMAT AS JSON:
         body: `We're excited to introduce you to our ${program} program, which has been designed to provide students with comprehensive knowledge and practical skills in this field.\n\nOur program offers:\n• Expert faculty with industry experience\n• State-of-the-art facilities\n• Career placement assistance\n• Flexible scheduling options\n\nWe believe this program aligns perfectly with your interests and career goals.`,
         callToAction: 'Learn more about our program and application process',
         closing: 'Warm regards,',
-        signature: 'Academic Programs Team',
+        signature: 'Capture Solutions Team',
         personalization: 'Program interest and name',
         tone: 'Warm'
       },
       'event-invitation': {
-        subject: `You're Invited: University Open House`,
+        subject: `You're Invited: Agency Industry Day`,
         greeting: `Dear ${leadName},`,
-        body: `We're delighted to invite you to our upcoming University Open House, where you can explore our campus, meet faculty, and learn more about our ${program} program.\n\nThis is a great opportunity to:\n• Tour our facilities\n• Meet current students\n• Speak with faculty\n• Get your questions answered\n\nWe'd love to see you there!`,
-        callToAction: 'RSVP for the Open House event',
+        body: `We're delighted to invite you to our upcoming Agency Industry Day, where you can review our capabilities, meet the capture team, and learn more about our ${program} offering.\n\nThis is a great opportunity to:\n• Tour our facilities\n• Meet current clients\n• Speak with capture leads\n• Get your questions answered\n\nWe'd love to see you there!`,
+        callToAction: 'RSVP for the Industry Day event',
         closing: 'Looking forward to seeing you,',
         signature: 'Events Team',
         personalization: 'Program interest and name',
@@ -249,20 +249,20 @@ FORMAT AS JSON:
       'application-reminder': {
         subject: `Important: Application Deadline Approaching`,
         greeting: `Dear ${leadName},`,
-        body: `We wanted to remind you that the application deadline for our ${program} program is approaching soon. We've been impressed by your interest and would hate for you to miss this opportunity.\n\nTo ensure your application is complete, please make sure to submit all required documents. If you need any assistance or have questions, our admissions team is here to help.`,
+        body: `We wanted to remind you that the application deadline for our ${program} program is approaching soon. We've been impressed by your interest and would hate for you to miss this opportunity.\n\nTo ensure your application is complete, please make sure to submit all required documents. If you need any assistance or have questions, our recruitments team is here to help.`,
         callToAction: 'Complete your application before the deadline',
         closing: 'Best regards,',
-        signature: 'Admissions Team',
+        signature: 'Capture Team',
         personalization: 'Program interest and name',
         tone: 'Urgent'
       },
       'welcome': {
-        subject: `Welcome to Our University Community!`,
+        subject: `Welcome to the JUNO RFP Community!`,
         greeting: `Dear ${leadName},`,
-        body: `Welcome to our university community! We're thrilled that you've shown interest in our ${program} program.\n\nAs you begin your journey with us, we want to ensure you have all the information and support you need. Our dedicated team is here to guide you through every step of the process.\n\nWe look forward to helping you achieve your academic and career goals.`,
+        body: `Welcome to the JUNO RFP community! We're thrilled that you've shown interest in our ${program} offering.\n\nAs you begin your journey with us, we want to ensure you have all the information and support you need. Our dedicated capture team is here to guide you through every step of the process.\n\nWe look forward to helping you achieve your proposal and contract goals.`,
         callToAction: 'Explore our resources and next steps',
         closing: 'Welcome aboard,',
-        signature: 'University Community',
+        signature: 'JUNO RFP Community',
         personalization: 'Program interest and name',
         tone: 'Welcoming'
       }

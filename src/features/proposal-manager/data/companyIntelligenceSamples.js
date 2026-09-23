@@ -62,7 +62,7 @@ const RAW_COMPANIES = [
 const REVENUE_FACTORS = [1.0, 0.94, 0.89, 0.83];
 const NET_MARGIN_ADJUST = [1.0, 0.97, 0.93, 0.9];
 const ASSET_FACTORS = [1.0, 0.96, 0.92, 0.88];
-const PERIODS = ["2024", "2023", "2022", "2021"];
+const PERIODS = ["2025", "2024", "2023", "2022"];
 
 function toUsd(billionValue) {
   return Math.round(billionValue * 1e9);

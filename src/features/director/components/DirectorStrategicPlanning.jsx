@@ -28,7 +28,7 @@ import {
 } from 'react-icons/fi';
 
 // Demo data for filters - will be generated dynamically with translations
-const years = ["2026", "2026", "2026", "2027", "2028"];
+const years = ["2024", "2025", "2026", "2027", "2028"];
 
 // Demo data for KPIs - will be generated dynamically with translations
 
@@ -161,18 +161,18 @@ export default function DirectorStrategicPlanning() {
   ];
 
   const captureOpportunities = [
-    { course: pmText("Water Wastewater Study", "دراسة المياه والصرف الصحي"), status: "Capture", lead: pmText("Capture Manager", "مدير الالتقاط"), start: "2026-02", end: "2026-04", priority: "high" },
-    { course: pmText("Landscape Maintenance", "صيانة المساحات الخضراء"), status: "Proposal", lead: pmText("Proposal Manager", "مدير العروض"), start: "2026-03", end: "2026-05", priority: "medium" },
-    { course: pmText("Airport Restaurant Lease", "تأجير مطعم المطار"), status: "Pricing", lead: pmText("Pricing Lead", "قائد التسعير"), start: "2026-03", end: "2026-05", priority: "low" },
-    { course: pmText("Balsitis Playground", "ملعب بالسيـتِس"), status: "Submitted", lead: pmText("Proposal Manager", "مدير العروض"), start: "2026-01", end: "2026-03", priority: "high" },
-    { course: pmText("Surplus Tanks", "خزانات الفائض"), status: "Go/No-Go", lead: pmText("Capture Manager", "مدير الالتقاط"), start: "2026-04", end: "2026-06", priority: "medium" },
+    { course: pmText("Water Wastewater Study", "دراسة المياه والصرف الصحي"), status: "Capture", lead: pmText("Capture Manager", "مدير الالتقاط"), start: "2026-09", end: "2026-09", priority: "high" },
+    { course: pmText("Landscape Maintenance", "صيانة المساحات الخضراء"), status: "Proposal", lead: pmText("Proposal Manager", "مدير العروض"), start: "2026-09", end: "2026-09", priority: "medium" },
+    { course: pmText("Airport Restaurant Lease", "تأجير مطعم المطار"), status: "Pricing", lead: pmText("Pricing Lead", "قائد التسعير"), start: "2026-09", end: "2026-09", priority: "low" },
+    { course: pmText("Balsitis Playground", "ملعب بالسيـتِس"), status: "Submitted", lead: pmText("Proposal Manager", "مدير العروض"), start: "2026-09", end: "2026-09", priority: "high" },
+    { course: pmText("Surplus Tanks", "خزانات الفائض"), status: "Go/No-Go", lead: pmText("Capture Manager", "مدير الالتقاط"), start: "2026-09", end: "2026-09", priority: "medium" },
   ];
   const curriculumMatrix = isCaptureStrategy ? captureOpportunities : [
-    { course: t('strategicPlanning.programs.bscAi'), status: t('strategicPlanning.curriculumStatus.proposal'), lead: t('strategicPlanning.faculty.drChen'), start: "2026-06", end: "2026-05", priority: "high" },
-    { course: t('strategicPlanning.programs.mbaFintech'), status: t('strategicPlanning.curriculumStatus.review'), lead: t('strategicPlanning.faculty.drRao'), start: "2026-09", end: "2026-08", priority: "medium" },
-    { course: t('strategicPlanning.programs.btechEee'), status: t('strategicPlanning.curriculumStatus.ongoing'), lead: t('strategicPlanning.faculty.drSingh'), start: "2026-07", end: "2026-06", priority: "low" },
-    { course: t('strategicPlanning.programs.mscDataSci'), status: t('strategicPlanning.curriculumStatus.proposal'), lead: t('strategicPlanning.faculty.drPatel'), start: "2026-01", end: "2026-12", priority: "high" },
-    { course: t('strategicPlanning.programs.bbaMarketing'), status: t('strategicPlanning.curriculumStatus.accredited'), lead: t('strategicPlanning.faculty.drMehra'), start: "2026-08", end: "2026-07", priority: "low" },
+    { course: t('strategicPlanning.programs.bscAi'), status: t('strategicPlanning.curriculumStatus.proposal'), lead: t('strategicPlanning.faculty.drChen'), start: "2026-09", end: "2026-09", priority: "high" },
+    { course: t('strategicPlanning.programs.mbaFintech'), status: t('strategicPlanning.curriculumStatus.review'), lead: t('strategicPlanning.faculty.drRao'), start: "2026-09", end: "2026-10", priority: "medium" },
+    { course: t('strategicPlanning.programs.btechEee'), status: t('strategicPlanning.curriculumStatus.ongoing'), lead: t('strategicPlanning.faculty.drSingh'), start: "2026-09", end: "2026-11", priority: "low" },
+    { course: t('strategicPlanning.programs.mscDataSci'), status: t('strategicPlanning.curriculumStatus.proposal'), lead: t('strategicPlanning.faculty.drPatel'), start: "2026-09", end: "2026-12", priority: "high" },
+    { course: t('strategicPlanning.programs.bbaMarketing'), status: t('strategicPlanning.curriculumStatus.accredited'), lead: t('strategicPlanning.faculty.drMehra'), start: "2026-10", end: "2026-10", priority: "low" },
   ];
 
   const captureBidReviews = [
@@ -184,7 +184,7 @@ export default function DirectorStrategicPlanning() {
   ];
   const programEvaluation = isCaptureStrategy ? captureBidReviews : [
     { program: t('strategicPlanning.programs.bscCs'), next: "2026", last: "2020", status: "upcoming" },
-    { program: t('strategicPlanning.programs.mba'), next: "2026", last: "2026", status: "upcoming" },
+    { program: t('strategicPlanning.programs.rfp'), next: "2026", last: "2026", status: "upcoming" },
     { program: t('strategicPlanning.programs.btechEee'), next: "2027", last: "2026", status: "upcoming" },
     { program: t('strategicPlanning.programs.mscDataSci'), next: "2028", last: "New", status: "new" },
     { program: t('strategicPlanning.programs.bbaMarketing'), next: "2026", last: "2019", status: "urgent" },
@@ -234,7 +234,7 @@ export default function DirectorStrategicPlanning() {
     [t('strategicPlanning.swot.threats')]: [
       t('strategicPlanning.swot.items.risingCompetition'),
       t('strategicPlanning.swot.items.changingRegulations'),
-      t('strategicPlanning.swot.items.decliningEnrollment'),
+      t('strategicPlanning.swot.items.decliningPipeline'),
       t('strategicPlanning.swot.items.economicDownturn')
     ],
   };
@@ -245,11 +245,11 @@ export default function DirectorStrategicPlanning() {
     { label: pmText("Submissions", "التقديمات"), values: [18, 20, 21, 22, 22], years: ["2022", "2023", "2024", "2025", "2026"], color: "#f59e0b" },
   ];
   const trends = isCaptureStrategy ? captureTrends : [
-    { label: t('strategicPlanning.trends.enrollment'), values: [1200, 1300, 1400, 1550, 1700], years: ["2020","2026","2026","2026","2026"], color: "#3b82f6" },
-    { label: t('strategicPlanning.trends.placements'), values: [800, 900, 950, 1100, 1200], years: ["2020","2026","2026","2026","2026"], color: "#10b981" },
-    { label: t('strategicPlanning.trends.researchFunding'), values: [200, 250, 300, 350, 400], years: ["2020","2026","2026","2026","2026"], color: "#f59e0b" },
-    { label: t('strategicPlanning.trends.facultyPublications'), values: [50, 60, 70, 85, 90], years: ["2020","2026","2026","2026","2026"], color: "#8b5cf6" },
-    { label: t('strategicPlanning.trends.internationalCollaborations'), values: [2, 3, 4, 6, 8], years: ["2020","2026","2026","2026","2026"], color: "#ef4444" },
+    { label: t('strategicPlanning.trends.enrollment'), values: [1200, 1300, 1400, 1550, 1700], years: ["2022","2023","2024","2025","2026"], color: "#3b82f6" },
+    { label: t('strategicPlanning.trends.placements'), values: [800, 900, 950, 1100, 1200], years: ["2022","2023","2024","2025","2026"], color: "#10b981" },
+    { label: t('strategicPlanning.trends.researchFunding'), values: [200, 250, 300, 350, 400], years: ["2022","2023","2024","2025","2026"], color: "#f59e0b" },
+    { label: t('strategicPlanning.trends.facultyPublications'), values: [50, 60, 70, 85, 90], years: ["2022","2023","2024","2025","2026"], color: "#8b5cf6" },
+    { label: t('strategicPlanning.trends.internationalCollaborations'), values: [2, 3, 4, 6, 8], years: ["2022","2023","2024","2025","2026"], color: "#ef4444" },
   ];
 
   // Helper functions

@@ -6,8 +6,8 @@ const allUsers = [
   { id: 1, name: 'Super Admin', email: 'superadmin@org.com', team: null, role: 'Super Admin', status: 'Active' },
   { id: 2, name: 'Marketing Head', email: 'marketing_head@org.com', team: 'Marketing Team', role: 'Head', status: 'Active' },
   { id: 3, name: 'Marketing Manager', email: 'marketing_manager@org.com', team: 'Marketing Team', role: 'Manager', status: 'Active' },
-  { id: 4, name: 'Admission Head', email: 'admission_head@org.com', team: 'Admission Team', role: 'Head', status: 'Active' },
-  { id: 5, name: 'Admission SPOC', email: 'admission_spoc@org.com', team: 'Admission Team', role: 'SPOC', status: 'Active' },
+  { id: 4, name: 'Admission Head', email: 'recruitment_head@org.com', team: 'Admission Team', role: 'Head', status: 'Active' },
+  { id: 5, name: 'Admission SPOC', email: 'recruitment_spoc@org.com', team: 'Admission Team', role: 'SPOC', status: 'Active' },
   { id: 6, name: 'HR Head', email: 'hr_head@org.com', team: 'HR & Payroll Team', role: 'CFO/Head', status: 'Active' },
   { id: 7, name: 'HR Manager', email: 'hr_manager@org.com', team: 'HR & Payroll Team', role: 'Manager', status: 'Active' },
   { id: 8, name: 'Admin Head', email: 'admin_head@org.com', team: 'Admin Team', role: 'Head', status: 'Active' },
@@ -24,10 +24,10 @@ const allUsers = [
   { id: 19, name: 'Library Head', email: 'library_head@org.com', team: 'Library Team', role: 'Head', status: 'Active' },
   { id: 20, name: 'Transport Head', email: 'transport_head@org.com', team: 'Transport Team', role: 'Head', status: 'Active' },
   // UserManagement.jsx
-  { id: 21, name: 'Dr. Sarah Ahmed', email: 'sarah.ahmed@university.edu', team: 'Science', role: 'Dean', status: 'Active' },
-  { id: 22, name: 'Prof. Mohammed Ali', email: 'mohammed.ali@university.edu', team: 'Engineering', role: 'HoD', status: 'Active' },
-  { id: 23, name: 'Dr. Fatima Khan', email: 'fatima.khan@university.edu', team: 'Business', role: 'Professor', status: 'Inactive' },
-  { id: 24, name: 'Ahmed Hassan', email: 'ahmed.hassan@university.edu', team: 'Admissions', role: 'Admin Staff', status: 'Active' },
+  { id: 21, name: 'Dr. Sarah Ahmed', email: 'sarah.ahmed@marln.com', team: 'Science', role: 'Dean', status: 'Active' },
+  { id: 22, name: 'Prof. Mohammed Ali', email: 'mohammed.ali@marln.com', team: 'Engineering', role: 'HoD', status: 'Active' },
+  { id: 23, name: 'Dr. Fatima Khan', email: 'fatima.khan@marln.com', team: 'Business', role: 'Professor', status: 'Inactive' },
+  { id: 24, name: 'Ahmed Hassan', email: 'ahmed.hassan@marln.com', team: 'Admissions', role: 'Admin Staff', status: 'Active' },
   { id: 25, name: 'John Doe', email: 'john.doe@univ.edu', team: 'Science', role: 'Dean', status: 'Active' },
   { id: 26, name: 'Jane Smith', email: 'jane.smith@univ.edu', team: 'EEE', role: 'HoD', status: 'Active' },
   { id: 27, name: 'Mike Johnson', email: 'mike.johnson@univ.edu', team: 'Math', role: 'Faculty', status: 'Inactive' },
@@ -41,7 +41,7 @@ const allTeams = [
   'Marketing Team', 'Admission Team', 'HR & Payroll Team', 'Admin Team', 'IT & Support Team', 'Director and Deans', 'HoD (Head of Department)', 'Teacher / Professor', 'Students', 'Parents', 'Exam Team', 'Library Team', 'Transport Team'
 ];
 
-const allPermissions = ['Users', 'Teams', 'Settings', 'Reports', 'Export', 'Delete', 'Academic Oversight', 'Department Management', 'Budget Approval', 'Course Management', 'Student Evaluation', 'Research Oversight', 'Administrative Tasks', 'Document Management', 'Student Support', 'System Maintenance', 'Technical Support', 'Security Management', 'User Management', 'System Configuration', 'Report Generation', 'Budget Management', 'Expense Approval', 'Financial Reports', 'Payment Processing', 'Access Control', 'Audit Logs', 'Security Settings', 'Compliance Management'];
+const allPermissions = ['Users', 'Teams', 'Settings', 'Reports', 'Export', 'Delete', 'Academic Oversight', 'Department Management', 'Budget Approval', 'Course Management', 'Proposal Review', 'Research Oversight', 'Administrative Tasks', 'Document Management', 'Student Support', 'System Maintenance', 'Technical Support', 'Security Management', 'User Management', 'System Configuration', 'Report Generation', 'Budget Management', 'Expense Approval', 'Financial Reports', 'Payment Processing', 'Access Control', 'Audit Logs', 'Security Settings', 'Compliance Management'];
 
 export default function AdminUserRoleManagement() {
   const [tab, setTab] = useState('users');

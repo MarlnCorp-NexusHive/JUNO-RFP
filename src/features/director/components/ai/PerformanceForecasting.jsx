@@ -248,7 +248,7 @@ const PerformanceForecasting = ({ universityData, onForecastComplete }) => {
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             <option value="revenue">{getTranslation('ai.performanceForecasting.revenue', 'Revenue')}</option>
-            <option value="enrollment">{getTranslation('ai.performanceForecasting.enrollment', 'Enrollment')}</option>
+            <option value="enrollment">{getTranslation('ai.performanceForecasting.enrollment', 'Pipeline')}</option>
             <option value="financial">{getTranslation('ai.performanceForecasting.financial', 'Financial')}</option>
             <option value="academic">{getTranslation('ai.performanceForecasting.academic', 'Academic')}</option>
             <option value="operational">{getTranslation('ai.performanceForecasting.operational', 'Operational')}</option>
@@ -371,7 +371,7 @@ const PerformanceForecasting = ({ universityData, onForecastComplete }) => {
           >
             <option value="all">{getTranslation('ai.performanceForecasting.allCategories', 'All Categories')}</option>
             <option value="revenue">{getTranslation('ai.performanceForecasting.revenue', 'Revenue')}</option>
-            <option value="enrollment">{getTranslation('ai.performanceForecasting.enrollment', 'Enrollment')}</option>
+            <option value="enrollment">{getTranslation('ai.performanceForecasting.enrollment', 'Pipeline')}</option>
             <option value="financial">{getTranslation('ai.performanceForecasting.financial', 'Financial')}</option>
             <option value="academic">{getTranslation('ai.performanceForecasting.academic', 'Academic')}</option>
             <option value="operational">{getTranslation('ai.performanceForecasting.operational', 'Operational')}</option>

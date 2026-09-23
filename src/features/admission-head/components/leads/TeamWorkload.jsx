@@ -7,10 +7,10 @@ const teamMembers = [
   {
     id: 1,
     name: 'Noura Al-Zahra',
-    role: 'Senior Counselor',
+    role: 'Senior Capture Lead',
     avatar: 'NA',
     email: 'noura.zahra@example.com',
-    phone: '+966 50 123 4567',
+    phone: '+1 (202) 555-123 4567',
     workload: {
       total: 45,
       active: 32,
@@ -34,7 +34,7 @@ const teamMembers = [
     role: 'Admission Officer',
     avatar: 'KA',
     email: 'khalid.sayed@example.com',
-    phone: '+966 50 234 5678',
+    phone: '+1 (202) 555-234 5678',
     workload: {
       total: 38,
       active: 25,

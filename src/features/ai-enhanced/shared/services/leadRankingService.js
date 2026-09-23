@@ -37,7 +37,7 @@ class LeadRankingService {
       timeline: lead.timeline || 'Not specified'
     }));
 
-    return `You are an expert lead scoring AI for a university marketing team. Analyze these leads and rank them by conversion probability (1-100 score).
+    return `You are an expert lead scoring AI for an RFP organization marketing team. Analyze these leads and rank them by conversion probability (1-100 score).
 
 LEADS TO RANK:
 ${JSON.stringify(leadsData, null, 2)}

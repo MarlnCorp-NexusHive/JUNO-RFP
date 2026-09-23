@@ -63,48 +63,48 @@ const recentMessages = [
 
 // Demo data for lead communications (historical, before June 14, 2026)
 const leadComms = [
-  { id: 1, name: "Saudi Arabia", channel: "Email", lastMsg: "Interested in MBA program", date: "2026-06-10", engagement: 0.85 },
-  { id: 2, name: "Saudi Arabia", channel: "WhatsApp", lastMsg: "Requested brochure", date: "2026-06-09", engagement: 0.72 },
-  { id: 3, name: "Saudi Arabia", channel: "SMS", lastMsg: "Sent application link", date: "2026-06-08", engagement: 0.60 },
+  { id: 1, name: "United States", channel: "Email", lastMsg: "Interested in RFP support", date: "2026-10-10", engagement: 0.85 },
+  { id: 2, name: "United States", channel: "WhatsApp", lastMsg: "Requested brochure", date: "2026-10-09", engagement: 0.72 },
+  { id: 3, name: "United States", channel: "SMS", lastMsg: "Sent application link", date: "2026-10-08", engagement: 0.60 },
 ];
 
 const teamChats = [
-  { id: 1, room: "MBA Campaign", lastMsg: "Design ready for review", unread: 2 },
+  { id: 1, room: "Weekly RFP Pipelines", lastMsg: "Design ready for review", unread: 2 },
   { id: 2, room: "Social Media", lastMsg: "Scheduled next post", unread: 0 },
   { id: 3, room: "Events", lastMsg: "Venue confirmed", unread: 1 },
 ];
 
 // Demo data for campaign messages (mix of future and past)
 const campaignMsgs = [
-  { id: 1, type: "Email", name: "Spring Blast", status: "Scheduled", segment: "All Leads", sendTime: "2026-06-16 10:00" },
-  { id: 2, type: "WhatsApp", name: "Event Reminder", status: "Sent", segment: "Event Attendees", sendTime: "2026-06-12 09:00" },
+  { id: 1, type: "Email", name: "Spring Blast", status: "Scheduled", segment: "All Leads", sendTime: "2026-10-16 10:00" },
+  { id: 2, type: "WhatsApp", name: "Event Reminder", status: "Sent", segment: "Event Attendees", sendTime: "2026-10-12 09:00" },
   { id: 3, type: "SMS", name: "App Deadline", status: "Draft", segment: "Applicants", sendTime: "-" },
 ];
 
 // Demo data for vendor communications (historical)
 const vendorComms = [
-  { id: 1, name: "Saudi Arabia", type: "Ad Agency", lastMsg: "Sent invoice", date: "2026-06-07", performance: "High" },
-  { id: 2, name: "Saudi Arabia", type: "Printer", lastMsg: "Shared creative", date: "2026-06-06", performance: "Medium" },
+  { id: 1, name: "United States", type: "Ad Agency", lastMsg: "Sent invoice", date: "2026-10-07", performance: "High" },
+  { id: 2, name: "United States", type: "Printer", lastMsg: "Shared creative", date: "2026-10-06", performance: "Medium" },
 ];
 
 // Demo data for communication calendar (future events)
 const commCalendar = [
-  { id: 1, event: "MBA Email Blast", type: "Email", date: "2026-06-16", time: "10:00" },
-  { id: 2, event: "Open Day Reminder", type: "WhatsApp", date: "2026-06-18", time: "09:00" },
+  { id: 1, event: "RFP Email Blast", type: "Email", date: "2026-10-16", time: "10:00" },
+  { id: 2, event: "Industry Day Reminder", type: "WhatsApp", date: "2026-10-18", time: "09:00" },
 ];
 
 // Demo data for notifications (historical)
 const notifications = [
-  { id: 1, type: "Lead", msg: "Lead Saudi Arabia viewed brochure 3 times", date: "2026-06-10", urgent: false },
-  { id: 2, type: "Campaign", msg: "Spring Blast sent successfully", date: "2026-06-09", urgent: false },
-  { id: 3, type: "Internal", msg: "Reply pending from design team", date: "2026-06-08", urgent: true },
+  { id: 1, type: "Lead", msg: "Lead United States viewed brochure 3 times", date: "2026-10-10", urgent: false },
+  { id: 2, type: "Campaign", msg: "Spring Blast sent successfully", date: "2026-10-09", urgent: false },
+  { id: 3, type: "Internal", msg: "Reply pending from design team", date: "2026-10-08", urgent: true },
 ];
 
 // Demo data for communication logs (historical)
 const commLogs = [
-  { id: 1, name: "Saudi Arabia", channel: "Email", outcome: "Opened", date: "2026-06-10" },
-  { id: 2, name: "Saudi Arabia", channel: "WhatsApp", outcome: "Clicked", date: "2026-06-09" },
-  { id: 3, name: "Saudi Arabia", channel: "SMS", outcome: "Delivered", date: "2026-06-08" },
+  { id: 1, name: "United States", channel: "Email", outcome: "Opened", date: "2026-10-10" },
+  { id: 2, name: "United States", channel: "WhatsApp", outcome: "Clicked", date: "2026-10-09" },
+  { id: 3, name: "United States", channel: "SMS", outcome: "Delivered", date: "2026-10-08" },
 ];
 
 
@@ -139,7 +139,7 @@ export default function MarketingHeadCommunicationHub() {
       Delivered: "تم التسليم",
       High: "مرتفع",
       Medium: "متوسط",
-      "Saudi Arabia": "السعودية",
+      "United States": "الولايات المتحدة",
     };
     return map[value] || value;
   };
@@ -322,8 +322,8 @@ const handleShowReplySuggestions = () => {
     </div>
     <MarketingReplySuggestions 
       leadContext={{
-        name: pmText("Saudi Arabia", "السعودية"),
-        lastMessage: pmText("Interested in MBA program", "مهتم ببرنامج ماجستير إدارة الأعمال"),
+        name: pmText("United States", "الولايات المتحدة"),
+        lastMessage: pmText("Interested in RFP support", "مهتم بدعم طلبات العروض"),
         channel: pmText("Email", "البريد الإلكتروني"),
         engagement: 0.85
       }}
@@ -367,7 +367,7 @@ const handleShowReplySuggestions = () => {
                 <tr key={c.id} className="border-b dark:border-gray-700">
                   <td className="py-3 font-medium">{c.name}</td>
                   <td className="py-3">{pmLabel(c.channel)}</td>
-                  <td className="py-3">{pmText(c.lastMsg, c.lastMsg === "Interested in MBA program" ? "مهتم ببرنامج ماجستير إدارة الأعمال" : c.lastMsg === "Requested brochure" ? "طلب الكتيب" : c.lastMsg === "Sent application link" ? "تم إرسال رابط التقديم" : c.lastMsg)}</td>
+                  <td className="py-3">{pmText(c.lastMsg, c.lastMsg === "Interested in RFP support" ? "مهتم بدعم طلبات العروض" : c.lastMsg === "Requested brochure" ? "طلب الكتيب" : c.lastMsg === "Sent application link" ? "تم إرسال رابط التقديم" : c.lastMsg)}</td>
                   <td className="py-3">{c.date}</td>
                   <td className="py-3">
                     <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -383,7 +383,7 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.leadCommunication.aiResponseSuggestion')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("\"Hi, thanks for your interest! Would you like to schedule a call to discuss the MBA program?\"", "\"مرحباً، شكراً لاهتمامك! هل ترغب في جدولة مكالمة لمناقشة برنامج ماجستير إدارة الأعمال؟\"")}</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("\"Hi, thanks for your interest! Would you like to schedule a call to discuss the RFP opportunity?\"", "\"مرحباً، شكراً لاهتمامك! هل ترغب في جدولة مكالمة لمناقشة فرصة طلب العروض؟\"")}</div>
           </div>
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.leadCommunication.aiToneOptimizer')}</div>
@@ -407,7 +407,7 @@ const handleShowReplySuggestions = () => {
               {teamChats.map((chat) => (
                 <li key={chat.id} className="flex items-center gap-2">
                   <FiMessageCircle className="text-blue-400" />
-                  <span className="font-medium">{pmText(chat.room, chat.room === "MBA Campaign" ? "حملة ماجستير إدارة الأعمال" : chat.room === "Social Media" ? "وسائل التواصل الاجتماعي" : chat.room === "Events" ? "الفعاليات" : chat.room)}</span>
+                  <span className="font-medium">{pmText(chat.room, chat.room === "Weekly RFP Pipelines" ? "خطوط أنابيب طلبات العروض الأسبوعية" : chat.room === "Social Media" ? "وسائل التواصل الاجتماعي" : chat.room === "Events" ? "الفعاليات" : chat.room)}</span>
                   <span className="text-xs text-gray-500">{pmText(chat.lastMsg, chat.lastMsg === "Design ready for review" ? "التصميم جاهز للمراجعة" : chat.lastMsg === "Scheduled next post" ? "تمت جدولة المنشور القادم" : chat.lastMsg === "Venue confirmed" ? "تم تأكيد الموقع" : chat.lastMsg)}</span>
                   {chat.unread > 0 && <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{chat.unread} {t('communication.teamCollaboration.new')}</span>}
                 </li>
@@ -428,7 +428,7 @@ const handleShowReplySuggestions = () => {
         </div>
         <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
           <div className="font-medium mb-1">{t('communication.teamCollaboration.aiSmartFileSuggestion')}</div>
-          <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Suggested: \"MBA_Brochure_v2.pdf\" for campaign discussion.", "مقترح: \"MBA_Brochure_v2.pdf\" لمناقشة الحملة.")}</div>
+          <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Suggested: \"RFP_Overview_v2.pdf\" for campaign discussion.", "مقترح: \"RFP_Overview_v2.pdf\" لمناقشة الحملة.")}</div>
         </div>
       </section>
 
@@ -472,7 +472,7 @@ const handleShowReplySuggestions = () => {
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.campaignMessaging.aiSubjectLinePredictor')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Subject: \"Unlock Your Future at Our MBA Program\" (Predicted Open Rate: 38%)", "العنوان: \"افتح مستقبلك مع برنامج ماجستير إدارة الأعمال\" (معدل فتح متوقع: 38%)")}</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Subject: \"Unlock Your Future at Our RFP Services\" (Predicted Open Rate: 38%)", "العنوان: \"افتح مستقبلك مع خدمات طلبات العروض\" (معدل فتح متوقع: 38%)")}</div>
           </div>
         </div>
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg mt-4">
@@ -518,11 +518,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.vendorPartner.aiVendorPerformanceSummary')}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">{pmText("Saudi Arabia: $5,000 spent, 120 leads, 30 conversions.", "السعودية: تم إنفاق 5,000$، 120 عميلًا محتملاً، 30 تحويلاً.")}</div>
+            <div className="text-sm text-green-700 dark:text-green-300">{pmText("United States: $5,000 spent, 120 leads, 30 conversions.", "الولايات المتحدة: تم إنفاق 5,000$، 120 عميلًا محتملاً، 30 تحويلاً.")}</div>
           </div>
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.vendorPartner.aiFollowUpNudge')}</div>
-            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("No follow-up sent to Saudi Arabia in 7 days.", "لم يتم إرسال متابعة إلى السعودية خلال 7 أيام.")}</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("No follow-up sent to United States in 7 days.", "لم يتم إرسال متابعة إلى الولايات المتحدة خلال 7 أيام.")}</div>
           </div>
         </div>
       </section>
@@ -548,7 +548,7 @@ const handleShowReplySuggestions = () => {
             <tbody>
               {commCalendar.map((e) => (
                 <tr key={e.id} className="border-b dark:border-gray-700">
-                  <td className="py-3 font-medium">{pmText(e.event, e.event === "MBA Email Blast" ? "دفعة بريدية لبرنامج ماجستير إدارة الأعمال" : e.event === "Open Day Reminder" ? "تذكير بيوم مفتوح" : e.event)}</td>
+                  <td className="py-3 font-medium">{pmText(e.event, e.event === "RFP Email Blast" ? "دفعة بريدية لطلبات العروض" : e.event === "Industry Day Reminder" ? "تذكير بيوم الصناعة" : e.event)}</td>
                   <td className="py-3">{pmLabel(e.type)}</td>
                   <td className="py-3">{e.date}</td>
                   <td className="py-3">{e.time}</td>
@@ -560,11 +560,11 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationCalendar.aiSmartScheduling')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("No message overlaps. Next free slot: 11:00 AM, 20th April.", "لا يوجد تداخل في الرسائل. أقرب وقت متاح: 11:00 صباحاً، 20 أبريل.")}</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("No message overlaps. Next free slot: 11:00 AM, 25th September.", "لا يوجد تداخل في الرسائل. أقرب وقت متاح: 11:00 صباحاً، 25 سبتمبر.")}</div>
           </div>
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationCalendar.aiMissedOpportunityAlert')}</div>
-            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("No campaign scheduled for \"Open Day\" event.", "لا توجد حملة مجدولة لفعالية \"اليوم المفتوح\".")}</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("No campaign scheduled for \"Industry Day\" event.", "لا توجد حملة مجدولة لفعالية \"يوم الصناعة\".")}</div>
           </div>
         </div>
       </section>
@@ -591,7 +591,7 @@ const handleShowReplySuggestions = () => {
               {notifications.map((n) => (
                 <tr key={n.id} className="border-b dark:border-gray-700">
                   <td className="py-3 font-medium">{pmLabel(n.type)}</td>
-                  <td className="py-3">{pmText(n.msg, n.msg === "Lead Saudi Arabia viewed brochure 3 times" ? "العميل المحتمل من السعودية شاهد الكتيب 3 مرات" : n.msg === "Spring Blast sent successfully" ? "تم إرسال انطلاقة الربيع بنجاح" : n.msg === "Reply pending from design team" ? "رد فريق التصميم ما زال معلقاً" : n.msg)}</td>
+                  <td className="py-3">{pmText(n.msg, n.msg === "Lead United States viewed brochure 3 times" ? "العميل المحتمل من الولايات المتحدة شاهد الكتيب 3 مرات" : n.msg === "Spring Blast sent successfully" ? "تم إرسال انطلاقة الربيع بنجاح" : n.msg === "Reply pending from design team" ? "رد فريق التصميم ما زال معلقاً" : n.msg)}</td>
                   <td className="py-3">{n.date}</td>
                   <td className="py-3">
                     {n.urgent ? <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded">{t('communication.notificationAlert.urgentLabel')}</span> : <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">{t('communication.notificationAlert.normal')}</span>}
@@ -608,7 +608,7 @@ const handleShowReplySuggestions = () => {
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.notificationAlert.aiPrioritization')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Lead Saudi Arabia ranked high value, prioritize follow-up.", "العميل المحتمل من السعودية مصنف عالي القيمة؛ أعطِ المتابعة أولوية.")}</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("Lead United States ranked high value, prioritize follow-up.", "العميل المحتمل من الولايات المتحدة مصنف عالي القيمة؛ أعطِ المتابعة أولوية.")}</div>
           </div>
         </div>
       </section>
@@ -673,7 +673,7 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationLogs.aiDropOffDetector')}</div>
-            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("Lead Saudi Arabia stopped engaging after last WhatsApp message.", "توقف العميل المحتمل من السعودية عن التفاعل بعد آخر رسالة واتساب.")}</div>
+            <div className="text-sm text-yellow-700 dark:text-yellow-300">{pmText("Lead United States stopped engaging after last WhatsApp message.", "توقف العميل المحتمل من الولايات المتحدة عن التفاعل بعد آخر رسالة واتساب.")}</div>
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationLogs.aiMessageQualityAnalyzer')}</div>
@@ -699,11 +699,11 @@ const handleShowReplySuggestions = () => {
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium mb-2">{t('communication.aiAssistant.generateDripCampaign')}</h3>
-            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("Day 1: Welcome email. Day 3: Program video. Day 5: Counselor call.", "اليوم 1: بريد ترحيبي. اليوم 3: فيديو البرنامج. اليوم 5: اتصال المستشار.")}</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("Day 1: Welcome email. Day 3: Capability video. Day 5: Capture lead call.", "اليوم 1: بريد ترحيبي. اليوم 3: فيديو القدرات. اليوم 5: اتصال قائد الالتقاط.")}</div>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium mb-2">{t('communication.aiAssistant.summarizeThread')}</h3>
-            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("\"Lead Saudi Arabia requested info, received brochure, scheduled call.\"", "\"العميل المحتمل من السعودية طلب معلومات، استلم الكتيب، وتمت جدولة مكالمة.\"")}</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{pmText("\"Lead United States requested info, received brochure, scheduled call.\"", "\"العميل المحتمل من الولايات المتحدة طلب معلومات، استلم الكتيب، وتمت جدولة مكالمة.\"")}</div>
           </div>
         </div>
       </section>

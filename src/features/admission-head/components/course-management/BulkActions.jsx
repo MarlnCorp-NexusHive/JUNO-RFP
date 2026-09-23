@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const initialCourses = [
-  { id: 1, name: 'B.Tech Computer Science', status: 'Active' },
-  { id: 2, name: 'MBA Finance', status: 'Draft' },
-  { id: 3, name: 'M.Sc Data Science', status: 'Active' },
+  { id: 1, name: 'Cloud Migration RFP', status: 'Active' },
+  { id: 2, name: 'RFP Finance', status: 'Draft' },
+  { id: 3, name: 'Data Analytics Task Order', status: 'Active' },
 ];
 
 const bulkActions = ['Archive', 'Publish', 'Assign Counselor', 'Update Fees'];

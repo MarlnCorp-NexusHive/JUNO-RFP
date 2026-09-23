@@ -11,8 +11,8 @@ const leads = [
     source: "Website",
     status: "New",
     assignedTo: "John Doe",
-    lastContact: "2026-04-10",
-    notes: "Interested in MBA program",
+    lastContact: "2026-09-10",
+    notes: "Interested in RFP support",
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const leads = [
     source: "Social Media",
     status: "Contacted",
     assignedTo: "Jane Smith",
-    lastContact: "2026-04-09",
+    lastContact: "2026-09-09",
     notes: "Requested program brochure",
   },
   {
@@ -33,8 +33,8 @@ const leads = [
     source: "Referral",
     status: "Qualified",
     assignedTo: "Mike Johnson",
-    lastContact: "2026-04-08",
-    notes: "Scheduled campus visit",
+    lastContact: "2026-09-08",
+    notes: "Scheduled site visit",
   },
 ];
 

@@ -5,13 +5,13 @@ import { directorFeatures } from "../features/director/components/directorFeatur
 
 const faqs = [
   { q: "How do I reset my password?", a: "Go to Settings > Security and click 'Reset Password'." },
-  { q: "How to contact IT support?", a: "Email support@univ.edu or call extension 1234." },
+  { q: "How to contact IT support?", a: "Email support@marln.com or call extension 1234." },
   { q: "Where can I find compliance reports?", a: "Navigate to Audit & Compliance > Reports." },
 ];
 const helpTopics = [
   { title: "User Management", desc: "Add, remove, or update user roles and permissions." },
   { title: "Data Security", desc: "Best practices for securing institutional data." },
-  { title: "Compliance", desc: "Guidelines for NCAAA, ETEC, MoE, and SCFHS compliance." },
+  { title: "Compliance", desc: "Guidelines for CMMC, FAR, GSA, and NIST compliance." },
 ];
 
 export default function DirectorSupport() {
@@ -88,7 +88,7 @@ export default function DirectorSupport() {
             className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow flex flex-col gap-2"
           >
             <div className="text-xs text-gray-600 dark:text-gray-300">
-              Email: <a href="mailto:support@univ.edu" className="text-blue-600 underline">support@univ.edu</a>
+              Email: <a href="mailto:support@marln.com" className="text-blue-600 underline">support@marln.com</a>
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-300">
               Phone: <a href="tel:1234" className="text-blue-600 underline">1234</a>

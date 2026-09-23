@@ -21,7 +21,7 @@
         "applicationsSubmitted": "Applications Submitted",
         "applicationsApproved": "Applications Approved",
         "offersSent": "Offers Sent",
-        "admissionsConfirmed": "Hires Confirmed",
+        "recruitmentsConfirmed": "Hires Confirmed",
         "enrolledStudents": "Onboarded Employees"
       }
     },
@@ -301,8 +301,8 @@
       "referral": "Referral"
     },
     "programs": {
-      "mba": "MBA",
-      "btech": "B.Tech"
+      "rfp": "RFP",
+      "btech": "IT Services BPA"
     },
     "demo": {
       "description": "(Demo) Table of formal candidates, document/verification/interview status, alerts for pending docs.",
@@ -793,11 +793,11 @@
       "engineering": "Engineering",
       "business": "Business",
       "arts": "Arts",
-      "medicalSciences": "Medical Sciences",
+      "medicalSciences": "Healthcare IT",
       "law": "Law"
     },
     "tags": {
-      "scholarship": "Scholarship",
+      "scholarship": "Incentive",
       "ews": "EWS",
       "international": "International",
       "sportsQuota": "Sports Quota",
@@ -917,7 +917,7 @@
       "applicationFee": "Application Fee",
       "admissionFee": "Onboarding Fee",
       "securityDeposit": "Background Check",
-      "tuitionFee": "Training Fee",
+      "contract revenueFee": "Training Fee",
       "hostelFee": "Relocation Support",
       "libraryFee": "Equipment Fee",
       "laboratoryFee": "Tools & Software"
@@ -1004,7 +1004,7 @@
       },
       "qualityAssurance": {
         "title": "Quality Assurance",
-        "admissionQualitySelfAssessment": "Recruitment Quality Self-Assessment",
+        "recruitmentQualitySelfAssessment": "Recruitment Quality Self-Assessment",
         "complianceCoverageAnalysis": "Compliance Coverage Analysis",
         "complianceUploads": "Compliance Uploads",
         "start": "Start",
@@ -1025,13 +1025,13 @@
       "title": "Training & Development",
       "teamTraining": {
         "title": "Team Training",
-        "admissionProcess": "Recruitment Process Training",
+        "recruitmentProcess": "Recruitment Process Training",
         "complianceTraining": "Compliance Training",
         "digitalTools": "Digital Tools Training"
       },
       "knowledgeManagement": {
         "title": "Knowledge Management",
-        "admissionGuidelines": "Recruitment Guidelines",
+        "recruitmentGuidelines": "Recruitment Guidelines",
         "complianceProcedures": "Compliance Procedures",
         "departmentSOPs": "Department SOPs"
       }
@@ -1085,7 +1085,7 @@
       },
       "geoFencing": {
         "title": "Geo-Fencing",
-        "checkedIn": "Checked in from Main Campus",
+        "checkedIn": "Checked in from HQ",
         "time": "@ 9:02 AM",
         "alert": "Alert",
         "outOfZoneAttendanceAttempt": "Out-of-zone attendance attempt"
@@ -1108,7 +1108,7 @@
       "linkedApplications": "Linked Applications",
       "feeMapping": "Salary Mapping",
       "documentRequirements": "Document Requirements",
-      "academicMetrics": "Academic Metrics",
+      "academicMetrics": "Pipeline Metrics",
       "bulkActions": "Bulk Actions",
       "marketingReadiness": "Marketing Readiness"
     },

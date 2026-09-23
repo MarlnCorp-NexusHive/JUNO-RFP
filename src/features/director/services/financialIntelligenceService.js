@@ -41,7 +41,7 @@ class FinancialIntelligenceService {
   buildFinancialAnalysisPrompt(data, analysisType, timePeriod) {
     const basePrompt = `As a corporate financial intelligence expert, analyze the following corporate financial data and provide comprehensive financial insights and recommendations.
 
-University Financial Data:
+Capture Portfolio Financial Data:
 ${JSON.stringify(data, null, 2)}
 
 Analysis Type: ${analysisType}
@@ -452,7 +452,7 @@ Format your response as structured JSON with this exact structure:
         rating: "Good",
         trend: "Stable",
         keyStrengths: ["Strong revenue base", "Good liquidity"],
-        keyConcerns: ["Expense growth", "Dependency on tuition"]
+        keyConcerns: ["Expense growth", "Dependency on contract revenue"]
       },
       revenueAnalysis: financialData.revenueAnalysis || {},
       expenseAnalysis: financialData.expenseAnalysis || {},
@@ -492,7 +492,7 @@ Format your response as structured JSON with this exact structure:
         rating: "Good",
         trend: "Improving",
         keyStrengths: [
-          "Strong tuition revenue base",
+          "Strong contract revenue base",
           "Good cash reserves",
           "Diversified funding sources"
         ],
@@ -508,7 +508,7 @@ Format your response as structured JSON with this exact structure:
         diversification: "Medium",
         primarySources: [
           {
-            source: "Tuition & Fees",
+            source: "Contract Revenue & Fees",
             amount: 32000000,
             percentage: 76.2,
             trend: "Growing"
@@ -527,7 +527,7 @@ Format your response as structured JSON with this exact structure:
           }
         ],
         recommendations: [
-          "Diversify revenue streams beyond tuition",
+          "Diversify revenue streams beyond contract revenue",
           "Increase research funding opportunities",
           "Develop corporate partnerships"
         ]
@@ -624,7 +624,7 @@ Format your response as structured JSON with this exact structure:
       investmentAnalysis: {
         capitalAllocation: [
           {
-            category: "Academic Programs",
+            category: "Capture Pursuits",
             amount: 15000000,
             roi: 12.5,
             risk: "Low"
@@ -685,10 +685,10 @@ Format your response as structured JSON with this exact structure:
       },
       recommendations: [
         "Implement comprehensive cost optimization program",
-        "Diversify revenue streams to reduce dependency on tuition",
+        "Diversify revenue streams to reduce dependency on contract revenue",
         "Invest in technology and process automation",
         "Maintain strong cash reserves for economic uncertainty",
-        "Focus on high-ROI investments in academic programs"
+        "Focus on high-ROI investments in capture pursuits"
       ],
       actionItems: [
         {
@@ -736,7 +736,7 @@ Format your response as structured JSON with this exact structure:
           trend: "Up"
         },
         {
-          name: "Cost per Student",
+          name: "Cost per Bid",
           current: 4823,
           target: 4500,
           trend: "Down"

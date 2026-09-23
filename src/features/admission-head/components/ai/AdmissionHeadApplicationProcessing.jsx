@@ -26,10 +26,10 @@ const AdmissionHeadApplicationProcessing = () => {
         id: 1,
         name: "Ahmed Al-Rashid",
         email: "ahmed.rashid@email.com",
-        phone: "+966501234567",
+        phone: "+12025551234567",
         program: "Computer Science",
         status: "pending",
-        submittedDate: "2026-01-15",
+        submittedDate: "2026-09-15",
         documents: ["High School Certificate", "Identity Document", "English Proficiency"],
         gpa: 3.8,
         experience: "2 years software development",
@@ -39,10 +39,10 @@ const AdmissionHeadApplicationProcessing = () => {
         id: 2,
         name: "Fatima Al-Zahra",
         email: "fatima.zahra@email.com",
-        phone: "+966507654321",
+        phone: "+12025557654321",
         program: "Business Administration",
         status: "under_review",
-        submittedDate: "2026-01-14",
+        submittedDate: "2026-09-14",
         documents: ["High School Certificate", "Identity Document"],
         gpa: 3.9,
         experience: "1 year marketing internship",
@@ -52,10 +52,10 @@ const AdmissionHeadApplicationProcessing = () => {
         id: 3,
         name: "Omar Hassan",
         email: "omar.hassan@email.com",
-        phone: "+966509876543",
+        phone: "+12025559876543",
         program: "Engineering",
         status: "approved",
-        submittedDate: "2026-01-13",
+        submittedDate: "2026-09-13",
         documents: ["High School Certificate", "Identity Document", "English Proficiency", "Portfolio"],
         gpa: 3.7,
         experience: "3 years engineering projects",
@@ -97,7 +97,7 @@ const AdmissionHeadApplicationProcessing = () => {
         suitabilityScore: Math.floor(Math.random() * 30) + 70, // 70-100
         recommendation: ['approve', 'waitlist'][Math.floor(Math.random() * 2)],
         strengths: [
-          isRTLMode ? "أداء أكاديمي قوي" : "Strong academic performance",
+          isRTLMode ? "أداء أكاديمي قوي" : "Strong professional performance",
           isRTLMode ? "خبرة ذات صلة في المجال" : "Relevant experience in field",
           isRTLMode ? "دوافع واضحة وأهداف مهنية" : "Clear motivation and career goals",
           isRTLMode ? "وثائق مكتملة" : "Complete documentation"
@@ -138,7 +138,7 @@ const AdmissionHeadApplicationProcessing = () => {
 This candidate shows strong potential for the ${selectedApplication.program} program. The application demonstrates solid academic performance and relevant experience.
 
 **Key Strengths:**
-- Strong academic record with GPA of ${selectedApplication.gpa}
+- Strong professional record with score of ${selectedApplication.gpa}
 - Relevant experience in the field
 - Clear motivation and career goals
 - Complete documentation

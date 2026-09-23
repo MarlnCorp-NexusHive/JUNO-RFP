@@ -41,7 +41,7 @@ const PayrollOverview = () => {
       department: 'Engineering',
       amount: '$8,500',
       status: 'Completed',
-      date: '2026-03-15',
+      date: '2026-09-15',
     },
     {
       id: 2,
@@ -49,7 +49,7 @@ const PayrollOverview = () => {
       department: 'Marketing',
       amount: '$7,200',
       status: 'Pending',
-      date: '2026-03-15',
+      date: '2026-09-15',
     },
   ];
 

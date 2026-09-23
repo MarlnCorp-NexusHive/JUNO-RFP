@@ -21,7 +21,7 @@ const initialModules = [
     format: "PDF",
     size: "2.4 MB",
     assignedTo: ["Foreign Applicants Team"],
-    releaseDate: "2026-08-01",
+    releaseDate: "2026-09-01",
     status: "Draft",
     icon: DocumentTextIcon
   },
@@ -31,8 +31,8 @@ const initialModules = [
     type: "Video",
     format: "MP4",
     size: "156 MB",
-    assignedTo: ["All Counselors"],
-    releaseDate: "2026-07-25",
+    assignedTo: ["All Capture Leads"],
+    releaseDate: "2026-09-25",
     status: "Published",
     icon: VideoCameraIcon
   },
@@ -43,7 +43,7 @@ const initialModules = [
     format: "PPTX",
     size: "8.7 MB",
     assignedTo: ["New Joiners"],
-    releaseDate: "2026-07-20",
+    releaseDate: "2026-09-20",
     status: "Published",
     icon: PresentationChartLineIcon
   }

@@ -17,12 +17,12 @@ export const WIN_LOSS_SAMPLES = [
   {
     id: "wl_water_wastewater",
     rfpName: "Final 2026 RFP — Water Wastewater Study",
-    solicitationNumber: "WW-2026-01",
+    solicitationNumber: "WW-2026-09",
     agency: "Municipal utilities board",
     segment: "State/Local",
     outcome: "lost",
-    submittedAt: "2026-03-12T00:00:00.000Z",
-    awardedAt: "2026-04-20T00:00:00.000Z",
+    submittedAt: "2026-09-12T00:00:00.000Z",
+    awardedAt: "2026-09-20T00:00:00.000Z",
     contractValue: 1.8,
     debrief: {
       sourceType: "debrief",
@@ -82,12 +82,12 @@ export const WIN_LOSS_SAMPLES = [
   {
     id: "wl_landscape",
     rfpName: "Landscape Maintenance Services RFP",
-    solicitationNumber: "CC-LM-2024",
+    solicitationNumber: "CC-LM-2026",
     agency: "City parks department",
     segment: "State/Local",
     outcome: "won",
-    submittedAt: "2024-10-02T00:00:00.000Z",
-    awardedAt: "2024-11-15T00:00:00.000Z",
+    submittedAt: "2026-10-02T00:00:00.000Z",
+    awardedAt: "2026-10-15T00:00:00.000Z",
     contractValue: 0.62,
     debrief: {
       sourceType: "evaluation_scores",
@@ -124,12 +124,12 @@ export const WIN_LOSS_SAMPLES = [
   {
     id: "wl_airport",
     rfpName: "Airport Restaurant Space Lease RFP",
-    solicitationNumber: "AIR-F&B-2025",
+    solicitationNumber: "AIR-F&B-2026",
     agency: "Airport authority",
     segment: "State/Local",
     outcome: "lost",
-    submittedAt: "2025-02-28T00:00:00.000Z",
-    awardedAt: "2025-04-08T00:00:00.000Z",
+    submittedAt: "2026-09-28T00:00:00.000Z",
+    awardedAt: "2026-09-08T00:00:00.000Z",
     contractValue: 4.1,
     debrief: {
       sourceType: "debrief",

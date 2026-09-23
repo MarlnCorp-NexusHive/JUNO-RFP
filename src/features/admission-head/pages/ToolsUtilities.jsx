@@ -4,35 +4,35 @@ import { FiUpload, FiDownload, FiFileText, FiSettings, FiMail, FiUsers, FiMapPin
 
 // Mock data for demo
 const mockLogs = [
-  { id: 1, user: 'Noura Al-Zahra', action: 'Edited applicant', module: 'Applicants', date: '2026-06-10', details: 'Updated phone number' },
-  { id: 2, user: 'Khalid Al-Sayed', action: 'Created lead', module: 'Leads', date: '2026-06-09', details: 'New lead from website' },
-  { id: 3, user: 'Layla Al-Mansour', action: 'Updated status', module: 'Applications', date: '2026-06-08', details: 'Status changed to approved' },
-  { id: 4, user: 'Omar Al-Mutairi', action: 'Generated report', module: 'Reports', date: '2026-06-07', details: 'Monthly enrollment report' },
-  { id: 5, user: 'Aisha Al-Hassan', action: 'Sent email', module: 'Communication', date: '2026-06-06', details: 'Welcome email sent' },
+  { id: 1, user: 'Noura Al-Zahra', action: 'Edited applicant', module: 'Applicants', date: '2026-10-10', details: 'Updated phone number' },
+  { id: 2, user: 'Khalid Al-Sayed', action: 'Created lead', module: 'Leads', date: '2026-10-09', details: 'New lead from website' },
+  { id: 3, user: 'Layla Al-Mansour', action: 'Updated status', module: 'Applications', date: '2026-10-08', details: 'Status changed to approved' },
+  { id: 4, user: 'Omar Al-Mutairi', action: 'Generated report', module: 'Reports', date: '2026-10-07', details: 'Monthly enrollment report' },
+  { id: 5, user: 'Aisha Al-Hassan', action: 'Sent email', module: 'Communication', date: '2026-10-06', details: 'Welcome email sent' },
 ];
 const mockTasks = [
-  { id: 1, task: 'Follow-up with Abdullah Al-Rashid', assigned: 'Noura Al-Zahra', deadline: '2026-06-12', priority: 'High', status: 'Pending' },
-  { id: 2, task: 'Review applications', assigned: 'Khalid Al-Sayed', deadline: '2026-06-11', priority: 'Medium', status: 'In Progress' },
-  { id: 3, task: 'Update website content', assigned: 'Layla Al-Mansour', deadline: '2026-06-10', priority: 'Low', status: 'Completed' },
-  { id: 4, task: 'Prepare presentation', assigned: 'Omar Al-Mutairi', deadline: '2026-06-09', priority: 'High', status: 'Pending' },
-  { id: 5, task: 'Contact references', assigned: 'Aisha Al-Hassan', deadline: '2026-06-08', priority: 'Medium', status: 'Completed' },
+  { id: 1, task: 'Follow-up with Abdullah Al-Rashid', assigned: 'Noura Al-Zahra', deadline: '2026-10-12', priority: 'High', status: 'Pending' },
+  { id: 2, task: 'Review applications', assigned: 'Khalid Al-Sayed', deadline: '2026-10-11', priority: 'Medium', status: 'In Progress' },
+  { id: 3, task: 'Update website content', assigned: 'Layla Al-Mansour', deadline: '2026-10-10', priority: 'Low', status: 'Completed' },
+  { id: 4, task: 'Prepare presentation', assigned: 'Omar Al-Mutairi', deadline: '2026-10-09', priority: 'High', status: 'Pending' },
+  { id: 5, task: 'Contact references', assigned: 'Aisha Al-Hassan', deadline: '2026-10-08', priority: 'Medium', status: 'Completed' },
 ];
 const mockTemplates = [
   { id: 1, name: 'Welcome Email', type: 'Email', content: 'Dear {Name}, welcome to our program!', fields: ['Name', 'Program'] },
   { id: 2, name: 'Payment Reminder', type: 'SMS', content: 'Dear {Name}, your payment for {Program} is due.', fields: ['Name', 'Program'] },
 ];
 const mockGeo = [
-  { region: 'Riyadh', count: 120 },
-  { region: 'Jeddah', count: 80 },
-  { region: 'Dammam', count: 60 },
+  { region: 'Washington DC', count: 120 },
+  { region: 'New York', count: 80 },
+  { region: 'Chicago', count: 60 },
 ];
 const mockDuplicates = [
   { id: 'A001', name: 'Abdullah Al-Rashid', email: 'abdullah@email.com', match: 'Email' },
   { id: 'A002', name: 'Abdullah Al-Rashid', email: 'abdullah@email.com', match: 'Name (fuzzy)' },
 ];
 const mockApiStatus = [
-  { name: 'Payment Gateway', status: 'Active', lastSync: '2026-06-10', errors: 0 },
-  { name: 'SMS Gateway', status: 'Error', lastSync: '2026-06-09', errors: 2 },
+  { name: 'Payment Gateway', status: 'Active', lastSync: '2026-10-10', errors: 0 },
+  { name: 'SMS Gateway', status: 'Error', lastSync: '2026-10-09', errors: 2 },
 ];
 
 export default function ToolsUtilities() {
@@ -101,10 +101,10 @@ export default function ToolsUtilities() {
           </div>
           <div className="text-xs text-gray-400 mt-2">{t('toolsUtilities.tools.documentConverter.ideal')}</div>
         </ToolCard>
-        <ToolCard icon={<FiSettings className="text-yellow-500" size={22} />} title={t('toolsUtilities.tools.feeEstimator.title')} accent="border-yellow-400" desc={t('toolsUtilities.tools.feeEstimator.desc')} tour={{ step: 6, titleEn: 'Fee Estimator', titleAr: 'مقدّر الرسوم', contentEn: 'Estimate fees and scholarships.', contentAr: 'تقدير الرسوم والمنح.' }}>
+        <ToolCard icon={<FiSettings className="text-yellow-500" size={22} />} title={t('toolsUtilities.tools.feeEstimator.title')} accent="border-yellow-400" desc={t('toolsUtilities.tools.feeEstimator.desc')} tour={{ step: 6, titleEn: 'Fee Estimator', titleAr: 'مقدّر الرسوم', contentEn: 'Estimate fees and incentives.', contentAr: 'تقدير الرسوم والحوافز.' }}>
           <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg font-semibold shadow hover:bg-yellow-700 transition">{t('toolsUtilities.tools.feeEstimator.button')}</button>
         </ToolCard>
-        <ToolCard icon={<FiCalendar className="text-pink-500" size={22} />} title={t('toolsUtilities.tools.timelineGenerator.title')} accent="border-pink-400" desc={t('toolsUtilities.tools.timelineGenerator.desc')} tour={{ step: 7, titleEn: 'Timeline Generator', titleAr: 'منشئ الجداول الزمنية', contentEn: 'Auto-generate admission schedules.', contentAr: 'إنشاء جداول القبول تلقائياً.' }}>
+        <ToolCard icon={<FiCalendar className="text-pink-500" size={22} />} title={t('toolsUtilities.tools.timelineGenerator.title')} accent="border-pink-400" desc={t('toolsUtilities.tools.timelineGenerator.desc')} tour={{ step: 7, titleEn: 'Timeline Generator', titleAr: 'منشئ الجداول الزمنية', contentEn: 'Auto-generate recruitment schedules.', contentAr: 'إنشاء جداول القبول تلقائياً.' }}>
           <button className="px-4 py-2 bg-pink-600 text-white rounded-lg font-semibold shadow hover:bg-pink-700 transition" onClick={() => setShowTimelineModal(true)}>{t('toolsUtilities.tools.timelineGenerator.button')}</button>
         </ToolCard>
         <ToolCard icon={<FiMail className="text-blue-400" size={22} />} title={t('toolsUtilities.tools.templatesManager.title')} accent="border-blue-300" desc={t('toolsUtilities.tools.templatesManager.desc')} tour={{ step: 8, titleEn: 'Templates Manager', titleAr: 'مدير القوالب', contentEn: 'Manage email/SMS templates.', contentAr: 'إدارة قوالب البريد/SMS.' }}>

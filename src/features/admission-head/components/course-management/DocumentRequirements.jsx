@@ -17,21 +17,21 @@ import {
 const initialDocs = [
   {
     id: 1,
-    course: 'B.Tech Computer Science',
+    course: 'Cloud Migration RFP',
     document: '10th Marksheet',
     type: 'Mandatory',
     status: 'Active',
   },
   {
     id: 2,
-    course: 'MBA Finance',
+    course: 'RFP Finance',
     document: 'Graduation Certificate',
     type: 'Mandatory',
     status: 'Active',
   },
   {
     id: 3,
-    course: 'M.Sc Data Science',
+    course: 'Data Analytics Task Order',
     document: 'Passport Size Photo',
     type: 'Optional',
     status: 'Active',

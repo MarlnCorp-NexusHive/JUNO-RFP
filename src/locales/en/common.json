@@ -76,7 +76,7 @@
     },
     "units": {
       "students": "Students",
-      "faculty": "Faculty",
+      "faculty": "Team",
       "departments": "Departments",
       "courses": "Courses",
       "applications": "Applications",
@@ -157,7 +157,7 @@
     "adminHead": "Admin Head",
     "director": "Director",
     "marketingHead": "Marketing Head",
-    "admissionHead": "Admission Head",
+    "recruitmentHead": "Admission Head",
     "hrHead": "HR Head"
   },
   "director": {
@@ -175,7 +175,7 @@
     "workspace": "Workspace",
     "helpSupport": "Help & Support"
   },
-  "admissionHead": {
+  "recruitmentHead": {
     "dashboard": "Dashboard",
     "leadsApplicants": "Leads / Applicants",
     "team": "Team",
@@ -588,7 +588,47 @@
       "forecasted": "Forecasted",
       "closed": "Closed",
       "archived": "Archived"
-    }
+    },
+    "modeTabs": "Opportunity source",
+    "modeGrants": "Grants.gov",
+    "modeContracts": "SAM.gov Contracts"
+  },
+  "proposalManagerSam": {
+    "eyebrow": "US Federal · SAM.gov (curated)",
+    "title": "Contract Opportunities",
+    "subtitle": "Curated excerpts from public SAM.gov contract notices — no API key. Combine keyword + NAICS + PSC + agency + set-aside + notice type to find IT, cloud, and cyber pursuits relevant to capture.",
+    "curatedFrom": "{{source}} · snapshot {{date}}",
+    "keyword": "Keyword",
+    "keywordPlaceholder": "Title, notice ID, cyber, cloud…",
+    "naics": "NAICS",
+    "psc": "PSC",
+    "agency": "Agency",
+    "noticeType": "Notice type",
+    "setAside": "Set-aside",
+    "anyNoticeType": "Any notice type",
+    "anySetAside": "Any set-aside",
+    "quickAgencies": "Agency:",
+    "quickNaics": "NAICS:",
+    "results": "{{count}} contract opportunities",
+    "combineHint": "Filters combine (AND) — NAICS + PSC + keyword + agency + set-aside",
+    "empty": "No SAM contracts matched these filters.",
+    "emptyHint": "Clear a filter or try NAICS 541512 / PSC DA01.",
+    "openOnSam": "Open on SAM.gov",
+    "copyNoticeId": "Copy notice ID",
+    "awardCeiling": "Ceiling / value",
+    "awardFloor": "Floor / low estimate",
+    "period": "Period of performance",
+    "department": "Department",
+    "subtier": "Sub-tier",
+    "office": "Office",
+    "posted": "Posted",
+    "responseDue": "Offers / response due",
+    "noDeadline": "No deadline listed (open / market research)",
+    "place": "Place of performance",
+    "description": "Description",
+    "contacts": "Points of contact",
+    "attachments": "Attachments (as listed)",
+    "attachmentsHint": "File names from the public SAM.gov notice. Download packages on SAM.gov."
   },
   "proposalManagerTrial": {
     "badge": "Trial",
@@ -1329,19 +1369,19 @@
       "social": "Social Media",
       "performance": "Performance"
     },
-    "admission": {
+    "recruitment": {
       "quickActions": "Admission Actions",
       "applicationReview": "Application Review",
-      "enrollmentForecast": "Enrollment Forecast", 
+      "enrollmentForecast": "Pipeline Forecast", 
       "documentVerification": "Document Verification",
       "waitlistManagement": "Waitlist Management",
-      "scholarshipAllocation": "Scholarship Allocation",
+      "scholarshipAllocation": "Incentive Allocation",
       "complianceCheck": "Compliance Check",
       "tools": "Admission Tools",
       "applications": "Applications",
       "analytics": "Analytics",
       "verification": "Verification",
-      "scholarships": "Scholarships",
+      "scholarships": "Incentives",
       "status": "Application Status"
     },
     "history": {

@@ -322,12 +322,12 @@
     },
     "riskTypes": {
       "dataSecurityBreach": "خرق أمان البيانات",
-      "studentEnrollmentDecline": "انخفاض تسجيل الطلاب",
+      "studentPipelineDecline": "انخفاض تسجيل المرشحون",
       "regulatoryCompliance": "الامتثال التنظيمي"
     },
     "categories": {
       "it": "تكنولوجيا المعلومات",
-      "academic": "أكاديمي",
+      "academic": "تشغيلي",
       "legal": "قانوني"
     },
     "severity": {
@@ -461,8 +461,8 @@
       "director": "المدير",
       "dean": "العميد",
       "hod": "رئيس القسم",
-      "faculty": "أعضاء هيئة التدريس",
-      "student": "طالب",
+      "faculty": "فريق العروض",
+      "student": "مرشح",
       "admin": "مدير"
     },
     "departments": {
@@ -632,17 +632,17 @@
     "last6Months": "آخر 6 أشهر",
     "lastYear": "السنة الماضية",
     "tabs": {
-      "admissions": "القبول",
+      "recruitments": "القبول",
       "financial": "المالية",
-      "academic": "الأكاديمي",
+      "academic": "التشغيلي",
       "engagement": "التفاعل",
       "placement": "التوظيف",
       "compliance": "الامتثال"
     },
     "sections": {
-      "admissions": {
+      "recruitments": {
         "admissionFunnel": "قناة القبول",
-        "programEnrollment": "تسجيل البرامج",
+        "programPipeline": "تسجيل البرامج",
         "geographicDistribution": "التوزيع الجغرافي",
         "applicationConversionRate": "معدل تحويل الطلبات حسب البرنامج",
         "enrollmentTrend": "اتجاه التسجيل",
@@ -658,8 +658,8 @@
       },
       "academic": {
         "coursePerformance": "أداء المقررات",
-        "facultyPerformance": "أداء أعضاء هيئة التدريس",
-        "studentDemographics": "ديموغرافية الطلاب",
+        "facultyPerformance": "أداء فريق العروض",
+        "studentDemographics": "ديموغرافية المرشحون",
         "averageGPAByDepartment": "متوسط المعدل التراكمي حسب القسم",
         "passRateTrend": "اتجاه معدل النجاح",
         "enrollmentByCourse": "التسجيل حسب المقرر"
@@ -670,7 +670,7 @@
         "staffAnalytics": "تحليلات الموظفين",
         "eventParticipationRateOverTime": "معدل مشاركة الأحداث مع مرور الوقت",
         "topRatedFacilities": "أفضل المرافق تقييماً",
-        "studentSatisfactionTrend": "اتجاه رضا الطلاب"
+        "studentSatisfactionTrend": "اتجاه رضا المرشحون"
       },
       "placement": {
         "programPlacement": "توظيف البرامج",
@@ -691,10 +691,10 @@
     },
     "dataLabels": {
       "departments": {
-        "academics": "الأكاديمية",
+        "academics": "التشغيل",
         "hr": "الموارد البشرية",
         "finance": "المالية",
-        "admissions": "القبول",
+        "recruitments": "القبول",
         "it": "تكنولوجيا المعلومات",
         "rd": "البحث والتطوير"
       },
@@ -722,24 +722,26 @@
       "years": {
         "2019": "2019",
         "2020": "2020",
-        "2021": "2026",
-        "2022": "2026",
-        "2023": "2026",
-        "2024": "2026"
+        "2021": "2021",
+        "2022": "2022",
+        "2023": "2023",
+        "2024": "2024",
+        "2025": "2025",
+        "2026": "2026"
       },
       "stages": {
         "inquiries": "الاستفسارات",
         "applications": "الطلبات",
         "interviews": "المقابلات",
         "offers": "العروض",
-        "enrollments": "التسجيلات"
+        "qualifiedLeads": "التسجيلات"
       },
       "categories": {
         "infrastructure": "البنية التحتية",
-        "faculty": "أعضاء هيئة التدريس",
+        "faculty": "فريق العروض",
         "admin": "الإدارة",
         "research": "البحث",
-        "studentServices": "خدمات الطلاب"
+        "studentServices": "خدمات المرشحون"
       },
       "standards": {
         "etec": "التعليم التقني",
@@ -748,7 +750,7 @@
         "tvtc": "التدريب التقني"
       },
       "areas": {
-        "academic": "أكاديمي",
+        "academic": "تشغيلي",
         "financial": "مالي",
         "administrative": "إداري",
         "infrastructure": "بنية تحتية"
@@ -765,7 +767,7 @@
         "library": "المكتبة",
         "sports": "الرياضة",
         "transport": "النقل",
-        "hostel": "السكن الطلابي"
+        "hostel": "السكن المرشحوني"
       },
       "companies": {
         "techCorp": "شركة التقنية",
@@ -792,11 +794,11 @@
       "kpi": "مؤشر الأداء الرئيسي",
       "budget": "الميزانية",
       "revenue": "الإيرادات",
-      "tuition": "الرسوم الدراسية",
-      "grants": "المنح",
+      "contract revenue": "إيرادات العقود",
+      "grants": "الحوافز",
       "other": "أخرى",
       "cost": "التكلفة",
-      "perStudent": "لكل طالب",
+      "perBid": "لكل مرشح",
       "profit": "الربح",
       "allocated": "المخصصة",
       "used": "المستخدمة",
@@ -808,7 +810,7 @@
       "capacity": "السعة",
       "rating": "التقييم",
       "publications": "المنشورات",
-      "students": "الطلاب",
+      "students": "المرشحون",
       "participants": "المشاركون",
       "satisfaction": "الرضا",
       "complaints": "الشكاوى",
@@ -846,33 +848,33 @@
     "listView": "عرض القائمة",
     "listViewComingSoon": "عرض القائمة قريباً...",
     "sections": {
-      "academicHealthIndicators": "مؤشرات الصحة الأكاديمية",
-      "facultyStaffAnalytics": "تحليلات أعضاء هيئة التدريس والموظفين",
+      "academicHealthIndicators": "مؤشرات صحة المحفظة",
+      "facultyStaffAnalytics": "تحليلات فريق العروض والموظفين",
       "financialSummary": "الملخص المالي",
       "researchInnovation": "مقاييس البحث والابتكار",
-      "studentOutcomes": "نتائج الطلاب",
+      "studentOutcomes": "نتائج المرشحون",
       "departmentAchievements": "إنجازات الأقسام"
     },
     "metrics": {
-      "enrollments": "التسجيلات",
+      "qualifiedLeads": "التسجيلات",
       "passRate": "معدل النجاح",
       "revenue": "الإيرادات",
-      "faculty": "أعضاء هيئة التدريس",
+      "faculty": "فريق العروض",
       "research": "البحث",
       "papers": "أوراق بحثية",
       "gpa": "المعدل التراكمي",
       "dropoutRate": "معدل الانسحاب",
       "completionRate": "معدل الإكمال",
       "satisfactionScore": "درجة الرضا",
-      "facultyStudentRatio": "نسبة أعضاء هيئة التدريس للطلاب",
+      "facultyStudentRatio": "نسبة فريق العروض للطلاب",
       "vacancies": "الوظائف الشاغرة",
       "attritionRate": "معدل الاستنزاف",
       "budgetAllocated": "الميزانية المخصصة",
       "budgetSpent": "الميزانية المنفقة",
-      "costPerStudent": "التكلفة لكل طالب",
+      "costPerStudent": "التكلفة لكل مرشح",
       "roiLabs": "العائد على الاستثمار في المختبرات",
       "publications": "المنشورات",
-      "grantsSecured": "المنح المحصلة",
+      "grantsSecured": "الحوافز المحصلة",
       "patentsFiled": "براءات الاختراع المقدمة",
       "collaborations": "التعاونات",
       "placementRate": "معدل التوظيف",
@@ -886,14 +888,14 @@
     },
     "chartLabels": {
       "passFailRate": "معدل النجاح/الرسوب",
-      "studentSatisfaction": "رضا الطلاب",
+      "studentSatisfaction": "رضا المرشحون",
       "completionVsDropout": "الإكمال مقابل الانسحاب",
-      "facultyMetrics": "مقاييس أعضاء هيئة التدريس",
-      "facultyWorkloadDistribution": "توزيع عبء العمل على أعضاء هيئة التدريس",
+      "facultyMetrics": "مقاييس فريق العروض",
+      "facultyWorkloadDistribution": "توزيع عبء العمل على فريق العروض",
       "budgetAllocationVsSpent": "تخصيص الميزانية مقابل الإنفاق",
       "costRevenueAnalysis": "تحليل التكلفة والإيرادات",
       "researchOutput": "المخرجات البحثية",
-      "grantsFunding": "المنح والتمويل",
+      "grantsFunding": "الحوافز والتمويل",
       "placementHigherStudies": "التوظيف والدراسات العليا",
       "packageInternships": "الراتب والتدريبات",
       "awardsRecognition": "الجوائز والاعتراف"
@@ -909,8 +911,8 @@
     "subtitle": "إدارة ومعالجة طلبات الموافقة",
     "categories": {
       "allCategories": "جميع الفئات",
-      "academic": "أكاديمي",
-      "facultyHr": "أعضاء هيئة التدريس والموارد البشرية",
+      "academic": "تشغيلي",
+      "facultyHr": "فريق العروض والموارد البشرية",
       "financial": "مالي",
       "administrative": "إداري",
       "complianceAudit": "الامتثال والتدقيق"
@@ -938,7 +940,7 @@
     "requestTypes": {
       "newCourseProposal": "اقتراح مقرر جديد",
       "curriculumRevision": "مراجعة المناهج",
-      "facultyHiring": "توظيف أعضاء هيئة التدريس",
+      "facultyHiring": "توظيف فريق العروض",
       "researchGrant": "منحة بحثية",
       "eventApproval": "موافقة على حدث",
       "accreditationDocumentation": "توثيق الاعتماد"
@@ -985,7 +987,7 @@
     "descriptions": {
       "quantumComputing": "اقتراح لمقرر جامعي جديد في الحوسبة الكمية",
       "aiSpecialization": "تحديث مناهج التخصص في الذكاء الاصطناعي لتشمل أحدث التطورات",
-      "dataScienceProfessor": "منصب جديد لأعضاء هيئة التدريس في تخصص علوم البيانات",
+      "dataScienceProfessor": "منصب جديد لفريق العروض في تخصص علوم البيانات",
       "aiResearchProject": "طلب منحة بحثية لمشروع أخلاقيات الذكاء الاصطناعي",
       "techSymposium": "ندوة تقنية سنوية مع خبراء الصناعة",
       "etecReport": "الموافقة النهائية على توثيق اعتماد التعليم التقني"
@@ -1014,7 +1016,7 @@
       "documentsCompiled": "تم تجميع جميع الوثائق المطلوبة"
     },
     "teams": {
-      "academicCommittee": "اللجنة الأكاديمية",
+      "academicCommittee": "لجنة العروض",
       "hrTeam": "فريق الموارد البشرية",
       "financeTeam": "فريق المالية",
       "eventCommittee": "لجنة الحدث",
@@ -1086,7 +1088,7 @@
       "mscDataSci": "فريق علوم البيانات",
       "bbaMarketing": "فريق التسويق",
       "bscCs": "فريق تكنولوجيا المعلومات",
-      "mba": "فريق الأعمال"
+      "rfp": "فريق الأعمال"
     },
     "faculty": {
       "drChen": "د. تشين",
@@ -1114,7 +1116,7 @@
         "onlineCourseExpansion": "توسيع الخدمات عبر الإنترنت",
         "risingCompetition": "منافسة متزايدة",
         "changingRegulations": "لوائح متغيرة",
-        "decliningEnrollment": "انخفاض التوظيف في بعض الفرق",
+        "decliningPipeline": "انخفاض التوظيف في بعض الفرق",
         "economicDownturn": "انكماش اقتصادي"
       }
     },
@@ -1128,7 +1130,7 @@
   },
   "dashboard": {
     "title": "لوحة المدير",
-    "subtitle": "نظرة عامة على أداء الجامعة والتحليلات",
+    "subtitle": "نظرة عامة على أداء المؤسسة والتحليلات",
     "features": {
       "dashboard": "لوحة التحكم",
       "analyticsReports": "التحليلات والتقارير",
@@ -1150,9 +1152,9 @@
       "helpDocumentation": "المساعدة/الوثائق"
     },
     "featureDescriptions": {
-      "dashboard": "نظرة عامة على أداء الجامعة، ملخص مؤشرات الأداء، التنبيهات والإشعارات",
+      "dashboard": "نظرة عامة على أداء المؤسسة، ملخص مؤشرات الأداء، التنبيهات والإشعارات",
       "analyticsReports": "تقارير حسب الأقسام، إحصائيات، مالية، اتجاهات، رؤى الموارد البشرية",
-      "departments": "الشؤون الأكاديمية، الموارد البشرية، المالية، القبول، تكنولوجيا المعلومات، البحث والتطوير",
+      "departments": "الاستحواذ، الموارد البشرية، المالية، خط الأنابيب، تكنولوجيا المعلومات، البحث والتطوير",
       "approvalCenter": "الموافقات على الميزانية، السياسات، التوظيف، المشتريات",
       "strategicPlanning": "الخطط السنوية، الاعتماد، إدارة المخاطر",
       "communication": "الإشعارات، المنشورات الدورية، الاتصالات الخارجية",
@@ -1169,8 +1171,8 @@
       "helpDocumentation": "المساعدة، الوثائق"
     },
     "summaryCards": {
-      "totalStudents": "إجمالي الطلاب",
-      "totalFacultyStaff": "إجمالي أعضاء هيئة التدريس/الموظفين",
+      "totalStudents": "إجمالي المرشحون",
+      "totalFacultyStaff": "إجمالي فريق العروض/الموظفين",
       "collegesDepartments": "الكليات/الأقسام",
       "coursesOffered": "المقررات المقدمة",
       "vehiclesRunning": "المركبات العاملة",
@@ -1183,14 +1185,14 @@
       "next7Days": "الـ 7 أيام القادمة"
     },
     "kpis": {
-      "admissions": "القبول",
+      "recruitments": "القبول",
       "finance": "المالية ($)",
       "hr": "الموارد البشرية (الموظفين)",
-      "academics": "الأكاديمية (المعدل التراكمي)",
+      "academics": "التشغيل (مؤشر الجودة)",
       "attendance": "الحضور (%)"
     },
     "sections": {
-      "academicInsights": "الرؤى الأكاديمية",
+      "academicInsights": "رؤى المحفظة",
       "financialOverview": "نظرة عامة مالية",
       "hrStaffAnalytics": "تحليلات الموارد البشرية والموظفين",
       "alertsNotifications": "التنبيهات والإشعارات",
@@ -1199,7 +1201,7 @@
       "aiPoweredRevenue": "تحليلات الإيرادات والتحويل المدعومة بالذكاء الاصطناعي"
     },
     "charts": {
-      "admissionsTrend": "اتجاه القبول",
+      "recruitmentsTrend": "اتجاه القبول",
       "financeOverview": "نظرة عامة مالية",
       "departmentPerformance": "أداء الأقسام",
       "enrollmentGraduation": "التسجيل والتخرج (آخر 5 سنوات)",
@@ -1210,10 +1212,10 @@
       "attritionRateTrend": "اتجاه معدل الاستنزاف (%)"
     },
     "departments": {
-      "academics": "الأكاديمية",
+      "academics": "التشغيل",
       "hr": "الموارد البشرية",
       "finance": "المالية",
-      "admissions": "القبول",
+      "recruitments": "القبول",
       "it": "تكنولوجيا المعلومات",
       "rd": "البحث والتطوير",
       "engineering": "الهندسة",
@@ -1230,13 +1232,13 @@
       "applicationFeeRevenue": "إيرادات رسوم الطلب",
       "departmentRevenue": "إيرادات الأقسام",
       "subjectProfitability": "ربحية المواد",
-      "studentDemographics": "ديموغرافية الطلاب",
+      "studentDemographics": "ديموغرافية المرشحون",
       "departmentRevenueRadar": "إيرادات الأقسام (رادار)",
       "subjectProfitabilityRadar": "ربحية المواد (رادار)"
     },
     "aiLabels": {
       "ai": "الذكاء الاصطناعي",
-      "nextSemesterIntake": "المتوقع للفصل الدراسي القادم",
+      "nextFiscal PeriodIntake": "المتوقع للفصل الدراسي القادم",
       "highestGrowth": "أعلى نمو",
       "confidence": "الثقة",
       "model": "النموذج",
@@ -1252,9 +1254,9 @@
       "pendingBudgetApprovals": "موافقات الميزانية المعلقة: 3",
       "complianceAlert": "تنبيه الامتثال: تقرير الهيئة الوطنية مستحق",
       "upcomingExamDeadline": "موعد الامتحان القادم: 15 يوليو",
-      "newFeedbackStudents": "تعليقات جديدة من الطلاب",
+      "newFeedbackStudents": "تعليقات جديدة من المرشحون",
       "proposalManager": {
-        "rfpSubmissionDeadline": "موعد تقديم RFP خلال 3 أيام: خدمات DoD IT (المناقصة #2025-084)",
+        "rfpSubmissionDeadline": "موعد تقديم RFP خلال 3 أيام: خدمات DoD IT (المناقصة #2026-084)",
         "complianceReviewDue": "مراجعة الامتثال مستحقة: بندان إلزاميان يحتاجان موافقة قبل التقديم",
         "bidApprovalPending": "قرار تقديم/عدم تقديم معلق: فرصة واحدة بانتظار موافقتك",
         "teamAssignmentNeeded": "تعيين الفريق مطلوب: قائد استراتيجية الاستحواذ غير معين لـ GSA BPA",
@@ -1280,18 +1282,18 @@
       "ambulances": "الإسعافات",
       "convocation": "حفل التخرج",
       "sportsMeet": "اللقاء الرياضي",
-      "facultyWorkshop": "ورشة عمل أعضاء هيئة التدريس",
+      "facultyWorkshop": "ورشة عمل فريق العروض",
       "daysLeft": "أيام متبقية",
       "applicationsThisMonth": "الطلبات هذا الشهر",
       "acceptanceRate": "معدل القبول",
       "topProgram": "أفضل برنامج",
       "feeCollectionYtd": "تحصيل الرسوم (من بداية العام)",
       "outstandingFees": "الرسوم المستحقة",
-      "scholarshipsGranted": "المنح الممنوحة",
+      "scholarshipsGranted": "الحوافز الممنوحة",
       "avgGpaUg": "متوسط المعدل التراكمي (البكالوريوس)",
       "avgGpaPg": "متوسط المعدل التراكمي (الدراسات العليا)",
       "topDepartment": "أفضل قسم",
-      "studentAttendance": "حضور الطلاب",
+      "studentAttendance": "حضور المرشحون",
       "staffAttendance": "حضور الموظفين",
       "lowest": "الأدنى",
       "trend": "الاتجاه",

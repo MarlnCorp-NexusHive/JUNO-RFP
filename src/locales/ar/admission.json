@@ -21,7 +21,7 @@
         "applicationsSubmitted": "الطلبات المقدمة",
         "applicationsApproved": "الطلبات المعتمدة",
         "offersSent": "العروض المرسلة",
-        "admissionsConfirmed": "التوظيف المؤكد",
+        "recruitmentsConfirmed": "التوظيف المؤكد",
         "enrolledStudents": "الموظفون المعينون"
       }
     },
@@ -266,7 +266,7 @@
       "referral": "إحالة"
     },
     "programs": {
-      "mba": "ماجستير إدارة الأعمال",
+      "rfp": "طلبات العروض",
       "btech": "بكالوريوس التكنولوجيا"
     },
     "demo": {
@@ -800,7 +800,7 @@
       "law": "القانون"
     },
     "tags": {
-      "scholarship": "منحة دراسية",
+      "scholarship": "حافز",
       "ews": "EWS",
       "international": "دولي",
       "sportsQuota": "حصة رياضية",
@@ -891,7 +891,7 @@
       },
       "qualityAssurance": {
         "title": "ضمان الجودة",
-        "admissionQualitySelfAssessment": "التقييم الذاتي لجودة التوظيف",
+        "recruitmentQualitySelfAssessment": "التقييم الذاتي لجودة التوظيف",
         "complianceCoverageAnalysis": "تحليل تغطية الامتثال",
         "complianceUploads": "رفع الامتثال",
         "start": "ابدأ",
@@ -912,13 +912,13 @@
       "title": "التدريب والتطوير",
       "teamTraining": {
         "title": "تدريب الفريق",
-        "admissionProcess": "تدريب عملية التوظيف",
+        "recruitmentProcess": "تدريب عملية التوظيف",
         "complianceTraining": "تدريب الامتثال",
         "digitalTools": "تدريب الأدوات الرقمية"
       },
       "knowledgeManagement": {
         "title": "إدارة المعرفة",
-        "admissionGuidelines": "إرشادات التوظيف",
+        "recruitmentGuidelines": "إرشادات التوظيف",
         "complianceProcedures": "إجراءات الامتثال",
         "departmentSOPs": "إجراءات التشغيل القياسية للأقسام"
       }
@@ -972,7 +972,7 @@
       },
       "geoFencing": {
         "title": "السياج الجغرافي",
-        "checkedIn": "تم تسجيل الدخول من الحرم الجامعي الرئيسي",
+        "checkedIn": "تم تسجيل الدخول من المقر الرئيسي",
         "time": "@ 9:02 ص",
         "alert": "تنبيه",
         "outOfZoneAttendanceAttempt": "محاولة حضور خارج المنطقة"
@@ -1352,7 +1352,7 @@
       "applicationFee": "رسوم الطلب",
       "admissionFee": "رسوم التعيين",
       "securityDeposit": "التحقق من الخلفية",
-      "tuitionFee": "رسوم التدريب",
+      "contract revenueFee": "رسوم التدريب",
       "hostelFee": "دعم الانتقال",
       "libraryFee": "رسوم المعدات",
       "laboratoryFee": "الأدوات والبرمجيات"

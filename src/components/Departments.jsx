@@ -12,8 +12,8 @@ import { directorFeatures } from './directorFeatures';
 const departments = [
   {
     id: 1,
-    name: "Computer Science",
-    enrollments: 1200,
+    name: "Federal IT",
+    qualifiedLeads: 1200,
     passRate: 82,
     revenue: 4200000,
     facultyStrength: 35,
@@ -45,7 +45,7 @@ const departments = [
   {
     id: 2,
     name: "Electronics & Communication",
-    enrollments: 890,
+    qualifiedLeads: 890,
     passRate: 78,
     revenue: 3100000,
     facultyStrength: 28,
@@ -76,8 +76,8 @@ const departments = [
   },
   {
     id: 3,
-    name: "Business Administration",
-    enrollments: 460,
+    name: "Professional Services",
+    qualifiedLeads: 460,
     passRate: 91,
     revenue: 2800000,
     facultyStrength: 18,
@@ -131,8 +131,8 @@ export default function Departments() {
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{dept.name}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Enrollments</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.enrollments}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Pipelines</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.qualifiedLeads}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">Pass Rate</p>
@@ -172,7 +172,7 @@ export default function Departments() {
             </ResponsiveContainer>
           </div>
           <div>
-            <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Student Satisfaction</h4>
+            <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Client Satisfaction</h4>
             <ResponsiveContainer width="100%" height={200}>
               <RadarChart data={departments.map(dept => ({
                 name: dept.name,
@@ -205,12 +205,12 @@ export default function Departments() {
         </div>
       </div>
 
-      {/* Faculty & Staff Analytics */}
+      {/* Team & Staff Analytics */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Faculty & Staff Analytics</h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Team & Staff Analytics</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Faculty Metrics</h4>
+            <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Team Metrics</h4>
             <div className="grid grid-cols-2 gap-4">
               {departments.map((dept) => (
                 <div key={dept.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -234,7 +234,7 @@ export default function Departments() {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Faculty Workload Distribution</h4>
+            <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Team Workload Distribution</h4>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={departments} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -274,7 +274,7 @@ export default function Departments() {
                   <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{dept.name}</h5>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">Cost per Student</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-300">Cost per Bid</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">${dept.costPerStudent}</p>
                     </div>
                     <div>
@@ -338,9 +338,9 @@ export default function Departments() {
         </div>
       </div>
 
-      {/* Student Outcomes */}
+      {/* Win Outcomes */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Student Outcomes</h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Win Outcomes</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">Placement & Higher Studies</h4>

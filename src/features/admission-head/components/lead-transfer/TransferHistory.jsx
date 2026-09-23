@@ -24,7 +24,7 @@ const TransferHistory = () => {
       applicationId: "APP001",
       fromCounselor: "Noura Al-Zahra",
       toCounselor: "Khalid Al-Sayed",
-      date: "2026-03-15",
+      date: "2026-09-15",
       time: "14:30",
       reason: "Better match for technical course counseling",
       initiatedBy: "Admission Head",
@@ -36,7 +36,7 @@ const TransferHistory = () => {
       applicationId: "APP002",
       fromCounselor: "Khalid Al-Sayed",
       toCounselor: "Aisha Al-Hassan",
-      date: "2026-03-14",
+      date: "2026-09-14",
       time: "11:15",
       reason: "Regional expertise required",
       initiatedBy: "Admission Head",
@@ -48,7 +48,7 @@ const TransferHistory = () => {
       applicationId: "APP003",
       fromCounselor: "Aisha Al-Hassan",
       toCounselor: "Omar Al-Mutairi",
-      date: "2026-03-16",
+      date: "2026-09-16",
       time: "09:45",
       reason: "Language preference match",
       initiatedBy: "Admission Head",
@@ -60,7 +60,7 @@ const TransferHistory = () => {
       applicationId: "APP004",
       fromCounselor: "Omar Al-Mutairi",
       toCounselor: "Noura Al-Zahra",
-      date: "2026-03-13",
+      date: "2026-09-13",
       time: "16:20",
       reason: "Cultural background match",
       initiatedBy: "Admission Head",
@@ -72,7 +72,7 @@ const TransferHistory = () => {
       applicationId: "APP005",
       fromCounselor: "Noura Al-Zahra",
       toCounselor: "Khalid Al-Sayed",
-      date: "2026-03-15",
+      date: "2026-09-15",
       time: "13:10",
       reason: "Workload balancing",
       initiatedBy: "Admission Head",
@@ -169,7 +169,7 @@ const TransferHistory = () => {
               onChange={(e) => setFilters({ ...filters, fromCounselor: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
-              <option value="all">All Counselors</option>
+              <option value="all">All Capture Leads</option>
               {counselors.map(counselor => (
                 <option key={counselor} value={counselor}>{counselor}</option>
               ))}
@@ -186,7 +186,7 @@ const TransferHistory = () => {
               onChange={(e) => setFilters({ ...filters, toCounselor: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
-              <option value="all">All Counselors</option>
+              <option value="all">All Capture Leads</option>
               {counselors.map(counselor => (
                 <option key={counselor} value={counselor}>{counselor}</option>
               ))}

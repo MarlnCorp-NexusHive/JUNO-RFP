@@ -40,15 +40,15 @@ class CampaignPredictionService {
 
     const typeInstructions = this.getCampaignTypeInstructions(campaignData.type);
     
-    return `You are an expert marketing AI for a university. Analyze this marketing campaign and predict its performance.
+    return `You are an expert marketing AI for an RFP organization. Analyze this marketing campaign and predict its performance.
 
 CAMPAIGN INFORMATION:
 ${JSON.stringify(campaignInfo, null, 2)}
 
 CONTEXT:
-- University focus: ${context.focus || 'Higher education marketing'}
-- Target market: ${context.market || 'Saudi Arabia and Middle East'}
-- Season: ${context.season || 'Current academic year'}
+- Market focus: ${context.focus || 'Federal capture marketing'}
+- Target market: ${context.market || 'United States'}
+- Season: ${context.season || 'Current fiscal year'}
 - Previous performance: ${context.previousPerformance || 'No historical data'}
 
 ${typeInstructions}
@@ -80,13 +80,13 @@ FORMAT AS JSON:
   },
   "targetAudience": {
     "primary": "High school graduates aged 17-19",
-    "secondary": "Parents of prospective students",
+    "secondary": "Agency program offices",
     "insights": "Most active on social media during evening hours"
   },
   "contentRecommendations": [
     "Use video content for higher engagement",
-    "Include testimonials from current students",
-    "Highlight scholarship opportunities"
+    "Include testimonials from current clients",
+    "Highlight past performance highlights"
   ],
   "budgetOptimization": {
     "recommendedBudget": 5000,
@@ -268,7 +268,7 @@ FORMAT AS JSON:
   getFallbackAudience(campaignData) {
     return {
       primary: 'High school graduates aged 17-19',
-      secondary: 'Parents of prospective students',
+      secondary: 'Agency program offices',
       insights: 'Most active during evening hours and weekends'
     };
   }

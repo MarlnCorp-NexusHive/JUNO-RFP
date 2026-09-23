@@ -4,11 +4,11 @@ class AISearchService {
   constructor() {
     this.searchHistory = [];
     this.suggestions = [
-      'Show me leads from Riyadh',
+      'Show me leads from Washington DC',
       'Find high-engagement prospects',
       'Campaigns with low conversion',
       'Leads interested in engineering',
-      'Recent inquiries from Jeddah',
+      'Recent inquiries from New York',
       'High-priority follow-ups needed'
     ];
   }
@@ -155,9 +155,9 @@ matchesLocation(query, location) {
   
   // Check for city variations
   const cityVariations = {
-    'riyadh': ['riyad', 'riyadha'],
-    'jeddah': ['jiddah', 'jidda'],
-    'dammam': ['damam', 'dahran']
+    'washington dc': ['washington', 'dc', 'd.c.'],
+    'new york': ['nyc', 'ny'],
+    'chicago': ['chi']
   };
   
   for (const [city, variations] of Object.entries(cityVariations)) {
@@ -189,50 +189,50 @@ matchesEngagement(query, engagement) {
         id: 1,
         name: "Ahmed Al-Rashid",
         email: "ahmed.rashid@example.com",
-        location: "Riyadh",
+        location: "Washington DC",
         interest: "Engineering",
         engagement: "High",
-        lastContact: "2026-01-15",
+        lastContact: "2026-09-15",
         type: "lead"
       },
       {
         id: 2,
         name: "Sara Al-Mansouri",
         email: "sara.mansouri@example.com",
-        location: "Jeddah",
+        location: "New York",
         interest: "Business",
         engagement: "Medium",
-        lastContact: "2026-01-10",
+        lastContact: "2026-09-10",
         type: "lead"
       },
       {
         id: 3,
         name: "Mohammed Al-Zahra",
         email: "mohammed.zahra@example.com",
-        location: "Riyadh",
+        location: "Washington DC",
         interest: "Medicine",
         engagement: "High",
-        lastContact: "2026-01-12",
+        lastContact: "2026-09-12",
         type: "lead"
       },
       {
         id: 4,
         name: "Fatima Al-Sheikh",
         email: "fatima.sheikh@example.com",
-        location: "Dammam",
+        location: "Chicago",
         interest: "Engineering",
         engagement: "Low",
-        lastContact: "2026-01-08",
+        lastContact: "2026-09-08",
         type: "lead"
       },
       {
         id: 5,
         name: "Omar Al-Hassan",
         email: "omar.hassan@example.com",
-        location: "Jeddah",
+        location: "New York",
         interest: "Business",
         engagement: "High",
-        lastContact: "2026-01-14",
+        lastContact: "2026-09-14",
         type: "lead"
       }
     ];

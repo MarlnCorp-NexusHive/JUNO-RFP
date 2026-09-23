@@ -106,12 +106,12 @@ const CommunicationHub = () => {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               <tr>
-                <td className="px-4 py-2">2026-03-10</td>
+                <td className="px-4 py-2">2026-09-10</td>
                 <td className="px-4 py-2">HR Policy Update</td>
                 <td className="px-4 py-2">Employees</td>
               </tr>
               <tr>
-                <td className="px-4 py-2">2026-03-08</td>
+                <td className="px-4 py-2">2026-09-08</td>
                 <td className="px-4 py-2">Payroll Reminder</td>
                 <td className="px-4 py-2">Payroll</td>
               </tr>

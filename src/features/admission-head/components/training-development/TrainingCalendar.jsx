@@ -16,7 +16,7 @@ const initialSessions = [
   {
     id: 1,
     title: "Effective Follow-up Tactics",
-    date: "2026-07-26",
+    date: "2026-09-26",
     time: "11:00 AM",
     type: "Soft Skills",
     trainer: "Dr. Noura Al-Zahra",
@@ -28,7 +28,7 @@ const initialSessions = [
   {
     id: 2,
     title: "CRM Usage & Automation",
-    date: "2026-07-28",
+    date: "2026-09-28",
     time: "02:00 PM",
     type: "Technical",
     trainer: "Michael Chen",
@@ -40,7 +40,7 @@ const initialSessions = [
   {
     id: 3,
     title: "Document Verification Best Practices",
-    date: "2026-07-30",
+    date: "2026-09-30",
     time: "10:00 AM",
     type: "Compliance",
     trainer: "Emma Wilson",

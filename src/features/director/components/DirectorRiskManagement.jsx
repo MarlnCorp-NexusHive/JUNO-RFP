@@ -82,7 +82,7 @@ export default function DirectorRiskManagement() {
     },
     {
       id: 2,
-      nameKey: 'riskTypes.studentEnrollmentDecline',
+      nameKey: 'riskTypes.studentPipelineDecline',
       categoryKey: 'categories.academic',
       severityKey: 'severity.high',
       probabilityKey: 'probability.low',

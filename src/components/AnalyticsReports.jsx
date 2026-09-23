@@ -44,24 +44,24 @@ const studentDemographics = {
 };
 
 const staffAnalytics = [
-  { year: "2019", Teaching: 400, NonTeaching: 200, Contract: 50 },
-  { year: "2020", Teaching: 420, NonTeaching: 210, Contract: 60 },
-  { year: "2026", Teaching: 430, NonTeaching: 220, Contract: 70 },
-  { year: "2026", Teaching: 440, NonTeaching: 230, Contract: 80 },
+  { year: "2022", Teaching: 400, NonTeaching: 200, Contract: 50 },
+  { year: "2023", Teaching: 420, NonTeaching: 210, Contract: 60 },
+  { year: "2024", Teaching: 430, NonTeaching: 220, Contract: 70 },
+  { year: "2025", Teaching: 440, NonTeaching: 230, Contract: 80 },
   { year: "2026", Teaching: 450, NonTeaching: 240, Contract: 90 },
 ];
 
-const admissionMetrics = {
+const recruitmentMetrics = {
   conversionFunnel: [
     { stage: "Inquiries", count: 5000, conversion: 100 },
     { stage: "Applications", count: 2500, conversion: 50 },
     { stage: "Interviews", count: 1500, conversion: 30 },
     { stage: "Offers", count: 1200, conversion: 24 },
-    { stage: "Enrollments", count: 1000, conversion: 20 },
+    { stage: "Pipelines", count: 1000, conversion: 20 },
   ],
-  programEnrollment: [
-    { program: "Computer Science", enrolled: 250, capacity: 300, trend: "up" },
-    { program: "Business Admin", enrolled: 180, capacity: 200, trend: "up" },
+  programPipeline: [
+    { program: "Federal IT", enrolled: 250, capacity: 300, trend: "up" },
+    { program: "Professional Services", enrolled: 180, capacity: 200, trend: "up" },
     { program: "Engineering", enrolled: 150, capacity: 200, trend: "down" },
     { program: "Arts", enrolled: 80, capacity: 100, trend: "stable" },
     { program: "Medicine", enrolled: 120, capacity: 150, trend: "up" },
@@ -76,18 +76,18 @@ const admissionMetrics = {
 
 const financialMetrics = {
   revenueByDepartment: [
-    { department: "Computer Science", tuition: 5000000, grants: 1000000, other: 500000 },
-    { department: "Business Admin", tuition: 4000000, grants: 800000, other: 400000 },
-    { department: "Engineering", tuition: 4500000, grants: 900000, other: 450000 },
-    { department: "Arts", tuition: 2000000, grants: 400000, other: 200000 },
-    { department: "Medicine", tuition: 6000000, grants: 1200000, other: 600000 },
+    { department: "Federal IT", contractRevenue: 5000000, grants: 1000000, other: 500000 },
+    { department: "Professional Services", contractRevenue: 4000000, grants: 800000, other: 400000 },
+    { department: "Engineering", contractRevenue: 4500000, grants: 900000, other: 450000 },
+    { department: "Arts", contractRevenue: 2000000, grants: 400000, other: 200000 },
+    { department: "Medicine", contractRevenue: 6000000, grants: 1200000, other: 600000 },
   ],
   costAnalysis: [
-    { category: "Infrastructure", cost: 2000000, perStudent: 2000 },
-    { category: "Faculty", cost: 3000000, perStudent: 3000 },
-    { category: "Admin", cost: 1000000, perStudent: 1000 },
-    { category: "Research", cost: 1500000, perStudent: 1500 },
-    { category: "Student Services", cost: 500000, perStudent: 500 },
+    { category: "Infrastructure", cost: 2000000, perBid: 2000 },
+    { category: "Faculty", cost: 3000000, perBid: 3000 },
+    { category: "Admin", cost: 1000000, perBid: 1000 },
+    { category: "Research", cost: 1500000, perBid: 1500 },
+    { category: "Client Services", cost: 500000, perBid: 500 },
   ],
 };
 
@@ -127,8 +127,8 @@ const studentEngagement = {
 
 const placementMetrics = {
   programPlacement: [
-    { program: "Computer Science", placement: 95, avgSalary: 800000, companies: 25 },
-    { program: "Business Admin", placement: 90, avgSalary: 700000, companies: 20 },
+    { program: "Federal IT", placement: 95, avgSalary: 800000, companies: 25 },
+    { program: "Professional Services", placement: 90, avgSalary: 700000, companies: 20 },
     { program: "Engineering", placement: 88, avgSalary: 750000, companies: 22 },
     { program: "Arts", placement: 85, avgSalary: 600000, companies: 15 },
     { program: "Medicine", placement: 98, avgSalary: 900000, companies: 30 },
@@ -144,9 +144,9 @@ const placementMetrics = {
 
 const complianceMetrics = {
   accreditationStatus: [
-    { standard: "ETEC", score: 4.2, status: "Accredited", nextReview: "2026" },
-    { standard: "MoE", score: 4.0, status: "Accredited", nextReview: "2026" },
-    { standard: "SCFHS", score: 4.5, status: "Accredited", nextReview: "2026" },
+    { standard: "FAR", score: 4.2, status: "Accredited", nextReview: "2026" },
+    { standard: "GSA", score: 4.0, status: "Accredited", nextReview: "2026" },
+    { standard: "NIST", score: 4.5, status: "Accredited", nextReview: "2026" },
     { standard: "TVTC", score: 4.3, status: "Accredited", nextReview: "2026" },
   ],
   auditStatus: [
@@ -162,7 +162,7 @@ const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 export default function AnalyticsReports() {
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [timeRange, setTimeRange] = useState("6M");
-  const [activeTab, setActiveTab] = useState("admissions");
+  const [activeTab, setActiveTab] = useState("recruitments");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
 
   const renderAdmissionsSection = () => (
@@ -175,7 +175,7 @@ export default function AnalyticsReports() {
       >
         <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Admission Funnel</h3>
         <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={admissionMetrics.conversionFunnel} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <BarChart data={recruitmentMetrics.conversionFunnel} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
@@ -185,16 +185,16 @@ export default function AnalyticsReports() {
         </ResponsiveContainer>
       </motion.div>
 
-      {/* Program-wise Enrollment */}
+      {/* Program-wise Pipeline */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
       >
-        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Program Enrollment</h3>
+        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Program Pipeline</h3>
         <ResponsiveContainer width="100%" height={200}>
-          <ComposedChart data={admissionMetrics.programEnrollment} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <ComposedChart data={recruitmentMetrics.programPipeline} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="program" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
@@ -216,7 +216,7 @@ export default function AnalyticsReports() {
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie
-              data={admissionMetrics.geographicDistribution}
+              data={recruitmentMetrics.geographicDistribution}
               dataKey="students"
               nameKey="region"
               cx="50%"
@@ -224,7 +224,7 @@ export default function AnalyticsReports() {
               outerRadius={60}
               label
             >
-              {admissionMetrics.geographicDistribution.map((entry, index) => (
+              {recruitmentMetrics.geographicDistribution.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -282,12 +282,12 @@ export default function AnalyticsReports() {
         <ResponsiveContainer width="100%" height={200}>
           <AreaChart
             data={[
-              { month: "Jan", applications: 120, enrollments: 80 },
-              { month: "Feb", applications: 150, enrollments: 100 },
-              { month: "Mar", applications: 180, enrollments: 120 },
-              { month: "Apr", applications: 160, enrollments: 110 },
-              { month: "May", applications: 200, enrollments: 140 },
-              { month: "Jun", applications: 220, enrollments: 160 }
+              { month: "Jan", applications: 120, qualifiedLeads: 80 },
+              { month: "Feb", applications: 150, qualifiedLeads: 100 },
+              { month: "Mar", applications: 180, qualifiedLeads: 120 },
+              { month: "Apr", applications: 160, qualifiedLeads: 110 },
+              { month: "May", applications: 200, qualifiedLeads: 140 },
+              { month: "Jun", applications: 220, qualifiedLeads: 160 }
             ]}
             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
           >
@@ -296,7 +296,7 @@ export default function AnalyticsReports() {
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
             <Area type="monotone" dataKey="applications" fill="#6366f1" stroke="#6366f1" />
-            <Area type="monotone" dataKey="enrollments" fill="#22c55e" stroke="#22c55e" />
+            <Area type="monotone" dataKey="qualifiedLeads" fill="#22c55e" stroke="#22c55e" />
           </AreaChart>
         </ResponsiveContainer>
       </motion.div>
@@ -310,7 +310,7 @@ export default function AnalyticsReports() {
         <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Admission KPIs</h3>
         <div className="space-y-3">
           {[
-            { label: "Application to Enrollment", value: "45%", change: "+5%" },
+            { label: "Application to Pipeline", value: "45%", change: "+5%" },
             { label: "Avg. Processing Time", value: "7 days", change: "-2 days" },
             { label: "Student Retention", value: "92%", change: "+3%" },
           ].map((stat) => (
@@ -344,7 +344,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="department" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="tuition" stackId="a" fill="#6366f1" />
+            <Bar dataKey="contractRevenue" stackId="a" fill="#6366f1" />
             <Bar dataKey="grants" stackId="a" fill="#22c55e" />
           </BarChart>
         </ResponsiveContainer>
@@ -357,14 +357,14 @@ export default function AnalyticsReports() {
         transition={{ delay: 0.1 }}
         className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
       >
-        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Cost per Student</h3>
+        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Cost per Bid</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={financialMetrics.costAnalysis} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="category" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="perStudent" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="perBid" fill="#6366f1" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -407,7 +407,7 @@ export default function AnalyticsReports() {
           <PieChart>
             <Pie
               data={[
-                { name: "Tuition", value: 60 },
+                { name: "Contract Revenue", value: 60 },
                 { name: "Grants", value: 25 },
                 { name: "Research", value: 10 },
                 { name: "Other", value: 5 }
@@ -420,7 +420,7 @@ export default function AnalyticsReports() {
               label
             >
               {[
-                { name: "Tuition", value: 60 },
+                { name: "Contract Revenue", value: 60 },
                 { name: "Grants", value: 25 },
                 { name: "Research", value: 10 },
                 { name: "Other", value: 5 }
@@ -512,14 +512,14 @@ export default function AnalyticsReports() {
         </ResponsiveContainer>
       </motion.div>
 
-      {/* Faculty Performance */}
+      {/* Team Performance */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
       >
-        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Faculty Performance</h3>
+        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Team Performance</h3>
         <ResponsiveContainer width="100%" height={200}>
           <ComposedChart data={academicMetrics.facultyPerformance} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -569,9 +569,9 @@ export default function AnalyticsReports() {
         <ResponsiveContainer width="100%" height={200}>
           <BarChart
             data={[
-              { year: "2020", publications: 45, citations: 120 },
-              { year: "2026", publications: 55, citations: 150 },
-              { year: "2026", publications: 65, citations: 180 },
+              { year: "2023", publications: 45, citations: 120 },
+              { year: "2024", publications: 55, citations: 150 },
+              { year: "2025", publications: 65, citations: 180 },
               { year: "2026", publications: 75, citations: 220 }
             ]}
             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
@@ -624,7 +624,7 @@ export default function AnalyticsReports() {
           {[
             { label: "Research Impact", value: "2.8", change: "+0.3" },
             { label: "Student Success", value: "89%", change: "+4%" },
-            { label: "Faculty Ratio", value: "1:15", change: "Optimal" },
+            { label: "Team Ratio", value: "1:15", change: "Optimal" },
           ].map((stat) => (
             <div key={stat.label} className="flex justify-between items-center">
               <span className="text-sm text-gray-600 dark:text-gray-300">{stat.label}</span>
@@ -740,7 +740,7 @@ export default function AnalyticsReports() {
         transition={{ delay: 0.1 }}
         className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg"
       >
-        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Student Satisfaction</h3>
+        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Client Satisfaction</h3>
         <ResponsiveContainer width="100%" height={200}>
           <RadarChart
             data={[
@@ -905,9 +905,9 @@ export default function AnalyticsReports() {
         <ResponsiveContainer width="100%" height={200}>
           <LineChart
             data={[
-              { year: "2020", avgSalary: 650000, maxSalary: 850000 },
-              { year: "2026", avgSalary: 700000, maxSalary: 900000 },
-              { year: "2026", avgSalary: 750000, maxSalary: 950000 },
+              { year: "2023", avgSalary: 650000, maxSalary: 850000 },
+              { year: "2024", avgSalary: 700000, maxSalary: 900000 },
+              { year: "2025", avgSalary: 750000, maxSalary: 950000 },
               { year: "2026", avgSalary: 800000, maxSalary: 1000000 }
             ]}
             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
@@ -1119,7 +1119,7 @@ export default function AnalyticsReports() {
               className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               <option value="All">All Departments</option>
-              {admissionMetrics.programEnrollment.map((dept) => (
+              {recruitmentMetrics.programPipeline.map((dept) => (
                 <option key={dept.program} value={dept.program}>
                   {dept.program}
                 </option>
@@ -1141,7 +1141,7 @@ export default function AnalyticsReports() {
         {/* Navigation Tabs */}
         <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
           {[
-            { id: "admissions", label: "Admissions" },
+            { id: "recruitments", label: "Admissions" },
             { id: "financial", label: "Financial" },
             { id: "academic", label: "Academic" },
             { id: "engagement", label: "Engagement" },
@@ -1164,7 +1164,7 @@ export default function AnalyticsReports() {
 
         {/* Content Section */}
         <div className="flex-1">
-          {activeTab === "admissions" && renderAdmissionsSection()}
+          {activeTab === "recruitments" && renderAdmissionsSection()}
           {activeTab === "financial" && renderFinancialSection()}
           {activeTab === "academic" && renderAcademicSection()}
           {activeTab === "engagement" && renderStudentEngagementSection()}

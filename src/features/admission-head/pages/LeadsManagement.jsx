@@ -14,26 +14,26 @@ const demoLeads = [
   {
     id: 1,
     name: "John Smith",
-    program: "Computer Science",
+    program: "Federal IT",
     source: "Website",
     status: "Inquiry",
     assignedTo: "Sarah Johnson",
     conversionScore: "High",
-    lastContact: "2026-03-15",
-    documents: ["ID Proof", "Academic Records"],
-    tags: ["Scholarship", "International"],
+    lastContact: "2026-09-15",
+    documents: ["ID Proof", "Past Performance Docs"],
+    tags: ["Incentive", "International"],
     contact: {
       email: "john.smith@email.com",
       phone: "+1 234-567-8900",
       country: "USA"
     },
     timeline: [
-      { type: "Inquiry", date: "2026-03-15", notes: "Initial inquiry via website" },
-      { type: "Contacted", date: "2026-03-16", notes: "Sent program brochure" }
+      { type: "Inquiry", date: "2026-09-15", notes: "Initial inquiry via website" },
+      { type: "Contacted", date: "2026-09-16", notes: "Sent program brochure" }
     ],
     engagement: {
       score: 85,
-      lastActivity: "2026-03-16",
+      lastActivity: "2026-09-16",
       interactions: 3,
       predictedConversion: "High"
     },
@@ -49,12 +49,12 @@ const demoLeads = [
   {
     id: 2,
     name: "Jane Doe",
-    program: "Business Administration",
+    program: "Professional Services",
     source: "Referral",
     status: "Contacted",
     assignedTo: "Michael Chen",
     conversionScore: "Medium",
-    lastContact: "2026-03-14",
+    lastContact: "2026-09-14",
     documents: ["ID Proof"],
     tags: ["International"],
     contact: {
@@ -63,12 +63,12 @@ const demoLeads = [
       country: "Canada"
     },
     timeline: [
-      { type: "Inquiry", date: "2026-03-10", notes: "Referred by alumni" },
-      { type: "Contacted", date: "2026-03-14", notes: "Called for more info" }
+      { type: "Inquiry", date: "2026-09-10", notes: "Referred by alumni" },
+      { type: "Contacted", date: "2026-09-14", notes: "Called for more info" }
     ],
     engagement: {
       score: 70,
-      lastActivity: "2026-03-14",
+      lastActivity: "2026-09-14",
       interactions: 2,
       predictedConversion: "Medium"
     },
@@ -89,8 +89,8 @@ const demoLeads = [
     status: "Qualified",
     assignedTo: "Sarah Johnson",
     conversionScore: "Low",
-    lastContact: "2026-03-12",
-    documents: ["ID Proof", "Academic Records", "Test Scores"],
+    lastContact: "2026-09-12",
+    documents: ["ID Proof", "Past Performance Docs", "Test Scores"],
     tags: ["Transfer"],
     contact: {
       email: "carlos.martinez@email.com",
@@ -98,22 +98,22 @@ const demoLeads = [
       country: "Spain"
     },
     timeline: [
-      { type: "Inquiry", date: "2026-03-08", notes: "Met at education fair" },
-      { type: "Contacted", date: "2026-03-12", notes: "Follow-up call" }
+      { type: "Inquiry", date: "2026-09-08", notes: "Met at education fair" },
+      { type: "Contacted", date: "2026-09-12", notes: "Follow-up call" }
     ],
     engagement: {
       score: 45,
-      lastActivity: "2026-03-12",
+      lastActivity: "2026-09-12",
       interactions: 1,
       predictedConversion: "Low"
     },
     application: {
       id: "APP-003",
       status: "In Progress",
-      documents: ["ID Proof", "Academic Records"],
+      documents: ["ID Proof", "Past Performance Docs"],
       paymentStatus: "Partial",
       testScore: 85,
-      interviewScheduled: "2026-03-20"
+      interviewScheduled: "2026-09-20"
     }
   }
 ];

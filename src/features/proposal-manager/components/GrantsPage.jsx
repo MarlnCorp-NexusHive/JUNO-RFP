@@ -17,6 +17,7 @@ import {
 } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { fetchFederalGrantOpportunity, searchFederalGrants } from "../../../services/api.js";
+import SamContractsPanel from "./SamContractsPanel.jsx";
 
 const STATUS_OPTIONS = [
   { value: "posted|forecasted", labelKey: "openAndForecasted" },
@@ -399,6 +400,7 @@ export default function GrantsPage() {
   const formId = useId();
   const resultsId = useId();
 
+  const [mode, setMode] = useState("grants"); // grants | contracts
   const [keyword, setKeyword] = useState("");
   const [draftKeyword, setDraftKeyword] = useState("");
   const [oppStatuses, setOppStatuses] = useState("posted|forecasted");
@@ -451,10 +453,11 @@ export default function GrantsPage() {
   );
 
   useEffect(() => {
+    if (mode !== "grants") return;
     runSearch({ nextStart: 0 });
     searchInputRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -555,6 +558,39 @@ export default function GrantsPage() {
         {statusMessage}
       </div>
 
+      <div
+        role="tablist"
+        aria-label={t("proposalManagerGrants.modeTabs")}
+        className="inline-flex rounded-xl border border-slate-200 bg-slate-100/80 p-1 dark:border-slate-700 dark:bg-slate-800/80"
+      >
+        {[
+          { id: "grants", label: t("proposalManagerGrants.modeGrants") },
+          { id: "contracts", label: t("proposalManagerGrants.modeContracts") },
+        ].map((tab) => {
+          const active = mode === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setMode(tab.id)}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
+                active
+                  ? "bg-white text-indigo-700 shadow-sm dark:bg-slate-900 dark:text-indigo-300"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {mode === "contracts" ? (
+        <SamContractsPanel />
+      ) : (
+        <>
       <header className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
@@ -933,6 +969,8 @@ export default function GrantsPage() {
           </ul>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }

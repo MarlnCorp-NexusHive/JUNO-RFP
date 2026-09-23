@@ -53,11 +53,11 @@ const PREUPLOADED_BOILERPLATE_DOCS = BOILERPLATE_PACK.flatMap((pack) => {
 // Pre-uploaded documents: place files in public/documents/ and list them here. (sizes in bytes; uploadedAt ISO strings for sorting)
 const PREUPLOADED_DOCS = [
   ...PREUPLOADED_BOILERPLATE_DOCS,
-  { id: "pre-water-wastewater", name: "Final 2026 RFP- Water Wastewater Study.pdf", url: "/documents/Final 2026 RFP- Water Wastewater Study.pdf", type: "application/pdf", size: 310045, uploadedAt: "2025-02-10T14:22:00.000Z", preUploaded: true },
-  { id: "pre-landscape-rfp", name: "CC Final-RFP for Landscape Maintenance Services 9-10-2024.pdf", url: "/documents/CC Final-RFP for Landscape Maintenance Services 9-10-2024.pdf", type: "application/pdf", size: 761095, uploadedAt: "2024-09-15T09:00:00.000Z", preUploaded: true },
-  { id: "pre-balsitis-playground", name: "Balsitis Park Playground RFP.pdf", url: "/documents/Balsitis Park Playground RFP.pdf", type: "application/pdf", size: 4239018, uploadedAt: "2025-01-28T11:45:00.000Z", preUploaded: true },
-  { id: "pre-surplus-tanks", name: "Surplus tanks.pdf", url: "/documents/Surplus tanks.pdf", type: "application/pdf", size: 338361, uploadedAt: "2024-11-20T16:30:00.000Z", preUploaded: true },
-  { id: "pre-airport-restaurant", name: "Final RFP to Lease Restaurant Space at Airport.pdf", url: "/documents/Final RFP to Lease Restaurant Space at Airport.pdf", type: "application/pdf", size: 196310, uploadedAt: "2025-02-05T08:15:00.000Z", preUploaded: true },
+  { id: "pre-water-wastewater", name: "Final 2026 RFP- Water Wastewater Study.pdf", url: "/documents/Final 2026 RFP- Water Wastewater Study.pdf", type: "application/pdf", size: 310045, uploadedAt: "2026-09-10T14:22:00.000Z", preUploaded: true },
+  { id: "pre-landscape-rfp", name: "CC Final-RFP for Landscape Maintenance Services 9-10-2024.pdf", url: "/documents/CC Final-RFP for Landscape Maintenance Services 9-10-2024.pdf", type: "application/pdf", size: 761095, uploadedAt: "2026-10-15T09:00:00.000Z", preUploaded: true },
+  { id: "pre-balsitis-playground", name: "Balsitis Park Playground RFP.pdf", url: "/documents/Balsitis Park Playground RFP.pdf", type: "application/pdf", size: 4239018, uploadedAt: "2026-09-28T11:45:00.000Z", preUploaded: true },
+  { id: "pre-surplus-tanks", name: "Surplus tanks.pdf", url: "/documents/Surplus tanks.pdf", type: "application/pdf", size: 338361, uploadedAt: "2026-10-20T16:30:00.000Z", preUploaded: true },
+  { id: "pre-airport-restaurant", name: "Final RFP to Lease Restaurant Space at Airport.pdf", url: "/documents/Final RFP to Lease Restaurant Space at Airport.pdf", type: "application/pdf", size: 196310, uploadedAt: "2026-09-05T08:15:00.000Z", preUploaded: true },
 ];
 const PREUPLOADED_IDS = new Set(PREUPLOADED_DOCS.map((d) => d.id));
 

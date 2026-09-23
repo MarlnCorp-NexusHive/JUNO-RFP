@@ -32,13 +32,13 @@ const AISearchComponent = ({
 
   // Dummy responses for your existing suggestions
   const dummyResponses = {
-    'show me leads from riyadh': {
+    'show me leads from washington dc': {
       results: [
-        { id: 1, name: 'Ahmed Al-Rashid', email: 'ahmed@example.com', city: 'Riyadh', status: 'Qualified', source: 'Website', engagement: '95%' },
-        { id: 2, name: 'Fatima Al-Zahra', email: 'fatima@example.com', city: 'Riyadh', status: 'Active', source: 'Referral', engagement: '87%' },
-        { id: 3, name: 'Mohammed Al-Saud', email: 'mohammed@example.com', city: 'Riyadh', status: 'New', source: 'Social Media', engagement: '92%' }
+        { id: 1, name: 'Ahmed Al-Rashid', email: 'ahmed@example.com', city: 'Washington DC', status: 'Qualified', source: 'Website', engagement: '95%' },
+        { id: 2, name: 'Fatima Al-Zahra', email: 'fatima@example.com', city: 'Washington DC', status: 'Active', source: 'Referral', engagement: '87%' },
+        { id: 3, name: 'Mohammed Al-Saud', email: 'mohammed@example.com', city: 'Washington DC', status: 'New', source: 'Social Media', engagement: '92%' }
       ],
-      message: t('aiSearch.results.leadsFromRiyadh', 'Here are your leads from Riyadh (Demo Data)')
+      message: t('aiSearch.results.leadsFromRiyadh', 'Here are your leads from Washington DC (Demo Data)')
     },
     'find high-engagement prospects': {
       results: [
@@ -64,13 +64,13 @@ const AISearchComponent = ({
       ],
       message: t('aiSearch.results.engineeringLeads', 'Here are leads interested in engineering (Demo Data)')
     },
-    'recent inquiries from jeddah': {
+    'recent inquiries from new york': {
       results: [
-        { id: 1, name: 'Omar Al-Harbi', email: 'omar@example.com', city: 'Jeddah', inquiryDate: '2 hours ago', status: 'New Inquiry', engagement: '93%' },
-        { id: 2, name: 'Noura Al-Ghamdi', email: 'noura@example.com', city: 'Jeddah', inquiryDate: '5 hours ago', status: 'Follow-up Needed', engagement: '89%' },
-        { id: 3, name: 'Khalid Al-Mansouri', email: 'khalid@example.com', city: 'Jeddah', inquiryDate: '1 day ago', status: 'In Progress', engagement: '86%' }
+        { id: 1, name: 'Omar Al-Harbi', email: 'omar@example.com', city: 'New York', inquiryDate: '2 hours ago', status: 'New Inquiry', engagement: '93%' },
+        { id: 2, name: 'Noura Al-Ghamdi', email: 'noura@example.com', city: 'New York', inquiryDate: '5 hours ago', status: 'Follow-up Needed', engagement: '89%' },
+        { id: 3, name: 'Khalid Al-Mansouri', email: 'khalid@example.com', city: 'New York', inquiryDate: '1 day ago', status: 'In Progress', engagement: '86%' }
       ],
-      message: t('aiSearch.results.recentInquiriesJeddah', 'Here are recent inquiries from Jeddah (Demo Data)')
+      message: t('aiSearch.results.recentInquiriesJeddah', 'Here are recent inquiries from New York (Demo Data)')
     },
     'high-priority follow-ups needed': {
       results: [
@@ -176,11 +176,11 @@ const AISearchComponent = ({
           message: t('aiSearch.errors.serverBusy', 'Server is busy. Please try again later.'),
           isError: true,
           suggestions: [
-            t('aiSearch.suggestions.leadsFromRiyadh', 'Try: "Show me leads from Riyadh"'),
+            t('aiSearch.suggestions.leadsFromRiyadh', 'Try: "Show me leads from Washington DC"'),
             t('aiSearch.suggestions.highEngagementProspects', 'Try: "Find high-engagement prospects"'),
             t('aiSearch.suggestions.lowConversionCampaigns', 'Try: "Campaigns with low conversion"'),
             t('aiSearch.suggestions.engineeringLeads', 'Try: "Leads interested in engineering"'),
-            t('aiSearch.suggestions.recentInquiriesJeddah', 'Try: "Recent inquiries from Jeddah"'),
+            t('aiSearch.suggestions.recentInquiriesJeddah', 'Try: "Recent inquiries from New York"'),
             t('aiSearch.suggestions.highPriorityFollowUps', 'Try: "High-priority follow-ups needed"')
           ]
         };

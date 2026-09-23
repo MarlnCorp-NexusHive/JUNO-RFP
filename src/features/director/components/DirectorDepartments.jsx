@@ -138,7 +138,7 @@ export default function DirectorDepartments() {
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{dept.name}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.enrollments')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.qualifiedLeads')}</p>
                 <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.employees}</p>
               </div>
               <div>
@@ -208,7 +208,7 @@ export default function DirectorDepartments() {
         </div>
       </div>
 
-      {/* Faculty & Staff Analytics */}
+      {/* Team & Staff Analytics */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{t('departments.sections.facultyStaffAnalytics')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -341,7 +341,7 @@ export default function DirectorDepartments() {
         </div>
       </div>
 
-      {/* Student Outcomes */}
+      {/* Win Outcomes */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{t('departments.sections.studentOutcomes')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -466,8 +466,8 @@ export default function DirectorDepartments() {
                 data-tour="2"
                 data-tour-title-en="Department Cards"
                 data-tour-title-ar="بطاقات الأقسام"
-                data-tour-content-en="Quick snapshot of each department: enrollments, pass rate, revenue, faculty, research."
-                data-tour-content-ar="لمحة سريعة عن كل قسم: التسجيلات، نسبة النجاح، الإيرادات، أعضاء هيئة التدريس، البحث."
+                data-tour-content-en="Quick snapshot of each department: qualifiedLeads, pass rate, revenue, faculty, research."
+                data-tour-content-ar="لمحة سريعة عن كل قسم: التسجيلات، نسبة النجاح، الإيرادات، فريق العروض، البحث."
                 data-tour-position="bottom"
               >
                 {departments.map((dept) => (
@@ -480,7 +480,7 @@ export default function DirectorDepartments() {
                     <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{dept.name}</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.enrollments')}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{t('departments.metrics.qualifiedLeads')}</p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-white">{dept.employees}</p>
                       </div>
                       <div>
@@ -505,7 +505,7 @@ export default function DirectorDepartments() {
                 className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
                 data-tour="3"
                 data-tour-title-en="Academic Health Indicators"
-                data-tour-title-ar="مؤشرات الصحة الأكاديمية"
+                data-tour-title-ar="مؤشرات صحة المحفظة"
                 data-tour-content-en="Pass/fail, satisfaction, and completion vs dropout metrics across departments."
                 data-tour-content-ar="مقاييس النجاح/الرسوب، الرضا، والإكمال مقابل التسرب عبر الأقسام."
                 data-tour-position="bottom"
@@ -558,14 +558,14 @@ export default function DirectorDepartments() {
                 </div>
               </div>
 
-              {/* Faculty & Staff Analytics */}
+              {/* Team & Staff Analytics */}
               <div
                 className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
                 data-tour="4"
-                data-tour-title-en="Faculty & Staff Analytics"
-                data-tour-title-ar="تحليلات أعضاء هيئة التدريس والموظفين"
-                data-tour-content-en="Faculty ratios, vacancies, attrition, and workload distribution."
-                data-tour-content-ar="نسب أعضاء هيئة التدريس، الشواغر، معدل التسرب الوظيفي، وتوزيع عبء العمل."
+                data-tour-title-en="Team & Staff Analytics"
+                data-tour-title-ar="تحليلات فريق العروض والموظفين"
+                data-tour-content-en="Team ratios, vacancies, attrition, and workload distribution."
+                data-tour-content-ar="نسب فريق العروض، الشواغر، معدل التسرب الوظيفي، وتوزيع عبء العمل."
                 data-tour-position="bottom"
               >
                 <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{t('departments.sections.facultyStaffAnalytics')}</h3>
@@ -617,7 +617,7 @@ export default function DirectorDepartments() {
                 data-tour-title-en="Financial Summary"
                 data-tour-title-ar="الملخص المالي"
                 data-tour-content-en="Budget allocation vs spent, cost per student, ROI of labs, and revenue."
-                data-tour-content-ar="توزيع الميزانية مقابل المصروف، التكلفة لكل طالب، العائد على الاستثمار للمختبرات، والإيرادات."
+                data-tour-content-ar="توزيع الميزانية مقابل المصروف، التكلفة لكل مرشح، العائد على الاستثمار للمختبرات، والإيرادات."
                 data-tour-position="bottom"
               >
                 <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{t('departments.sections.financialSummary')}</h3>
@@ -669,7 +669,7 @@ export default function DirectorDepartments() {
                 data-tour-title-en="Research & Innovation"
                 data-tour-title-ar="البحث والابتكار"
                 data-tour-content-en="Publications, patents, collaborations, and grants across departments."
-                data-tour-content-ar="المنشورات، براءات الاختراع، التعاونات، والمنح عبر الأقسام."
+                data-tour-content-ar="المنشورات، براءات الاختراع، التعاونات، والحوافز عبر الأقسام."
                 data-tour-position="bottom"
               >
                 <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{t('departments.sections.researchInnovation')}</h3>
@@ -715,12 +715,12 @@ export default function DirectorDepartments() {
                 </div>
               </div>
 
-              {/* Student Outcomes */}
+              {/* Win Outcomes */}
               <div
                 className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
                 data-tour="7"
-                data-tour-title-en="Student Outcomes"
-                data-tour-title-ar="نتائج الطلاب"
+                data-tour-title-en="Win Outcomes"
+                data-tour-title-ar="نتائج المرشحون"
                 data-tour-content-en="Placements, higher studies, average package, and internships."
                 data-tour-content-ar="التوظيف، الدراسات العليا، متوسط الراتب، والتدريب."
                 data-tour-position="bottom"

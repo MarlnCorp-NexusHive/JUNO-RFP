@@ -15,7 +15,7 @@ const accounts = [
     contactPerson: 'John Smith',
     email: 'john@acme.com',
     phone: '+1 (555) 123-4567',
-    lastContact: '2026-02-15',
+    lastContact: '2026-09-15',
     notes: 'Interested in enterprise solutions',
   },
   {
@@ -30,7 +30,7 @@ const accounts = [
     contactPerson: 'Noura Al-Zahra',
     email: 'noura@techstart.com',
     phone: '+1 (555) 987-6543',
-    lastContact: '2026-02-10',
+    lastContact: '2026-09-10',
     notes: 'Looking for marketing automation',
   },
   {
@@ -45,7 +45,7 @@ const accounts = [
     contactPerson: 'Khalid Al-Sayed',
     email: 'khalid@globalind.com',
     phone: '+1 (555) 456-7890',
-    lastContact: '2026-01-20',
+    lastContact: '2026-09-20',
     notes: 'On hold due to budget constraints',
   },
 ];

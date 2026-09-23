@@ -21,6 +21,6 @@ export const preloadTeams = [
 export const preloadRoleTemplates = [
   // Example: { id, team, role, version, name, scopes, createdAt, clonedFrom }
   { id: 1, team: 'Marketing Team', role: 'Manager', version: 1, name: 'Marketing Manager v1', scopes: ['read:leads', 'edit:campaigns'], createdAt: Date.now(), clonedFrom: null },
-  { id: 2, team: 'Admission Team', role: 'SPOC', version: 1, name: 'Admission SPOC v1', scopes: ['read:students', 'manage:admissions'], createdAt: Date.now(), clonedFrom: null },
+  { id: 2, team: 'Admission Team', role: 'SPOC', version: 1, name: 'Admission SPOC v1', scopes: ['read:students', 'manage:recruitments'], createdAt: Date.now(), clonedFrom: null },
   // Add more as needed for demo
 ]; 

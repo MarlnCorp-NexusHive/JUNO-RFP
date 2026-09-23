@@ -36,9 +36,9 @@ const campaignPerformance = [
 ];
 
 const audienceEngagement = [
-  { id: 1, group: "18-24, Riyadh", engagement: 0.38, device: "Mobile", interest: "Hot" },
-  { id: 2, group: "25-34, Jeddah", engagement: 0.29, device: "Desktop", interest: "Warm" },
-  { id: 3, group: "35-44, Dammam", engagement: 0.22, device: "Mobile", interest: "Cold" },
+  { id: 1, group: "18-24, Washington DC", engagement: 0.38, device: "Mobile", interest: "Hot" },
+  { id: 2, group: "25-34, New York", engagement: 0.29, device: "Desktop", interest: "Warm" },
+  { id: 3, group: "35-44, Chicago", engagement: 0.22, device: "Mobile", interest: "Cold" },
 ];
 
 const contentEffectiveness = [
@@ -350,7 +350,7 @@ export default function MarketingHeadReportingAnalytics() {
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
           <div className="font-medium mb-1">{t('analytics.audienceEngagement.aiGeoDemographicInsights')}</div>
           <div className="text-sm text-yellow-700 dark:text-yellow-300">
-            {isRTLMode ? 'اقترح استهداف مستخدمي الدمام على الهاتف المحمول بمحتوى فيديو لتفاعل أعلى.' : 'Suggest targeting Dammam mobile users with video content for higher engagement.'}
+            {isRTLMode ? 'اقترح استهداف مستخدمي شيكاغو على الهاتف المحمول بمحتوى فيديو لتفاعل أعلى.' : 'Suggest targeting Chicago mobile users with video content for higher engagement.'}
           </div>
         </div>
       </section>
@@ -391,7 +391,7 @@ export default function MarketingHeadReportingAnalytics() {
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('analytics.contentEffectiveness.aiContentRecommendation')}</div>
             <div className="text-sm text-green-700 dark:text-green-300">
-              {isRTLMode ? 'استخدم المزيد من فيديوهات البرامج للفئة العمرية 18-24 في الرياض.' : 'Use more program videos for 18-24 age group in Riyadh.'}
+              {isRTLMode ? 'استخدم المزيد من فيديوهات البرامج للفئة العمرية 18-24 في واشنطن.' : 'Use more program videos for 18-24 age group in Washington DC.'}
             </div>
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
