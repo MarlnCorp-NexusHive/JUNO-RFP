@@ -95,15 +95,18 @@ export default function TechnicalSolutioningPage() {
     return cat ? t(`proposalManagerTechnicalSolutioning.categories.${cat.labelKey}`, { defaultValue: catId }) : catId;
   };
 
-  const loadRequirementsFromWorkspace = useCallback(() => {
-    const doc = workspaceDocs.find((d) => d.id === selectedDocId);
-    if (!doc) return;
-    const fromQas = (doc.extractedQAs || [])
-      .map((q, i) => `${i + 1}. ${q.question}`)
-      .join("\n");
-    setRequirementsText(fromQas || doc.rawText?.slice(0, 12000) || "");
-    saveSettings({ ...settings, selectedWorkspaceDocId: selectedDocId });
-  }, [selectedDocId, workspaceDocs, settings]);
+  const loadRequirementsFromWorkspace = useCallback(
+    (docId = selectedDocId) => {
+      const doc = workspaceDocs.find((d) => d.id === docId);
+      if (!doc) return;
+      const fromQas = (doc.extractedQAs || [])
+        .map((q, i) => `${i + 1}. ${q.question}`)
+        .join("\n");
+      setRequirementsText(fromQas || doc.rawText?.slice(0, 12000) || "");
+      saveSettings({ ...settings, selectedWorkspaceDocId: docId });
+    },
+    [selectedDocId, workspaceDocs, settings],
+  );
 
   const handleUploadReferences = async (fileList) => {
     const files = Array.from(fileList || []);
@@ -438,28 +441,23 @@ export default function TechnicalSolutioningPage() {
               {t("proposalManagerTechnicalSolutioning.requirementsTitle")}
             </h2>
             {workspaceDocs.length > 0 ? (
-              <div className="flex flex-wrap gap-2 items-end">
-                <div className="flex-1 min-w-[200px]">
-                  <label className="text-xs font-medium text-gray-500 block mb-1">
-                    {t("proposalManagerTechnicalSolutioning.fromWorkspace")}
-                  </label>
-                  <select
-                    value={selectedDocId}
-                    onChange={(e) => setSelectedDocId(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
-                  >
-                    {workspaceDocs.map((d) => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <button
-                  type="button"
-                  onClick={loadRequirementsFromWorkspace}
-                  className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900"
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">
+                  {t("proposalManagerTechnicalSolutioning.fromWorkspace")}
+                </label>
+                <select
+                  value={selectedDocId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setSelectedDocId(id);
+                    loadRequirementsFromWorkspace(id);
+                  }}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
                 >
-                  {t("proposalManagerTechnicalSolutioning.loadFromWorkspace")}
-                </button>
+                  {workspaceDocs.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </select>
               </div>
             ) : (
               <p className="text-sm text-amber-600 dark:text-amber-400">{t("proposalManagerTechnicalSolutioning.noWorkspaceDocs")}</p>

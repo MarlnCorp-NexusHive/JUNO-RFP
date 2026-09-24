@@ -6,7 +6,6 @@ import SidebarLanguageSwitcher from "../../../components/localization/SidebarLan
 import SmartTourButton from "../../../components/tours/SmartTourButton";
 import { clearCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
 import { clearTrialSession } from "../../../services/trialAuthSession.js";
-import SageAIButton from "../../../components/ui/SageAIButton";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
 
 export default function Sidebar({ features, userLabel, expanded, setExpanded, role = "director" }) {
@@ -110,9 +109,6 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
       <div className={`flex flex-col items-center gap-2 p-4 border-t ${
         darkTheme ? 'border-gray-700' : 'border-white/20'
       }`}>
-        {/* Enhanced Sage AI Button */}
-        <SageAIButton expanded={expanded} darkTheme={darkTheme} isRTLMode={isRTLMode} role={role} />
-        
         {/* Language Switcher */}
         <SidebarLanguageSwitcher expanded={expanded} darkTheme={darkTheme} />
         

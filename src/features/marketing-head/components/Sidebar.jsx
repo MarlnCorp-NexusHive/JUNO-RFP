@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
 import SidebarLanguageSwitcher from "../../../components/localization/SidebarLanguageSwitcher";
 import SmartTourButton from '../../../components/tours/SmartTourButton';
-import SageAIButton from '../../../components/ui/SageAIButton';
 import ThemeToggleButton from '../../../components/ui/ThemeToggleButton';
 import marlnLogo from "../../../assets/MARLN logo.png";
 
@@ -101,9 +100,6 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
       <div className={`flex flex-col items-center gap-2 p-4 border-t ${
         darkTheme ? 'border-gray-700' : 'border-white/20'
       }`}>
-        {/* Enhanced Sage AI Button */}
-        <SageAIButton expanded={expanded} darkTheme={darkTheme} role="marketing-head" />
-        
         {/* Language Switcher */}
         <SidebarLanguageSwitcher expanded={expanded} darkTheme={darkTheme} />
         

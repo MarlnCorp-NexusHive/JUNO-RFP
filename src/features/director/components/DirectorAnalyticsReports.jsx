@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -299,39 +299,83 @@ const complianceMetrics = {
 const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
 // Proposal Manager – Bid Vault (RFP submissions, win/loss, pipeline)
-const bidVaultData = {
-  submissionFunnel: [
-    { stage: "RFPs Identified", count: 48, conversion: 100 },
-    { stage: "Go/No-Go", count: 32, conversion: 67 },
-    { stage: "Proposal Submitted", count: 22, conversion: 46 },
-    { stage: "Shortlisted", count: 12, conversion: 25 },
-    { stage: "Won", count: 7, conversion: 15 },
-  ],
-  winLossBySegment: [
-    { segment: "Federal", won: 4, lost: 6, pending: 2 },
-    { segment: "State/Local", won: 2, lost: 5, pending: 1 },
-    { segment: "Commercial", won: 1, lost: 3, pending: 2 },
-    { segment: "International", won: 0, lost: 2, pending: 1 },
-  ],
-  pipelineByStage: [
-    { stage: "Qualification", value: 12, count: 8 },
-    { stage: "Capture", value: 18, count: 6 },
-    { stage: "Proposal", value: 8, count: 4 },
-    { stage: "Submitted", value: 5, count: 3 },
-  ],
-  submissionsTrend: [
-    { month: "Jan", submitted: 4, won: 1 },
-    { month: "Feb", submitted: 5, won: 2 },
-    { month: "Mar", submitted: 6, won: 1 },
-    { month: "Apr", submitted: 3, won: 2 },
-    { month: "May", submitted: 7, won: 1 },
-    { month: "Jun", submitted: 5, won: 0 },
-  ],
-  winRateByFiscal: [
-    { year: "FY24", rate: 28, submissions: 18 },
-    { year: "FY25", rate: 32, submissions: 22 },
-    { year: "FY26", rate: 35, submissions: 24 },
-  ],
+// Separate demo series for Last 6 months vs Last year so the time switch visibly updates charts.
+const bidVaultDataByRange = {
+  "6M": {
+    submissionFunnel: [
+      { stage: "RFPs Identified", count: 48, conversion: 100 },
+      { stage: "Go/No-Go", count: 32, conversion: 67 },
+      { stage: "Proposal Submitted", count: 22, conversion: 46 },
+      { stage: "Shortlisted", count: 12, conversion: 25 },
+      { stage: "Won", count: 7, conversion: 15 },
+    ],
+    winLossBySegment: [
+      { segment: "Federal", won: 4, lost: 6, pending: 2 },
+      { segment: "State/Local", won: 2, lost: 5, pending: 1 },
+      { segment: "Commercial", won: 1, lost: 3, pending: 2 },
+      { segment: "International", won: 0, lost: 2, pending: 1 },
+    ],
+    pipelineByStage: [
+      { stage: "Qualification", value: 12, count: 8 },
+      { stage: "Capture", value: 18, count: 6 },
+      { stage: "Proposal", value: 8, count: 4 },
+      { stage: "Submitted", value: 5, count: 3 },
+    ],
+    submissionsTrend: [
+      { month: "Jan", submitted: 4, won: 1 },
+      { month: "Feb", submitted: 5, won: 2 },
+      { month: "Mar", submitted: 6, won: 1 },
+      { month: "Apr", submitted: 3, won: 2 },
+      { month: "May", submitted: 7, won: 1 },
+      { month: "Jun", submitted: 5, won: 0 },
+    ],
+    winRateByFiscal: [
+      { year: "FY24", rate: 28, submissions: 18 },
+      { year: "FY25", rate: 32, submissions: 22 },
+      { year: "FY26", rate: 35, submissions: 24 },
+    ],
+  },
+  "1Y": {
+    submissionFunnel: [
+      { stage: "RFPs Identified", count: 96, conversion: 100 },
+      { stage: "Go/No-Go", count: 64, conversion: 67 },
+      { stage: "Proposal Submitted", count: 41, conversion: 43 },
+      { stage: "Shortlisted", count: 19, conversion: 20 },
+      { stage: "Won", count: 13, conversion: 14 },
+    ],
+    winLossBySegment: [
+      { segment: "Federal", won: 8, lost: 11, pending: 3 },
+      { segment: "State/Local", won: 5, lost: 9, pending: 2 },
+      { segment: "Commercial", won: 3, lost: 6, pending: 2 },
+      { segment: "International", won: 1, lost: 4, pending: 1 },
+    ],
+    pipelineByStage: [
+      { stage: "Qualification", value: 22, count: 14 },
+      { stage: "Capture", value: 31, count: 11 },
+      { stage: "Proposal", value: 15, count: 7 },
+      { stage: "Submitted", value: 9, count: 5 },
+    ],
+    submissionsTrend: [
+      { month: "Jul", submitted: 3, won: 1 },
+      { month: "Aug", submitted: 4, won: 0 },
+      { month: "Sep", submitted: 5, won: 2 },
+      { month: "Oct", submitted: 4, won: 1 },
+      { month: "Nov", submitted: 6, won: 1 },
+      { month: "Dec", submitted: 5, won: 2 },
+      { month: "Jan", submitted: 4, won: 1 },
+      { month: "Feb", submitted: 5, won: 2 },
+      { month: "Mar", submitted: 6, won: 1 },
+      { month: "Apr", submitted: 3, won: 2 },
+      { month: "May", submitted: 7, won: 1 },
+      { month: "Jun", submitted: 5, won: 0 },
+    ],
+    winRateByFiscal: [
+      { year: "FY23", rate: 24, submissions: 16 },
+      { year: "FY24", rate: 28, submissions: 18 },
+      { year: "FY25", rate: 32, submissions: 22 },
+      { year: "FY26", rate: 35, submissions: 24 },
+    ],
+  },
 };
 
 // Proposal Manager – Content Hub (past performance, boilerplate, library)
@@ -381,6 +425,13 @@ export default function DirectorAnalyticsReports() {
   const [financialAnalysis, setFinancialAnalysis] = useState(null);
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isArabic ? ar : en);
+  const bidVaultData = useMemo(
+    () => bidVaultDataByRange[timeRange] || bidVaultDataByRange["6M"],
+    [timeRange],
+  );
+  const bidRangeLabel = timeRange === "1Y"
+    ? pmText("Last year", "العام الماضي")
+    : pmText("Last 6 months", "آخر 6 أشهر");
   const bidLabel = (text) => {
     const map = {
       "RFPs Identified": "طلبات العروض المحددة",
@@ -402,6 +453,12 @@ export default function DirectorAnalyticsReports() {
       Apr: "أبريل",
       May: "مايو",
       Jun: "يونيو",
+      Jul: "يوليو",
+      Aug: "أغسطس",
+      Sep: "سبتمبر",
+      Oct: "أكتوبر",
+      Nov: "نوفمبر",
+      Dec: "ديسمبر",
       Submissions: "التقديمات",
       "Win/Loss": "فوز/خسارة",
       Pipeline: "خط الأنابيب",
@@ -1210,7 +1267,7 @@ export default function DirectorAnalyticsReports() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
           <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Proposal Submission Funnel", "مسار تقديم العروض")}</h3>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={200} key={`funnel-${timeRange}`}>
             <BarChart data={bidVaultData.submissionFunnel} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="stage" tick={{ fontSize: 9 }} tickFormatter={bidLabel} />
@@ -1221,8 +1278,8 @@ export default function DirectorAnalyticsReports() {
           </ResponsiveContainer>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Submissions vs Wins (6M)", "التقديمات مقابل الفوز (آخر 6 أشهر)")}</h3>
-          <ResponsiveContainer width="100%" height={200}>
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText(`Submissions vs Wins (${bidRangeLabel})`, `التقديمات مقابل الفوز (${bidRangeLabel})`)}</h3>
+          <ResponsiveContainer width="100%" height={200} key={`submissions-trend-${timeRange}`}>
             <LineChart data={bidVaultData.submissionsTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
@@ -1235,7 +1292,7 @@ export default function DirectorAnalyticsReports() {
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
           <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Win Rate by Fiscal Year", "معدل الفوز حسب السنة المالية")}</h3>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={200} key={`winrate-${timeRange}`}>
             <BarChart data={bidVaultData.winRateByFiscal} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" tick={{ fontSize: 10 }} />
@@ -1253,7 +1310,7 @@ export default function DirectorAnalyticsReports() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
           <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Win/Loss by Segment", "الفوز/الخسارة حسب القطاع")}</h3>
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={280} key={`winloss-${timeRange}`}>
             <BarChart data={bidVaultData.winLossBySegment} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="segment" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
@@ -1268,7 +1325,7 @@ export default function DirectorAnalyticsReports() {
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
           <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Pipeline by Stage ($M)", "خط الأنابيب حسب المرحلة (مليون $)")}</h3>
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={280} key={`pipeline-wl-${timeRange}`}>
             <BarChart data={bidVaultData.pipelineByStage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="stage" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
@@ -1286,7 +1343,7 @@ export default function DirectorAnalyticsReports() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
           <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Pipeline Value by Stage", "قيمة خط الأنابيب حسب المرحلة")}</h3>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={260} key={`pipeline-main-${timeRange}`}>
             <BarChart data={bidVaultData.pipelineByStage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="stage" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
@@ -1299,7 +1356,7 @@ export default function DirectorAnalyticsReports() {
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
           <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">{pmText("Submission Funnel", "مسار التقديم")}</h3>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={260} key={`funnel-pie-${timeRange}`}>
             <PieChart>
               <Pie data={bidVaultData.submissionFunnel.map((x) => ({ ...x, stageLabel: bidLabel(x.stage) }))} dataKey="count" nameKey="stageLabel" cx="50%" cy="50%" outerRadius={80} label>
                 {bidVaultData.submissionFunnel.map((entry, index) => (

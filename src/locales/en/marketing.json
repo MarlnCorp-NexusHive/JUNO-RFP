@@ -1182,6 +1182,7 @@
         "aiRecommendations": "AI Recommendations",
         "certified": "Certified",
         "inProgress": "In Progress",
+        "pending": "Pending",
         "aiTrainingRecommendation": "AI: Recommends \"Social Media Analytics\" for Khalid Al-Sayed"
       },
       "communicationCenter": {

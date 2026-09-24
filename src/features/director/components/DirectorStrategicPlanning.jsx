@@ -317,7 +317,8 @@ export default function DirectorStrategicPlanning() {
               </button>
             </div>
 
-            {/* Filter Controls */}
+            {/* Filter Controls – hidden on Capture Strategy */}
+            {!isCaptureStrategy && (
             <div className={`flex flex-wrap gap-3 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
               <select 
                 value={selectedDept} 
@@ -334,6 +335,7 @@ export default function DirectorStrategicPlanning() {
                 {years.map(y => <option key={y}>{y}</option>)}
               </select>
             </div>
+            )}
           </div>
         </div>
 

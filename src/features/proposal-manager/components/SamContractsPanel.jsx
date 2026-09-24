@@ -152,9 +152,6 @@ export default function SamContractsPanel() {
             })}
           </p>
         </div>
-        <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-          {t("proposalManagerSam.subtitle")}
-        </p>
       </header>
 
       <section className="sticky top-0 z-20 -mx-1 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">

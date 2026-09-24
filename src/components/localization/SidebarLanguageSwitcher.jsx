@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../../hooks/useLocalization';
 import { useTranslation } from 'react-i18next';
+import { ARABIC_LANGUAGE_ENABLED } from '../../utils/languageUtils';
 
 const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
   const { currentLanguage, toggleLanguage } = useLocalization();
@@ -14,12 +15,18 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
 
   // Glow animation every 6 seconds
   useEffect(() => {
+    if (!ARABIC_LANGUAGE_ENABLED) return undefined;
     const interval = setInterval(() => {
       setGlowAnimation(true);
       setTimeout(() => setGlowAnimation(false), 1500);
     }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  // Arabic temporarily disabled — hide EN/AR toggle (locales kept for later).
+  if (!ARABIC_LANGUAGE_ENABLED) {
+    return null;
+  }
 
   return (
     <button
@@ -83,4 +90,4 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
   );
 };
 
-export default SidebarLanguageSwitcher; 
+export default SidebarLanguageSwitcher;

@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { useLocalization } from '../../hooks/useLocalization.jsx';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_LANGUAGES } from '../../utils/languageUtils';
+import { ARABIC_LANGUAGE_ENABLED, SUPPORTED_LANGUAGES } from '../../utils/languageUtils';
 import { FiGlobe, FiChevronDown } from 'react-icons/fi';
 
 const LanguageSwitcher = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { currentLanguage, changeLanguage, isRTLMode } = useLocalization();
   const { t } = useTranslation('common');
+
+  // Arabic temporarily disabled — hide switcher entirely (locales kept for later).
+  if (!ARABIC_LANGUAGE_ENABLED || SUPPORTED_LANGUAGES.length < 2) {
+    return null;
+  }
   
   const currentLang = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLanguage);
 
@@ -53,4 +58,4 @@ const LanguageSwitcher = () => {
   );
 };
 
-export default LanguageSwitcher; 
+export default LanguageSwitcher;

@@ -1,7 +1,7 @@
 export const proposalManagerFeatures = [
   { label: "director.dashboard", icon: "📊", route: "/rbac/proposal-manager", description: "Performance Overview, KPI Summary, Alerts & Notices" },
   { label: "proposalManager.companyIntelligence", icon: "🌐", route: "/rbac/proposal-manager/company-intelligence", description: "RFP issuer financials, trends, and customers from public sources" },
-  { label: "proposalManager.competitiveIntelligence", icon: "🎯", route: "/rbac/proposal-manager/competitive-intelligence", description: "Compare peer competitors, datasheets, and key differentiators" },
+  { label: "proposalManager.competitiveIntelligence", icon: "🎯", route: "/rbac/proposal-manager/competitive-intelligence", description: "Look up any competitor or compare curated peers — datasheets and differentiators" },
   { label: "proposalManager.sourceDocs", icon: "📄", route: "/rbac/proposal-manager/source-docs", description: "Source documents and reference materials" },
   { label: "proposalManager.manageTeam", icon: "👥", route: "/rbac/proposal-manager/team", description: "Team Management and Collaboration" },
   { label: "proposalManager.rfpCollaboration", icon: "🤝", route: "/rbac/proposal-manager/rfp-collaboration", description: "Assign RFP questions to auditors, AI drafts, review, activity log" },

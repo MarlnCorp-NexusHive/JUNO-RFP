@@ -97,7 +97,13 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
+    // Keep Arabic resources loaded; force English while Arabic UI is disabled
+    // (see ARABIC_LANGUAGE_ENABLED in languageUtils.js).
+    lng: 'en',
     fallbackLng: 'en',
+    supportedLngs: ['en', 'ar'],
+    nonExplicitSupportedLngs: true,
+    load: 'languageOnly',
     debug: process.env.NODE_ENV === 'development',
     
     interpolation: {
@@ -105,6 +111,7 @@ i18n
     },
     
     detection: {
+      // Prefer saved preference, but LocalizationProvider forces `en` when Arabic is disabled.
       order: ['localStorage', 'navigator', 'htmlTag'],
       lookupLocalStorage: 'preferred-language',
       caches: ['localStorage'],

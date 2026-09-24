@@ -1216,6 +1216,7 @@
         "aiRecommendations": "توصيات الذكاء الاصطناعي",
         "certified": "معتمد",
         "inProgress": "قيد التقدم",
+        "pending": "قيد الانتظار",
         "aiTrainingRecommendation": "الذكاء الاصطناعي: يوصي بـ \"تحليلات وسائل التواصل الاجتماعي\" لخالد السيد"
       },
       "communicationCenter": {

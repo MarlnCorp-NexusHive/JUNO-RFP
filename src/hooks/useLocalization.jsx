@@ -1,7 +1,11 @@
 import { useContext, createContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isRTL, getTextDirection, forceRTLScrollbar, cleanupRTLStyling, debugRTLState } from '../utils/rtl';
-import { saveLanguagePreference, getLanguagePreference, detectUserLanguage } from '../utils/languageUtils';
+import {
+  ARABIC_LANGUAGE_ENABLED,
+  saveLanguagePreference,
+  getLanguagePreference,
+} from '../utils/languageUtils';
 
 const LocalizationContext = createContext();
 const normalizeLanguageCode = (lng) => String(lng || 'en').toLowerCase().split('-')[0];
@@ -9,22 +13,45 @@ const normalizeLanguageCode = (lng) => String(lng || 'en').toLowerCase().split('
 export const LocalizationProvider = ({ children }) => {
   const { i18n } = useTranslation();
   const initialLanguage = normalizeLanguageCode(
-    i18n?.resolvedLanguage || i18n?.language || getLanguagePreference(),
+    ARABIC_LANGUAGE_ENABLED
+      ? (i18n?.resolvedLanguage || i18n?.language || getLanguagePreference())
+      : 'en',
   );
 
   const [currentLanguage, setCurrentLanguage] = useState(initialLanguage);
   const [isRTLMode, setIsRTLMode] = useState(isRTL(initialLanguage));
 
   useEffect(() => {
+    // Force English while Arabic is disabled (clears a prior AR preference in the UI).
+    if (!ARABIC_LANGUAGE_ENABLED) {
+      if (normalizeLanguageCode(i18n?.language) !== 'en') {
+        void changeLanguage('en');
+      } else {
+        saveLanguagePreference('en');
+        if (typeof document !== 'undefined') {
+          document.documentElement.lang = 'en';
+          document.documentElement.dir = 'ltr';
+          cleanupRTLStyling();
+          document.body.classList.add('ltr-layout');
+        }
+      }
+      return;
+    }
+
     const savedLang = normalizeLanguageCode(getLanguagePreference());
     if (savedLang && savedLang !== i18n?.resolvedLanguage) {
       void changeLanguage(savedLang);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount / flag change
   }, []);
 
   useEffect(() => {
     const onLanguageChanged = (lng) => {
       const normalized = normalizeLanguageCode(lng);
+      if (!ARABIC_LANGUAGE_ENABLED && normalized === 'ar') {
+        void changeLanguage('en');
+        return;
+      }
       setCurrentLanguage(normalized);
       setIsRTLMode(isRTL(normalized));
     };
@@ -35,7 +62,10 @@ export const LocalizationProvider = ({ children }) => {
   }, [i18n]);
 
   async function changeLanguage(languageCode) {
-    const normalized = normalizeLanguageCode(languageCode);
+    let normalized = normalizeLanguageCode(languageCode);
+    if (!ARABIC_LANGUAGE_ENABLED && normalized === 'ar') {
+      normalized = 'en';
+    }
     try {
       await i18n.changeLanguage(normalized);
       setCurrentLanguage(normalized);
@@ -76,6 +106,7 @@ export const LocalizationProvider = ({ children }) => {
   }
 
   const toggleLanguage = () => {
+    if (!ARABIC_LANGUAGE_ENABLED) return;
     const current = normalizeLanguageCode(currentLanguage);
     const newLanguage = current === 'ar' ? 'en' : 'ar';
     void changeLanguage(newLanguage);
@@ -87,6 +118,7 @@ export const LocalizationProvider = ({ children }) => {
     changeLanguage,
     toggleLanguage,
     textDirection: getTextDirection(currentLanguage),
+    arabicEnabled: ARABIC_LANGUAGE_ENABLED,
   };
 
   return (
@@ -102,4 +134,4 @@ export const useLocalization = () => {
     throw new Error('useLocalization must be used within a LocalizationProvider');
   }
   return context;
-}; 
+};
