@@ -110,15 +110,37 @@ function LoginPageContent() {
       const ident = username.trim().toLowerCase();
       const passIn = password.trim();
 
-      // 1) Trial tenants (backend) — same Netlify/Render deploy, isolated by tenantId
+      // 1) Demo accounts first (local, instant).
+      // Previously we awaited /trial/auth/login before this path. On live, a cold
+      // Render backend + the 10-minute axios timeout made demo login feel stuck;
+      // refresh then "worked" because the next attempt hit a warm API (fast 401).
+      clearTrialSession();
+      preloadDemoUsers();
+
+      const users = localStorageService.getUsers();
+      const demoUser = users.find((u) => {
+        const uName = String(u.username || "").toLowerCase();
+        const uMail = String(u.collabEmail || "").toLowerCase();
+        const passOk = String(u.password || "") === passIn;
+        if (!passOk) return false;
+        return uName === ident || (uMail && uMail === ident);
+      });
+      if (demoUser) {
+        localStorage.setItem("rbac_current_user", JSON.stringify(demoUser));
+        navigate(dashboardRoute(demoUser), { replace: true });
+        return;
+      }
+
+      // 2) Trial tenants (backend) — short timeout so a sleeping API cannot hang the form
       try {
-        const { data } = await API.post("/trial/auth/login", {
-          email: ident,
-          password: passIn,
-        });
+        const { data } = await API.post(
+          "/trial/auth/login",
+          { email: ident, password: passIn },
+          { timeout: 8_000 },
+        );
         setTrialSession(data);
         localStorage.setItem("rbac_current_user", JSON.stringify(trialUserToRbacUser(data)));
-        navigate("/rbac/proposal-manager");
+        navigate("/rbac/proposal-manager", { replace: true });
         return;
       } catch (trialErr) {
         const code = trialErr?.response?.data?.code;
@@ -128,26 +150,6 @@ function LoginPageContent() {
           setError(msg || t("auth.login.trialExpired", { defaultValue: "This trial has expired." }));
           return;
         }
-        // Network / 401 → fall through to demo accounts
-      }
-
-      // 2) Demo mode (unchanged) — clears any leftover trial session so storage stays unscoped
-      clearTrialSession();
-      preloadDemoUsers();
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const users = localStorageService.getUsers();
-      const user = users.find((u) => {
-        const uName = String(u.username || "").toLowerCase();
-        const uMail = String(u.collabEmail || "").toLowerCase();
-        const passOk = String(u.password || "") === passIn;
-        if (!passOk) return false;
-        return uName === ident || (uMail && uMail === ident);
-      });
-      if (user) {
-        localStorage.setItem("rbac_current_user", JSON.stringify(user));
-        navigate(dashboardRoute(user));
-      } else {
         setError(t('auth.login.invalidCredentials'));
       }
     } catch (err) {
