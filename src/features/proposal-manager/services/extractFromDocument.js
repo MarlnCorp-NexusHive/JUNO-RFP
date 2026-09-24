@@ -217,7 +217,19 @@ function trimLeadingBeforeFirstListMarker(s) {
 /**
  * Typical RFPs use numbered requirements / shall / must — not "Q:" / "A:" pairs.
  * Turn requirement-like paragraphs into { question, answer } rows (empty answer = draft in UI).
+ * Keeps original verbiage; skips near-duplicate requirements.
  */
+function normalizeRequirementKey(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/^\s*\d+[\.)]\s+/, "")
+    .replace(/^\s*[\u2022•\-–—]\s+/, "")
+    .replace(/\s+/g, " ")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .trim();
+}
+
 function extractRfpRequirementSnippets(text) {
   const trimmed = text.trim();
   if (trimmed.length < 120) return [];
@@ -242,9 +254,11 @@ function extractRfpRequirementSnippets(text) {
   const seen = new Set();
 
   const add = (p, requireSignal) => {
-    const q = p.slice(0, 2000);
-    const sig = q.slice(0, 96);
-    if (seen.has(sig)) return;
+    // Keep original wording; only soft-cap extremely long blocks.
+    const q = p.length > 8000 ? `${p.slice(0, 8000)}…` : p;
+    const key = normalizeRequirementKey(q);
+    if (!key || key.length < 12) return;
+    if (seen.has(key)) return;
     if (!looksLikeRealText(q, 10)) return;
     if (requireSignal) {
       const isLikely =
@@ -257,7 +271,7 @@ function extractRfpRequirementSnippets(text) {
         /^(section|attachment|exhibit|appendix|volume|part)\s+[A-Z0-9.\-]+/im.test(q);
       if (!isLikely) return;
     }
-    seen.add(sig);
+    seen.add(key);
     out.push({ question: q, answer: "" });
   };
 

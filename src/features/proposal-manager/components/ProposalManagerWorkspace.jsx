@@ -28,8 +28,12 @@ import {
   FiRefreshCw,
   FiUserPlus,
   FiGrid,
+  FiSearch,
+  FiX,
 } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
+import { SAMPLE_COMPANIES } from "../data/companyIntelligenceSamples";
+import { fetchCompanyIntelligence } from "../../../services/companyIntelligenceService";
 import {
   generateAnswer,
   structureRfpRequirementsWithAi,
@@ -198,11 +202,65 @@ async function messageFromApiError(error) {
 export default function ProposalManagerWorkspace() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { issuer } = useProposalIssuer();
+  const { issuer, linkFromIntelligence, clearLink } = useProposalIssuer();
   const [issuerBrief, setIssuerBrief] = useState("");
+  const [companyQuery, setCompanyQuery] = useState("");
+  const [companyPickerOpen, setCompanyPickerOpen] = useState(false);
+  const [companyLoading, setCompanyLoading] = useState(false);
+  const [companyError, setCompanyError] = useState("");
   useEffect(() => {
     if (issuer?.narrative) setIssuerBrief(issuer.narrative);
   }, [issuer?.linkedAt, issuer?.narrative]);
+
+  const companySuggestions = useMemo(() => {
+    const q = companyQuery.trim().toLowerCase();
+    if (!q) return [];
+    return SAMPLE_COMPANIES
+      .filter((c) => c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [companyQuery]);
+
+  const selectWorkspaceCompany = useCallback(async (rawQuery) => {
+    const q = String(rawQuery || companyQuery || "").trim();
+    if (!q) {
+      setCompanyError(t("proposalManagerWorkspace.companySelectRequired", { defaultValue: "Enter a company name or ticker." }));
+      return;
+    }
+    setCompanyError("");
+    setCompanyLoading(true);
+    try {
+      const data = await fetchCompanyIntelligence({
+        companyName: q,
+        ticker: q.length <= 6 && /^[A-Z0-9.-]+$/i.test(q) ? q : undefined,
+      });
+      if (!data || data.error || !data.financials) {
+        setCompanyError(
+          data?.error
+            || t("proposalManagerWorkspace.companySelectFailed", { defaultValue: "Could not load that company. Try another name or ticker." }),
+        );
+        return;
+      }
+      const ok = linkFromIntelligence(data);
+      if (!ok) {
+        setCompanyError(t("proposalManagerWorkspace.companySelectFailed", { defaultValue: "Could not link that company to this workspace." }));
+        return;
+      }
+      setCompanyQuery("");
+      setCompanyPickerOpen(false);
+    } catch (e) {
+      setCompanyError(e?.message || t("proposalManagerWorkspace.companySelectFailed", { defaultValue: "Could not load that company. Try another name or ticker." }));
+    } finally {
+      setCompanyLoading(false);
+    }
+  }, [companyQuery, linkFromIntelligence, t]);
+
+  const clearWorkspaceCompany = useCallback(() => {
+    clearLink();
+    setIssuerBrief("");
+    setCompanyQuery("");
+    setCompanyError("");
+    setCompanyPickerOpen(true);
+  }, [clearLink]);
 
   const [folders, setFolders] = useState(() => {
     ensureBoilerplateLibrary();
@@ -649,9 +707,9 @@ export default function ProposalManagerWorkspace() {
       const qas = items.map((it, i) => {
         const n = typeof it.n === "number" && it.n >= 1 ? it.n : i + 1;
         const q = (it.q || "").trim();
-        const ref = typeof it.ref === "string" ? it.ref.trim() : "";
+        // Keep model/source wording as-is; only add a workspace number if none is present.
         const question = /^\d+[\.)]\s/.test(q) ? q : `${n}. ${q}`;
-        return { question, answer: ref };
+        return { question, answer: "" };
       });
       updateDocument(rfpId, {
         extractedQAs: qas,
@@ -962,28 +1020,137 @@ export default function ProposalManagerWorkspace() {
           </p>
         </div>
 
-        {issuer && (
-          <section className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-indigo-950/40 dark:via-gray-800 dark:to-blue-950/30 p-5 shadow-sm space-y-3">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex items-start gap-2 min-w-0">
-                <FiZap className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
-                <div>
-                  <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t("proposalManagerWorkspace.issuerProfileTitle")}</h2>
+        <section className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-indigo-950/40 dark:via-gray-800 dark:to-blue-950/30 p-5 shadow-sm space-y-3">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex items-start gap-2 min-w-0">
+              <FiZap className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {t("proposalManagerWorkspace.issuerProfileTitle")}
+                </h2>
+                {issuer ? (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                     {issuer.name}
                     {issuer.ticker ? ` · ${issuer.ticker}` : ""}
                     {issuer.region ? ` · ${issuer.region}` : ""}
                   </p>
-                </div>
+                ) : (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                    {t("proposalManagerWorkspace.selectCompanyHint", {
+                      defaultValue: "Select the issuing company here to personalize exports and AI context.",
+                    })}
+                  </p>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={() => navigate("/rbac/proposal-manager/company-intelligence")}
-                className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
-              >
-                {t("proposalManagerWorkspace.changeCompany")}
-              </button>
             </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {issuer && !companyPickerOpen && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCompanyPickerOpen(true);
+                      setCompanyError("");
+                    }}
+                    className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    {t("proposalManagerWorkspace.changeCompany")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearWorkspaceCompany}
+                    className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:underline"
+                  >
+                    {t("proposalManagerWorkspace.clearCompany", { defaultValue: "Clear" })}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {(!issuer || companyPickerOpen) && (
+            <div className="space-y-2">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("proposalManagerWorkspace.selectCompanyLabel", { defaultValue: "Company name or ticker" })}
+              </label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={companyQuery}
+                    onChange={(e) => {
+                      setCompanyQuery(e.target.value);
+                      setCompanyError("");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void selectWorkspaceCompany();
+                      }
+                    }}
+                    placeholder={t("proposalManagerWorkspace.selectCompanyPlaceholder", {
+                      defaultValue: "e.g. Amazon, AAPL, Microsoft…",
+                    })}
+                    disabled={companyLoading}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white pl-9 pr-3 py-2 text-sm disabled:opacity-60"
+                  />
+                  {companySuggestions.length > 0 && (
+                    <ul className="absolute z-20 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-lg">
+                      {companySuggestions.map((c) => (
+                        <li key={`${c.ticker}-${c.name}`}>
+                          <button
+                            type="button"
+                            disabled={companyLoading}
+                            onClick={() => void selectWorkspaceCompany(c.ticker || c.name)}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-800 dark:text-gray-100"
+                          >
+                            <span className="font-medium">{c.name}</span>
+                            <span className="text-gray-500 dark:text-gray-400"> · {c.ticker}</span>
+                            {c.region ? <span className="text-gray-400 dark:text-gray-500"> · {c.region}</span> : null}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void selectWorkspaceCompany()}
+                  disabled={companyLoading || !companyQuery.trim()}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium shrink-0"
+                >
+                  {companyLoading
+                    ? t("proposalManagerWorkspace.selectCompanyLoading", { defaultValue: "Linking…" })
+                    : t("proposalManagerWorkspace.selectCompanyButton", { defaultValue: "Use company" })}
+                </button>
+                {issuer && companyPickerOpen && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCompanyPickerOpen(false);
+                      setCompanyQuery("");
+                      setCompanyError("");
+                    }}
+                    className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium shrink-0 inline-flex items-center gap-1"
+                  >
+                    <FiX className="w-4 h-4" />
+                    {t("proposalManagerWorkspace.cancel")}
+                  </button>
+                )}
+              </div>
+              {companyError && (
+                <p className="text-sm text-red-600 dark:text-red-400">{companyError}</p>
+              )}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t("proposalManagerWorkspace.selectCompanyQuickHint", {
+                  defaultValue: "Pick from suggestions or type a ticker. Full research stays on Company Intelligence if you need it.",
+                })}
+              </p>
+            </div>
+          )}
+
+          {issuer && (
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t("proposalManagerWorkspace.issuerOverviewLabel")}</label>
               <textarea
@@ -993,8 +1160,8 @@ export default function ProposalManagerWorkspace() {
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm"
               />
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Folders */}

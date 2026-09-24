@@ -496,7 +496,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: t('dashboard.kpis.attendance'), value: 92, icon: "📅", color: "bg-pink-100 text-pink-700" },
   ];
   const proposalManagerKpis = [
-    { label: pmText("Bid/No-Bid Ratio", "نسبة تقديم/عدم تقديم العطاء"), value: 2.1, formatType: "ratio", icon: "⚖️", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" },
+    { label: pmText("RFP MTTR", "متوسط وقت الاستجابة لطلب العروض"), value: pmText("3 days", "3 أيام"), formatType: "text", icon: "⏱️", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200", spark: [5.5, 5.0, 4.4, 3.9, 3.4, 3.0], sparkColor: { light: "#f59e0b", dark: "#fbbf24" } },
+    { label: pmText("RFPs Responded (Last Quarter)", "طلبات العروض المُجاب عليها (الربع الأخير)"), value: 27, formatType: "number", icon: "📨", color: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200", spark: [18, 20, 22, 24, 25, 27], sparkColor: { light: "#0ea5e9", dark: "#7dd3fc" } },
     { label: pmText("Compliance Coverage %", "نسبة تغطية الامتثال"), value: 94, formatType: "percent", icon: "✅", color: "bg-green-100 text-green-700" },
     { label: pmText("Unaddressed Mandatory Clauses", "البنود الإلزامية غير المعالجة"), value: 2, formatType: "number", icon: "⚠️", color: "bg-amber-100 text-amber-700" },
     { label: pmText("FAR / Regulatory Risk Flag (if federal)", "مؤشر مخاطر FAR / المخاطر التنظيمية"), value: pmText("Low", "منخفض"), formatType: "text", icon: "🚩", color: "bg-purple-100 text-purple-700" },
@@ -1196,7 +1197,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
         {/* Animated KPI Cards */}
         <div
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6"
           data-tour="3"
           data-tour-title-en="KPI Grid"
           data-tour-content-en="Deeper metrics with interactive cards. Click any to expand."
@@ -1210,7 +1211,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`rounded-2xl shadow-lg p-6 flex flex-col items-center ${kpi.color} bg-opacity-80 backdrop-blur-md cursor-pointer hover:scale-[1.03] active:scale-95 transition-transform`}
+              className={`rounded-2xl shadow-lg p-6 flex flex-col items-center ${kpi.color} bg-opacity-80 backdrop-blur-md cursor-pointer hover:scale-[1.03] active:scale-95 transition-transform relative overflow-visible`}
               onClick={() => setModalCard({ ...kpi, isKpi: true })}
             >
               <span className="text-3xl mb-2">{kpi.icon}</span>
@@ -1229,7 +1230,40 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         : kpi.value}
                 </motion.span>
               </span>
-              <span className="text-sm font-medium mt-1 opacity-80">{kpi.label}</span>
+              <span className="text-sm font-medium mt-1 opacity-80 text-center">{kpi.label}</span>
+              {Array.isArray(kpi.spark) && kpi.spark.length > 0 && (
+                <div className="absolute bottom-3 right-3 w-16 h-6 opacity-90 pointer-events-none">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={kpi.spark.map((v, idx) => ({ idx, v }))} margin={{ top: 6, right: 0, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id={`kpi-spark-gradient-${i}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={kpi.sparkColor?.light || "#f59e0b"} stopOpacity={0.5} />
+                          <stop offset="100%" stopColor={kpi.sparkColor?.light || "#f59e0b"} stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
+                      <Area
+                        type="monotone"
+                        dataKey="v"
+                        stroke={kpi.sparkColor?.light || "#f59e0b"}
+                        fill={`url(#kpi-spark-gradient-${i})`}
+                        strokeWidth={3.2}
+                        dot={false}
+                        className="block dark:hidden"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="v"
+                        stroke={kpi.sparkColor?.dark || "#fbbf24"}
+                        fill="none"
+                        strokeWidth={3.2}
+                        dot={false}
+                        className="hidden dark:block"
+                        style={{ filter: 'drop-shadow(0 0 4px #fff8)' }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>

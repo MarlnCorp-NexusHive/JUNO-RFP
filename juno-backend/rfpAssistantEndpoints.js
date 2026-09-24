@@ -15,6 +15,73 @@ function parseJsonCompletion(content) {
   }
 }
 
+function normalizeRequirementKey(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/^\s*\d+[\.)]\s+/, "")
+    .replace(/^\s*[\u2022•\-–—]\s+/, "")
+    .replace(/\s+/g, " ")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .trim();
+}
+
+/** Prefer the exact span from the source document when the model returns near-verbatim text. */
+function snapToSourceVerbatim(source, candidate) {
+  const src = String(source || "");
+  const cand = String(candidate || "").trim();
+  if (!cand) return "";
+  if (!src) return cand;
+
+  const direct = src.indexOf(cand);
+  if (direct >= 0) return src.slice(direct, direct + cand.length);
+
+  const words = cand.split(/\s+/).filter(Boolean);
+  if (words.length < 4) return cand;
+  try {
+    const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const re = new RegExp(escaped.join("\\s+"), "i");
+    const m = src.match(re);
+    if (m?.[0]) return m[0];
+  } catch {
+    /* ignore bad regex */
+  }
+  return cand;
+}
+
+function dedupeRequirementItems(items) {
+  const out = [];
+  const seen = new Set();
+  for (const row of items) {
+    const q = String(row?.q || "").trim();
+    if (!q) continue;
+    const key = normalizeRequirementKey(q);
+    if (!key || key.length < 12) continue;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      n: Number(row?.n) || out.length + 1,
+      q,
+      ref: row?.ref != null ? String(row.ref).trim() : undefined,
+    });
+  }
+  return out.map((row, i) => ({ ...row, n: i + 1 }));
+}
+
+const STRUCTURE_RFP_SYSTEM_PROMPT = `You extract discrete RFP / solicitation requirements for a proposal workspace.
+
+Return ONLY JSON of this shape:
+{"items":[{"n":number,"q":"requirement text","ref":"optional short source excerpt"}]}
+
+Rules (strict):
+1. COPY each requirement VERBATIM from the source. Do NOT paraphrase, summarize, rewrite, rephrase, "clean up", or change meaning, grammar, spelling, punctuation, capitalization, or legal wording.
+2. Your job is ONLY to find boundaries between distinct requirements / questions and split them into separate items. The text in "q" must be the original words from the document.
+3. Preserve original list numbers inside "q" when they appear in the source (e.g. keep "3. The contractor shall…"). Also set "n" to consecutive integers starting at 1 for workspace order.
+4. Detect duplicates: if the same requirement appears more than once (same or nearly identical wording), include it ONLY ONCE — keep the first occurrence.
+5. Skip boilerplate that is not a response requirement (title pages, TOC-only lines, pure confidentiality headers) unless they contain an actionable shall/must/requirement.
+6. One distinct requirement per item. Preserve document order. If there are no clear requirements, return {"items":[]}.
+7. "ref" is optional and must also be a short verbatim excerpt from the source (or omit it). Never invent text.`;
+
 export function registerRfpAssistantEndpoints(app, openai) {
   app.post("/structure-rfp-requirements", async (req, res) => {
     try {
@@ -23,30 +90,36 @@ export function registerRfpAssistantEndpoints(app, openai) {
         return res.status(400).json({ error: 'Request body must include non-empty string "text"' });
       }
 
+      const sourceText = text.slice(0, MAX_DOC_CHARS);
+
       const response = await openai.chat.completions.create({
         model: "gpt-4.1",
         response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
-            content:
-              'Split the RFP/solicitation text into separate numbered requirements. Return JSON: {"items":[{"n":number,"q":"requirement text","ref":"optional short source excerpt"}]}. One distinct requirement per item; preserve order. Use consecutive n starting at 1. If there are no clear requirements, return {"items":[]}.',
+            content: STRUCTURE_RFP_SYSTEM_PROMPT,
           },
-          { role: "user", content: text.slice(0, MAX_DOC_CHARS) },
+          { role: "user", content: sourceText },
         ],
-        temperature: 0.2,
+        temperature: 0,
         max_completion_tokens: 8192,
       });
 
       const parsed = parseJsonCompletion(response.choices[0]?.message?.content);
       const rawItems = Array.isArray(parsed?.items) ? parsed.items : [];
-      const items = rawItems
-        .map((row, i) => ({
+      const snapped = rawItems.map((row, i) => {
+        const rawQ = String(row?.q || "").trim();
+        const rawRef = row?.ref != null ? String(row.ref).trim() : "";
+        const q = snapToSourceVerbatim(sourceText, rawQ);
+        const ref = rawRef ? snapToSourceVerbatim(sourceText, rawRef) : undefined;
+        return {
           n: Number(row?.n) || i + 1,
-          q: String(row?.q || "").trim(),
-          ref: row?.ref != null ? String(row.ref).trim() : undefined,
-        }))
-        .filter((row) => row.q.length > 0);
+          q,
+          ref: ref || undefined,
+        };
+      });
+      const items = dedupeRequirementItems(snapped);
 
       res.json({ items });
     } catch (err) {

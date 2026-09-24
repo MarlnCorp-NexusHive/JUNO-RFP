@@ -96,6 +96,14 @@ function stripTags(html) {
     .trim();
 }
 
+/** Avoid "1. 1. Requirement…" when RFP text already includes a list number. */
+function stripLeadingListMarker(text) {
+  return String(text || "")
+    .replace(/^\s*\d+[\.)]\s+/, "")
+    .replace(/^\s*[\u2022•\-–—]\s+/, "")
+    .trim();
+}
+
 function inlineRunsFromHtml(html) {
   const runs = [];
   const tokens = String(html || "").split(/(<\/?(?:strong|b|em|i|br)\s*\/?>)/gi).filter(Boolean);
@@ -225,13 +233,15 @@ export async function buildWorkspaceDocumentDocx(workspaceId) {
   ];
 
   model.sections.forEach((section, i) => {
+    const questionText =
+      stripLeadingListMarker(section.question) || "Untitled question";
     docChildren.push(
       new Paragraph({
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 180, after: 140 },
         children: [
           new TextRun({
-            text: sanitizeWordPlainText(`${i + 1}. ${section.question || "Untitled question"}`),
+            text: sanitizeWordPlainText(`${i + 1}. ${questionText}`),
             bold: true,
           }),
         ],

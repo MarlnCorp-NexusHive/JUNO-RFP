@@ -108,7 +108,11 @@ function appendWorkspaceAnnexToDocumentXml(documentXml, qa) {
     "",
   ];
   for (const row of qa) {
-    lines.push(`${row.number}. ${row.question}`);
+    const q = String(row.question || "")
+      .replace(/^\s*\d+[\.)]\s+/, "")
+      .replace(/^\s*[\u2022•\-–—]\s+/, "")
+      .trim() || "Untitled question";
+    lines.push(`${row.number}. ${q}`);
     lines.push(row.answer);
     lines.push("");
   }

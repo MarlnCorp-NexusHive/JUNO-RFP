@@ -38,6 +38,19 @@ function builtinTitle(selectedTemplate) {
   return "RFP Response";
 }
 
+/** Avoid "1. 1. Requirement…" when question text already includes a list number. */
+function stripLeadingListMarker(text) {
+  return String(text || "")
+    .replace(/^\s*\d+[\.)]\s+/, "")
+    .replace(/^\s*[\u2022•\-–—]\s+/, "")
+    .trim();
+}
+
+function formatNumberedQuestion(number, question) {
+  const body = stripLeadingListMarker(question) || "Untitled question";
+  return `${number}. ${body}`;
+}
+
 function sanitizeWordPlainText(s) {
   return String(s || "")
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
@@ -102,7 +115,7 @@ function buildParagraphs({ normalized, companyName, mode, selectedTemplate }) {
         heading: HeadingLevel.HEADING_2,
         children: [
           new TextRun({
-            text: `${row.number}. ${row.question}`,
+            text: formatNumberedQuestion(row.number, row.question),
             bold: true,
           }),
         ],
@@ -148,7 +161,7 @@ function pushAnnex(children, normalized) {
         heading: HeadingLevel.HEADING_2,
         children: [
           new TextRun({
-            text: `${row.number}. ${row.question}`,
+            text: formatNumberedQuestion(row.number, row.question),
             bold: true,
           }),
         ],

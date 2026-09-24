@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import {
   getContentHubQAs,
@@ -7,7 +7,7 @@ import {
   deleteContentHubQA,
   ensureBoilerplateLibrary,
 } from "../services/proposalManagerStorage";
-import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload } from "react-icons/fi";
+import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload, FiSearch } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { useTranslation } from "react-i18next";
 import { generateAnswer, askWithContext, generateCompanyProfile, generateSlideDeck, generateWorkDocument } from "../../../services/api.js";
@@ -37,6 +37,7 @@ export default function ProposalManagerContentHub() {
   const [qas, setQas] = useState(getContentHubQAs());
   const location = useLocation();
   const [filterTag, setFilterTag] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [editingQAId, setEditingQAId] = useState(null);
   const [editingTags, setEditingTags] = useState("");
   const [showAddQA, setShowAddQA] = useState(false);
@@ -92,9 +93,20 @@ export default function ProposalManagerContentHub() {
     }
   }, [location.pathname]);
 
-  const filteredQAs = filterTag
-    ? qas.filter((qa) => qa.tags && qa.tags.some((t) => t.toLowerCase().includes(filterTag.toLowerCase())))
-    : qas;
+  const filteredQAs = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return qas.filter((qa) => {
+      if (filterTag) {
+        const hasTag = (qa.tags || []).some((tag) =>
+          String(tag).toLowerCase().includes(filterTag.toLowerCase()),
+        );
+        if (!hasTag) return false;
+      }
+      if (!q) return true;
+      const haystack = `${qa.question || ""} ${qa.answer || ""} ${(qa.tags || []).join(" ")}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [qas, filterTag, searchQuery]);
 
   const handleSaveQATags = (id) => {
     const tags = editingTags
@@ -550,7 +562,22 @@ export default function ProposalManagerContentHub() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <FiFileText className="text-indigo-500" /> {t("proposalManagerContentHub.qaLibraryHeading")}
             </h2>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
+              <div className="relative min-w-[12rem] flex-1 sm:flex-none sm:w-64">
+                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("proposalManagerContentHub.searchPlaceholder", {
+                    defaultValue: "Search questions…",
+                  })}
+                  aria-label={t("proposalManagerContentHub.searchPlaceholder", {
+                    defaultValue: "Search questions…",
+                  })}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-9 pr-3 py-2 text-sm"
+                />
+              </div>
               <select
                 value={filterTag}
                 onChange={(e) => setFilterTag(e.target.value)}
@@ -618,7 +645,11 @@ export default function ProposalManagerContentHub() {
           <ul className="space-y-3 max-h-[70vh] overflow-y-auto">
             {filteredQAs.length === 0 ? (
               <li className="text-gray-500 dark:text-gray-400 text-sm py-4">
-                {t("proposalManagerContentHub.noQAsYet")}
+                {searchQuery.trim() || filterTag
+                  ? t("proposalManagerContentHub.noSearchResults", {
+                      defaultValue: "No Q&As match your search.",
+                    })
+                  : t("proposalManagerContentHub.noQAsYet")}
               </li>
             ) : (
               filteredQAs.map((qa) => (
