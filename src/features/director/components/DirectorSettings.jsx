@@ -114,25 +114,36 @@ export default function DirectorSettings() {
             },
           ]
         : []),
-      { 
-        labelKey: "institutionalSettings.type", 
-        valueKey: "institutionalSettings.typeValue",
-        type: "select",
-        editable: true,
-        options: ["Corporation", "Company", "Organization", "Enterprise"]
-      },
-      { 
-        labelKey: "institutionalSettings.accreditation", 
-        valueKey: "institutionalSettings.accreditationValue",
-        type: "text",
-        editable: true
-      },
-      { 
-        labelKey: "institutionalSettings.academicYear", 
-        valueKey: "institutionalSettings.academicYearValue",
-        type: "date",
-        editable: true
-      },
+      ...(isPM
+        ? [
+            {
+              labelKey: "institutionalSettings.academicYear",
+              valueKey: "institutionalSettings.academicYearValue",
+              type: "date",
+              editable: true,
+            },
+          ]
+        : [
+            {
+              labelKey: "institutionalSettings.type",
+              valueKey: "institutionalSettings.typeValue",
+              type: "select",
+              editable: true,
+              options: ["Corporation", "Company", "Organization", "Enterprise"],
+            },
+            {
+              labelKey: "institutionalSettings.accreditation",
+              valueKey: "institutionalSettings.accreditationValue",
+              type: "text",
+              editable: true,
+            },
+            {
+              labelKey: "institutionalSettings.academicYear",
+              valueKey: "institutionalSettings.academicYearValue",
+              type: "date",
+              editable: true,
+            },
+          ]),
     ];
 
     const institutional = {
@@ -446,9 +457,6 @@ export default function DirectorSettings() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   {t(`settings.${category.nameKey}`)}
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {pmText(category.description)}
-                </p>
               </div>
             </div>
             
@@ -512,12 +520,6 @@ export default function DirectorSettings() {
                         {opt.required && (
                           <span className="text-red-500 text-sm">*</span>
                         )}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                        {opt.type === 'toggle' ? pmText('Enable or disable this feature') : 
-                         opt.type === 'permissions' ? pmText('Manage user access permissions') :
-                         opt.type === 'percentage' ? pmText('Set percentage value (0-100)') :
-                         pmText('Configure this setting')}
                       </div>
                       <div className="flex items-center gap-4">
                         {renderFieldValue(opt)}
