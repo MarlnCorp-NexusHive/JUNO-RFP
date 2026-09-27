@@ -1,0 +1,68 @@
+REQUEST FOR PROPOSAL (RFP)
+
+Solicitation Number: CI-NET-2026-091
+Title: Enterprise WAN, Cloud Connectivity, and Secure Remote Access Services
+Issuing Organization: Contoso Industries, Inc.
+Issue Date: September 25, 2026
+Questions Due Date: October 3, 2026, 5:00 PM ET
+Proposal Due Date: October 17, 2026, 2:00 PM ET
+Place of Performance: United States (hybrid on-premises and commercial cloud)
+Period of Performance: Base year plus four (4) option years
+Contract Type: Firm-Fixed-Price with optional Time-and-Materials surge CLIN
+
+SECTION 1 — PURPOSE AND BACKGROUND
+
+Contoso Industries, Inc. seeks a qualified Offeror to provide cost-effective, secure, and resilient Wide Area Network (WAN) connectivity between Contoso datacenter locations, Amazon Web Services (AWS) and Microsoft Azure instances, specified offices, and remote users. The solution must support Contoso's Cloud First strategy and enable migration from on-premises data centers to cloud service providers.
+
+SECTION 2 — SCOPE OF WORK (MANDATORY REQUIREMENTS)
+
+Offerors shall address each numbered requirement below. Responses must map clearly to the requirement number.
+
+1. The Contractor shall provide cost-effective, secure, and resilient Wide Area Network (WAN) connectivity between Contoso datacenter locations, AWS and Azure instances, specified offices, and remote users.
+
+2. The Contractor shall deliver secure connectivity and a platform-based architecture for WAN to support Contoso's Cloud First strategy, enabling migration from on-premise data centres to cloud service providers and access to other cloud-based platforms.
+
+3. The Contractor shall provide a single global supplier partnership for a consolidated and secure global network.
+
+4. The Contractor shall enable direct internet access at the site level, supporting network transformation and cost savings by decommissioning legacy network and security perimeter firewalls where Contoso approves the design.
+
+5. The Contractor shall provide encrypted site-to-site connectivity between Contoso facilities and Contoso-approved cloud landing zones with availability of not less than 99.9% measured monthly, excluding Contoso-caused outages.
+
+6. The Contractor shall implement Zero Trust Network Access (ZTNA) for remote users and shall not rely solely on legacy VPN concentrators as the primary remote access control.
+
+7. The Contractor shall provide centralized visibility, logging, and alerting for network and security events, with logs retained for a minimum of twelve (12) months and exportable to Contoso's SIEM.
+
+8. The Contractor shall support identity federation with Contoso's enterprise identity provider and shall enforce multi-factor authentication for privileged and remote access.
+
+9. The Contractor shall produce and maintain as-built network diagrams, runbooks, and a change-management process aligned to Contoso's change advisory board within ten (10) business days of any production change.
+
+10. The Contractor shall provide 24x7 Tier-1 and Tier-2 support with a Mean Time To Respond (MTTR) of three (3) hours or less for Severity-1 incidents.
+
+11. The Contractor shall complete a transition-in plan within sixty (60) calendar days of award, including knowledge transfer from the incumbent and dual-run cutover criteria agreed with Contoso.
+
+12. The Contractor shall comply with Contoso information security policies and shall support Contoso's audit and assessment activities upon ten (10) business days' notice.
+
+13. The Offeror shall describe its technical approach, architecture, and bill of materials for the proposed WAN and cloud connectivity solution.
+
+14. The Offeror shall provide a draft project schedule with milestones for discovery, design, pilot, production cutover, and hypercare.
+
+15. The Offeror shall submit a firm-fixed-price proposal for the base year and each option year, including assumptions and exclusions.
+
+SECTION 3 — EVALUATION CRITERIA
+
+Proposals will be evaluated on a best-value tradeoff basis considering:
+
+A. Technical Approach (40%) — clarity, feasibility, and alignment to Contoso Cloud First objectives.
+B. Past Performance (25%) — relevant WAN, SD-WAN, ZTNA, and cloud interconnect engagements of similar scale.
+C. Management and Transition (20%) — staffing, MTTR commitments, and transition risk mitigation.
+D. Price (15%) — reasonableness and completeness of the firm-fixed-price schedule.
+
+SECTION 4 — SUBMISSION INSTRUCTIONS
+
+Offerors shall submit a single searchable PDF or DOCX proposal not exceeding forty (40) pages for the technical volume (excluding price tables and resumes). Proposals shall be organized to answer Requirements 1 through 15 in order. Late proposals may not be considered.
+
+SECTION 5 — QUESTIONS
+
+Questions regarding this solicitation shall be submitted in writing by the Questions Due Date stated above. Contoso will publish consolidated answers to all Offerors.
+
+END OF SOLICITATION — CI-NET-2026-091

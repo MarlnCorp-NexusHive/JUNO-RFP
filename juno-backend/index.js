@@ -29,8 +29,14 @@ import { registerTechnicalSolutioningRoutes } from "./technicalSolutioningServic
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
 import { registerGrantsGovRoutes } from "./grantsGovService.js";
+import { registerAltGrantsRoutes } from "./altGrantsService.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 /**
  * Safe Content-Disposition for file downloads. Node rejects non-Latin-1 / non-ASCII in
@@ -80,6 +86,7 @@ app.use("/calendar", calendarRouter);
 registerRfpAssistantEndpoints(app, openai);
 registerTechnicalSolutioningRoutes(app, openai);
 registerGrantsGovRoutes(app);
+registerAltGrantsRoutes(app);
 
 /* ================= MULTER ================= */
 const upload = multer({
@@ -568,5 +575,6 @@ app.listen(PORT, () => {
   console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
   console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines");
   console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)");
-  console.log("Grants.gov: POST /grants/search, POST /grants/opportunity\n");
+  console.log("Grants.gov: POST /grants/search, POST /grants/opportunity");
+  console.log("Alt grants: POST /grants/alt/search (private + local live)\n");
 });

@@ -281,6 +281,37 @@ export const fetchFederalGrantOpportunity = async (opportunityId) => {
   return res.data;
 };
 
+/** Live private foundations (ProPublica) or state/local-eligible Grants.gov opportunities */
+export const searchAltGrants = async (params = {}) => {
+  const res = await API.post("/grants/alt/search", params);
+  return res.data;
+};
+
+/** Trial tenants: change own password (requires Bearer trial token) */
+export const changeTrialPassword = async ({ currentPassword, newPassword }) => {
+  const res = await API.post("/trial/auth/change-password", { currentPassword, newPassword });
+  return res.data;
+};
+
+export const signupTrial = async (payload) => {
+  const res = await API.post("/trial/auth/signup", payload, { timeout: 20_000 });
+  return res.data;
+};
+
+export const confirmTrialEmail = async (token) => {
+  const res = await API.post("/trial/auth/confirm", { token }, { timeout: 15_000 });
+  return res.data;
+};
+
+export const resendTrialConfirmation = async ({ email, password }) => {
+  const res = await API.post(
+    "/trial/auth/resend-confirmation",
+    { email, password },
+    { timeout: 20_000 },
+  );
+  return res.data;
+};
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {

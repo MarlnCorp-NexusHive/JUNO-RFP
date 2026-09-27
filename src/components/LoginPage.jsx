@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { localStorageService } from "../services/localStorageService";
 import { preloadDemoUsers } from "../data/preloadDemoUsers";
-import API from "../services/api.js";
+import API, {
+  confirmTrialEmail,
+  signupTrial,
+} from "../services/api.js";
 import {
   clearTrialSession,
   setTrialSession,
@@ -46,6 +49,19 @@ const dashboardRoute = (user) => {
 
 const PRODUCT_HIGHLIGHT_KEYS = ["aiQa", "companyIntel", "exports", "collaboration"];
 
+/** Dedupe confirm calls (Strict Mode remount / double-click). */
+const confirmInFlight = new Map();
+const confirmHandled = new Set();
+
+async function confirmTrialEmailOnce(token) {
+  if (confirmInFlight.has(token)) return confirmInFlight.get(token);
+  const promise = confirmTrialEmail(token).finally(() => {
+    confirmInFlight.delete(token);
+  });
+  confirmInFlight.set(token, promise);
+  return promise;
+}
+
 function ProductHighlight({ label, darkTheme }) {
   return (
     <div className={`flex items-center gap-2 text-xs ${darkTheme ? "text-white/70" : "text-white/85"}`}>
@@ -60,13 +76,23 @@ function ProductHighlight({ label, darkTheme }) {
 }
 
 function LoginPageContent() {
+  const [mode, setMode] = useState("login"); // login | signup
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [signupName, setSignupName] = useState("");
+  const [signupCompany, setSignupCompany] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirm, setSignupConfirm] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [devConfirmUrl, setDevConfirmUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [darkTheme, setDarkTheme] = useState(false);
   const [demoReloaded, setDemoReloaded] = useState(false);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation(['auth', 'common']);
   const { isRTL, flexDirection, textAlign, margin, padding } = useRTL();
 
@@ -88,6 +114,61 @@ function LoginPageContent() {
     }
   }, []);
 
+  // Handle email confirmation link: /login?trialConfirm=TOKEN
+  useEffect(() => {
+    const token = searchParams.get("trialConfirm");
+    if (!token) return;
+    if (confirmHandled.has(token)) {
+      setInfo(t("auth.confirm.alreadyConfirmed"));
+      setMode("login");
+      setSearchParams({}, { replace: true });
+      return;
+    }
+
+    let alive = true;
+    (async () => {
+      setConfirming(true);
+      setError("");
+      setInfo(t("auth.confirm.loading"));
+      try {
+        const data = await confirmTrialEmailOnce(token);
+        if (!alive) return;
+        confirmHandled.add(token);
+        setInfo(
+          data?.alreadyConfirmed
+            ? t("auth.confirm.alreadyConfirmed")
+            : t("auth.confirm.success"),
+        );
+        setMode("login");
+        setSearchParams({}, { replace: true });
+      } catch (err) {
+        if (!alive) return;
+        const code = err?.response?.data?.code;
+        setInfo("");
+        if (code === "invalid_token") {
+          // Link already consumed (scanner / prior click) — account is usually already active
+          confirmHandled.add(token);
+          setError("");
+          setInfo(t("auth.confirm.alreadyUsed"));
+          setMode("login");
+          setSearchParams({}, { replace: true });
+        } else {
+          setError(
+            code === "token_expired"
+              ? t("auth.confirm.expired")
+              : err?.response?.data?.error || t("auth.confirm.failed"),
+          );
+          setSearchParams({}, { replace: true });
+        }
+      } finally {
+        if (alive) setConfirming(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [searchParams, setSearchParams, t]);
+
   const handleThemeToggle = () => {
     const newTheme = !darkTheme;
     setDarkTheme(newTheme);
@@ -105,15 +186,14 @@ function LoginPageContent() {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    setInfo("");
+    setDevConfirmUrl("");
     
     try {
       const ident = username.trim().toLowerCase();
       const passIn = password.trim();
 
       // 1) Demo accounts first (local, instant).
-      // Previously we awaited /trial/auth/login before this path. On live, a cold
-      // Render backend + the 10-minute axios timeout made demo login feel stuck;
-      // refresh then "worked" because the next attempt hit a warm API (fast 401).
       clearTrialSession();
       preloadDemoUsers();
 
@@ -131,7 +211,7 @@ function LoginPageContent() {
         return;
       }
 
-      // 2) Trial tenants (backend) — short timeout so a sleeping API cannot hang the form
+      // 2) Trial tenants (backend)
       try {
         const { data } = await API.post(
           "/trial/auth/login",
@@ -147,7 +227,12 @@ function LoginPageContent() {
         const msg = trialErr?.response?.data?.error;
         if (code === "trial_expired" || code === "tenant_disabled") {
           clearTrialSession();
-          setError(msg || t("auth.login.trialExpired", { defaultValue: "This trial has expired." }));
+          setError(msg || t("auth.login.trialExpired"));
+          return;
+        }
+        if (code === "email_not_verified") {
+          clearTrialSession();
+          setError(msg || t("auth.login.emailNotVerified"));
           return;
         }
         setError(t('auth.login.invalidCredentials'));
@@ -159,12 +244,54 @@ function LoginPageContent() {
     }
   };
 
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setError("");
+    setInfo("");
+    setDevConfirmUrl("");
+
+    if (signupPassword.length < 8) {
+      setError(t("auth.signup.tooShort"));
+      return;
+    }
+    if (signupPassword !== signupConfirm) {
+      setError(t("auth.signup.mismatch"));
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const data = await signupTrial({
+        name: signupName.trim(),
+        companyName: signupCompany.trim(),
+        email: signupEmail.trim().toLowerCase(),
+        password: signupPassword,
+      });
+      setInfo(data.emailSent ? t("auth.signup.success") : t("auth.signup.successDev"));
+      if (data.confirmUrl) setDevConfirmUrl(data.confirmUrl);
+      setUsername(signupEmail.trim().toLowerCase());
+      setPassword("");
+      setMode("login");
+    } catch (err) {
+      const code = err?.response?.data?.code;
+      const msg = err?.response?.data?.error;
+      if (code === "email_taken") setError(t("auth.signup.emailTaken"));
+      else if (code === "password_too_short") setError(t("auth.signup.tooShort"));
+      else setError(msg || t("auth.signup.failed"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleReloadDemoUsers = () => {
     preloadDemoUsers();
     setDemoReloaded(true);
     setError("");
     setTimeout(() => setDemoReloaded(false), 3000);
   };
+
+  const inputClass = `w-full px-4 py-3 rounded-xl ${darkTheme ? 'bg-slate-700/80 text-white placeholder:text-slate-300/60' : 'bg-white/60 text-[#23232B] placeholder:text-[#23232B]/60'} focus:outline-none focus:ring-2 focus:ring-[#4f3cc9] font-medium shadow text-${textAlign('left')}`;
+  const labelClass = `block text-sm font-medium ${darkTheme ? 'text-white' : 'text-white/80'} mb-1 text-${textAlign('left')}`;
 
   return (
     <RTLWrapper className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#4f3cc9] via-[#6c5dd3] to-[#90caf9] relative">
@@ -233,23 +360,31 @@ function LoginPageContent() {
         {/* Right Side - Login Form */}
         <div className={`flex-1 flex flex-col justify-center items-center p-8 md:p-16 bg-white/20 ${isRTL ? 'rounded-l-3xl' : 'rounded-r-3xl'} form-container`}>
           <div className="w-full max-w-sm">
-            <h2 className={`text-2xl font-bold text-center ${darkTheme ? 'text-white' : 'text-[#23232B]'} mb-8`}>
-              {t('auth.login.title')}
+            <h2 className={`text-2xl font-bold text-center ${darkTheme ? 'text-white' : 'text-[#23232B]'} mb-2`}>
+              {mode === "signup" ? t("auth.signup.title") : t("auth.login.title")}
             </h2>
+            {mode === "signup" && (
+              <p className={`text-center text-sm mb-6 ${darkTheme ? "text-white/70" : "text-white/85"}`}>
+                {t("auth.signup.subtitle")}
+              </p>
+            )}
+            {mode === "login" && <div className="mb-8" />}
+
+            {mode === "login" ? (
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
-                <label className={`block text-sm font-medium ${darkTheme ? 'text-white' : 'text-white/80'} mb-1 text-${textAlign('left')}`}>
+                <label className={labelClass}>
                   {t('auth.login.username')}
                 </label>
                 <div className="relative input-with-icon">
                   <input
                     type="text"
-                    className={`w-full px-4 py-3 rounded-xl ${darkTheme ? 'bg-slate-700/80 text-white placeholder:text-slate-300/60' : 'bg-white/60 text-[#23232B] placeholder:text-[#23232B]/60'} focus:outline-none focus:ring-2 focus:ring-[#4f3cc9] font-medium shadow text-${textAlign('left')} ${isRTL ? 'pr-12' : 'pl-12'}`}
+                    className={`${inputClass} ${isRTL ? 'pr-12' : 'pl-12'}`}
                     placeholder={t('auth.login.usernamePlaceholder')}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     autoFocus
-                    disabled={isLoading}
+                    disabled={isLoading || confirming}
                   />
                   <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4f3cc9] input-icon`}>
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#4f3cc9"/></svg>
@@ -257,32 +392,39 @@ function LoginPageContent() {
                 </div>
               </div>
               <div>
-                <label className={`block text-sm font-medium ${darkTheme ? 'text-white' : 'text-white/80'} mb-1 text-${textAlign('left')}`}>
+                <label className={labelClass}>
                   {t('auth.login.password')}
                 </label>
                 <div className="relative input-with-icon">
                   <input
                     type="password"
-                    className={`w-full px-4 py-3 rounded-xl ${darkTheme ? 'bg-slate-700/80 text-white placeholder:text-slate-300/60' : 'bg-white/60 text-[#23232B] placeholder:text-[#23232B]/60'} focus:outline-none focus:ring-2 focus:ring-[#4f3cc9] font-medium shadow text-${textAlign('left')} ${isRTL ? 'pr-12' : 'pl-12'}`}
+                    className={`${inputClass} ${isRTL ? 'pr-12' : 'pl-12'}`}
                     placeholder={t('auth.login.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || confirming}
                   />
                   <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4f3cc9] input-icon`}>
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-7V8a6 6 0 10-12 0v2a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2zm-8-2a4 4 0 118 0v2H6V8zm10 10H4v-6h16v6z" fill="#4f3cc9"/></svg>
                   </span>
                 </div>
-                <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mt-1`}>
-                  <button type="button" className={`text-xs ${darkTheme ? 'text-white' : 'text-[#4f3cc9]'} hover:underline`}>
-                    {t('auth.login.forgotPassword')}
-                  </button>
-                </div>
               </div>
-              {error && (
-                <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-red-400 bg-red-900/20' : 'text-red-500 bg-red-50'}`}>
-                  {error}
+              {(error || info || confirming) && (
+                <div className={`text-sm text-center p-3 rounded-lg ${
+                  error
+                    ? (darkTheme ? 'text-red-400 bg-red-900/20' : 'text-red-500 bg-red-50')
+                    : (darkTheme ? 'text-emerald-300 bg-emerald-900/20' : 'text-emerald-700 bg-emerald-50')
+                }`}>
+                  {error || info}
                 </div>
+              )}
+              {devConfirmUrl && (
+                <a
+                  href={devConfirmUrl}
+                  className="block text-center text-sm font-semibold text-[#4f3cc9] underline"
+                >
+                  {t("auth.signup.openConfirmLink")}
+                </a>
               )}
               {demoReloaded && (
                 <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-green-400 bg-green-900/20' : 'text-green-600 bg-green-50'}`}>
@@ -291,7 +433,7 @@ function LoginPageContent() {
               )}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || confirming}
                 className={`w-full py-3 rounded-xl bg-[#23232B] text-white font-semibold text-lg shadow hover:bg-[#4f3cc9] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed ${flexDirection('row')} login-button`}
               >
                 {isLoading ? t('auth.login.loading') : t('auth.login.signInButton')}
@@ -310,12 +452,109 @@ function LoginPageContent() {
               </button>
               <button
                 type="button"
+                onClick={() => {
+                  setMode("signup");
+                  setError("");
+                  setInfo("");
+                }}
+                className="w-full mt-1 py-2 text-sm font-semibold text-white hover:underline"
+              >
+                {t("auth.login.noAccount")} {t("auth.login.signUp")}
+              </button>
+              <button
+                type="button"
                 onClick={handleReloadDemoUsers}
-                className="w-full mt-3 py-2 text-sm text-[#4f3cc9] hover:underline"
+                className="w-full py-2 text-sm text-[#4f3cc9] hover:underline"
               >
                 Reload demo credentials
               </button>
             </form>
+            ) : (
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div>
+                <label className={labelClass}>{t("auth.signup.name")}</label>
+                <input
+                  className={inputClass}
+                  value={signupName}
+                  onChange={(e) => setSignupName(e.target.value)}
+                  placeholder={t("auth.signup.namePlaceholder")}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>{t("auth.signup.company")}</label>
+                <input
+                  className={inputClass}
+                  value={signupCompany}
+                  onChange={(e) => setSignupCompany(e.target.value)}
+                  placeholder={t("auth.signup.companyPlaceholder")}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>{t("auth.signup.email")}</label>
+                <input
+                  type="email"
+                  className={inputClass}
+                  value={signupEmail}
+                  onChange={(e) => setSignupEmail(e.target.value)}
+                  placeholder={t("auth.signup.emailPlaceholder")}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>{t("auth.signup.password")}</label>
+                <input
+                  type="password"
+                  className={inputClass}
+                  value={signupPassword}
+                  onChange={(e) => setSignupPassword(e.target.value)}
+                  placeholder={t("auth.signup.passwordPlaceholder")}
+                  minLength={8}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>{t("auth.signup.confirmPassword")}</label>
+                <input
+                  type="password"
+                  className={inputClass}
+                  value={signupConfirm}
+                  onChange={(e) => setSignupConfirm(e.target.value)}
+                  minLength={8}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {error && (
+                <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-red-400 bg-red-900/20' : 'text-red-500 bg-red-50'}`}>
+                  {error}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 rounded-xl bg-[#23232B] text-white font-semibold text-lg shadow hover:bg-[#4f3cc9] transition-colors disabled:opacity-70"
+              >
+                {isLoading ? t("auth.signup.loading") : t("auth.signup.submit")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                  setInfo("");
+                }}
+                className="w-full py-2 text-sm font-semibold text-white hover:underline"
+              >
+                {t("auth.login.haveAccount")} {t("auth.login.backToSignIn")}
+              </button>
+            </form>
+            )}
 
             <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-2.5">
               {PRODUCT_HIGHLIGHT_KEYS.map((key) => (

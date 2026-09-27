@@ -293,7 +293,14 @@ export default function CompanyIntelligencePage() {
   return (
     <div className={isRTLMode ? "rtl" : "ltr"} dir={isRTLMode ? "rtl" : "ltr"}>
       <div className="max-w-6xl mx-auto space-y-6">
-        <header>
+        <header
+          data-tour="1"
+          data-tour-title-en="Company Intelligence"
+          data-tour-title-ar="ذكاء الشركات"
+          data-tour-content-en="Look up RFP issuers by name or ticker. Financials and trends sync into your pursuit workspace when auto-push is on."
+          data-tour-content-ar="ابحث عن جهات إصدار طلبات العروض بالاسم أو الرمز. تُزامَن البيانات المالية مع مساحة المتابعة عند تفعيل الدفع التلقائي."
+          data-tour-position="bottom"
+        >
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <FiGlobe className="w-8 h-8 text-blue-600" />
             {t("proposalManagerCompanyIntelligence.title")}
@@ -323,7 +330,15 @@ export default function CompanyIntelligencePage() {
           )}
         </header>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 md:p-6">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 md:p-6"
+          data-tour="2"
+          data-tour-title-en="Search issuers"
+          data-tour-title-ar="ابحث عن الجهات"
+          data-tour-content-en="Enter a company name or ticker, optionally filter by region/sector, then run search to load the live intelligence snapshot."
+          data-tour-content-ar="أدخل اسم الشركة أو الرمز، ويمكنك التصفية حسب المنطقة/القطاع، ثم نفّذ البحث لتحميل اللقطة المباشرة."
+          data-tour-position="bottom"
+        >
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t("proposalManagerCompanyIntelligence.companyNameOrTicker")}</label>
           <div className={`grid grid-cols-1 md:grid-cols-3 gap-2 mb-3 ${isRTLMode ? "md:[direction:rtl]" : ""}`}>
             <select

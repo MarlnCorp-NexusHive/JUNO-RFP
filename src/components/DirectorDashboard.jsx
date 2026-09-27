@@ -1119,9 +1119,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           className="summary-cards grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
           data-tour="2"
           data-tour-title-en="KPI Cards"
-          data-tour-content-en="Instant insights. Click any card for details."
+          data-tour-content-en="Instant capture KPIs — including RFP MTTR and RFPs Responded. Click any card for details."
           data-tour-title-ar="بطاقات مؤشرات الأداء"
-          data-tour-content-ar="رؤى فورية. اضغط على بطاقة للتفاصيل."
+          data-tour-content-ar="مؤشرات الاستحواذ الفورية — بما فيها متوسط زمن الاستجابة وعدد الردود. اضغط على أي بطاقة للتفاصيل."
           data-tour-position="top"
         >
           {summaryCards.map((card, i) => (

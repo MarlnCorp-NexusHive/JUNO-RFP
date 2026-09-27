@@ -7,7 +7,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = path.join(__dirname, "..", "data", "trial-tenants.json");
 
 function emptyDb() {
-  return { tenants: [], users: [], sessions: [], usage: {} };
+  return {
+    tenants: [],
+    users: [],
+    sessions: [],
+    usage: {},
+    emailTokens: [],
+    usedEmailTokens: [],
+  };
+}
+
+const USED_TOKEN_TTL_MS = 48 * 60 * 60 * 1000;
+
+function pruneUsedEmailTokens(db) {
+  const cutoff = Date.now() - USED_TOKEN_TTL_MS;
+  db.usedEmailTokens = (db.usedEmailTokens || []).filter(
+    (t) => Date.parse(t.usedAt || 0) > cutoff,
+  );
 }
 
 function ensureDir() {
@@ -25,6 +41,8 @@ export function loadTrialDb() {
       users: Array.isArray(parsed.users) ? parsed.users : [],
       sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
       usage: parsed.usage && typeof parsed.usage === "object" ? parsed.usage : {},
+      emailTokens: Array.isArray(parsed.emailTokens) ? parsed.emailTokens : [],
+      usedEmailTokens: Array.isArray(parsed.usedEmailTokens) ? parsed.usedEmailTokens : [],
     };
   } catch (err) {
     console.warn("[trial] failed to load trial-tenants.json:", err.message);
@@ -106,6 +124,7 @@ export function createTrialTenant({
     passwordHash: hash,
     role: "Proposal Manager",
     team: "Proposal Team",
+    emailVerified: true,
     createdAt: now.toISOString(),
   };
 
@@ -144,6 +163,13 @@ export function publicTenant(tenant) {
 
 export function getTenantStatus(tenant) {
   if (!tenant) return { ok: false, code: "tenant_missing", message: "Tenant not found" };
+  if (tenant.status === "pending_verification") {
+    return {
+      ok: false,
+      code: "email_not_verified",
+      message: "Please confirm your email before signing in. Check your inbox for the activation link.",
+    };
+  }
   if (tenant.status === "revoked" || tenant.status === "disabled") {
     return { ok: false, code: "tenant_disabled", message: "This trial has been disabled" };
   }
@@ -152,6 +178,241 @@ export function getTenantStatus(tenant) {
     return { ok: false, code: "trial_expired", message: "This trial has expired" };
   }
   return { ok: true };
+}
+
+/**
+ * Self-serve signup: creates a pending trial until email is confirmed.
+ * @returns {{ tenant, user, confirmToken, confirmExpiresAt }}
+ */
+export function registerTrialSignup({
+  companyName,
+  email,
+  password,
+  contactName,
+  trialDays = 30,
+  aiDailyLimit = 80,
+  aiMonthlyLimit = 800,
+}) {
+  const db = loadTrialDb();
+  const emailNorm = String(email || "").trim().toLowerCase();
+  const name = String(contactName || "").trim();
+  const company = String(companyName || "").trim();
+
+  if (!name) {
+    const err = new Error("Name is required");
+    err.code = "missing_name";
+    throw err;
+  }
+  if (!company) {
+    const err = new Error("Company name is required");
+    err.code = "missing_company";
+    throw err;
+  }
+  if (!emailNorm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNorm)) {
+    const err = new Error("A valid email is required");
+    err.code = "invalid_email";
+    throw err;
+  }
+  if (!password || String(password).length < 8) {
+    const err = new Error("Password must be at least 8 characters");
+    err.code = "password_too_short";
+    throw err;
+  }
+
+  const existing = db.users.find((u) => String(u.email).toLowerCase() === emailNorm);
+  if (existing) {
+    const tenant = db.tenants.find((t) => t.id === existing.tenantId);
+    if (existing.emailVerified || tenant?.status === "active") {
+      const err = new Error("An account with this email already exists. Please sign in.");
+      err.code = "email_taken";
+      throw err;
+    }
+    // Allow re-signup refresh for unverified accounts: update password/name and issue new token
+    const { salt, hash } = hashPassword(password);
+    existing.passwordSalt = salt;
+    existing.passwordHash = hash;
+    existing.name = name;
+    if (tenant) tenant.name = company;
+
+    db.emailTokens = (db.emailTokens || []).filter((t) => t.userId !== existing.id);
+    const confirmToken = crypto.randomBytes(32).toString("hex");
+    const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    db.emailTokens.push({
+      token: confirmToken,
+      userId: existing.id,
+      tenantId: existing.tenantId,
+      purpose: "email_confirm",
+      expiresAt: confirmExpiresAt,
+      createdAt: new Date().toISOString(),
+    });
+    saveTrialDb(db);
+    return {
+      tenant,
+      user: publicUser(existing),
+      confirmToken,
+      confirmExpiresAt,
+      refreshed: true,
+    };
+  }
+
+  const now = new Date();
+  const ends = new Date(now.getTime() + Number(trialDays) * 24 * 60 * 60 * 1000);
+  const tenantId = slugifyTenantId(company);
+  const { salt, hash } = hashPassword(password);
+
+  const tenant = {
+    id: tenantId,
+    name: company,
+    status: "pending_verification",
+    trialStartsAt: now.toISOString(),
+    trialEndsAt: ends.toISOString(),
+    aiDailyLimit: Number(aiDailyLimit) || 80,
+    aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
+    createdAt: now.toISOString(),
+  };
+
+  const user = {
+    id: `u_${crypto.randomBytes(6).toString("hex")}`,
+    tenantId,
+    email: emailNorm,
+    name,
+    passwordSalt: salt,
+    passwordHash: hash,
+    role: "Proposal Manager",
+    team: "Proposal Team",
+    emailVerified: false,
+    createdAt: now.toISOString(),
+  };
+
+  const confirmToken = crypto.randomBytes(32).toString("hex");
+  const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+  db.tenants.push(tenant);
+  db.users.push(user);
+  if (!db.emailTokens) db.emailTokens = [];
+  db.emailTokens.push({
+    token: confirmToken,
+    userId: user.id,
+    tenantId,
+    purpose: "email_confirm",
+    expiresAt: confirmExpiresAt,
+    createdAt: now.toISOString(),
+  });
+  if (!db.usage[tenantId]) db.usage[tenantId] = {};
+  saveTrialDb(db);
+
+  return {
+    tenant,
+    user: publicUser(user),
+    confirmToken,
+    confirmExpiresAt,
+    refreshed: false,
+  };
+}
+
+export function confirmTrialEmail(token) {
+  const db = loadTrialDb();
+  const raw = String(token || "").trim();
+  if (!raw) {
+    const err = new Error("Confirmation token is required");
+    err.code = "missing_token";
+    throw err;
+  }
+
+  pruneUsedEmailTokens(db);
+
+  const record = (db.emailTokens || []).find(
+    (t) => t.token === raw && t.purpose === "email_confirm",
+  );
+
+  // Idempotent: link already consumed (email scanner / double-click / Strict Mode)
+  if (!record) {
+    const used = (db.usedEmailTokens || []).find((t) => t.token === raw);
+    if (used) {
+      const user = db.users.find((u) => u.id === used.userId);
+      const tenant = db.tenants.find((t) => t.id === used.tenantId);
+      if (user?.emailVerified && tenant) {
+        return {
+          user: publicUser(user),
+          tenant: publicTenant(tenant),
+          alreadyConfirmed: true,
+        };
+      }
+    }
+    const err = new Error("Invalid or already used confirmation link");
+    err.code = "invalid_token";
+    throw err;
+  }
+  if (Date.parse(record.expiresAt) <= Date.now()) {
+    const err = new Error("This confirmation link has expired. Please sign up again or resend confirmation.");
+    err.code = "token_expired";
+    throw err;
+  }
+
+  const user = db.users.find((u) => u.id === record.userId);
+  const tenant = db.tenants.find((t) => t.id === record.tenantId);
+  if (!user || !tenant) {
+    const err = new Error("Account not found for this confirmation link");
+    err.code = "user_missing";
+    throw err;
+  }
+
+  user.emailVerified = true;
+  user.emailVerifiedAt = new Date().toISOString();
+  if (tenant.status === "pending_verification") {
+    tenant.status = "active";
+    tenant.activatedAt = new Date().toISOString();
+  }
+
+  db.emailTokens = (db.emailTokens || []).filter((t) => t.token !== raw);
+  db.usedEmailTokens = db.usedEmailTokens || [];
+  db.usedEmailTokens.push({
+    token: raw,
+    userId: user.id,
+    tenantId: tenant.id,
+    usedAt: new Date().toISOString(),
+  });
+  saveTrialDb(db);
+
+  return { user: publicUser(user), tenant: publicTenant(tenant), alreadyConfirmed: false };
+}
+
+/** Issue a fresh confirmation token for an unverified account (password required). */
+export function reissueEmailConfirmation({ email, password }) {
+  const db = loadTrialDb();
+  const emailNorm = String(email || "").trim().toLowerCase();
+  const user = db.users.find((u) => String(u.email).toLowerCase() === emailNorm);
+  if (!user || !verifyPassword(password, user.passwordSalt, user.passwordHash)) {
+    const err = new Error("Invalid email or password");
+    err.code = "invalid_credentials";
+    throw err;
+  }
+  if (user.emailVerified) {
+    const err = new Error("Email is already confirmed. You can sign in.");
+    err.code = "already_verified";
+    throw err;
+  }
+
+  db.emailTokens = (db.emailTokens || []).filter((t) => t.userId !== user.id || t.purpose !== "email_confirm");
+  const confirmToken = crypto.randomBytes(32).toString("hex");
+  const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  db.emailTokens.push({
+    token: confirmToken,
+    userId: user.id,
+    tenantId: user.tenantId,
+    purpose: "email_confirm",
+    expiresAt: confirmExpiresAt,
+    createdAt: new Date().toISOString(),
+  });
+  saveTrialDb(db);
+
+  const tenant = db.tenants.find((t) => t.id === user.tenantId);
+  return {
+    user: publicUser(user),
+    tenant,
+    confirmToken,
+    confirmExpiresAt,
+  };
 }
 
 export function createSession(user, tenant, ttlHours = 24 * 14) {
@@ -249,6 +510,50 @@ export function findUserByEmail(email) {
 export function findTenantById(tenantId) {
   const db = loadTrialDb();
   return db.tenants.find((t) => t.id === tenantId) || null;
+}
+
+/**
+ * Update a trial user's password after verifying the current one.
+ * Revokes other sessions for that user; keeps the active token if provided.
+ */
+export function changeUserPassword(userId, currentPassword, newPassword, { keepToken } = {}) {
+  const db = loadTrialDb();
+  const user = db.users.find((u) => u.id === userId);
+  if (!user) {
+    const err = new Error("User not found");
+    err.code = "user_missing";
+    throw err;
+  }
+  if (!verifyPassword(currentPassword, user.passwordSalt, user.passwordHash)) {
+    const err = new Error("Current password is incorrect");
+    err.code = "invalid_current_password";
+    throw err;
+  }
+  const next = String(newPassword || "");
+  if (next.length < 8) {
+    const err = new Error("New password must be at least 8 characters");
+    err.code = "password_too_short";
+    throw err;
+  }
+  if (verifyPassword(next, user.passwordSalt, user.passwordHash)) {
+    const err = new Error("New password must be different from the current password");
+    err.code = "password_unchanged";
+    throw err;
+  }
+
+  const { salt, hash } = hashPassword(next);
+  user.passwordSalt = salt;
+  user.passwordHash = hash;
+  user.passwordChangedAt = new Date().toISOString();
+
+  db.sessions = (db.sessions || []).filter((s) => {
+    if (s.userId !== userId) return true;
+    if (keepToken && s.token === keepToken) return true;
+    return false;
+  });
+
+  saveTrialDb(db);
+  return { user: publicUser(user), passwordChangedAt: user.passwordChangedAt };
 }
 
 export function dataFilePath() {

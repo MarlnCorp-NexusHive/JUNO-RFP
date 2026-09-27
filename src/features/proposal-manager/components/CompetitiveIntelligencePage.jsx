@@ -300,7 +300,15 @@ export default function CompetitiveIntelligencePage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6 lg:p-8" dir={dir}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="space-y-1">
+        <header
+          className="space-y-1"
+          data-tour="1"
+          data-tour-title-en="Competitive Intelligence"
+          data-tour-title-ar="الذكاء التنافسي"
+          data-tour-content-en="Compare competitors side-by-side. Look up any company by name (live JUNO API) or pick curated peers, then refresh live metrics."
+          data-tour-content-ar="قارن المنافسين جنباً إلى جنب. ابحث عن أي شركة بالاسم أو اختر أقراناً محفوظين ثم حدّث المقاييس مباشرة."
+          data-tour-position="bottom"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
               <FiTarget className="h-5 w-5" aria-hidden />
@@ -331,7 +339,15 @@ export default function CompetitiveIntelligencePage() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-12">
-          <section className="lg:col-span-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <section
+            className="lg:col-span-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+            data-tour="2"
+            data-tour-title-en="Find & select competitors"
+            data-tour-title-ar="ابحث واختر المنافسين"
+            data-tour-content-en="Search curated peers or type any company name to look it up live. Select up to five for comparison."
+            data-tour-content-ar="ابحث في الأقران المحفوظين أو اكتب اسم أي شركة للبحث المباشر. اختر حتى خمسة للمقارنة."
+            data-tour-position="right"
+          >
             <div className="mb-3 flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 {t("proposalManagerCompetitiveIntelligence.competitorsTitle")}

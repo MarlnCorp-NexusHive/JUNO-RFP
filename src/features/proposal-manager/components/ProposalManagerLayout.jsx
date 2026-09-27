@@ -9,10 +9,13 @@ import { useTour } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 import { getTrialSession } from "../../../services/trialAuthSession.js";
+import { getProposalManagerTourPage } from "../../../components/tours/data/proposalManagerTourPages.js";
 import { useTranslation } from "react-i18next";
+import TrialChangePasswordModal from "./TrialChangePasswordModal.jsx";
 
 function TrialBanner() {
   const { t } = useTranslation("common");
+  const [pwOpen, setPwOpen] = useState(false);
   const session = getTrialSession();
   const user = parseLocalStorageJson("rbac_current_user");
   if (!session?.tenantId && !user?.isTrialUser) return null;
@@ -26,18 +29,32 @@ function TrialBanner() {
   }
 
   return (
-    <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm text-indigo-950 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-100">
-      <span className="font-semibold">{t("proposalManagerTrial.badge")}</span>
-      {" · "}
-      {company}
-      {daysLeft != null && (
-        <>
+    <>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm text-indigo-950 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-100">
+        <div>
+          <span className="font-semibold">{t("proposalManagerTrial.badge")}</span>
           {" · "}
-          {t("proposalManagerTrial.daysLeft", { count: daysLeft })}
-        </>
-      )}
-      <span className="opacity-70"> · {t("proposalManagerTrial.isolatedHint")}</span>
-    </div>
+          {company}
+          {daysLeft != null && (
+            <>
+              {" · "}
+              {t("proposalManagerTrial.daysLeft", { count: daysLeft })}
+            </>
+          )}
+          <span className="opacity-70"> · {t("proposalManagerTrial.isolatedHint")}</span>
+        </div>
+        {session?.token && (
+          <button
+            type="button"
+            onClick={() => setPwOpen(true)}
+            className="rounded-lg border border-indigo-300 bg-white/80 px-3 py-1 text-xs font-semibold text-indigo-800 hover:bg-white dark:border-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-100 dark:hover:bg-indigo-900"
+          >
+            {t("proposalManagerTrial.changePassword")}
+          </button>
+        )}
+      </div>
+      <TrialChangePasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
+    </>
   );
 }
 
@@ -46,34 +63,7 @@ function AutoStartTour({ role }) {
   const { startTour, getTourStatus, isActive } = useTour();
   const user = parseLocalStorageJson("rbac_current_user");
 
-  const getCurrentPage = (pathname) => {
-    const segments = pathname.split('/');
-    if (segments.includes('proposal-manager')) {
-      if (segments.includes('source-docs')) return 'source-docs';
-      if (segments.includes('company-intelligence')) return 'company-intelligence';
-      if (segments.includes('competitive-intelligence')) return 'competitive-intelligence';
-      if (segments.includes('team')) return 'team';
-      if (segments.includes('bid-vault')) return 'bid-vault';
-      if (segments.includes('scoring')) return 'scoring';
-      if (segments.includes('win-slide')) return 'win-slide';
-      if (segments.includes('grants')) return 'grants';
-      if (segments.includes('capture-strategy')) return 'capture-strategy';
-      if (segments.includes('content-hub')) return 'content-hub';
-      if (segments.includes('pricing')) return 'pricing';
-      if (segments.includes('communication')) return 'communication';
-      if (segments.includes('compliance')) return 'compliance';
-      if (segments.includes('meetings-calendar')) return 'meetings-calendar';
-      if (segments.includes('user-management')) return 'user-management';
-      if (segments.includes('rfp-collaboration')) return 'rfp-collaboration';
-      if (segments.includes('technical-solutioning')) return 'technical-solutioning';
-      if (segments.includes('topology')) return 'topology';
-      if (segments.includes('workspace')) return 'workspace';
-      if (segments.includes('help-support')) return 'help-support';
-      if (segments.includes('settings')) return 'settings';
-      return 'dashboard';
-    }
-    return 'dashboard';
-  };
+  const getCurrentPage = (pathname) => getProposalManagerTourPage(pathname) || "dashboard";
 
   React.useEffect(() => {
     const page = getCurrentPage(location.pathname);

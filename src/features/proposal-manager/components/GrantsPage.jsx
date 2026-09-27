@@ -18,6 +18,7 @@ import {
 import { useLocalization } from "../../../hooks/useLocalization";
 import { fetchFederalGrantOpportunity, searchFederalGrants } from "../../../services/api.js";
 import SamContractsPanel from "./SamContractsPanel.jsx";
+import AltGrantsPanel from "./AltGrantsPanel.jsx";
 
 const STATUS_OPTIONS = [
   { value: "posted|forecasted", labelKey: "openAndForecasted" },
@@ -562,9 +563,17 @@ export default function GrantsPage() {
         role="tablist"
         aria-label={t("proposalManagerGrants.modeTabs")}
         className="inline-flex rounded-xl border border-slate-200 bg-slate-100/80 p-1 dark:border-slate-700 dark:bg-slate-800/80"
+        data-tour="1"
+        data-tour-title-en="Opportunity sources"
+        data-tour-title-ar="مصادر الفرص"
+        data-tour-content-en="Switch between Grants.gov (live federal), Private funding (live foundations), Local & state (live state/local-eligible), and SAM.gov Contracts (curated)."
+        data-tour-content-ar="بدّل بين Grants.gov والمنح الخاصة والمحلية/الولائية وعقود SAM.gov."
+        data-tour-position="bottom"
       >
         {[
           { id: "grants", label: t("proposalManagerGrants.modeGrants") },
+          { id: "private", label: t("proposalManagerGrants.modePrivate") },
+          { id: "local", label: t("proposalManagerGrants.modeLocal") },
           { id: "contracts", label: t("proposalManagerGrants.modeContracts") },
         ].map((tab) => {
           const active = mode === tab.id;
@@ -589,9 +598,21 @@ export default function GrantsPage() {
 
       {mode === "contracts" ? (
         <SamContractsPanel />
+      ) : mode === "private" ? (
+        <AltGrantsPanel variant="private" />
+      ) : mode === "local" ? (
+        <AltGrantsPanel variant="local" />
       ) : (
         <>
-      <header className="space-y-2">
+      <header
+        className="space-y-2"
+        data-tour="2"
+        data-tour-title-en="Live federal grants"
+        data-tour-title-ar="المنح الفيدرالية المباشرة"
+        data-tour-content-en="Browse open and forecasted US federal opportunities from Grants.gov. Results refresh from the live API."
+        data-tour-content-ar="تصفح الفرص الفيدرالية المفتوحة والمتوقعة من Grants.gov مباشرة."
+        data-tour-position="bottom"
+      >
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
@@ -618,6 +639,12 @@ export default function GrantsPage() {
       <section
         aria-labelledby={`${formId}-legend`}
         className="sticky top-0 z-20 -mx-1 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
+        data-tour="3"
+        data-tour-title-en="Search & filters"
+        data-tour-title-ar="البحث والمرشحات"
+        data-tour-content-en="Filter by keyword, agency, and status. Use Search to pull the latest Grants.gov matches."
+        data-tour-content-ar="صفِّ حسب الكلمة المفتاحية والوكالة والحالة. استخدم البحث لجلب أحدث نتائج Grants.gov."
+        data-tour-position="bottom"
       >
         <h2 id={`${formId}-legend`} className="sr-only">
           {t("proposalManagerGrants.searchFilters")}

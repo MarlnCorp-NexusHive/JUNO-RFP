@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTour } from './TourContext';
 import { useLocation } from 'react-router-dom';
+import { getProposalManagerTourPage } from './data/proposalManagerTourPages.js';
 
 const SmartTourButton = ({ 
   role, 
@@ -34,6 +35,9 @@ const SmartTourButton = ({
   const getCurrentPage = () => {
     const path = location.pathname;
     const segments = path.split('/');
+
+    const pmPage = getProposalManagerTourPage(path);
+    if (pmPage) return pmPage;
     
     // Handle different route patterns
     if (segments.includes('director')) {

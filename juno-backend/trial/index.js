@@ -33,5 +33,7 @@ export function registerTrialSystem(app) {
     return meterTrialAi(req, res, next);
   });
 
-  console.log("Trial tenancy API: /trial/auth/login, /trial/auth/me, /trial/auth/logout");
+  console.log(
+    "Trial tenancy API: /trial/auth/login, /signup, /confirm, /resend-confirmation, /me, /logout, /change-password",
+  );
 }

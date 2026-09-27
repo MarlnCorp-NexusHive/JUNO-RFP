@@ -537,13 +537,176 @@ export const tourData = {
       },
       steps: []
     }
-  }
+  },
+
+  // PROPOSAL MANAGER — capture desk (new features use autoScan + [data-tour] markers)
+  "proposal-manager": {
+    dashboard: {
+      autoScan: true,
+      title: { en: "Proposal Manager Dashboard", ar: "لوحة مدير العروض" },
+      description: {
+        en: "Pipeline KPIs, RFP MTTR, RFPs responded, alerts, and capture insights",
+        ar: "مؤشرات خط الأنابيب وMTTR وعدد الردود والتنبيهات ورؤى الاستحواذ",
+      },
+      steps: [],
+    },
+    grants: {
+      autoScan: true,
+      title: { en: "Grants & funding", ar: "المنح والتمويل" },
+      description: {
+        en: "Live Grants.gov, private foundations, local/state-eligible opportunities, and SAM.gov contracts",
+        ar: "Grants.gov المباشر والمنح الخاصة والمحلية/الولائية وعقود SAM.gov",
+      },
+      steps: [
+        {
+          id: 1,
+          target: '[data-tour="1"]',
+          title: { en: "Opportunity sources", ar: "مصادر الفرص" },
+          content: {
+            en: "Switch tabs for Grants.gov, Private funding, Local & state, and SAM.gov Contracts.",
+            ar: "بدّل التبويبات بين Grants.gov والتمويل الخاص والمحلي/الولائي وعقود SAM.gov.",
+          },
+          position: "bottom",
+        },
+      ],
+    },
+    "company-intelligence": {
+      autoScan: true,
+      title: { en: "Company Intelligence", ar: "ذكاء الشركات" },
+      description: {
+        en: "Look up issuer financials and sync into your pursuit",
+        ar: "ابحث عن البيانات المالية للجهة وزامنها مع المتابعة",
+      },
+      steps: [],
+    },
+    "competitive-intelligence": {
+      autoScan: true,
+      title: { en: "Competitive Intelligence", ar: "الذكاء التنافسي" },
+      description: {
+        en: "Live competitor lookup and side-by-side datasheets",
+        ar: "بحث المنافسين المباشر ومقارنة أوراق البيانات",
+      },
+      steps: [],
+    },
+    "source-docs": {
+      autoScan: true,
+      title: { en: "Source Documents", ar: "المستندات المصدرية" },
+      description: { en: "RFP packs and reference materials", ar: "حزم طلبات العروض والمواد المرجعية" },
+      steps: [],
+    },
+    team: {
+      autoScan: true,
+      title: { en: "Team", ar: "الفريق" },
+      description: { en: "Proposal team management", ar: "إدارة فريق العروض" },
+      steps: [],
+    },
+    "rfp-collaboration": {
+      autoScan: true,
+      title: { en: "RFP Collaboration", ar: "تعاون طلبات العروض" },
+      description: { en: "Assign questions, AI drafts, and review", ar: "تعيين الأسئلة ومسودات الذكاء والمراجعة" },
+      steps: [],
+    },
+    "technical-solutioning": {
+      autoScan: true,
+      title: { en: "Technical Solutioning", ar: "الحل التقني" },
+      description: { en: "Architecture from references and requirements", ar: "هندسة الحل من المراجع والمتطلبات" },
+      steps: [],
+    },
+    topology: {
+      autoScan: true,
+      title: { en: "Topology", ar: "الطوبولوجيا" },
+      description: { en: "Customer infrastructure with JUNO overlay", ar: "بنية العميل مع طبقة JUNO" },
+      steps: [],
+    },
+    "bid-vault": {
+      autoScan: true,
+      title: { en: "Bid Vault", ar: "خزينة العروض" },
+      description: { en: "Bid repository and submissions", ar: "مستودع العروض والتقديمات" },
+      steps: [],
+    },
+    scoring: {
+      autoScan: true,
+      title: { en: "Win / Loss Scoring", ar: "تسجيل الفوز/الخسارة" },
+      description: { en: "Debrief scores and product capability gaps", ar: "درجات الإحاطة وفجوات القدرات" },
+      steps: [],
+    },
+    "win-slide": {
+      autoScan: true,
+      title: { en: "Win Slide", ar: "شريحة الفوز" },
+      description: { en: "Post-selection POV and competitive framing", ar: "وجهة النظر بعد الاختيار والإطار التنافسي" },
+      steps: [],
+    },
+    "capture-strategy": {
+      autoScan: true,
+      title: { en: "Capture Strategy", ar: "استراتيجية الاستحواذ" },
+      description: { en: "Capture planning workspace", ar: "مساحة تخطيط الاستحواذ" },
+      steps: [],
+    },
+    "content-hub": {
+      autoScan: true,
+      title: { en: "Content Hub", ar: "مركز المحتوى" },
+      description: { en: "Reusable Q&A and proposal content library", ar: "مكتبة الأسئلة والأجوبة ومحتوى العروض" },
+      steps: [],
+    },
+    pricing: {
+      autoScan: true,
+      title: { en: "Pricing", ar: "التسعير" },
+      description: { en: "Pricing and cost proposal analytics", ar: "تحليلات التسعير وتكاليف العرض" },
+      steps: [],
+    },
+    communication: {
+      autoScan: true,
+      title: { en: "Communication", ar: "التواصل" },
+      description: { en: "Internal pursuit communication", ar: "التواصل الداخلي للمتابعة" },
+      steps: [],
+    },
+    compliance: {
+      autoScan: true,
+      title: { en: "Compliance", ar: "الامتثال" },
+      description: { en: "Audit and compliance docs", ar: "التدقيق ومستندات الامتثال" },
+      steps: [],
+    },
+    "meetings-calendar": {
+      autoScan: true,
+      title: { en: "Meetings & Calendar", ar: "الاجتماعات والتقويم" },
+      description: { en: "Deadlines, kickoffs, and reviews", ar: "المواعيد والانطلاقات والمراجعات" },
+      steps: [],
+    },
+    "user-management": {
+      autoScan: true,
+      title: { en: "User Management", ar: "إدارة المستخدمين" },
+      description: { en: "Roles and permissions", ar: "الأدوار والصلاحيات" },
+      steps: [],
+    },
+    workspace: {
+      autoScan: true,
+      title: { en: "Workspace", ar: "مساحة العمل" },
+      description: { en: "RFP workspace, company picker, and document build", ar: "مساحة العمل واختيار الشركة وبناء المستند" },
+      steps: [],
+    },
+    "help-support": {
+      autoScan: true,
+      title: { en: "Help & Support", ar: "المساعدة والدعم" },
+      description: { en: "Support and handbook", ar: "الدعم والدليل" },
+      steps: [],
+    },
+    settings: {
+      autoScan: true,
+      title: { en: "Settings", ar: "الإعدادات" },
+      description: { en: "Profile and preferences — trial users can also change password from the trial banner", ar: "الملف والتفضيلات — يمكن لمستخدمي التجربة تغيير كلمة المرور من شريط التجربة" },
+      steps: [],
+    },
+  },
 };
 
 // Helper function to get tour data for a specific role and page
-// Proposal Manager reuses Director tour content (same cloned UI)
 export const getTourData = (role, page) => {
-  return tourData[role]?.[page] || (role === 'proposal-manager' ? tourData.director?.[page] : null);
+  if (tourData[role]?.[page]) return tourData[role][page];
+  // Legacy fallback: only for pages that still share director UI
+  if (role === "proposal-manager" && tourData.director?.[page]) {
+    return tourData.director[page];
+  }
+  return null;
 };
 
 // Helper function to get tour steps for a specific role and page

@@ -92,11 +92,27 @@ export const TourProvider = ({ children }) => {
     if (!steps || steps.length === 0) {
       steps = getTourSteps(role, page);
     }
-
+    // Soft fallback so new pages still get a Start Tour experience
     if (!steps || steps.length === 0) {
-      console.warn('TourContext: No steps found for tour');
-      setIsLoading(false);
-      return false;
+      steps = [
+        {
+          id: 1,
+          target: "main",
+          title: {
+            en: tour.title?.en || "This page",
+            ar: tour.title?.ar || "هذه الصفحة",
+          },
+          content: {
+            en:
+              tour.description?.en ||
+              "Explore the controls on this page. Tour markers will expand as the page gains more guided highlights.",
+            ar:
+              tour.description?.ar ||
+              "استكشف عناصر هذه الصفحة. ستتوسع علامات الجولة مع إضافة المزيد من الإرشادات.",
+          },
+          position: "bottom",
+        },
+      ];
     }
 
     // Set tour state
