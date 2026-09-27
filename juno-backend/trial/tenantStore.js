@@ -19,6 +19,25 @@ function emptyDb() {
 
 const USED_TOKEN_TTL_MS = 48 * 60 * 60 * 1000;
 
+/** Default self-serve / provisioned trial length. Clock starts on email confirm (or first login fallback). */
+export const DEFAULT_TRIAL_DAYS = 7;
+
+/**
+ * Start the trial window once. No-op if trialEndsAt is already set.
+ * @returns {boolean} true if the clock was started now
+ */
+export function startTrialClockIfNeeded(tenant, { now = new Date() } = {}) {
+  if (!tenant) return false;
+  if (tenant.trialEndsAt) return false;
+  const days =
+    Number(tenant.trialDays) > 0 ? Number(tenant.trialDays) : DEFAULT_TRIAL_DAYS;
+  const start = now instanceof Date ? now : new Date(now);
+  tenant.trialDays = days;
+  tenant.trialStartsAt = start.toISOString();
+  tenant.trialEndsAt = new Date(start.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
+  return true;
+}
+
 function pruneUsedEmailTokens(db) {
   const cutoff = Date.now() - USED_TOKEN_TTL_MS;
   db.usedEmailTokens = (db.usedEmailTokens || []).filter(
@@ -86,7 +105,7 @@ export function createTrialTenant({
   email,
   password,
   contactName,
-  trialDays = 30,
+  trialDays = DEFAULT_TRIAL_DAYS,
   aiDailyLimit = 80,
   aiMonthlyLimit = 800,
 }) {
@@ -100,7 +119,8 @@ export function createTrialTenant({
   }
 
   const now = new Date();
-  const ends = new Date(now.getTime() + Number(trialDays) * 24 * 60 * 60 * 1000);
+  const days = Number(trialDays) > 0 ? Number(trialDays) : DEFAULT_TRIAL_DAYS;
+  const ends = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   const tenantId = slugifyTenantId(companyName);
   const { salt, hash } = hashPassword(password);
 
@@ -108,6 +128,7 @@ export function createTrialTenant({
     id: tenantId,
     name: String(companyName).trim(),
     status: "active",
+    trialDays: days,
     trialStartsAt: now.toISOString(),
     trialEndsAt: ends.toISOString(),
     aiDailyLimit: Number(aiDailyLimit) || 80,
@@ -189,7 +210,7 @@ export function registerTrialSignup({
   email,
   password,
   contactName,
-  trialDays = 30,
+  trialDays = DEFAULT_TRIAL_DAYS,
   aiDailyLimit = 80,
   aiMonthlyLimit = 800,
 }) {
@@ -256,7 +277,7 @@ export function registerTrialSignup({
   }
 
   const now = new Date();
-  const ends = new Date(now.getTime() + Number(trialDays) * 24 * 60 * 60 * 1000);
+  const days = Number(trialDays) > 0 ? Number(trialDays) : DEFAULT_TRIAL_DAYS;
   const tenantId = slugifyTenantId(company);
   const { salt, hash } = hashPassword(password);
 
@@ -264,8 +285,10 @@ export function registerTrialSignup({
     id: tenantId,
     name: company,
     status: "pending_verification",
-    trialStartsAt: now.toISOString(),
-    trialEndsAt: ends.toISOString(),
+    // Clock starts when email is confirmed (see confirmTrialEmail / login fallback).
+    trialDays: days,
+    trialStartsAt: null,
+    trialEndsAt: null,
     aiDailyLimit: Number(aiDailyLimit) || 80,
     aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
     createdAt: now.toISOString(),
@@ -363,6 +386,8 @@ export function confirmTrialEmail(token) {
     tenant.status = "active";
     tenant.activatedAt = new Date().toISOString();
   }
+  // 7-day (or tenant.trialDays) window begins at confirmation — not at signup.
+  startTrialClockIfNeeded(tenant);
 
   db.emailTokens = (db.emailTokens || []).filter((t) => t.token !== raw);
   db.usedEmailTokens = db.usedEmailTokens || [];
@@ -450,6 +475,9 @@ export function resolveSession(token) {
   const user = db.users.find((u) => u.id === session.userId);
   const tenant = db.tenants.find((t) => t.id === session.tenantId);
   if (!user || !tenant) return null;
+  if (startTrialClockIfNeeded(tenant)) {
+    saveTrialDb(db);
+  }
   const status = getTenantStatus(tenant);
   if (!status.ok) return { invalid: true, ...status };
   return { session, user, tenant };
@@ -510,6 +538,15 @@ export function findUserByEmail(email) {
 export function findTenantById(tenantId) {
   const db = loadTrialDb();
   return db.tenants.find((t) => t.id === tenantId) || null;
+}
+
+/** Persist trial clock start for a tenant (e.g. first login if confirm missed it). */
+export function ensureTrialClockStarted(tenantId) {
+  const db = loadTrialDb();
+  const tenant = db.tenants.find((t) => t.id === tenantId);
+  if (!tenant) return null;
+  if (startTrialClockIfNeeded(tenant)) saveTrialDb(db);
+  return tenant;
 }
 
 /**

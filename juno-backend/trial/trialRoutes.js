@@ -9,6 +9,7 @@ import {
   changeUserPassword,
   confirmTrialEmail,
   createSession,
+  ensureTrialClockStarted,
   findTenantById,
   findUserByEmail,
   getTenantStatus,
@@ -185,14 +186,17 @@ router.post("/login", (req, res) => {
       return res.status(403).json({ error: status.message, code: status.code });
     }
 
-    const { token, expiresAt } = createSession(user, tenant);
-    const usage = getUsageSnapshot(tenant);
+    // Fallback: start 7-day clock on first login if confirm didn't (legacy rows).
+    const tenantFresh = ensureTrialClockStarted(user.tenantId) || tenant;
+
+    const { token, expiresAt } = createSession(user, tenantFresh);
+    const usage = getUsageSnapshot(tenantFresh);
 
     return res.json({
       token,
       expiresAt,
       user: publicUser(user),
-      tenant: publicTenant(tenant),
+      tenant: publicTenant(tenantFresh),
       usage,
     });
   } catch (err) {

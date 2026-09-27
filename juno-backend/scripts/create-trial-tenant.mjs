@@ -4,12 +4,12 @@
  *
  * Usage:
  *   node scripts/create-trial-tenant.mjs --company "Acme Corp" --email jane@acme.com --name "Jane Doe"
- *   node scripts/create-trial-tenant.mjs --company "Acme" --email jane@acme.com --password 'TempPass123!' --days 30
+ *   node scripts/create-trial-tenant.mjs --company "Acme" --email jane@acme.com --password 'TempPass123!' --days 7
  *
  * Writes to juno-backend/data/trial-tenants.json (same file the API uses).
  */
 import crypto from "crypto";
-import { createTrialTenant, dataFilePath } from "../trial/tenantStore.js";
+import { createTrialTenant, dataFilePath, DEFAULT_TRIAL_DAYS } from "../trial/tenantStore.js";
 
 function arg(name, fallback = "") {
   const i = process.argv.indexOf(`--${name}`);
@@ -24,7 +24,7 @@ function flag(name) {
 const company = arg("company");
 const email = arg("email");
 const name = arg("name", "");
-const days = Number(arg("days", "30")) || 30;
+const days = Number(arg("days", String(DEFAULT_TRIAL_DAYS))) || DEFAULT_TRIAL_DAYS;
 const daily = Number(arg("daily", "80")) || 80;
 const monthly = Number(arg("monthly", "800")) || 800;
 let password = arg("password", "");
@@ -39,7 +39,7 @@ Required:
 Optional:
   --name "Contact Name"
   --password "TempPass123!"   (auto-generated if omitted)
-  --days 30
+  --days ${DEFAULT_TRIAL_DAYS}
   --daily 80
   --monthly 800
 
