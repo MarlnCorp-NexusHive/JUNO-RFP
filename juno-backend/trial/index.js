@@ -1,6 +1,6 @@
 import { attachTrialContext, meterTrialAi } from "./authMiddleware.js";
 import trialRoutes from "./trialRoutes.js";
-import { migrateTrialDurationsOnBoot } from "./tenantStore.js";
+import { getTrialDataPath, migrateTrialDurationsOnBoot } from "./tenantStore.js";
 
 /** AI / generative routes that should count against trial quotas when a trial token is present. */
 const METERED_PATH_PREFIXES = [
@@ -25,6 +25,17 @@ function isMeteredPath(url = "") {
 }
 
 export function registerTrialSystem(app) {
+  const dataPath = getTrialDataPath();
+  const usingPersistentHint =
+    dataPath.includes("/var/data") ||
+    Boolean(String(process.env.TRIAL_DATA_PATH || process.env.TRIAL_DATA_DIR || "").trim());
+  console.log(`[trial] data file: ${dataPath}${usingPersistentHint ? " (custom/persistent path)" : " (default — ephemeral on Render Free)"}`);
+  if (!usingPersistentHint && process.env.RENDER) {
+    console.warn(
+      "[trial] RENDER detected without TRIAL_DATA_PATH — trial signups will be lost on restart. Attach a Persistent Disk and set TRIAL_DATA_PATH=/var/data/trial-tenants.json",
+    );
+  }
+
   try {
     migrateTrialDurationsOnBoot();
   } catch (err) {

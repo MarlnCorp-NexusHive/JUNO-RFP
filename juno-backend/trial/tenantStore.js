@@ -4,7 +4,23 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_PATH = path.join(__dirname, "..", "data", "trial-tenants.json");
+const DEFAULT_DATA_PATH = path.join(__dirname, "..", "data", "trial-tenants.json");
+
+/**
+ * Resolve trial DB path.
+ * On Render, set TRIAL_DATA_PATH to a file on a Persistent Disk
+ * (e.g. /var/data/trial-tenants.json) so signups survive restarts.
+ * Lazy: reads env at call time (after dotenv).
+ */
+export function getTrialDataPath() {
+  const fromEnv = String(
+    process.env.TRIAL_DATA_PATH || process.env.JUNO_TRIAL_DATA_PATH || "",
+  ).trim();
+  if (fromEnv) return path.resolve(fromEnv);
+  const dirEnv = String(process.env.TRIAL_DATA_DIR || "").trim();
+  if (dirEnv) return path.resolve(dirEnv, "trial-tenants.json");
+  return DEFAULT_DATA_PATH;
+}
 
 function emptyDb() {
   return {
@@ -94,14 +110,16 @@ export function migrateTrialDurationsOnBoot() {
 }
 
 function ensureDir() {
-  const dir = path.dirname(DATA_PATH);
+  const dataPath = getTrialDataPath();
+  const dir = path.dirname(dataPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
 export function loadTrialDb() {
+  const dataPath = getTrialDataPath();
   try {
-    if (!fs.existsSync(DATA_PATH)) return emptyDb();
-    const raw = fs.readFileSync(DATA_PATH, "utf8");
+    if (!fs.existsSync(dataPath)) return emptyDb();
+    const raw = fs.readFileSync(dataPath, "utf8");
     const parsed = JSON.parse(raw);
     return {
       tenants: Array.isArray(parsed.tenants) ? parsed.tenants : [],
@@ -112,16 +130,17 @@ export function loadTrialDb() {
       usedEmailTokens: Array.isArray(parsed.usedEmailTokens) ? parsed.usedEmailTokens : [],
     };
   } catch (err) {
-    console.warn("[trial] failed to load trial-tenants.json:", err.message);
+    console.warn("[trial] failed to load trial DB:", dataPath, err.message);
     return emptyDb();
   }
 }
 
 export function saveTrialDb(db) {
+  const dataPath = getTrialDataPath();
   ensureDir();
-  const tmp = `${DATA_PATH}.tmp`;
+  const tmp = `${dataPath}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(db, null, 2), "utf8");
-  fs.renameSync(tmp, DATA_PATH);
+  fs.renameSync(tmp, dataPath);
 }
 
 export function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -642,5 +661,5 @@ export function changeUserPassword(userId, currentPassword, newPassword, { keepT
 }
 
 export function dataFilePath() {
-  return DATA_PATH;
+  return getTrialDataPath();
 }

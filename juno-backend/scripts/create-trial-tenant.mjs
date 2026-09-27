@@ -6,7 +6,7 @@
  *   node scripts/create-trial-tenant.mjs --company "Acme Corp" --email jane@acme.com --name "Jane Doe"
  *   node scripts/create-trial-tenant.mjs --company "Acme" --email jane@acme.com --password 'TempPass123!' --days 7
  *
- * Writes to juno-backend/data/trial-tenants.json (same file the API uses).
+ * Writes to the same trial DB file the API uses (see TRIAL_DATA_PATH / default juno-backend/data/trial-tenants.json).
  */
 import crypto from "crypto";
 import { createTrialTenant, dataFilePath, DEFAULT_TRIAL_DAYS } from "../trial/tenantStore.js";
