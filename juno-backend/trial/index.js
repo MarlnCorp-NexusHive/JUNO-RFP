@@ -1,5 +1,6 @@
 import { attachTrialContext, meterTrialAi } from "./authMiddleware.js";
 import trialRoutes from "./trialRoutes.js";
+import { migrateTrialDurationsOnBoot } from "./tenantStore.js";
 
 /** AI / generative routes that should count against trial quotas when a trial token is present. */
 const METERED_PATH_PREFIXES = [
@@ -24,6 +25,12 @@ function isMeteredPath(url = "") {
 }
 
 export function registerTrialSystem(app) {
+  try {
+    migrateTrialDurationsOnBoot();
+  } catch (err) {
+    console.warn("[trial] duration migration skipped:", err.message);
+  }
+
   app.use(attachTrialContext);
   app.use("/trial/auth", trialRoutes);
 

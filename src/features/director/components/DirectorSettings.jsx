@@ -1,43 +1,34 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
-import { directorFeatures } from '../../../components/directorFeatures';
+import { getTrialSession } from "../../../services/trialAuthSession.js";
 import { 
-  FiSettings, 
-  FiHome, // Changed from FiBuilding to FiHome
+  FiHome,
   FiBookOpen, 
   FiShield, 
   FiBell, 
   FiLock, 
   FiEdit3, 
   FiSave, 
-  FiRefreshCw, 
-  FiCheck, 
-  FiX, 
-  FiInfo, 
-  FiAlertCircle, 
-  FiEye, 
-  FiEyeOff, 
-  FiDownload, 
-  FiUpload, 
-  FiTrash2, 
-  FiPlus, 
-  FiMinus,
-  FiChevronRight,
-  FiChevronDown,
-  FiTarget,
-  FiZap
+  FiX
 } from "react-icons/fi";
 
 
 export default function DirectorSettings() {
   const location = useLocation();
   const isPM = location.pathname.includes("/rbac/proposal-manager/settings");
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
-  const [activeCategory, setActiveCategory] = useState("institutional");
-  const [expandedSections, setExpandedSections] = useState({});
+  const user = JSON.parse(localStorage.getItem('rbac_current_user') || "null");
+  const trialSession = getTrialSession();
+  const signupCompany =
+    trialSession?.tenantName ||
+    user?.tenantName ||
+    "";
+  const signupContactName =
+    trialSession?.user?.name ||
+    user?.name ||
+    "";
   const [editingField, setEditingField] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const { t, i18n } = useTranslation('director');
@@ -80,44 +71,85 @@ export default function DirectorSettings() {
     };
     return map[value] || value;
   };
+
+  const getOptionValue = (option) => {
+    if (isPM) {
+      if (option.valueKey === "institutionalSettings.nameValue" && signupCompany) {
+        return signupCompany;
+      }
+      if (option.valueKey === "institutionalSettings.contactNameValue" && signupContactName) {
+        return signupContactName;
+      }
+      if (option.valueKey === "institutionalSettings.contactEmailValue") {
+        const email = trialSession?.user?.email || user?.email || user?.username || "";
+        if (email) return email;
+      }
+    }
+    return t(`settings.${option.valueKey}`);
+  };
   
   // Settings categories using translation keys
-  const settingsCategories = [
-    {
+  const settingsCategories = useMemo(() => {
+    const institutionalOptions = [
+      { 
+        labelKey: "institutionalSettings.name", 
+        valueKey: "institutionalSettings.nameValue",
+        type: "text",
+        editable: true,
+        required: true
+      },
+      ...(isPM
+        ? [
+            {
+              labelKey: "institutionalSettings.contactName",
+              valueKey: "institutionalSettings.contactNameValue",
+              type: "text",
+              editable: true,
+            },
+            {
+              labelKey: "institutionalSettings.contactEmail",
+              valueKey: "institutionalSettings.contactEmailValue",
+              type: "text",
+              editable: true,
+            },
+          ]
+        : []),
+      { 
+        labelKey: "institutionalSettings.type", 
+        valueKey: "institutionalSettings.typeValue",
+        type: "select",
+        editable: true,
+        options: ["Corporation", "Company", "Organization", "Enterprise"]
+      },
+      { 
+        labelKey: "institutionalSettings.accreditation", 
+        valueKey: "institutionalSettings.accreditationValue",
+        type: "text",
+        editable: true
+      },
+      { 
+        labelKey: "institutionalSettings.academicYear", 
+        valueKey: "institutionalSettings.academicYearValue",
+        type: "date",
+        editable: true
+      },
+    ];
+
+    const institutional = {
       nameKey: "categories.institutional",
       name: "institutional",
-      icon: FiHome, // Changed from FiBuilding to FiHome
+      icon: FiHome,
       color: "blue",
       description: "Organization information and basic configuration",
-      options: [
-        { 
-          labelKey: "institutionalSettings.name", 
-          valueKey: "institutionalSettings.nameValue",
-          type: "text",
-          editable: true,
-          required: true
-        },
-        { 
-          labelKey: "institutionalSettings.type", 
-          valueKey: "institutionalSettings.typeValue",
-          type: "select",
-          editable: true,
-          options: ["Corporation", "Company", "Organization", "Enterprise"]
-        },
-        { 
-          labelKey: "institutionalSettings.accreditation", 
-          valueKey: "institutionalSettings.accreditationValue",
-          type: "text",
-          editable: true
-        },
-        { 
-          labelKey: "institutionalSettings.academicYear", 
-          valueKey: "institutionalSettings.academicYearValue",
-          type: "date",
-          editable: true
-        },
-      ],
-    },
+      options: institutionalOptions,
+    };
+
+    if (isPM) {
+      return [institutional];
+    }
+
+    return [
+    institutional,
     {
       nameKey: "categories.academic",
       name: "academic",
@@ -235,28 +267,10 @@ export default function DirectorSettings() {
       ],
     },
   ];
-
+  }, [isPM]);
   const getCategoryIcon = (category) => {
     const IconComponent = category.icon;
     return <IconComponent className="w-5 h-5" />;
-  };
-
-  const getCategoryColor = (color) => {
-    switch(color) {
-      case 'blue': return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400';
-      case 'green': return 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400';
-      case 'purple': return 'text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400';
-      case 'orange': return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400';
-      case 'red': return 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400';
-      default: return 'text-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-gray-400';
-    }
-  };
-
-  const toggleSection = (sectionName) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionName]: !prev[sectionName]
-    }));
   };
 
   const handleEdit = (fieldKey) => {
@@ -276,20 +290,21 @@ export default function DirectorSettings() {
   };
 
   const renderFieldValue = (option) => {
+    const displayValue = getOptionValue(option);
     if (editingField === option.labelKey) {
       switch(option.type) {
         case 'text':
           return (
             <input 
               type="text" 
-              defaultValue={t(`settings.${option.valueKey}`)}
+              defaultValue={displayValue}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           );
         case 'select':
           return (
             <select 
-              defaultValue={t(`settings.${option.valueKey}`)}
+              defaultValue={displayValue}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               {option.options?.map(opt => (
@@ -303,7 +318,7 @@ export default function DirectorSettings() {
               <input
                 type="checkbox"
                 className="sr-only peer"
-                defaultChecked={["Enabled", "مفعل", "مفعلة"].includes(t(`settings.${option.valueKey}`))}
+                defaultChecked={["Enabled", "مفعل", "مفعلة"].includes(displayValue)}
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
@@ -314,7 +329,7 @@ export default function DirectorSettings() {
               type="number" 
               min="0" 
               max="100" 
-              defaultValue={t(`settings.${option.valueKey}`).replace('%', '')}
+              defaultValue={String(displayValue).replace('%', '')}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-20"
             />
           );
@@ -322,7 +337,7 @@ export default function DirectorSettings() {
           return (
             <input 
               type="date" 
-              defaultValue={t(`settings.${option.valueKey}`)}
+              defaultValue={displayValue}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           );
@@ -336,18 +351,18 @@ export default function DirectorSettings() {
             </div>
           );
         default:
-          return <span className="text-sm text-gray-600 dark:text-gray-300">{t(`settings.${option.valueKey}`)}</span>;
+          return <span className="text-sm text-gray-600 dark:text-gray-300">{displayValue}</span>;
       }
     } else {
       switch(option.type) {
         case 'toggle':
           return (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              ["Enabled", "مفعل", "مفعلة"].includes(t(`settings.${option.valueKey}`))
+              ["Enabled", "مفعل", "مفعلة"].includes(displayValue)
                 ? 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400' 
                 : 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400'
             }`}>
-              {t(`settings.${option.valueKey}`)}
+              {displayValue}
             </span>
           );
         case 'permissions':
@@ -363,174 +378,166 @@ export default function DirectorSettings() {
             </div>
           );
         default:
-          return <span className="text-sm text-gray-600 dark:text-gray-300">{t(`settings.${option.valueKey}`)}</span>;
+          return <span className="text-sm text-gray-600 dark:text-gray-300">{displayValue}</span>;
       }
     }
   };
 
-  const currentCategory = settingsCategories.find(cat => cat.name === activeCategory);
-
   return (
     <div className="w-full">
       <main className="w-full space-y-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
-          data-tour="1"
-          data-tour-title-en="Settings Overview"
-          data-tour-title-ar="نظرة عامة على الإعدادات"
-          data-tour-content-en="Manage organizational, business, access, notifications, and data privacy settings."
-          data-tour-content-ar="أدر إعدادات المنظمة والتجارية والوصول والإشعارات وخصوصية البيانات."
-          data-tour-position="bottom"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                <FiSettings className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? pmText("Proposal Manager Settings") : t('settings.title')}
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
-                {isPM ? pmText("Profile, notifications, and proposal preferences.") : t('settings.subtitle')}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              {hasChanges && (
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
-                  >
-                    <FiSave className="w-4 h-4" />
-                    {pmText("Save Changes")}
-                  </button>
-                  <button 
-                    onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
-                  >
-                    <FiX className="w-4 h-4" />
-                    {pmText("Cancel")}
-                  </button>
-                </div>
-              )}
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
-                <FiDownload className="w-4 h-4" />
-                {pmText("Export Settings")}
-              </button>
-            </div>
+        {hasChanges && (
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+            >
+              <FiSave className="w-4 h-4" />
+              {pmText("Save Changes")}
+            </button>
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+            >
+              <FiX className="w-4 h-4" />
+              {pmText("Cancel")}
+            </button>
           </div>
-        </motion.div>
-
-        {/* Settings Categories */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
-          data-tour="2"
-          data-tour-title-en="Categories"
-          data-tour-title-ar="الفئات"
-          data-tour-content-en="Switch between settings categories using these tabs."
-          data-tour-content-ar="بدّل بين فئات الإعدادات باستخدام هذه الألسنة."
-          data-tour-position="bottom"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <FiTarget className="w-6 h-6 text-green-600 dark:text-green-400" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {pmText("Settings Categories")}
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {settingsCategories.map(cat => (
-              <button 
-                key={cat.name} 
-                onClick={() => setActiveCategory(cat.name)} 
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  activeCategory === cat.name 
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
-                    : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
-                }`}
-              >
-                <div className="flex flex-col items-center text-center">
-                  <div className={`p-3 rounded-xl mb-3 ${getCategoryColor(cat.color)}`}>
-                    {getCategoryIcon(cat)}
-                  </div>
-                  <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-1">
-                    {t(`settings.${cat.nameKey}`)}
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {pmText(cat.description)}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </motion.section>
+        )}
 
         {/* Settings Options */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
-          data-tour="3"
-          data-tour-title-en="Options"
-          data-tour-title-ar="الخيارات"
-          data-tour-content-en="Review and adjust settings values within the selected category."
-          data-tour-content-ar="راجع وعدّل قيم الإعدادات ضمن الفئة المحددة."
-          data-tour-position="bottom"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            {getCategoryIcon(currentCategory)}
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {t(`settings.${currentCategory.nameKey}`)}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {pmText(currentCategory.description)}
-              </p>
+        {settingsCategories.map((category, catIdx) => (
+          <motion.section
+            key={category.name}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 + catIdx * 0.05 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
+            data-tour={catIdx === 0 ? "1" : undefined}
+            data-tour-title-en={
+              catIdx === 0
+                ? isPM
+                  ? "Organization"
+                  : "Organization settings"
+                : undefined
+            }
+            data-tour-title-ar={
+              catIdx === 0 ? (isPM ? "المؤسسة" : "إعدادات المؤسسة") : undefined
+            }
+            data-tour-content-en={
+              catIdx === 0
+                ? isPM
+                  ? "Your company name, contact name, and email come from trial signup. Other fields are optional organization details."
+                  : "Review and adjust organization settings values."
+                : undefined
+            }
+            data-tour-content-ar={
+              catIdx === 0
+                ? isPM
+                  ? "اسم الشركة واسم جهة الاتصال والبريد تأتي من تسجيل التجربة. الحقول الأخرى اختيارية."
+                  : "راجع وعدّل قيم إعدادات المؤسسة."
+                : undefined
+            }
+            data-tour-position={catIdx === 0 ? "bottom" : undefined}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              {getCategoryIcon(category)}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {t(`settings.${category.nameKey}`)}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {pmText(category.description)}
+                </p>
+              </div>
             </div>
-          </div>
-          
-          <div className="space-y-4">
-            {currentCategory.options.map((opt, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {t(`settings.${opt.labelKey}`)}
-                      </h3>
-                      {opt.required && (
-                        <span className="text-red-500 text-sm">*</span>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                      {opt.type === 'toggle' ? pmText('Enable or disable this feature') : 
-                       opt.type === 'permissions' ? pmText('Manage user access permissions') :
-                       opt.type === 'percentage' ? pmText('Set percentage value (0-100)') :
-                       pmText('Configure this setting')}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {renderFieldValue(opt)}
-                      {!editingField && opt.editable && (
-                        <button 
-                          onClick={() => handleEdit(opt.labelKey)}
-                          className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                        >
-                          <FiEdit3 className="w-4 h-4" />
-                        </button>
-                      )}
+            
+            <div className="space-y-4">
+              {category.options.map((opt, idx) => {
+                const isSignupField =
+                  isPM &&
+                  (opt.valueKey === "institutionalSettings.nameValue" ||
+                    opt.valueKey === "institutionalSettings.contactNameValue" ||
+                    opt.valueKey === "institutionalSettings.contactEmailValue");
+                const tourAttrs =
+                  isSignupField && opt.valueKey === "institutionalSettings.nameValue"
+                    ? {
+                        "data-tour": "2",
+                        "data-tour-title-en": "Company name",
+                        "data-tour-title-ar": "اسم الشركة",
+                        "data-tour-content-en":
+                          "This is the company name you entered when creating your trial account.",
+                        "data-tour-content-ar":
+                          "هذا هو اسم الشركة الذي أدخلته عند إنشاء حساب التجربة.",
+                        "data-tour-position": "bottom",
+                      }
+                    : isSignupField &&
+                        opt.valueKey === "institutionalSettings.contactNameValue"
+                      ? {
+                          "data-tour": "3",
+                          "data-tour-title-en": "Contact name",
+                          "data-tour-title-ar": "اسم جهة الاتصال",
+                          "data-tour-content-en":
+                            "Your signup name appears here for this trial workspace.",
+                          "data-tour-content-ar":
+                            "يظهر هنا الاسم الذي سجّلت به في مساحة عمل التجربة.",
+                          "data-tour-position": "bottom",
+                        }
+                      : isSignupField &&
+                          opt.valueKey === "institutionalSettings.contactEmailValue"
+                        ? {
+                            "data-tour": "4",
+                            "data-tour-title-en": "Contact email",
+                            "data-tour-title-ar": "بريد جهة الاتصال",
+                            "data-tour-content-en":
+                              "The work email used for trial login and confirmation.",
+                            "data-tour-content-ar":
+                              "البريد المهني المستخدم لتسجيل الدخول وتأكيد التجربة.",
+                            "data-tour-position": "bottom",
+                          }
+                        : {};
+
+                return (
+                <div
+                  key={idx}
+                  className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600"
+                  {...tourAttrs}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {t(`settings.${opt.labelKey}`)}
+                        </h3>
+                        {opt.required && (
+                          <span className="text-red-500 text-sm">*</span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                        {opt.type === 'toggle' ? pmText('Enable or disable this feature') : 
+                         opt.type === 'permissions' ? pmText('Manage user access permissions') :
+                         opt.type === 'percentage' ? pmText('Set percentage value (0-100)') :
+                         pmText('Configure this setting')}
+                      </div>
+                      <div className="flex items-center gap-4">
+                        {renderFieldValue(opt)}
+                        {!editingField && opt.editable && (
+                          <button 
+                            onClick={() => handleEdit(opt.labelKey)}
+                            className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          >
+                            <FiEdit3 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </motion.section>
+                );
+              })}
+            </div>
+          </motion.section>
+        ))}
       </main>
     </div>
   );

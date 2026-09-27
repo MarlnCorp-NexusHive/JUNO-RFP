@@ -136,6 +136,10 @@
     "institutionalSettings": {
       "name": "Name",
       "nameValue": "Nexus Corporate",
+      "contactName": "Contact name",
+      "contactNameValue": "—",
+      "contactEmail": "Contact email",
+      "contactEmailValue": "—",
       "type": "Type",
       "typeValue": "Private",
       "accreditation": "Certification",

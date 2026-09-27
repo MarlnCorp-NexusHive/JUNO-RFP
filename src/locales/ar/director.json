@@ -137,6 +137,10 @@
     "institutionalSettings": {
       "name": "الاسم",
       "nameValue": "نكسس للشركات",
+      "contactName": "اسم جهة الاتصال",
+      "contactNameValue": "—",
+      "contactEmail": "بريد جهة الاتصال",
+      "contactEmailValue": "—",
       "type": "النوع",
       "typeValue": "خاصة",
       "accreditation": "الشهادة",

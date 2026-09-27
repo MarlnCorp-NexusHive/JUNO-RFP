@@ -303,6 +303,11 @@ export const confirmTrialEmail = async (token) => {
   return res.data;
 };
 
+export const fetchTrialMe = async () => {
+  const res = await API.get("/trial/auth/me", { timeout: 15_000 });
+  return res.data;
+};
+
 export const resendTrialConfirmation = async ({ email, password }) => {
   const res = await API.post(
     "/trial/auth/resend-confirmation",

@@ -692,8 +692,11 @@ export const tourData = {
     },
     settings: {
       autoScan: true,
-      title: { en: "Settings", ar: "الإعدادات" },
-      description: { en: "Profile and preferences — trial users can also change password from the trial banner", ar: "الملف والتفضيلات — يمكن لمستخدمي التجربة تغيير كلمة المرور من شريط التجربة" },
+      title: { en: "Organization Settings", ar: "إعدادات المؤسسة" },
+      description: {
+        en: "View your company and contact details from trial signup. Change password from the trial banner at the top.",
+        ar: "اعرض اسم الشركة وبيانات الاتصال من تسجيل التجربة. غيّر كلمة المرور من شريط التجربة في الأعلى.",
+      },
       steps: [],
     },
   },

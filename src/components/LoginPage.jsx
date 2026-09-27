@@ -75,10 +75,41 @@ function ProductHighlight({ label, darkTheme }) {
   );
 }
 
+function EyeIcon({ off = false }) {
+  if (off) {
+    return (
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M3 3l18 18M10.6 10.6A2 2 0 0012 14a2 2 0 001.4-.6M9.9 5.1A9.8 9.8 0 0112 5c5 0 9.3 3.1 11 7a11.4 11.4 0 01-4.2 4.8M6.1 6.1A11.5 11.5 0 001 12c1.7 3.9 6 7 11 7a10.4 10.4 0 005.1-1.3"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+    </svg>
+  );
+}
+
 function LoginPageContent() {
   const [mode, setMode] = useState("login"); // login | signup
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showSignupConfirm, setShowSignupConfirm] = useState(false);
   const [signupName, setSignupName] = useState("");
   const [signupCompany, setSignupCompany] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
@@ -397,16 +428,26 @@ function LoginPageContent() {
                 </label>
                 <div className="relative input-with-icon">
                   <input
-                    type="password"
-                    className={`${inputClass} ${isRTL ? 'pr-12' : 'pl-12'}`}
+                    type={showPassword ? "text" : "password"}
+                    className={`${inputClass} ${isRTL ? "pl-12 pr-12" : "pl-12 pr-12"}`}
                     placeholder={t('auth.login.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading || confirming}
+                    autoComplete="current-password"
                   />
                   <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4f3cc9] input-icon`}>
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-7V8a6 6 0 10-12 0v2a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2zm-8-2a4 4 0 118 0v2H6V8zm10 10H4v-6h16v6z" fill="#4f3cc9"/></svg>
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#4f3cc9] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#4f3cc9]/40 dark:hover:bg-white/10`}
+                    aria-label={showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
+                    tabIndex={0}
+                  >
+                    <EyeIcon off={showPassword} />
+                  </button>
                 </div>
               </div>
               {(error || info || confirming) && (
@@ -507,28 +548,50 @@ function LoginPageContent() {
               </div>
               <div>
                 <label className={labelClass}>{t("auth.signup.password")}</label>
-                <input
-                  type="password"
-                  className={inputClass}
-                  value={signupPassword}
-                  onChange={(e) => setSignupPassword(e.target.value)}
-                  placeholder={t("auth.signup.passwordPlaceholder")}
-                  minLength={8}
-                  required
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <input
+                    type={showSignupPassword ? "text" : "password"}
+                    className={`${inputClass} ${isRTL ? "pl-12" : "pr-12"}`}
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    placeholder={t("auth.signup.passwordPlaceholder")}
+                    minLength={8}
+                    required
+                    disabled={isLoading}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSignupPassword((v) => !v)}
+                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#4f3cc9] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#4f3cc9]/40 dark:hover:bg-white/10`}
+                    aria-label={showSignupPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
+                  >
+                    <EyeIcon off={showSignupPassword} />
+                  </button>
+                </div>
               </div>
               <div>
                 <label className={labelClass}>{t("auth.signup.confirmPassword")}</label>
-                <input
-                  type="password"
-                  className={inputClass}
-                  value={signupConfirm}
-                  onChange={(e) => setSignupConfirm(e.target.value)}
-                  minLength={8}
-                  required
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <input
+                    type={showSignupConfirm ? "text" : "password"}
+                    className={`${inputClass} ${isRTL ? "pl-12" : "pr-12"}`}
+                    value={signupConfirm}
+                    onChange={(e) => setSignupConfirm(e.target.value)}
+                    minLength={8}
+                    required
+                    disabled={isLoading}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSignupConfirm((v) => !v)}
+                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#4f3cc9] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#4f3cc9]/40 dark:hover:bg-white/10`}
+                    aria-label={showSignupConfirm ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
+                  >
+                    <EyeIcon off={showSignupConfirm} />
+                  </button>
+                </div>
               </div>
               {error && (
                 <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-red-400 bg-red-900/20' : 'text-red-500 bg-red-50'}`}>

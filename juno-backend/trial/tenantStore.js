@@ -45,6 +45,54 @@ function pruneUsedEmailTokens(db) {
   );
 }
 
+/**
+ * Cap every tenant trial window at DEFAULT_TRIAL_DAYS from its start.
+ * Leaves pending accounts (no trialEndsAt) untouched so the clock still starts on confirm.
+ * @returns {number} tenants updated
+ */
+export function capTrialWindowsToDefaultDays(db, { days = DEFAULT_TRIAL_DAYS } = {}) {
+  const ms = Number(days) * 24 * 60 * 60 * 1000;
+  let updated = 0;
+  for (const tenant of db.tenants || []) {
+    if (!tenant) continue;
+    const prevDays = tenant.trialDays;
+    const prevEnds = tenant.trialEndsAt;
+    tenant.trialDays = days;
+
+    if (!tenant.trialEndsAt) {
+      // Clock not started yet (awaiting email confirm)
+      if (prevDays !== days) updated += 1;
+      continue;
+    }
+
+    const startMs = Date.parse(
+      tenant.trialStartsAt || tenant.activatedAt || tenant.createdAt || "",
+    );
+    const start = Number.isFinite(startMs) ? startMs : Date.now();
+    if (!Number.isFinite(Date.parse(tenant.trialStartsAt || ""))) {
+      tenant.trialStartsAt = new Date(start).toISOString();
+    }
+    const maxEnd = start + ms;
+    const currentEnd = Date.parse(tenant.trialEndsAt);
+    if (!Number.isFinite(currentEnd) || currentEnd > maxEnd) {
+      tenant.trialEndsAt = new Date(maxEnd).toISOString();
+    }
+    if (prevEnds !== tenant.trialEndsAt || prevDays !== days) updated += 1;
+  }
+  return updated;
+}
+
+/** Load DB, apply 7-day cap migration once per process start, persist if needed. */
+export function migrateTrialDurationsOnBoot() {
+  const db = loadTrialDb();
+  const n = capTrialWindowsToDefaultDays(db);
+  if (n > 0) {
+    saveTrialDb(db);
+    console.log(`[trial] capped ${n} tenant trial window(s) to ${DEFAULT_TRIAL_DAYS} days`);
+  }
+  return n;
+}
+
 function ensureDir() {
   const dir = path.dirname(DATA_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

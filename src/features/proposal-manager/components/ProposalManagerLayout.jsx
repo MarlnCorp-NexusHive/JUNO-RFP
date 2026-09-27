@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../director/components/Sidebar";
 import { proposalManagerFeatures } from "./proposalManagerFeatures";
 import { Outlet, useLocation } from "react-router-dom";
@@ -8,20 +8,63 @@ import { TourProvider } from "../../../components/tours/TourContext";
 import { useTour } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
-import { getTrialSession } from "../../../services/trialAuthSession.js";
+import { getTrialSession, setTrialSession } from "../../../services/trialAuthSession.js";
 import { getProposalManagerTourPage } from "../../../components/tours/data/proposalManagerTourPages.js";
 import { useTranslation } from "react-i18next";
 import TrialChangePasswordModal from "./TrialChangePasswordModal.jsx";
+import { fetchTrialMe } from "../../../services/api.js";
 
 function TrialBanner() {
   const { t } = useTranslation("common");
   const [pwOpen, setPwOpen] = useState(false);
   const session = getTrialSession();
   const user = parseLocalStorageJson("rbac_current_user");
+  const [trialEndsAt, setTrialEndsAt] = useState(
+    () => session?.trialEndsAt || user?.trialEndsAt || "",
+  );
+
+  useEffect(() => {
+    if (!session?.token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const me = await fetchTrialMe();
+        if (cancelled || !me?.tenant) return;
+        const ends = me.tenant.trialEndsAt || "";
+        setTrialEndsAt(ends);
+        setTrialSession({
+          ...session,
+          tenant: me.tenant,
+          user: me.user || session.user,
+          usage: me.usage || session.usage,
+          trialEndsAt: ends,
+        });
+        try {
+          const rbac = parseLocalStorageJson("rbac_current_user");
+          if (rbac?.isTrialUser) {
+            localStorage.setItem(
+              "rbac_current_user",
+              JSON.stringify({ ...rbac, trialEndsAt: ends, tenantName: me.tenant.name || rbac.tenantName }),
+            );
+          }
+        } catch {
+          /* ignore */
+        }
+      } catch {
+        /* keep cached banner values */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Only refresh once per mount / token
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.token]);
+
   if (!session?.tenantId && !user?.isTrialUser) return null;
 
   const company = session?.tenantName || user?.tenantName || t("proposalManagerTrial.tenant");
-  const ends = session?.trialEndsAt || user?.trialEndsAt;
+  const ends = trialEndsAt || session?.trialEndsAt || user?.trialEndsAt;
   let daysLeft = null;
   if (ends) {
     const ms = Date.parse(ends) - Date.now();
