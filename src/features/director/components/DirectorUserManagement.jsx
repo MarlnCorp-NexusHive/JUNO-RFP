@@ -32,6 +32,66 @@ import {
 } from "react-icons/fi";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { loadTrialFeatureData, persistTrialFeatureData, canUseTrialFeatures } from "../../../services/trialFeatureApi.js";
+import { fetchTrialMembers } from "../../../services/api.js";
+import { getTrialSession } from "../../../services/trialAuthSession.js";
+
+function mapSignupMemberToCard(m) {
+  const name = String(m?.name || "").trim() || String(m?.email || "").split("@")[0] || "User";
+  const initials = name
+    .split(/\s+/)
+    .map((s) => s[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+  const created = m?.createdAt || m?.emailVerifiedAt || "";
+  return {
+    id: m.id,
+    source: "signup",
+    name,
+    displayName: name,
+    email: m.email || "",
+    role: m.role || "Proposal Manager",
+    department: m.team || "Proposals",
+    statusKey: "userStatuses.active",
+    avatar: initials || "U",
+    permissions: 3,
+    joinDate: String(created).slice(0, 10) || "—",
+    createdAt: created || null,
+  };
+}
+
+/** Always include the viewer from the trial session if the members API is empty/slow. */
+function sessionUserAsMember() {
+  const session = getTrialSession();
+  const u = session?.user;
+  if (!u?.id && !u?.email) return null;
+  return {
+    id: u.id || `session_${u.email}`,
+    tenantId: session.tenantId || u.tenantId,
+    email: u.email || "",
+    name: u.name || u.email || "You",
+    role: u.role || "Proposal Manager",
+    team: u.team || "Proposals",
+    emailVerified: true,
+    createdAt: u.createdAt || session.savedAt || new Date().toISOString(),
+    emailVerifiedAt: u.emailVerifiedAt || null,
+  };
+}
+
+function mergeSignupMembers(apiMembers) {
+  const list = Array.isArray(apiMembers) ? [...apiMembers] : [];
+  const self = sessionUserAsMember();
+  if (self) {
+    const selfEmail = String(self.email || "").toLowerCase();
+    const exists = list.some(
+      (m) =>
+        String(m.id) === String(self.id) ||
+        (selfEmail && String(m.email || "").toLowerCase() === selfEmail),
+    );
+    if (!exists) list.unshift(self);
+  }
+  return list;
+}
 
 
 export default function DirectorUserManagement() {
@@ -92,6 +152,8 @@ export default function DirectorUserManagement() {
       Operations: "العمليات",
       "Other (custom)": "أخرى (مخصص)",
       "Enter department name": "أدخل اسم القسم",
+      You: "أنت",
+      "Signed up": "مسجّل",
     };
     return map[value] || value;
   };
@@ -125,37 +187,68 @@ export default function DirectorUserManagement() {
     { id: 5, nameKey: "demoUsers.davidBrown", roleKey: "roles.student", departmentKey: "departments.engineering", statusKey: "userStatuses.active", email: "david.brown@company.com", lastLogin: "2026-09-12", avatar: "DB", permissions: 3, joinDate: "2026-09-01" },
   ];
   const initialUsers = isTrialPm ? [] : isPM ? pmInitialUsers : directorInitialUsers;
+  /** Manual roster (Add User) — trial persists under tenant feature store. */
   const [users, setUsers] = useState(initialUsers);
+  /** Real trial signup accounts for this company tenant. */
+  const [signupMembers, setSignupMembers] = useState([]);
+  const [signupTotals, setSignupTotals] = useState({ totalUsers: 0, newUsers: 0 });
   const [usersReady, setUsersReady] = useState(!isTrialPm);
 
   const persistUsers = React.useCallback(
     (nextUsers) => {
       if (!isTrialPm || !canUseTrialFeatures()) return;
-      void persistTrialFeatureData("userManagement", { users: Array.isArray(nextUsers) ? nextUsers : [] });
+      const manualOnly = (Array.isArray(nextUsers) ? nextUsers : []).filter((u) => u?.source !== "signup");
+      void persistTrialFeatureData("userManagement", { users: manualOnly });
     },
     [isTrialPm],
   );
 
   const hydrateUsers = React.useCallback(async () => {
     if (!isTrialPm) return;
+    let membersRes = null;
+    try {
+      membersRes = canUseTrialFeatures() ? await fetchTrialMembers() : null;
+    } catch (err) {
+      console.warn("[user-management] members fetch failed:", err?.message || err);
+      membersRes = null;
+    }
     const data = await loadTrialFeatureData("userManagement", { users: [] });
-    setUsers(Array.isArray(data?.users) ? data.users : []);
+    const manual = (Array.isArray(data?.users) ? data.users : []).map((u) => ({
+      ...u,
+      source: u.source === "signup" ? "manual" : u.source || "manual",
+    }));
+    setUsers(manual);
+
+    const mergedMembers = mergeSignupMembers(membersRes?.ok ? membersRes.members : []);
+    setSignupMembers(mergedMembers);
+
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const newCount = mergedMembers.filter((m) => {
+      const t = Date.parse(m.createdAt || m.emailVerifiedAt || "");
+      return Number.isFinite(t) && now - t <= weekMs;
+    }).length;
+
+    setSignupTotals({
+      totalUsers: mergedMembers.length,
+      newUsers: newCount,
+    });
     setUsersReady(true);
   }, [isTrialPm]);
 
   React.useEffect(() => {
     if (!isTrialPm) {
       setUsers(initialUsers);
+      setSignupMembers([]);
+      setSignupTotals({ totalUsers: 0, newUsers: 0 });
       setUsersReady(true);
       return undefined;
     }
     let cancelled = false;
     setUsersReady(false);
     (async () => {
-      const data = await loadTrialFeatureData("userManagement", { users: [] });
+      await hydrateUsers();
       if (cancelled) return;
-      setUsers(Array.isArray(data?.users) ? data.users : []);
-      setUsersReady(true);
     })();
     return () => {
       cancelled = true;
@@ -180,9 +273,13 @@ export default function DirectorUserManagement() {
     };
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisibility);
+    const poll = window.setInterval(() => {
+      void hydrateUsers();
+    }, 20_000);
     return () => {
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibility);
+      window.clearInterval(poll);
     };
   }, [isTrialPm, hydrateUsers]);
 
@@ -217,6 +314,7 @@ export default function DirectorUserManagement() {
   };
 
   const openEditUser = (u) => {
+    if (u?.source === "signup") return;
     let display = "";
     if (isPM && u.name) display = u.name;
     else if (u.displayName) display = u.displayName;
@@ -258,12 +356,22 @@ export default function DirectorUserManagement() {
         : newUser.department || "Proposals"
       : undefined;
 
+    const emailNorm = email.toLowerCase();
+    const signupEmails = new Set(
+      signupMembers.map((m) => String(m.email || "").toLowerCase()).filter(Boolean),
+    );
+    if (isTrialPm && signupEmails.has(emailNorm)) return;
+    if (users.some((u) => String(u.email || "").toLowerCase() === emailNorm && u.id !== editingUserId)) {
+      return;
+    }
+
     if (editingUserId != null) {
       setUsers((prev) => {
         const next = prev.map((u) =>
           u.id === editingUserId
             ? {
                 ...u,
+                source: "manual",
                 displayName: name,
                 name,
                 email,
@@ -288,6 +396,7 @@ export default function DirectorUserManagement() {
           ...prev,
           {
             id: nextId,
+            source: "manual",
             nameKey: "demoUsers.newUser",
             displayName: name,
             name,
@@ -315,6 +424,7 @@ export default function DirectorUserManagement() {
 
   const handleRemoveSelected = () => {
     if (selectedUsers.length === 0) return;
+    // Signup accounts stay; only remove manually added roster rows.
     setUsers((prev) => {
       const next = prev.filter((u) => !selectedUsers.includes(u.id));
       persistUsers(next);
@@ -342,8 +452,32 @@ export default function DirectorUserManagement() {
     { key: "departments.business", labelKey: "userManagement.departments.business" },
   ];
 
-  const trialTotalUsers = users.length;
-  const trialNewUsers = 0;
+  const rosterUsers = React.useMemo(() => {
+    if (!isTrialPm) return users;
+    const session = getTrialSession();
+    const selfEmail = String(session?.user?.email || "").toLowerCase();
+    const signupCards = signupMembers.map((m) => {
+      const card = mapSignupMemberToCard(m);
+      const isSelf =
+        (selfEmail && String(card.email || "").toLowerCase() === selfEmail) ||
+        String(card.id) === String(session?.user?.id || "");
+      return { ...card, isSelf };
+    });
+    // Current viewer first, then other signups, then Add User rows.
+    signupCards.sort((a, b) => Number(b.isSelf) - Number(a.isSelf));
+    const signupEmails = new Set(
+      signupCards.map((u) => String(u.email || "").toLowerCase()).filter(Boolean),
+    );
+    const manualCards = users
+      .filter((u) => u?.source !== "signup")
+      .filter((u) => !signupEmails.has(String(u.email || "").toLowerCase()))
+      .map((u) => ({ ...u, source: "manual", isSelf: false }));
+    return [...signupCards, ...manualCards];
+  }, [isTrialPm, signupMembers, users]);
+
+  // Total Users mirrors the Users list (signups on this tenant + Add User rows).
+  const trialTotalUsers = isTrialPm ? rosterUsers.length : users.length;
+  const trialNewUsers = isTrialPm ? signupTotals.newUsers : 0;
 
   // Demo data for user metrics using translation keys (trial derives from live user list)
   const userMetrics = isTrialPm
@@ -435,13 +569,16 @@ export default function DirectorUserManagement() {
   };
 
   const getUserDisplayName = (u) => (isPM && u.name) ? u.name : (u.displayName ?? t(`userManagement.${u.nameKey}`));
-  const filteredUsers = users.filter(u => {
+  const filteredUsers = rosterUsers.filter(u => {
     const roleMatch = !roleFilter || (isPM ? u.role === roleFilter : u.roleKey === `roles.${roleFilter}`);
     const statusMatch = statusFilter === "all" || u.statusKey === `userStatuses.${statusFilter}`;
     const searchMatch = getUserDisplayName(u).toLowerCase().includes(search.toLowerCase()) ||
                       (u.email || "").toLowerCase().includes(search.toLowerCase());
     return roleMatch && statusMatch && searchMatch;
   });
+  const removableSelectedCount = selectedUsers.filter((id) =>
+    filteredUsers.some((u) => u.id === id && u.source !== "signup"),
+  ).length;
 
   const handleSelectUser = (userId) => {
     setSelectedUsers(prev => 
@@ -629,14 +766,14 @@ export default function DirectorUserManagement() {
               >
                 {selectedUsers.length === filteredUsers.length ? pmText('Deselect All') : pmText('Select All')}
               </button>
-              {selectedUsers.length > 0 && (
+              {removableSelectedCount > 0 && (
                 <button
                   type="button"
                   onClick={handleRemoveSelected}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
                 >
                   <FiUserX className="w-4 h-4" />
-                  {pmText("Remove")} ({selectedUsers.length})
+                  {pmText("Remove")} ({removableSelectedCount})
                 </button>
               )}
             </div>
@@ -666,9 +803,16 @@ export default function DirectorUserManagement() {
                         <h3 className="font-semibold text-gray-900 dark:text-white">
                           {getUserDisplayName(u)}
                         </h3>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(String(u.statusKey || "userStatuses.active").split(".").pop())}`}>
-                          {t(`userManagement.${u.statusKey || "userStatuses.active"}`)}
-                        </span>
+                        {u.isSelf ? (
+                          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                            {pmText("You")}
+                          </span>
+                        ) : null}
+                        {u.source === "signup" && !u.isSelf ? (
+                          <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                            {pmText("Signed up")}
+                          </span>
+                        ) : null}
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-2">
                         <div className="flex items-center gap-1">
@@ -684,22 +828,23 @@ export default function DirectorUserManagement() {
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <span>{pmText("Department")}: {isPM ? pmText(u.department) : (u.displayDepartment ?? t(`userManagement.${u.departmentKey}`))}</span>
-                        <span>{pmText("Permissions")}: {u.permissions}</span>
                         <span>{pmText("Joined")}: {u.joinDate}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openEditUser(u)}
-                      className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
-                      aria-label={pmText("Edit")}
-                      title={pmText("Edit")}
-                    >
-                      <FiEdit3 className="w-4 h-4" />
-                    </button>
+                    {u.source !== "signup" && (
+                      <button
+                        type="button"
+                        onClick={() => openEditUser(u)}
+                        className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                        aria-label={pmText("Edit")}
+                        title={pmText("Edit")}
+                      >
+                        <FiEdit3 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

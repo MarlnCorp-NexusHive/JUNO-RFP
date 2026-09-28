@@ -309,6 +309,12 @@ export const fetchTrialMe = async () => {
   return res.data;
 };
 
+/** Trial tenant signup accounts (for User Management Total/New + shared list). */
+export const fetchTrialMembers = async () => {
+  const res = await API.get("/trial/auth/members", { timeout: 15_000 });
+  return res.data;
+};
+
 export const resendTrialConfirmation = async ({ email, password }) => {
   const res = await API.post(
     "/trial/auth/resend-confirmation",

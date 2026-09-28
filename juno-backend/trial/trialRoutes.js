@@ -15,6 +15,7 @@ import {
   getTenantStatus,
   getTrialStorageStatus,
   getUsageSnapshot,
+  listUsersForTenant,
   publicTenant,
   publicUser,
   registerTrialSignup,
@@ -229,6 +230,31 @@ router.get("/me", (req, res) => {
     tenant: publicTenant(req.trialTenantFull),
     usage: getUsageSnapshot(req.trialTenantFull),
   });
+});
+
+/** Signup accounts for the authenticated tenant (shared User Management metrics/list). */
+router.get("/members", requireTrialAuth, (req, res) => {
+  try {
+    const members = listUsersForTenant(req.tenantId);
+    const now = Date.now();
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const newMembers = members.filter((m) => {
+      const t = Date.parse(m.createdAt || m.emailVerifiedAt || "");
+      return Number.isFinite(t) && now - t <= weekMs;
+    });
+    return res.json({
+      ok: true,
+      tenantId: req.tenantId,
+      members,
+      totals: {
+        totalUsers: members.length,
+        newUsers: newMembers.length,
+      },
+    });
+  } catch (err) {
+    console.error("[trial] members error:", err);
+    return res.status(500).json({ error: err.message || "Could not load members", code: "members_failed" });
+  }
 });
 
 /** Public disk/path diagnostics — no passwords or tokens. */

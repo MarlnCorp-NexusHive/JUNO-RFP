@@ -326,6 +326,29 @@ export function publicUser(user) {
   };
 }
 
+/** Members list for User Management — includes signup timestamps for Total/New metrics. */
+export function publicMemberUser(user) {
+  if (!user) return null;
+  return {
+    ...publicUser(user),
+    emailVerified: Boolean(user.emailVerified),
+    createdAt: user.createdAt || null,
+    emailVerifiedAt: user.emailVerifiedAt || null,
+  };
+}
+
+/** All users belonging to a tenant (signup accounts). */
+export function listUsersForTenant(tenantId) {
+  const db = loadTrialDb();
+  const tid = String(tenantId || "");
+  if (!tid) return [];
+  return (db.users || [])
+    .filter((u) => u && String(u.tenantId) === tid)
+    .map(publicMemberUser)
+    .filter(Boolean)
+    .sort((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
+}
+
 export function publicTenant(tenant) {
   if (!tenant) return null;
   return {
