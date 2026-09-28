@@ -30,8 +30,9 @@ const API = axios.create({
 API.interceptors.request.use((config) => {
   try {
     const url = String(config.url || "");
-    // Collab uses its own Bearer user-id tokens; do not overwrite with trial session.
-    if (url.includes("/rfp-collab")) return config;
+    // Collab uses its own Bearer user-id tokens — except trial-session, which needs the trial JWT.
+    const isTrialCollabBootstrap = url.includes("/rfp-collab/auth/trial-session");
+    if (url.includes("/rfp-collab") && !isTrialCollabBootstrap) return config;
     const raw = localStorage.getItem("juno_trial_session");
     if (!raw) return config;
     const session = JSON.parse(raw);

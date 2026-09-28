@@ -77,6 +77,56 @@ export function login(email, password) {
   };
 }
 
+/**
+ * Per-tenant Proposal Manager for trial users — isolated from shared demo jordan@juno.
+ * Empty workspace list until the tenant creates their own.
+ */
+export function ensureTrialProposalManager({ tenantId, name } = {}) {
+  const safe = String(tenantId || "")
+    .replace(/[^a-zA-Z0-9_-]/g, "")
+    .slice(0, 64);
+  if (!safe) {
+    const e = new Error("Trial tenant required");
+    e.statusCode = 400;
+    throw e;
+  }
+  const id = `user_pm_trial_${safe}`;
+  const email = `trial-pm-${safe}@juno.local`;
+  const password = `trial_${safe}`;
+  let u = store.usersById.get(id);
+  if (!u) {
+    u = {
+      id,
+      email,
+      password,
+      name: String(name || "Proposal Manager").trim() || "Proposal Manager",
+      role: "proposal_manager",
+      tenantId: safe,
+    };
+    store.usersById.set(id, u);
+    store.usersByEmail.set(email.toLowerCase(), id);
+    scheduleCollaborationPersist();
+  } else if (name && String(name).trim() && u.name !== String(name).trim()) {
+    u.name = String(name).trim();
+    scheduleCollaborationPersist();
+  }
+  return {
+    token: u.id,
+    user: { id: u.id, email: u.email, name: u.name, role: u.role },
+  };
+}
+
+/** Recreate trial PM users after disk reload (users are not always persisted). */
+export function hydrateTrialUsersFromWorkspaces() {
+  for (const ws of store.workspaces.values()) {
+    const id = ws?.createdBy;
+    if (!id || !String(id).startsWith("user_pm_trial_")) continue;
+    if (store.usersById.has(id)) continue;
+    const tenantId = String(id).slice("user_pm_trial_".length);
+    ensureTrialProposalManager({ tenantId, name: "Proposal Manager" });
+  }
+}
+
 export function listAuditors() {
   return [...store.usersById.values()]
     .filter((u) => u.role === "auditor")
@@ -123,7 +173,10 @@ export function createWorkspace(pmUserId, { title, document, questions }) {
     store.questions.set(qid, q);
   });
 
-  seedQuarterlyItems(wsId);
+  // Demo-only quarterly checklist seed — skip for trial tenant PMs
+  if (!String(pmUserId || "").startsWith("user_pm_trial_")) {
+    seedQuarterlyItems(wsId);
+  }
 
   pushLog(wsId, {
     user: userName(pmUserId),

@@ -103,12 +103,6 @@ export default function RfpCollaborationPmWorkspace() {
         setBootstrapping(false);
         return;
       }
-      const existing = loadCollabSession();
-      if (existing?.user?.role === "proposal_manager") {
-        setSession(existing);
-        setBootstrapping(false);
-        return;
-      }
       try {
         const s = await ensureProposalManagerCollabSession();
         if (!cancelled && s) setSession(s);

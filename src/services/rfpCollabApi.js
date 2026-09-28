@@ -3,6 +3,7 @@
  * on every request (token is the user id).
  */
 import API from "./api.js";
+import { getTrialSession } from "./trialAuthSession.js";
 
 const C = "/rfp-collab";
 
@@ -21,6 +22,22 @@ function auth(token) {
 
 export const rfpCollab = {
   login: (email, password) => API.post(`${C}/auth/login`, { email, password }),
+
+  /** Trial: isolated PM collab session — send trial JWT explicitly */
+  trialSession: () => {
+    const trialToken = getTrialSession()?.token;
+    if (!trialToken) {
+      return Promise.reject(new Error("Trial session required"));
+    }
+    return API.post(
+      `${C}/auth/trial-session`,
+      {},
+      {
+        timeout: 20_000,
+        headers: { Authorization: `Bearer ${trialToken}` },
+      },
+    );
+  },
 
   listAuditors: (token) => API.get(`${C}/auditors`, auth(token)),
   listWorkspaces: (token) => API.get(`${C}/workspaces`, auth(token)),

@@ -264,6 +264,47 @@ export default function MarketingHeadTeamManagement() {
     { metric: "Trainings Logged", target: Math.max(customTrainings.length, 1), achieved: customTrainings.length, icon: FiAward, color: "yellow" },
   ];
 
+  /** Live feed for trial Team Updates card — from assignments, members, trainings only. */
+  const trialTeamUpdates = (() => {
+    if (!isTrialPm) return [];
+    const items = [];
+    const open = assignments
+      .filter((a) => a.status !== "completed")
+      .slice()
+      .sort((a, b) => (Date.parse(a.deadline) || 0) - (Date.parse(b.deadline) || 0));
+    for (const a of open.slice(0, 4)) {
+      const who = a.assigned || a.assignee || "Unassigned";
+      const when = a.deadline ? ` · due ${a.deadline}` : "";
+      items.push({
+        type: "reminder",
+        message: `${a.task || "Assignment"} → ${who}${when}`,
+        icon: FiClock,
+      });
+    }
+    for (const a of assignments.filter((x) => x.status === "completed").slice(0, 2)) {
+      items.push({
+        type: "announcement",
+        message: `Completed: ${a.task || "Assignment"}${a.assigned ? ` (${a.assigned})` : ""}`,
+        icon: FiCheckCircle,
+      });
+    }
+    for (const m of members.slice(0, 2)) {
+      items.push({
+        type: "brief",
+        message: `Team member: ${m.name}${m.role ? ` · ${m.role}` : ""}`,
+        icon: FiUsers,
+      });
+    }
+    for (const tr of customTrainings.slice(0, 2)) {
+      items.push({
+        type: "brief",
+        message: `Training logged: ${tr.training || tr.name || "Training"}`,
+        icon: FiAward,
+      });
+    }
+    return items.slice(0, 6);
+  })();
+
   const toggleMemberPermission = (memberId, permId) => {
     setMembers((prev) => {
       const next = prev.map((m) => {
@@ -416,7 +457,7 @@ export default function MarketingHeadTeamManagement() {
     );
   };
 
-  const MetricCard = ({ title, value, target, achieved, icon: Icon, color = "blue" }) => {
+  const MetricCard = ({ title, value, target, achieved, icon: Icon, color = "blue", showTarget = true }) => {
     const colorClasses = {
       blue: "text-blue-600 dark:text-blue-400",
       green: "text-green-600 dark:text-green-400",
@@ -425,7 +466,7 @@ export default function MarketingHeadTeamManagement() {
       red: "text-red-600 dark:text-red-400"
     };
 
-    const percentage = Math.round((achieved / target) * 100);
+    const percentage = target > 0 ? Math.round((achieved / target) * 100) : 0;
 
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -433,12 +474,16 @@ export default function MarketingHeadTeamManagement() {
           <div className={`p-2 rounded-lg bg-${color}-50 dark:bg-${color}-900/20`}>
             <Icon className={`h-5 w-5 ${colorClasses[color]}`} />
           </div>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{percentage}%</span>
+          {showTarget && (
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{percentage}%</span>
+          )}
         </div>
         <div>
           <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{achieved}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Target: {target}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+          {showTarget && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Target: {target}</p>
+          )}
         </div>
       </div>
     );
@@ -570,6 +615,7 @@ export default function MarketingHeadTeamManagement() {
         achieved={metric.achieved}
         icon={metric.icon}
         color={metric.color}
+        showTarget={!isTrialPm}
       />
     ))}
   </div>
@@ -950,7 +996,7 @@ export default function MarketingHeadTeamManagement() {
                     <FiClipboard className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {isProposalManagerTeam ? pmText('Section Assignments & Deadlines', 'تعيين الأقسام والمواعيد النهائية') : t('team.sections.taskAssignment.title')}
+                    {isProposalManagerTeam ? pmText('Assignments & Deadlines', 'التعيينات والمواعيد النهائية') : t('team.sections.taskAssignment.title')}
                   </h2>
                   {!isTrialPm && (
                   <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded animate-pulse">
@@ -1212,12 +1258,37 @@ export default function MarketingHeadTeamManagement() {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {isProposalManagerTeam ? pmText('Team Updates & Reminders', 'تحديثات الفريق والتذكيرات') : t('team.sections.communicationCenter.title')}
                 </h2>
+                {!isTrialPm && (
                 <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded animate-pulse">
                   {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.communicationCenter.aiSummary')}
                 </span>
+                )}
               </div>
               
               <div className="space-y-3">
+                {isTrialPm ? (
+                  trialTeamUpdates.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
+                      {pmText(
+                        "No updates yet. Add team members, assignments, or trainings and they’ll show up here.",
+                        "لا توجد تحديثات بعد. أضف أعضاء فريق أو مهام أو تدريبات وستظهر هنا.",
+                      )}
+                    </p>
+                  ) : (
+                    trialTeamUpdates.map((item, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <item.icon className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <span className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase">
+                            {t(`team.sections.communicationCenter.${item.type}`, { defaultValue: item.type })}
+                          </span>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">{item.message}</p>
+                        </div>
+                      </div>
+                    ))
+                  )
+                ) : (
+                  <>
                 {(isProposalManagerTeam
                   ? [
                       { type: "announcement", message: "DoD IT Services draft due July 15 – all sections", icon: FiInfo },
@@ -1240,9 +1311,13 @@ export default function MarketingHeadTeamManagement() {
                     </div>
                   </div>
                 ))}
+                {!isProposalManagerTeam && (
                 <div className="text-xs text-blue-600 animate-bounce">
-                  {isProposalManagerTeam ? pmText('AI highlights upcoming submission milestones.', 'يبرز الذكاء الاصطناعي المراحل القادمة للتسليم.') : t('team.sections.communicationCenter.aiTopUpdates')}
+                  {t('team.sections.communicationCenter.aiTopUpdates')}
                 </div>
+                )}
+                  </>
+                )}
               </div>
             </section>
           </div>

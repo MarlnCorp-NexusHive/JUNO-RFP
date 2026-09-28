@@ -89,11 +89,30 @@ export function isMainAppProposalManager() {
 }
 
 /**
- * If the user is logged into JUNO as Proposal Manager, obtain a collaboration API session
- * using the seeded PM account (override with VITE_COLLAB_PM_EMAIL / VITE_COLLAB_PM_PASSWORD).
- * Display name is taken from the signed-up / main-app user, not the seed account.
+ * If the user is logged into JUNO as Proposal Manager, obtain a collaboration API session.
+ * Trial: per-tenant isolated PM (empty workspace list) — never the shared jordan@juno demo account.
+ * Demo: seeded jordan@juno (unchanged).
  */
 export async function ensureProposalManagerCollabSession() {
+  const trial = getTrialSession();
+  const rbac = readRbacUser();
+  const isTrial = Boolean(trial?.token || rbac?.isTrialUser);
+
+  if (isTrial) {
+    // Always re-ensure on the server (users are in-memory; stale sessionStorage breaks after Render restarts).
+    clearCollabSession();
+    if (!isMainAppProposalManager()) return null;
+    if (!trial?.token) {
+      throw new Error("Trial session required — please sign in again");
+    }
+    const { data } = await rfpCollab.trialSession();
+    if (data.user?.role !== "proposal_manager") {
+      throw new Error("Collaboration PM account mismatch");
+    }
+    saveCollabSession(data.token, data.user);
+    return loadCollabSession();
+  }
+
   const existing = loadCollabSession();
   if (existing?.token && existing?.user?.role === "proposal_manager") {
     return existing;

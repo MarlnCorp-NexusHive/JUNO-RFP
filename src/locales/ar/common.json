@@ -734,7 +734,7 @@
     "title": "فرص العقود",
     "subtitle": "",
     "curatedFrom": "{{source}} · لقطة {{date}}",
-    "hourlyRefresh": "{{source}} · حُدّث {{time}} · يتجدد كل ساعة (بدون واجهة برمجة)",
+    "hourlyRefresh": "{{source}} · حُدّث {{time}} · يتجدد كل ساعة",
     "keyword": "كلمة مفتاحية",
     "keywordPlaceholder": "العنوان، رقم الإعلان، سيبراني، سحابة…",
     "naics": "NAICS",

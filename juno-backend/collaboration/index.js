@@ -1,5 +1,5 @@
 import { seedUsers } from "./seedData.js";
-import { setCollaborationOpenAI } from "./collaborationService.js";
+import { setCollaborationOpenAI, hydrateTrialUsersFromWorkspaces } from "./collaborationService.js";
 import {
   loadCollaborationState,
   registerCollaborationPersistOnExit,
@@ -12,6 +12,7 @@ import collaborationRouter from "./collaborationRoutes.js";
 export function initCollaboration(openai) {
   seedUsers();
   loadCollaborationState();
+  hydrateTrialUsersFromWorkspaces();
   setCollaborationOpenAI(openai);
   registerCollaborationPersistOnExit();
 }

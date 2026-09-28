@@ -16,6 +16,7 @@ function persistNow() {
     const payload = {
       version: 1,
       savedAt: new Date().toISOString(),
+      users: Object.fromEntries(store.usersById),
       workspaces: Object.fromEntries(store.workspaces),
       questions: Object.fromEntries(store.questions),
       messages: store.messages,
@@ -57,6 +58,14 @@ export function loadCollaborationState() {
     store.questions = new Map(Object.entries(raw.questions || {}));
     store.messages = Array.isArray(raw.messages) ? raw.messages : [];
     store.logs = Array.isArray(raw.logs) ? raw.logs : [];
+
+    // Restore users (esp. trial PMs) so tokens survive restarts
+    const users = raw.users && typeof raw.users === "object" ? raw.users : {};
+    for (const u of Object.values(users)) {
+      if (!u?.id || !u?.email) continue;
+      store.usersById.set(u.id, u);
+      store.usersByEmail.set(String(u.email).toLowerCase(), u.id);
+    }
 
     const qbw = raw.quarterlyByWorkspace || {};
     store.quarterlyByWorkspace = new Map(

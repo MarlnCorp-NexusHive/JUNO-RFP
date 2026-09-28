@@ -204,6 +204,7 @@ async function messageFromApiError(error) {
 export default function ProposalManagerWorkspace() {
   const t = useTrialCollabT();
   const navigate = useNavigate();
+  const isTrial = isTrialUserSession();
   const { issuer, linkFromIntelligence, clearLink } = useProposalIssuer();
   const [issuerBrief, setIssuerBrief] = useState("");
   const [companyQuery, setCompanyQuery] = useState("");
@@ -416,7 +417,7 @@ export default function ProposalManagerWorkspace() {
   };
 
   const currentDocs =
-    selectedFolderId === null
+    isTrial || selectedFolderId === null
       ? documents
       : documents.filter((d) => d.folderId === selectedFolderId);
   const rootFolders = folders.filter((f) => !f.parentId);
@@ -1180,8 +1181,9 @@ export default function ProposalManagerWorkspace() {
           )}
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Folders */}
+        <div className={`grid grid-cols-1 gap-6 ${isTrial ? "" : "lg:grid-cols-3"}`}>
+          {/* Folders — demo only; trial uses a flat document list */}
+          {!isTrial && (
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1245,9 +1247,10 @@ export default function ProposalManagerWorkspace() {
               ))}
             </ul>
           </section>
+          )}
 
           {/* Upload + Document list */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`space-y-4 ${isTrial ? "" : "lg:col-span-2"}`}>
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <FiUpload className="text-indigo-500" /> {t("proposalManagerWorkspace.uploadDocument")}

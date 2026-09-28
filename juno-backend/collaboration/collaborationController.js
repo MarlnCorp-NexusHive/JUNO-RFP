@@ -11,6 +11,19 @@ export async function login(req, res) {
   }
 }
 
+/** Trial tenants: isolated collab PM (not shared jordan@juno). Requires trial Bearer. */
+export function trialSession(req, res) {
+  try {
+    const out = svc.ensureTrialProposalManager({
+      tenantId: req.tenantId,
+      name: req.trialUser?.name,
+    });
+    res.json(out);
+  } catch (e) {
+    svc.handleServiceError(res, e);
+  }
+}
+
 export function listAuditors(req, res) {
   try {
     res.json({ auditors: svc.listAuditors() });

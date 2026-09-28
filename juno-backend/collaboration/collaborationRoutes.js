@@ -1,11 +1,14 @@
 import { Router } from "express";
 import * as ctrl from "./collaborationController.js";
 import { requireAuth, requireRoles, requireAuditorSelfOrPm } from "./authMiddleware.js";
+import { requireTrialAuth } from "../trial/authMiddleware.js";
 
 const router = Router();
 
 /** Public */
 router.post("/auth/login", ctrl.login);
+/** Trial-only: tenant-scoped PM session (blank slate, not shared demo account) */
+router.post("/auth/trial-session", requireTrialAuth, ctrl.trialSession);
 
 /** Authenticated */
 router.use(requireAuth);

@@ -734,7 +734,7 @@
     "title": "Contract Opportunities",
     "subtitle": "",
     "curatedFrom": "{{source}} · snapshot {{date}}",
-    "hourlyRefresh": "{{source}} · refreshed {{time}} · updates hourly (no API)",
+    "hourlyRefresh": "{{source}} · refreshed {{time}} · updates hourly",
     "keyword": "Keyword",
     "keywordPlaceholder": "Title, notice ID, cyber, cloud…",
     "naics": "NAICS",

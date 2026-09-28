@@ -52,14 +52,8 @@ export default function RfpCollaborationPmHub() {
         setBootstrapping(false);
         return;
       }
-      const existing = loadCollabSession();
-      if (existing?.user?.role === "proposal_manager") {
-        setSession(existing);
-        await refresh();
-        setBootstrapping(false);
-        return;
-      }
       try {
+        // Trial: always go through ensure (swaps off shared jordan → tenant PM)
         const s = await ensureProposalManagerCollabSession();
         if (!cancelled && s) {
           setSession(s);
@@ -169,6 +163,56 @@ export default function RfpCollaborationPmHub() {
   }
 
   if (!session?.token || session.user?.role !== "proposal_manager") {
+    // Trial: never show demo jordan@juno / pm123 login — retry auto-connect instead
+    if (isTrialUserSession()) {
+      return (
+        <div className="max-w-md mx-auto mt-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            {t("rfpCollaboration.pmHubTitle")}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {loginError
+              ? loginError
+              : t(
+                  "rfpCollaboration.trialConnectHint",
+                  "Connecting your Team Collab workspace…",
+                )}
+          </p>
+          <button
+            type="button"
+            disabled={busy || bootstrapping}
+            onClick={async () => {
+              setLoginError("");
+              setBusy(true);
+              setBootstrapping(true);
+              try {
+                const s = await ensureProposalManagerCollabSession();
+                if (s) {
+                  setSession(s);
+                  await refresh();
+                } else {
+                  setLoginError(
+                    t(
+                      "rfpCollaboration.trialConnectFailed",
+                      "Could not connect Team Collab. Refresh the page or sign in again.",
+                    ),
+                  );
+                }
+              } catch (err) {
+                setLoginError(err?.response?.data?.error || err.message);
+              } finally {
+                setBusy(false);
+                setBootstrapping(false);
+              }
+            }}
+            className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium disabled:opacity-50"
+          >
+            {busy ? t("rfpCollaboration.signingIn") : t("rfpCollaboration.retryConnect", "Retry connect")}
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-md mx-auto mt-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">

@@ -179,45 +179,93 @@ export default function DirectorUserManagement() {
 
   const roles = isPM ? ["Proposal Manager", "Capture Manager", "Proposal Writer", "Technical Lead", "Pricing Lead", "Compliance Specialist"] : ["director", "dean", "hod", "team", "employee", "admin"];
 
-  // Demo data for user metrics using translation keys
-  const userMetrics = [
-    {
-      id: 1,
-      titleKey: 'metrics.totalUsers',
-      value: '245',
-      change: '+12',
-      trend: 'up',
-      icon: FiUsers,
-      color: 'blue'
-    },
-    {
-      id: 2,
-      titleKey: 'metrics.activeUsers',
-      value: '230',
-      change: '+8',
-      trend: 'up',
-      icon: FiUserCheck,
-      color: 'green'
-    },
-    {
-      id: 3,
-      titleKey: 'metrics.newUsers',
-      value: '15',
-      change: '+5',
-      trend: 'up',
-      icon: FiUserPlus,
-      color: 'purple'
-    },
-    {
-      id: 4,
-      titleKey: 'metrics.avgActivity',
-      value: '85%',
-      change: '+2%',
-      trend: 'up',
-      icon: FiTrendingUp,
-      color: 'orange'
-    }
-  ];
+  const isUserActive = (u) => {
+    const key = String(u?.statusKey || u?.status || "").toLowerCase();
+    return key.includes("active") && !key.includes("inactive");
+  };
+  const trialTotalUsers = users.length;
+  const trialActiveUsers = users.filter(isUserActive).length;
+  const trialNewUsers = 0;
+  const trialAvgActivity = trialTotalUsers > 0 ? "—" : "0%";
+
+  // Demo data for user metrics using translation keys (trial derives from live user list)
+  const userMetrics = isTrialPm
+    ? [
+        {
+          id: 1,
+          titleKey: "metrics.totalUsers",
+          value: String(trialTotalUsers),
+          change: "—",
+          trend: "flat",
+          icon: FiUsers,
+          color: "blue",
+        },
+        {
+          id: 2,
+          titleKey: "metrics.activeUsers",
+          value: String(trialActiveUsers),
+          change: "—",
+          trend: "flat",
+          icon: FiUserCheck,
+          color: "green",
+        },
+        {
+          id: 3,
+          titleKey: "metrics.newUsers",
+          value: String(trialNewUsers),
+          change: "—",
+          trend: "flat",
+          icon: FiUserPlus,
+          color: "purple",
+        },
+        {
+          id: 4,
+          titleKey: "metrics.avgActivity",
+          value: trialAvgActivity,
+          change: "—",
+          trend: "flat",
+          icon: FiTrendingUp,
+          color: "orange",
+        },
+      ]
+    : [
+        {
+          id: 1,
+          titleKey: "metrics.totalUsers",
+          value: "245",
+          change: "+12",
+          trend: "up",
+          icon: FiUsers,
+          color: "blue",
+        },
+        {
+          id: 2,
+          titleKey: "metrics.activeUsers",
+          value: "230",
+          change: "+8",
+          trend: "up",
+          icon: FiUserCheck,
+          color: "green",
+        },
+        {
+          id: 3,
+          titleKey: "metrics.newUsers",
+          value: "15",
+          change: "+5",
+          trend: "up",
+          icon: FiUserPlus,
+          color: "purple",
+        },
+        {
+          id: 4,
+          titleKey: "metrics.avgActivity",
+          value: "85%",
+          change: "+2%",
+          trend: "up",
+          icon: FiTrendingUp,
+          color: "orange",
+        },
+      ];
 
   const getStatusColor = (status) => {
     switch(status) {
@@ -319,11 +367,15 @@ export default function DirectorUserManagement() {
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <div className="text-sm text-gray-500 dark:text-gray-400">{t('userManagement.metrics.totalUsers')}</div>
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">245</div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {isTrialPm ? trialTotalUsers : 245}
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-500 dark:text-gray-400">{t('userManagement.userStatuses.active')}</div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">230</div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {isTrialPm ? trialActiveUsers : 230}
+                </div>
               </div>
             </div>
           </div>
