@@ -60,13 +60,19 @@ router.post("/signup", async (req, res) => {
       confirmToken: result.confirmToken,
     });
 
+    const joined = Boolean(result.joinedExisting);
     return res.status(201).json({
       ok: true,
       message: delivery.emailed
-        ? "Check your email to confirm your account before signing in."
-        : "Account created. Email is not configured on this server — use the confirmation link returned (dev mode).",
+        ? joined
+          ? "Joined your company trial. Check your email to confirm before signing in."
+          : "Check your email to confirm your account before signing in."
+        : joined
+          ? "Joined your company trial. Email is not configured — use the confirmation link returned (dev mode)."
+          : "Account created. Email is not configured on this server — use the confirmation link returned (dev mode).",
       user: result.user,
       tenant: publicTenant(result.tenant),
+      joinedExisting: joined,
       emailSent: delivery.emailed,
       // Only expose confirm URL when Resend is not configured (local/dev).
       confirmUrl: delivery.confirmUrl,
@@ -77,6 +83,8 @@ router.post("/signup", async (req, res) => {
     const status =
       code === "email_taken"
         ? 409
+        : code === "trial_expired" || code === "tenant_disabled"
+          ? 403
         : code === "missing_name" ||
             code === "missing_company" ||
             code === "invalid_email" ||

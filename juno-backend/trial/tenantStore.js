@@ -189,6 +189,56 @@ export function slugifyTenantId(name) {
   return `t_${base}_${crypto.randomBytes(3).toString("hex")}`;
 }
 
+/** Case/space-insensitive company match so teammates land on one tenant. */
+export function normalizeCompanyName(name) {
+  return String(name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+/**
+ * Canonical org key for tenant joining.
+ * WBEC variants (WBEC, WBEC Pacific, WBEC North, WBEC-Pacific, etc.) share one tenant.
+ */
+export function companyGroupKey(name) {
+  const n = normalizeCompanyName(name);
+  if (!n) return "";
+  const compact = n.replace(/[\s\-_.']/g, "");
+
+  // Known trial org: WBEC (any regional / legal suffix)
+  if (
+    compact === "wbec" ||
+    compact.startsWith("wbecpacific") ||
+    compact.startsWith("wbecnorth") ||
+    compact.startsWith("wbecsouth") ||
+    compact.startsWith("wbeceast") ||
+    compact.startsWith("wbecwest") ||
+    /^wbec(inc|llc|corp|corporation|co|company)?$/.test(compact) ||
+    /^wbec\b/.test(n)
+  ) {
+    return "org:wbec";
+  }
+
+  return `name:${n}`;
+}
+
+export function findTenantByCompanyName(companyName, db = null) {
+  const store = db || loadTrialDb();
+  const groupKey = companyGroupKey(companyName);
+  if (!groupKey) return null;
+  return (
+    (store.tenants || []).find((t) => companyGroupKey(t.name) === groupKey) || null
+  );
+}
+
+/** Preferred display name when creating the first tenant for a known org group. */
+export function canonicalCompanyDisplayName(companyName) {
+  const group = companyGroupKey(companyName);
+  if (group === "org:wbec") return "WBEC Pacific";
+  return String(companyName || "").trim();
+}
+
 export function createTrialTenant({
   companyName,
   email,
@@ -210,24 +260,38 @@ export function createTrialTenant({
   const now = new Date();
   const days = Number(trialDays) > 0 ? Number(trialDays) : DEFAULT_TRIAL_DAYS;
   const ends = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-  const tenantId = slugifyTenantId(companyName);
   const { salt, hash } = hashPassword(password);
 
-  const tenant = {
-    id: tenantId,
-    name: String(companyName).trim(),
-    status: "active",
-    trialDays: days,
-    trialStartsAt: now.toISOString(),
-    trialEndsAt: ends.toISOString(),
-    aiDailyLimit: Number(aiDailyLimit) || 80,
-    aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
-    createdAt: now.toISOString(),
-  };
+  let tenant = findTenantByCompanyName(companyName, db);
+  let joinedExisting = false;
+  if (tenant) {
+    const status = getTenantStatus(tenant);
+    if (tenant.status === "revoked" || tenant.status === "disabled") {
+      throw new Error("This company trial has been disabled");
+    }
+    if (!status.ok && status.code === "trial_expired") {
+      throw new Error("This company trial has expired");
+    }
+    joinedExisting = true;
+  } else {
+    const displayName = canonicalCompanyDisplayName(companyName);
+    tenant = {
+      id: slugifyTenantId(displayName),
+      name: displayName,
+      status: "active",
+      trialDays: days,
+      trialStartsAt: now.toISOString(),
+      trialEndsAt: ends.toISOString(),
+      aiDailyLimit: Number(aiDailyLimit) || 80,
+      aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
+      createdAt: now.toISOString(),
+    };
+    db.tenants.push(tenant);
+  }
 
   const user = {
     id: `u_${crypto.randomBytes(6).toString("hex")}`,
-    tenantId,
+    tenantId: tenant.id,
     email: emailNorm,
     name: String(contactName || emailNorm.split("@")[0]).trim(),
     passwordSalt: salt,
@@ -238,12 +302,16 @@ export function createTrialTenant({
     createdAt: now.toISOString(),
   };
 
-  db.tenants.push(tenant);
   db.users.push(user);
-  if (!db.usage[tenantId]) db.usage[tenantId] = {};
+  if (!db.usage[tenant.id]) db.usage[tenant.id] = {};
   saveTrialDb(db);
 
-  return { tenant, user: publicUser(user), temporaryPassword: String(password) };
+  return {
+    tenant,
+    user: publicUser(user),
+    temporaryPassword: String(password),
+    joinedExisting,
+  };
 }
 
 export function publicUser(user) {
@@ -367,25 +435,44 @@ export function registerTrialSignup({
 
   const now = new Date();
   const days = Number(trialDays) > 0 ? Number(trialDays) : DEFAULT_TRIAL_DAYS;
-  const tenantId = slugifyTenantId(company);
   const { salt, hash } = hashPassword(password);
 
-  const tenant = {
-    id: tenantId,
-    name: company,
-    status: "pending_verification",
-    // Clock starts when email is confirmed (see confirmTrialEmail / login fallback).
-    trialDays: days,
-    trialStartsAt: null,
-    trialEndsAt: null,
-    aiDailyLimit: Number(aiDailyLimit) || 80,
-    aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
-    createdAt: now.toISOString(),
-  };
+  // Same company name → same tenant so teammates share dashboards / uploads / feature data.
+  let tenant = findTenantByCompanyName(company, db);
+  let joinedExisting = false;
+  if (tenant) {
+    if (tenant.status === "revoked" || tenant.status === "disabled") {
+      const err = new Error("This company trial has been disabled");
+      err.code = "tenant_disabled";
+      throw err;
+    }
+    const status = getTenantStatus(tenant);
+    if (!status.ok && status.code === "trial_expired") {
+      const err = new Error("This company trial has expired");
+      err.code = "trial_expired";
+      throw err;
+    }
+    joinedExisting = true;
+  } else {
+    const displayName = canonicalCompanyDisplayName(company);
+    tenant = {
+      id: slugifyTenantId(displayName),
+      name: displayName,
+      status: "pending_verification",
+      // Clock starts when email is confirmed (see confirmTrialEmail / login fallback).
+      trialDays: days,
+      trialStartsAt: null,
+      trialEndsAt: null,
+      aiDailyLimit: Number(aiDailyLimit) || 80,
+      aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
+      createdAt: now.toISOString(),
+    };
+    db.tenants.push(tenant);
+  }
 
   const user = {
     id: `u_${crypto.randomBytes(6).toString("hex")}`,
-    tenantId,
+    tenantId: tenant.id,
     email: emailNorm,
     name,
     passwordSalt: salt,
@@ -399,18 +486,17 @@ export function registerTrialSignup({
   const confirmToken = crypto.randomBytes(32).toString("hex");
   const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-  db.tenants.push(tenant);
   db.users.push(user);
   if (!db.emailTokens) db.emailTokens = [];
   db.emailTokens.push({
     token: confirmToken,
     userId: user.id,
-    tenantId,
+    tenantId: tenant.id,
     purpose: "email_confirm",
     expiresAt: confirmExpiresAt,
     createdAt: now.toISOString(),
   });
-  if (!db.usage[tenantId]) db.usage[tenantId] = {};
+  if (!db.usage[tenant.id]) db.usage[tenant.id] = {};
   saveTrialDb(db);
 
   return {
@@ -419,6 +505,7 @@ export function registerTrialSignup({
     confirmToken,
     confirmExpiresAt,
     refreshed: false,
+    joinedExisting,
   };
 }
 
