@@ -5,7 +5,7 @@ import { useLocalization } from "../../hooks/useLocalization";
 import { rfpAuditorFeatures } from "./rfpAuditorFeatures.js";
 import { ensureRbacAuditorCollabSession } from "./rfpCollabSession.js";
 import { FiRefreshCw } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
+import { useTrialCollabT } from "./useTrialCollabT.js";
 import { TourProvider } from "../../components/tours/TourContext";
 import TourOverlay from "../../components/tours/TourOverlay";
 
@@ -19,7 +19,7 @@ function readRbacUser() {
 
 export default function RfpAuditorRbacLayout() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   const { isRTLMode } = useLocalization();
   const [expanded, setExpanded] = useState(false);
   const [collabReady, setCollabReady] = useState(false);

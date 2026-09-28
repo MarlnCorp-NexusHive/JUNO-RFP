@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiLogOut, FiRefreshCw } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
 import { rfpCollab } from "../../services/rfpCollabApi.js";
 import {
   clearCollabSession,
@@ -10,6 +9,7 @@ import {
   saveCollabSession,
 } from "./rfpCollabSession.js";
 import { getRfpAuditorBasePath } from "./rfpAuditorPaths.js";
+import { useTrialCollabT } from "./useTrialCollabT.js";
 
 const STATUS_KEYS = {
   unassigned: "rfpCollaboration.status.unassigned",
@@ -22,7 +22,7 @@ const STATUS_KEYS = {
 };
 
 export default function RfpAuditorHome() {
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   const base = getRfpAuditorBasePath();
   const [session, setSession] = useState(() => loadCollabSession());
   const [email, setEmail] = useState("aiyana@juno");

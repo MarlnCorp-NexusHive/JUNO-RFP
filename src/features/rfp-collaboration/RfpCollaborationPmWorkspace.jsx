@@ -10,13 +10,13 @@ import {
   FiX,
   FiZap,
 } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
 import { rfpCollab } from "../../services/rfpCollabApi.js";
 import {
   ensureProposalManagerCollabSession,
   isMainAppProposalManager,
   loadCollabSession,
 } from "./rfpCollabSession.js";
+import { useTrialCollabT } from "./useTrialCollabT.js";
 
 const STATUS_KEYS = {
   unassigned: "rfpCollaboration.status.unassigned",
@@ -36,7 +36,7 @@ const QR_LABELS = {
 
 export default function RfpCollaborationPmWorkspace() {
   const { workspaceId } = useParams();
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   const [session, setSession] = useState(() => loadCollabSession());
   const [bootstrapping, setBootstrapping] = useState(() => {
     if (loadCollabSession()?.user?.role === "proposal_manager") return false;

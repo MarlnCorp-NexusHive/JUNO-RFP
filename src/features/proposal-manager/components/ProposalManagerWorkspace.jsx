@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useTrialCollabT } from "../../rfp-collaboration/useTrialCollabT.js";
 import {
   getFolders,
   saveFolders,
@@ -200,7 +200,7 @@ async function messageFromApiError(error) {
 }
 
 export default function ProposalManagerWorkspace() {
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   const navigate = useNavigate();
   const { issuer, linkFromIntelligence, clearLink } = useProposalIssuer();
   const [issuerBrief, setIssuerBrief] = useState("");

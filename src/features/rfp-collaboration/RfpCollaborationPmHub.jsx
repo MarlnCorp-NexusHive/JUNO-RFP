@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiPlus, FiRefreshCw, FiUsers } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
 import { rfpCollab } from "../../services/rfpCollabApi.js";
 import { structureRfpRequirementsWithAi } from "../../services/api.js";
 import {
@@ -10,9 +9,10 @@ import {
   loadCollabSession,
   saveCollabSession,
 } from "./rfpCollabSession.js";
+import { useTrialCollabT } from "./useTrialCollabT.js";
 
 export default function RfpCollaborationPmHub() {
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   const navigate = useNavigate();
   const [session, setSession] = useState(() => loadCollabSession());
   const [bootstrapping, setBootstrapping] = useState(() => {

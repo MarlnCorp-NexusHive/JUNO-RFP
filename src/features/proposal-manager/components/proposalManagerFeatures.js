@@ -1,6 +1,7 @@
 export const proposalManagerFeatures = [
   { label: "director.dashboard", icon: "📊", route: "/rbac/proposal-manager", description: "Performance Overview, KPI Summary, Alerts & Notices" },
   { label: "proposalManager.grants", icon: "🏛️", route: "/rbac/proposal-manager/grants", description: "Federal Grants.gov (live) + private foundations (live IRS/ProPublica) + state/local-eligible Grants.gov + SAM.gov contracts (curated)" },
+  { label: "director.workspace", icon: "📁", route: "/rbac/proposal-manager/workspace", description: "Workspace and tasks" },
   { label: "proposalManager.companyIntelligence", icon: "🌐", route: "/rbac/proposal-manager/company-intelligence", description: "RFP issuer financials, trends, and customers from public sources" },
   { label: "proposalManager.competitiveIntelligence", icon: "🎯", route: "/rbac/proposal-manager/competitive-intelligence", description: "Look up any competitor or compare curated peers — datasheets and differentiators" },
   { label: "proposalManager.sourceDocs", icon: "📄", route: "/rbac/proposal-manager/source-docs", description: "Source documents and reference materials" },
@@ -18,7 +19,6 @@ export const proposalManagerFeatures = [
   { label: "proposalManager.compliance", icon: "🕵️", route: "/rbac/proposal-manager/compliance", description: "Audit, Compliance, Legal Docs" },
   { label: "proposalManager.meetingsCalendar", icon: "🗓️", route: "/rbac/proposal-manager/meetings-calendar", description: "Scheduler, Minutes, Events" },
   { label: "director.userManagement", icon: "👤", route: "/rbac/proposal-manager/user-management", description: "Roles, Permissions, Admin Controls" },
-  { label: "director.workspace", icon: "📁", route: "/rbac/proposal-manager/workspace", description: "Workspace and tasks" },
   { label: "director.helpSupport", icon: "🆘", route: "/rbac/proposal-manager/help-support", description: "Technical Support, Handbook" },
   { label: "director.settings", icon: "⚙️", route: "/rbac/proposal-manager/settings", description: "Profile, Branding, Notifications" },
 ];

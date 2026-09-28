@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useTrialCollabT } from "./useTrialCollabT.js";
 
 export default function RfpAuditorShell() {
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   return (
     <div className="min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-4 py-3 flex flex-wrap items-center justify-between gap-2">

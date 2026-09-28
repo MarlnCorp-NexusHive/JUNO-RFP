@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FiArrowLeft, FiRefreshCw, FiSend, FiZap } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
 import { rfpCollab } from "../../services/rfpCollabApi.js";
 import { loadCollabSession } from "./rfpCollabSession.js";
 import { getRfpAuditorBasePath } from "./rfpAuditorPaths.js";
+import { useTrialCollabT } from "./useTrialCollabT.js";
 
 const STATUS_KEYS = {
   unassigned: "rfpCollaboration.status.unassigned",
@@ -24,7 +24,7 @@ const QR_LABELS = {
 
 export default function RfpAuditorQuestion() {
   const { workspaceId, questionId } = useParams();
-  const { t } = useTranslation();
+  const t = useTrialCollabT();
   const base = getRfpAuditorBasePath();
   const session = loadCollabSession();
   const token = session?.token;
