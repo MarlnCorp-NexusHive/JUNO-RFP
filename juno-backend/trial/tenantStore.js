@@ -138,9 +138,31 @@ export function loadTrialDb() {
 export function saveTrialDb(db) {
   const dataPath = getTrialDataPath();
   ensureDir();
+  const payload = JSON.stringify(db, null, 2);
   const tmp = `${dataPath}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2), "utf8");
+  const fd = fs.openSync(tmp, "w");
+  try {
+    fs.writeFileSync(fd, payload, "utf8");
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
   fs.renameSync(tmp, dataPath);
+  // Best-effort directory fsync so the rename itself survives a sudden restart.
+  try {
+    const dirFd = fs.openSync(path.dirname(dataPath), "r");
+    try {
+      fs.fsyncSync(dirFd);
+    } finally {
+      fs.closeSync(dirFd);
+    }
+  } catch {
+    // Some environments disallow directory fsync; file write already succeeded.
+  }
+  const bytes = Buffer.byteLength(payload, "utf8");
+  console.log(
+    `[trial] saved ${db.tenants?.length || 0} tenant(s), ${db.users?.length || 0} user(s) → ${dataPath} (${bytes} bytes)`,
+  );
 }
 
 export function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -662,4 +684,49 @@ export function changeUserPassword(userId, currentPassword, newPassword, { keepT
 
 export function dataFilePath() {
   return getTrialDataPath();
+}
+
+/** Safe diagnostics for Render disk debugging (no secrets / passwords). */
+export function getTrialStorageStatus() {
+  const dataPath = getTrialDataPath();
+  const dir = path.dirname(dataPath);
+  const fromEnv = Boolean(
+    String(process.env.TRIAL_DATA_PATH || process.env.JUNO_TRIAL_DATA_PATH || process.env.TRIAL_DATA_DIR || "").trim(),
+  );
+  let exists = false;
+  let bytes = 0;
+  let tenants = 0;
+  let users = 0;
+  let mtime = null;
+  try {
+    if (fs.existsSync(dataPath)) {
+      exists = true;
+      const st = fs.statSync(dataPath);
+      bytes = st.size;
+      mtime = st.mtime.toISOString();
+      const db = loadTrialDb();
+      tenants = db.tenants?.length || 0;
+      users = db.users?.length || 0;
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      dataPath,
+      dir,
+      fromEnv,
+      error: err.message,
+    };
+  }
+  return {
+    ok: true,
+    dataPath,
+    dir,
+    fromEnv,
+    fileExists: exists,
+    bytes,
+    mtime,
+    tenants,
+    users,
+    render: Boolean(process.env.RENDER),
+  };
 }

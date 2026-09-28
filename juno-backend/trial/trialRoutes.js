@@ -13,6 +13,7 @@ import {
   findTenantById,
   findUserByEmail,
   getTenantStatus,
+  getTrialStorageStatus,
   getUsageSnapshot,
   publicTenant,
   publicUser,
@@ -220,6 +221,11 @@ router.get("/me", (req, res) => {
     tenant: publicTenant(req.trialTenantFull),
     usage: getUsageSnapshot(req.trialTenantFull),
   });
+});
+
+/** Public disk/path diagnostics — no passwords or tokens. */
+router.get("/storage-status", (_req, res) => {
+  return res.json(getTrialStorageStatus());
 });
 
 router.post("/logout", (req, res) => {
