@@ -317,6 +317,17 @@ export const resendTrialConfirmation = async ({ email, password }) => {
   return res.data;
 };
 
+/** Trial feature blobs (workspace, scoring, etc.) — requires Bearer trial token */
+export {
+  fetchTrialFeature,
+  saveTrialFeature,
+  resetTrialFeature,
+  loadTrialFeatureData,
+  persistTrialFeatureData,
+  canUseTrialFeatures,
+  TRIAL_FEATURE_KEYS,
+} from "./trialFeatureApi.js";
+
 /* ================= RFP DOCUMENT ================= */
 export const generateRfpDocument = async (payload) => {
   const res = await API.post("/generate-rfp-document", payload, {

@@ -4,6 +4,8 @@
  */
 
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
+import { isTrialMode } from "../../../services/trialAuthSession.js";
+import { persistTrialFeatureData, canUseTrialFeatures, loadTrialFeatureData } from "../../../services/trialFeatureApi.js";
 
 const KEYS = {
   ASSETS: "proposal_manager_tech_solution_assets",
@@ -129,11 +131,24 @@ function save(key, data) {
   } catch (e) {
     console.warn("technicalSolutioningStorage save failed", key, e);
   }
+  if (canUseTrialFeatures()) {
+    const snapshot = {
+      assets: key === KEYS.ASSETS ? data : load(KEYS.ASSETS, []),
+      patterns: key === KEYS.PATTERNS ? data : load(KEYS.PATTERNS, []),
+      designs: key === KEYS.DESIGNS ? data : load(KEYS.DESIGNS, []),
+      settings: key === KEYS.SETTINGS ? data : load(KEYS.SETTINGS, {}),
+    };
+    persistTrialFeatureData("techSolutioning", snapshot);
+  }
 }
 
 export function getReferenceAssets() {
   const existing = load(KEYS.ASSETS, []);
   if (!Array.isArray(existing) || existing.length === 0) {
+    if (isTrialMode()) {
+      save(KEYS.ASSETS, []);
+      return [];
+    }
     save(KEYS.ASSETS, DEMO_REFERENCE_ASSETS);
     return [...DEMO_REFERENCE_ASSETS];
   }
@@ -225,4 +240,26 @@ export function designToContentHubEntries(design) {
   }
 
   return entries;
+}
+
+export async function hydrateTechSolutioningFromBackend() {
+  if (!canUseTrialFeatures()) return;
+  const data = await loadTrialFeatureData("techSolutioning", {
+    assets: [],
+    patterns: null,
+    designs: [],
+    settings: {},
+  });
+  if (Array.isArray(data?.assets)) {
+    localStorage.setItem(scopedStorageKey(KEYS.ASSETS), JSON.stringify(data.assets));
+  }
+  if (data?.patterns != null) {
+    localStorage.setItem(scopedStorageKey(KEYS.PATTERNS), JSON.stringify(data.patterns));
+  }
+  if (Array.isArray(data?.designs)) {
+    localStorage.setItem(scopedStorageKey(KEYS.DESIGNS), JSON.stringify(data.designs));
+  }
+  if (data?.settings && typeof data.settings === "object") {
+    localStorage.setItem(scopedStorageKey(KEYS.SETTINGS), JSON.stringify(data.settings));
+  }
 }

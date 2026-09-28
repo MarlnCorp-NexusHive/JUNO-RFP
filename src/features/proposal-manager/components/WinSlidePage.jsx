@@ -1,19 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiDownload, FiLayout } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { generateSlideDeck } from "../../../services/api.js";
 import { COMPETITORS } from "../data/competitiveIntelligenceSamples";
 import { buildWinSlideDeckContent, defaultWinSlideFromPursuit } from "../data/winSlideTemplates";
-import { getWinLossRecords } from "../services/winLossStorage";
-import { loadWinSlideDraft, saveWinSlideDraft } from "../services/winSlideStorage";
+import { getWinLossRecords, hydrateWinLossFromBackend } from "../services/winLossStorage";
+import { loadWinSlideDraft, saveWinSlideDraft, hydrateWinSlideFromBackend } from "../services/winSlideStorage";
 import { useProposalIssuer } from "./ProposalIssuerContext";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 export default function WinSlidePage() {
   const { t } = useTranslation("common");
   const { isRTLMode } = useLocalization();
   const { issuer } = useProposalIssuer();
-  const pursuits = useMemo(() => getWinLossRecords(), []);
+  const [pursuits, setPursuits] = useState(() => getWinLossRecords());
   const draft = loadWinSlideDraft();
 
   const [pursuitId, setPursuitId] = useState(draft?.pursuitId || pursuits[0]?.id || "");
@@ -26,6 +27,27 @@ export default function WinSlidePage() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
   const [seeded, setSeeded] = useState(!!draft?.pov);
+
+  useEffect(() => {
+    if (!isTrialUserSession()) return undefined;
+    let cancelled = false;
+    (async () => {
+      await hydrateWinLossFromBackend();
+      const nextDraft = await hydrateWinSlideFromBackend();
+      if (cancelled) return;
+      const nextPursuits = getWinLossRecords();
+      setPursuits(nextPursuits);
+      if (nextDraft?.pursuitId) setPursuitId(nextDraft.pursuitId);
+      if (nextDraft?.pov) setPov(nextDraft.pov);
+      if (nextDraft?.testing) setTesting(nextDraft.testing);
+      if (nextDraft?.whyUs) setWhyUs(nextDraft.whyUs);
+      if (nextDraft?.whyThem) setWhyThem(nextDraft.whyThem);
+      if (nextDraft?.pov) setSeeded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const pursuit = pursuits.find((p) => p.id === pursuitId) || null;
   const selectedCompetitors = COMPETITORS.filter((c) => competitorIds.includes(c.id));

@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { attachTrialContext, meterTrialAi } from "./authMiddleware.js";
 import trialRoutes from "./trialRoutes.js";
+import featureRoutes from "./featureRoutes.js";
+import { getFeaturesStoragePath } from "./featureStore.js";
 import { getTrialDataPath, loadTrialDb, migrateTrialDurationsOnBoot } from "./tenantStore.js";
 
 /** AI / generative routes that should count against trial quotas when a trial token is present. */
@@ -122,6 +124,7 @@ export function registerTrialSystem(app) {
 
   app.use(attachTrialContext);
   app.use("/trial/auth", trialRoutes);
+  app.use("/trial/features", featureRoutes);
 
   app.use((req, res, next) => {
     if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return next();
@@ -132,4 +135,5 @@ export function registerTrialSystem(app) {
   console.log(
     "Trial tenancy API: /trial/auth/login, /signup, /confirm, /resend-confirmation, /me, /logout, /change-password",
   );
+  console.log(`Trial feature store: ${getFeaturesStoragePath()} (GET/PUT/DELETE /trial/features/:key)`);
 }

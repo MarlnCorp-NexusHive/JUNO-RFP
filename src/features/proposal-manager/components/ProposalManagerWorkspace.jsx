@@ -14,7 +14,9 @@ import {
   appendExtractedQAs,
   replaceExtractedQAsInContentHub,
   ensureBoilerplateLibrary,
+  hydrateWorkspaceFromBackend,
 } from "../services/proposalManagerStorage";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
 import {
@@ -267,6 +269,21 @@ export default function ProposalManagerWorkspace() {
     return getFolders();
   });
   const [documents, setDocuments] = useState(getDocuments);
+
+  useEffect(() => {
+    if (!isTrialUserSession()) return undefined;
+    let cancelled = false;
+    (async () => {
+      await hydrateWorkspaceFromBackend();
+      if (cancelled) return;
+      setFolders(getFolders());
+      setDocuments(getDocuments());
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [documentTypeId, setDocumentTypeId] = useState("solicitation");
   const [uploading, setUploading] = useState(false);

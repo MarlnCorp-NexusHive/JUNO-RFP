@@ -6,12 +6,14 @@ import {
   updateContentHubQA,
   deleteContentHubQA,
   ensureBoilerplateLibrary,
+  hydrateWorkspaceFromBackend,
 } from "../services/proposalManagerStorage";
 import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload, FiSearch } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { useTranslation } from "react-i18next";
 import { generateAnswer, askWithContext, generateCompanyProfile, generateSlideDeck, generateWorkDocument } from "../../../services/api.js";
 import { extractFromFile } from "../services/extractFromDocument.js";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 const MIN_SLIDE_CONTENT_CHARS = 120;
 const MIN_WORK_DOC_CHARS = 80;
@@ -87,10 +89,19 @@ export default function ProposalManagerContentHub() {
   };
 
   useEffect(() => {
-    if (location.pathname.includes("content-hub")) {
-      ensureBoilerplateLibrary();
-      setQas(getContentHubQAs());
-    }
+    if (!location.pathname.includes("content-hub")) return undefined;
+    let cancelled = false;
+    (async () => {
+      if (isTrialUserSession()) {
+        await hydrateWorkspaceFromBackend();
+      } else {
+        ensureBoilerplateLibrary();
+      }
+      if (!cancelled) setQas(getContentHubQAs());
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [location.pathname]);
 
   const filteredQAs = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -32,12 +32,14 @@ import {
   getSettings,
   saveSettings,
   designToContentHubEntries,
+  hydrateTechSolutioningFromBackend,
 } from "../services/technicalSolutioningStorage";
 import {
   extractTechnicalReferencePatterns,
   generateTechnicalSolutionDesign,
 } from "../../../services/api.js";
 import SolutionArchitectureDiagram from "./solutioning/SolutionArchitectureDiagram";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 const STEPS = ["library", "requirements", "blueprint"];
 
@@ -69,6 +71,23 @@ export default function TechnicalSolutioningPage() {
   const [selectedAssetIds, setSelectedAssetIds] = useState(() =>
     getReferenceAssets().slice(0, 3).map((a) => a.id),
   );
+
+  useEffect(() => {
+    if (!isTrialUserSession()) return undefined;
+    let cancelled = false;
+    (async () => {
+      await hydrateTechSolutioningFromBackend();
+      if (cancelled) return;
+      const nextAssets = getReferenceAssets();
+      setAssets(nextAssets);
+      setPatterns(getIndexedPatterns());
+      setSettingsState(getSettings());
+      setSelectedAssetIds(nextAssets.slice(0, 3).map((a) => a.id));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const workspaceDocs = useMemo(() => getDocuments().filter((d) => d.rawText?.length > 100), []);
   const [selectedDocId, setSelectedDocId] = useState(settings.selectedWorkspaceDocId || workspaceDocs[0]?.id || "");

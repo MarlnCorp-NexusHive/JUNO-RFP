@@ -9,7 +9,7 @@ import {
   loadCollabSession,
   saveCollabSession,
 } from "./rfpCollabSession.js";
-import { useTrialCollabT } from "./useTrialCollabT.js";
+import { useTrialCollabT, isTrialUserSession } from "./useTrialCollabT.js";
 
 export default function RfpCollaborationPmHub() {
   const t = useTrialCollabT();
@@ -20,8 +20,8 @@ export default function RfpCollaborationPmHub() {
     if (s?.user?.role === "proposal_manager") return false;
     return isMainAppProposalManager();
   });
-  const [email, setEmail] = useState("jordan@juno");
-  const [password, setPassword] = useState("pm123");
+  const [email, setEmail] = useState(() => (isTrialUserSession() ? "" : "jordan@juno"));
+  const [password, setPassword] = useState(() => (isTrialUserSession() ? "" : "pm123"));
   const [loginError, setLoginError] = useState("");
   const [busy, setBusy] = useState(false);
   const [workspaces, setWorkspaces] = useState([]);

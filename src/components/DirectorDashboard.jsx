@@ -29,6 +29,10 @@ import {
   getPastPerformanceScore,
   buildComplianceAlerts,
 } from "../features/proposal-manager/services/complianceStore.js";
+import {
+  subscribeTeam,
+  listAssignments,
+} from "../features/proposal-manager/services/teamStore.js";
 
 function isTrialUserSession() {
   const session = getTrialSession();
@@ -353,6 +357,39 @@ const revenueFromWinsData = [
   { month: 'May', Revenue: 490000, Pending: 210000 },
   { month: 'Jun', Revenue: 580000, Pending: 260000 },
 ];
+
+/** Empty shells for trial dashboard clean slate (no demo series). */
+const EMPTY_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+const emptyRollingWinRate = EMPTY_MONTHS.map((month) => ({
+  month,
+  "FAR Part 15 (Best Value)": 0,
+  "FAR Part 15 (LPTA)": 0,
+  "FAR Part 16 (Task Orders)": 0,
+  "Sole Source": 0,
+  "Full & Open": 0,
+}));
+const emptyWinRateVsLeadTime = [
+  { winRate: 0, label: "0–30 days" },
+  { winRate: 0, label: "31–60 days" },
+  { winRate: 0, label: "61–90 days" },
+  { winRate: 0, label: "91–180 days" },
+];
+const emptyProposalQuality = [
+  { dept: "Core Evaluation Intelligence", KPI: 0 },
+  { dept: "Risk & Compliance", KPI: 0 },
+  { dept: "Competitive", KPI: 0 },
+  { dept: "Weakness & Debrief", KPI: 0 },
+  { dept: "Operational Quality", KPI: 0 },
+  { dept: "Financial & RO", KPI: 0 },
+];
+const emptySectionM = [
+  { period: "—", competitiveIntelligence: 0, competitiveDifferentiation: 0, incumbentAdvantage: 0, priceTechnical: 0, bidDensity: 0, agencyWinPattern: 0, discriminatorStrength: 0 },
+];
+const emptyRiskCompliance = [{ name: "—", score: 0 }];
+const emptySubmissionForecast = EMPTY_MONTHS.map((month) => ({ month, Actual: null, Forecast: null }));
+const emptyWinProbabilityTrend = EMPTY_MONTHS.map((month) => ({ month, Rate: null }));
+const emptyRevenueFromWins = EMPTY_MONTHS.map((month) => ({ month, Revenue: 0, Pending: 0 }));
+
 const winValueByVehicleData = [
   { vehicle: 'FAR 15 Best Value', Revenue: 1.2, Projected: 1.4 },
   { vehicle: 'FAR 15 LPTA', Revenue: 0.9, Projected: 1.0 },
@@ -399,6 +436,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const [modalChart, setModalChart] = useState(null);
   const [shortlistItems, setShortlistItems] = useState(() => listShortlist());
   const [complianceData, setComplianceData] = useState(() => getComplianceData());
+  const [assignmentItems, setAssignmentItems] = useState(() => listAssignments());
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
   const pmText = (en, ar) => (isArabic ? ar : en);
   const pmLabel = (text) => {
@@ -529,7 +567,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   ];
 
   // Proposal Manager dashboard: RFP-focused summary cards; Director: translated summary cards
-  const proposalManagerSummaryCards = [
+  const proposalManagerSummaryCardsBase = [
     { label: pmText("Active RFPs/Grant in Pipeline", "طلبات العروض/المنح النشطة في خط الأنابيب"), value: 18, formatType: "number", icon: "📋", color: "from-blue-400 to-blue-600", trend: "", trendColor: "", sub: pmText("In progress", "قيد التنفيذ"), spark: [12, 14, 15, 16, 17, 18], sparkColor: { light: "#3b82f6", dark: "#fff" } },
     { label: pmText("Total Pipeline Value ($)", "إجمالي قيمة خط الأنابيب ($)"), value: 8450000, formatType: "currency", icon: "💰", color: "from-green-400 to-green-600", trend: "", trendColor: "", sub: pmText("Combined opportunity value", "القيمة الإجمالية للفرص"), spark: [6200000, 6800000, 7200000, 7800000, 8100000, 8450000], sparkColor: { light: "#22c55e", dark: "#fff" } },
     { label: pmText("Average Deal Size", "متوسط حجم الصفقة"), value: 425000, formatType: "currency", icon: "📊", color: "from-purple-400 to-purple-600", trend: "", trendColor: "", sub: pmText("Per RFP", "لكل طلب عروض"), spark: [380000, 392000, 398000, 405000, 412000, 425000], sparkColor: { light: "#a78bfa", dark: "#fff" } },
@@ -545,12 +583,22 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: t('dashboard.summaryCards.vehiclesRunning'), value: 42, icon: "🚌", color: "from-green-400 to-green-600", trend: "", trendColor: "", sub: t('dashboard.summaryCards.routesActive'), spark: [40, 41, 43, 44, 43, 42], sparkColor: { light: "#22c55e", dark: "#fff" } },
     { label: t('dashboard.summaryCards.upcomingEvents'), value: 7, icon: "📅", color: "from-orange-400 to-orange-600", trend: "", trendColor: "", sub: t('dashboard.summaryCards.next7Days'), spark: [3, 4, 5, 6, 7, 7], sparkColor: { light: "#fb923c", dark: "#fff" } },
   ];
-  const summaryCards = basePath === "/app" ? proposalManagerSummaryCards : directorSummaryCards;
 
   // Generate translated alerts: Proposal Manager = RFP/bid/compliance alerts; Director = budget/compliance/HR
   const isPM = basePath === "/app";
   const isTrialPm = isPM && isTrialUserSession();
   const hideAiRevenueSection = isTrialPm;
+
+  const trialEmptySub = t("dashboard.trialEmpty.noPipelineYet");
+  const proposalManagerSummaryCards = isTrialPm
+    ? proposalManagerSummaryCardsBase.map((card) => ({
+        ...card,
+        value: card.formatType === "ratio" ? 0 : 0,
+        spark: [],
+        sub: trialEmptySub,
+      }))
+    : proposalManagerSummaryCardsBase;
+  const summaryCards = basePath === "/app" ? proposalManagerSummaryCards : directorSummaryCards;
 
   const farFlag = getFarRiskFlag(complianceData);
   const farFlagLabel =
@@ -564,14 +612,26 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   const proposalManagerKpis = isTrialPm
     ? proposalManagerKpisBase.map((kpi, idx) => {
-        if (idx === 2) return { ...kpi, value: getComplianceScore(complianceData) };
-        if (idx === 3) return { ...kpi, value: getUnaddressedClauseCount(complianceData) };
-        if (idx === 4) return { ...kpi, value: farFlagLabel };
-        if (idx === 5) return { ...kpi, value: getPastPerformanceScore(complianceData) };
-        return kpi;
+        if (idx === 0) return { ...kpi, value: "—", spark: undefined };
+        if (idx === 1) return { ...kpi, value: 0, spark: undefined };
+        if (idx === 2) return { ...kpi, value: getComplianceScore(complianceData), spark: undefined };
+        if (idx === 3) return { ...kpi, value: getUnaddressedClauseCount(complianceData), spark: undefined };
+        if (idx === 4) return { ...kpi, value: farFlagLabel, spark: undefined };
+        if (idx === 5) return { ...kpi, value: getPastPerformanceScore(complianceData), spark: undefined };
+        return { ...kpi, spark: undefined };
       })
     : proposalManagerKpisBase;
   const kpis = basePath === "/app" ? proposalManagerKpis : directorKpis;
+
+  // Chart datasets: demo numbers for demos; empty shells for trial
+  const trialRollingWinRate = isTrialPm ? emptyRollingWinRate : rollingWinRateByProcurement;
+  const trialWinRateVsLead = isTrialPm ? emptyWinRateVsLeadTime : winRateVsLeadTimeData;
+  const trialProposalQuality = isTrialPm ? emptyProposalQuality : proposalQualityIntelligenceData;
+  const trialSectionM = isTrialPm ? emptySectionM : sectionMScoringData;
+  const trialRiskCompliance = isTrialPm ? emptyRiskCompliance : riskComplianceIntelligenceData;
+  const trialSubmissionForecast = isTrialPm ? emptySubmissionForecast : proposalSubmissionForecast;
+  const trialWinProbabilityTrend = isTrialPm ? emptyWinProbabilityTrend : proposalWinProbabilityTrend;
+  const trialRevenueFromWins = isTrialPm ? emptyRevenueFromWins : revenueFromWinsData;
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
@@ -585,22 +645,20 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     return subscribeCompliance(setComplianceData);
   }, [isTrialPm]);
 
-  const staticPmAlerts = isTrialPm
-    ? [
-        { text: t('dashboard.alerts.proposalManager.rfpSubmissionDeadline'), color: 'text-red-500' },
-        { text: t('dashboard.alerts.proposalManager.bidApprovalPending'), color: 'text-blue-500' },
-        { text: t('dashboard.alerts.proposalManager.teamAssignmentNeeded'), color: 'text-indigo-500' },
-        { text: t('dashboard.alerts.proposalManager.pastPerformanceUpdate'), color: 'text-purple-500' },
-        { text: t('dashboard.alerts.proposalManager.pricingReviewRequired'), color: 'text-green-600 dark:text-green-400' },
-      ]
-    : [
-        { text: t('dashboard.alerts.proposalManager.rfpSubmissionDeadline'), color: 'text-red-500' },
-        { text: t('dashboard.alerts.proposalManager.complianceReviewDue'), color: 'text-amber-500' },
-        { text: t('dashboard.alerts.proposalManager.bidApprovalPending'), color: 'text-blue-500' },
-        { text: t('dashboard.alerts.proposalManager.teamAssignmentNeeded'), color: 'text-indigo-500' },
-        { text: t('dashboard.alerts.proposalManager.pastPerformanceUpdate'), color: 'text-purple-500' },
-        { text: t('dashboard.alerts.proposalManager.pricingReviewRequired'), color: 'text-green-600 dark:text-green-400' },
-      ];
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    setAssignmentItems(listAssignments());
+    return subscribeTeam((data) => setAssignmentItems(data.assignments || []));
+  }, [isTrialPm]);
+
+  const staticPmAlerts = [
+    { text: t('dashboard.alerts.proposalManager.rfpSubmissionDeadline'), color: 'text-red-500' },
+    { text: t('dashboard.alerts.proposalManager.complianceReviewDue'), color: 'text-amber-500' },
+    { text: t('dashboard.alerts.proposalManager.bidApprovalPending'), color: 'text-blue-500' },
+    { text: t('dashboard.alerts.proposalManager.teamAssignmentNeeded'), color: 'text-indigo-500' },
+    { text: t('dashboard.alerts.proposalManager.pastPerformanceUpdate'), color: 'text-purple-500' },
+    { text: t('dashboard.alerts.proposalManager.pricingReviewRequired'), color: 'text-green-600 dark:text-green-400' },
+  ];
   const shortlistAlerts = isTrialPm
     ? shortlistItems.map((item) => {
         const days = daysUntilDeadline(item.deadline);
@@ -620,9 +678,31 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         };
       })
     : [];
+  const assignmentAlerts = isTrialPm
+    ? assignmentItems.map((item) => {
+        const days = daysUntilDeadline(item.deadline);
+        const daysPart =
+          days == null
+            ? ""
+            : days < 0
+              ? ` (${t("dashboard.alerts.proposalManager.shortlistPastDue")})`
+              : ` (${t("dashboard.alerts.proposalManager.shortlistDaysLeft", { count: days })})`;
+        return {
+          text: t("dashboard.alerts.proposalManager.assignmentDeadline", {
+            date: item.deadline,
+            title: item.task,
+            assignee: item.assigned || "",
+            daysPart,
+          }),
+          color: urgencyAlertColor(days),
+        };
+      })
+    : [];
   const complianceAlerts = isTrialPm ? buildComplianceAlerts(complianceData, t) : [];
   const alerts = isPM
-    ? [...shortlistAlerts, ...complianceAlerts, ...staticPmAlerts]
+    ? isTrialPm
+      ? [...shortlistAlerts, ...assignmentAlerts, ...complianceAlerts]
+      : [...shortlistAlerts, ...staticPmAlerts]
     : [
         { icon: '🚨', text: t('dashboard.alerts.pendingBudgetApprovals'), color: 'text-red-500' },
         { icon: '⚠️', text: t('dashboard.alerts.complianceAlert'), color: 'text-yellow-500' },
@@ -1060,7 +1140,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             </div>
                             <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                   <span>{t('dashboard.aiLabels.interactiveBarChart')}</span>
-                  <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                 </div>
           </div>
         </div>
@@ -1247,6 +1326,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 )}
               </div>
               {/* Mini sparkline */}
+              {Array.isArray(card.spark) && card.spark.length > 0 && (
               <div className="absolute bottom-2 right-2 w-16 h-6 opacity-90 pointer-events-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={card.spark.map((v, idx) => ({ idx, v }))} margin={{ top: 6, right: 0, left: 0, bottom: 0 }}>
@@ -1278,6 +1358,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              )}
               <span className="text-xs opacity-80 mt-1 z-10 break-words">{card.sub}</span>
             </motion.div>
           ))}
@@ -1374,12 +1455,18 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           </div>
           <div className="w-full">
             <div className="w-full rounded-2xl shadow-lg p-6 flex flex-col gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
-              {alerts.map((alert, idx) => (
+              {alerts.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
+                  {t("dashboard.trialEmpty.noAlerts")}
+                </p>
+              ) : (
+                alerts.map((alert, idx) => (
                 <div key={idx} className={`flex items-center gap-3 font-medium ${alert.color}`}>
                   <span className="shrink-0 w-6 text-gray-600 dark:text-gray-400 font-semibold">{idx + 1}.</span>
                   <span>{alert.text}</span>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -1406,8 +1493,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <>
                 <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Rolling Win Rate by Procurement Type", "معدل الفوز المتحرك حسب نوع الشراء")}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Trailing 12 months — win rate %", "آخر 12 شهراً — نسبة معدل الفوز %")}</p>
+                {isTrialPm && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.trialEmpty.chartsFillIn")}</p>
+                )}
                 <ResponsiveContainer width="100%" height={280}>
-                  <AreaChart data={rollingWinRateByProcurement} margin={{ top: 12, right: 24, left: 0, bottom: 0 }}>
+                  <AreaChart data={trialRollingWinRate} margin={{ top: 12, right: 24, left: 0, bottom: 0 }}>
                     <defs>
                       {WIN_RATE_KEYS.map((key, idx) => (
                         <linearGradient key={key} id={WIN_RATE_GRADIENT_IDS[idx]} x1="0" y1="0" x2="0" y2="1">
@@ -1459,7 +1549,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Win Rate vs Capture Lead Time", "معدل الفوز مقابل مدة الالتقاط")}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Win rate % by proposal lead time (days)", "نسبة الفوز حسب مدة تجهيز العرض (بالأيام)")}</p>
                 <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={winRateVsLeadTimeData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <LineChart data={trialWinRateVsLead} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="label" tick={{ fontSize: 11 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 60]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
@@ -1503,7 +1593,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         >
           <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/app" ? pmText("Proposal Quality Intelligence", "ذكاء جودة العروض") : t('dashboard.charts.departmentPerformance')}</h3>
           <ResponsiveContainer width="100%" height={basePath === "/app" ? 300 : 220}>
-            <BarChart data={basePath === "/app" ? proposalQualityIntelligenceData : deptPerformance} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+            <BarChart data={basePath === "/app" ? trialProposalQuality : deptPerformance} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="dept" tick={{ fontSize: 12 }} tickFormatter={basePath === "/app" ? pmGraphLabel : undefined} />
               <YAxis />
@@ -1534,7 +1624,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/app" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : t('dashboard.charts.enrollmentGraduation')}</h3>
               <ResponsiveContainer width="100%" height={basePath === "/app" ? 340 : 180}>
                 {basePath === "/app" ? (
-                  <LineChart data={sectionMScoringData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <LineChart data={trialSectionM} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="period" tick={{ fontSize: 11 }} />
                     <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}`} />
@@ -1582,7 +1672,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 w-full">
               <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Risk & Compliance — Tracked Metrics", "المخاطر والامتثال — المؤشرات المتتبعة")}</h3>
               <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={riskComplianceIntelligenceData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <BarChart data={trialRiskCompliance} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 100]} />
@@ -1754,7 +1844,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             </section>
             )}
 
-            {/* Competitive Intelligence (Positioning & Win Probability) */}
+            {!isTrialPm && (
+            /* Competitive Intelligence (Positioning & Win Probability) — demo PM only */
             <section className="mt-8" data-tour-position="bottom">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-bold tracking-wide">{pmText("Competitive Intelligence (Positioning & Win Probability)", "الذكاء التنافسي (التموضع واحتمالية الفوز)")}</h2>
@@ -1786,6 +1877,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 </div>
               </div>
             </section>
+            )}
           </>
         )}
 
@@ -1845,7 +1937,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
                   <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('recruitment')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                     <ResponsiveContainer width="100%" height={140}>
-                      <LineChart data={proposalSubmissionForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <LineChart data={trialSubmissionForecast} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis />
@@ -1862,16 +1954,25 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
+                        {isTrialPm ? (
+                          t("dashboard.trialEmpty.forecastsAppear")
+                        ) : (
+                          <>
                         <span className="font-bold text-green-600 dark:text-green-400">~10-11</span> {pmText("submissions next month", "تقديمات الشهر القادم")}; <span className="text-xs">(+15%)</span>.<br />
                         {pmText("Highest volume", "الأعلى حجماً")}: <span className="font-semibold">FAR 15 Best Value, FAR 16 Task</span>.
+                          </>
+                        )}
                       </div>
+                      {!isTrialPm && (
+                      <>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">89%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Pipeline Stage, Due Dates, Capture Lead Time", "مرحلة خط الأنابيب، تواريخ الاستحقاق، مهلة الالتقاط")}</span></div>
                       <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{pmText("What-if: +2 capture staff -> +1.2 submissions/month", "ماذا لو: +2 من فريق الالتقاط -> +1.2 تقديم/شهر")}</div>
+                      </>
+                      )}
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
-                      <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
+                      <span>{t('dashboard.aiLabels.lastUpdated')}: {isTrialPm ? "—" : "2h ago"}</span>
                     </div>
                   </div>
                 </div>
@@ -1907,7 +2008,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -1941,7 +2041,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -1953,12 +2052,12 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
                   <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('leadConversion')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                     <ResponsiveContainer width="100%" height={140}>
-                      <LineChart data={proposalWinProbabilityTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <LineChart data={trialWinProbabilityTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
-                        <YAxis domain={[25, 40]} tickFormatter={v => `${v}%`} />
+                        <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} />
                         <Tooltip formatter={v => `${v}%`} labelFormatter={(label) => pmGraphLabel(label)} />
-                        <Line type="monotone" dataKey="Rate" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="Rate" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -1969,16 +2068,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        {pmText("Weighted win rate trending to", "اتجاه معدل الفوز الموزون نحو")} <span className="font-bold text-green-600 dark:text-green-400">~35%</span> (+2%).<br />
-                        {pmText("Strongest", "الأقوى")}: <span className="font-semibold">Sole Source, FAR 16 Task</span>.
+                        {t("dashboard.trialEmpty.forecastsAppear")}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">90%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Past Performance, Price Position, Technical Score", "الأداء السابق، تموضع السعر، الدرجة الفنية")}</span></div>
-                      <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{pmText("What-if: +5% technical score -> +1.5% win rate", "ماذا لو: +5% في الدرجة الفنية -> +1.5% معدل فوز")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
-                      <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
+                      <span>{t('dashboard.aiLabels.lastUpdated')}: —</span>
                     </div>
                   </div>
                 </div>
@@ -1986,7 +2080,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
                   <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('applicationFee')} title={t('dashboard.aiLabels.clickToEnlarge')}>
                     <ResponsiveContainer width="100%" height={140}>
-                      <BarChart data={revenueFromWinsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <BarChart data={trialRevenueFromWins} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
@@ -2003,16 +2097,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-xs text-green-700 dark:text-green-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
                       </div>
                       <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
-                        {pmText("YTD revenue from won proposals", "إيرادات السنة حتى الآن من العروض الفائزة")}: <span className="font-bold text-blue-600 dark:text-blue-400">~$2.93M</span>.<br />
-                        {pmText("Pending (award not yet funded)", "معلّق (ترسية غير ممولة بعد)")}: <span className="font-semibold">~$1.28M</span>.
+                        {t("dashboard.trialEmpty.forecastsAppear")}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">91%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Win Rate, Contract Value, Award Timing", "معدل الفوز، قيمة العقد، توقيت الترسية")}</span></div>
-                      <div className="text-xs text-green-600 dark:text-green-300 mb-1">{pmText("What-if: +2 wins/month -> +$0.4M revenue", "ماذا لو: +2 فوز/شهر -> +$0.4M إيرادات")}</div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
-                      <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
+                      <span>{t('dashboard.aiLabels.lastUpdated')}: —</span>
                     </div>
                   </div>
                 </div>
@@ -2050,7 +2139,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2084,7 +2172,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2117,7 +2204,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2158,7 +2244,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2193,7 +2278,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2228,7 +2312,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2264,7 +2347,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2299,7 +2381,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                       <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -2341,7 +2422,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                   <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
-                  <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                 </div>
               </div>
             </div>
@@ -2396,7 +2476,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2430,7 +2509,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2464,7 +2542,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2498,7 +2575,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2533,7 +2609,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.interactiveRadar')}</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2567,7 +2642,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2603,7 +2677,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2638,7 +2711,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2673,7 +2745,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.interactiveRadar')}</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2707,7 +2778,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.interactiveRadar')}</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2742,7 +2812,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 3h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>
@@ -2778,7 +2847,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
                     <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
-                    <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
                   </div>
                 </div>
               </div>

@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiAward, FiDownload, FiPlus, FiTrash2, FiUpload } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { parseScoringText, PRODUCT_AREAS, rollupRoadmap } from "../data/winLossSamples";
-import { getWinLossRecords, upsertWinLossRecord } from "../services/winLossStorage";
+import { getWinLossRecords, upsertWinLossRecord, hydrateWinLossFromBackend } from "../services/winLossStorage";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 function emptyRecord() {
   return {
@@ -35,6 +36,20 @@ export default function WinLossScoringPage() {
   const [gapDraft, setGapDraft] = useState({ title: "", productArea: "content", severity: "high", description: "" });
   const [showCreate, setShowCreate] = useState(false);
   const [createName, setCreateName] = useState("");
+
+  useEffect(() => {
+    if (!isTrialUserSession()) return undefined;
+    let cancelled = false;
+    (async () => {
+      const next = await hydrateWinLossFromBackend();
+      if (cancelled) return;
+      setRecords(next);
+      setSelectedId(next[0]?.id || null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const selected = records.find((r) => r.id === selectedId) || null;
   const filtered = records.filter((r) => (filter === "all" ? true : r.outcome === filter));

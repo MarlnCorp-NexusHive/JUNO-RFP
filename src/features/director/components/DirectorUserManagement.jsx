@@ -32,11 +32,14 @@ import {
   FiTarget,
   FiZap
 } from "react-icons/fi";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { loadTrialFeatureData, persistTrialFeatureData, canUseTrialFeatures } from "../../../services/trialFeatureApi.js";
 
 
 export default function DirectorUserManagement() {
   const location = useLocation();
   const isPM = location.pathname.includes("/app/user-management");
+  const isTrialPm = isPM && isTrialUserSession();
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -114,9 +117,29 @@ export default function DirectorUserManagement() {
     { id: 4, nameKey: "demoUsers.sarahWilson", roleKey: "roles.faculty", departmentKey: "departments.computer", statusKey: "userStatuses.active", email: "sarah.wilson@company.com", lastLogin: "2026-09-11", avatar: "SW", permissions: 6, joinDate: "2026-09-15" },
     { id: 5, nameKey: "demoUsers.davidBrown", roleKey: "roles.student", departmentKey: "departments.engineering", statusKey: "userStatuses.active", email: "david.brown@company.com", lastLogin: "2026-09-12", avatar: "DB", permissions: 3, joinDate: "2026-09-01" },
   ];
-  const initialUsers = isPM ? pmInitialUsers : directorInitialUsers;
+  const initialUsers = isTrialPm ? [] : isPM ? pmInitialUsers : directorInitialUsers;
   const [users, setUsers] = useState(initialUsers);
-  React.useEffect(() => { setUsers(initialUsers); }, [isPM]);
+  React.useEffect(() => {
+    if (!isTrialPm) {
+      setUsers(initialUsers);
+      return undefined;
+    }
+    let cancelled = false;
+    (async () => {
+      const data = await loadTrialFeatureData("userManagement", { users: [] });
+      if (cancelled) return;
+      setUsers(Array.isArray(data?.users) ? data.users : []);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isPM, isTrialPm]);
+
+  React.useEffect(() => {
+    if (!isTrialPm || !canUseTrialFeatures()) return;
+    persistTrialFeatureData("userManagement", { users });
+  }, [users, isTrialPm]);
+
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [newUser, setNewUser] = useState({
     displayName: "",
@@ -443,6 +466,11 @@ export default function DirectorUserManagement() {
           </div>
           
           <div className="space-y-4">
+            {filteredUsers.length === 0 && isTrialPm && (
+              <p className="col-span-full text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+                {pmText("No users yet. Add your first team member to manage roles and access.")}
+              </p>
+            )}
             {filteredUsers.map((u, idx) => (
               <div key={idx} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">

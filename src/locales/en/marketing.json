@@ -1219,6 +1219,15 @@
       "skills": "Skills",
       "currentProjects": "Current Projects"
     },
+    "trialEmpty": {
+      "noMembers": "No team members yet. Add your first member to build the roster.",
+      "noAssignments": "No assignments yet. Add a task with a deadline to see it on Alerts and Calendar.",
+      "addAssignment": "Add assignment",
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel",
+      "actions": "Actions"
+    },
     "status": {
       "active": "Active",
       "onLeave": "On Leave",

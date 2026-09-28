@@ -24,11 +24,23 @@ import {
   FiClock,
   FiCheckCircle,
   FiStar,
-  FiFileText
+  FiFileText,
+  FiTrash2
 } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useLocalization } from "../../../hooks/useLocalization";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import {
+  getTeamData,
+  subscribeTeam,
+  addTeamMember,
+  updateTeamMember,
+  addTeamTraining,
+  removeTeamTraining,
+  addTeamAssignment,
+  updateTeamAssignment,
+  removeTeamAssignment,
+} from "../../proposal-manager/services/teamStore.js";
 // Proposal Manager team roles (Team Structure & Hierarchy)
 const PROPOSAL_MANAGER_ROLES = [
   "Capture Manager",
@@ -159,26 +171,14 @@ export default function MarketingHeadTeamManagement() {
     setLanguageVersion(prev => prev + 1);
   }, [i18n.language]);
 
-  useEffect(() => {
-    if (location.pathname.includes('/app/team')) {
-      setMembers(isTrialUserSession() ? [] : proposalManagerInitialMembers);
+  const user = JSON.parse(localStorage.getItem('rbac_current_user') || "null");
+  const [members, setMembers] = useState(() => {
+    if (location.pathname.includes("/app/team") && isTrialUserSession()) {
+      return getTeamData().members;
     }
-  }, [location.pathname]);
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
-        <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{isArabic ? "جارٍ التحميل..." : "Loading..."}</h1>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
-  const [members, setMembers] = useState(initialTeamMembers);
+    if (location.pathname.includes("/app/team")) return proposalManagerInitialMembers;
+    return initialTeamMembers;
+  });
   const [selectedMember, setSelectedMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -186,8 +186,31 @@ export default function MarketingHeadTeamManagement() {
   const [activeTab, setActiveTab] = useState('overview');
   const [trainingPerfStatus, setTrainingPerfStatus] = useState("certified");
   const [newTrainingTitle, setNewTrainingTitle] = useState("");
-  /** Trial starts empty — users add their own trainings/certs. */
-  const [customTrainings, setCustomTrainings] = useState([]);
+  const [customTrainings, setCustomTrainings] = useState(() =>
+    isTrialUserSession() && location.pathname.includes("/app/team") ? getTeamData().trainings : [],
+  );
+  const [assignments, setAssignments] = useState(() =>
+    isTrialUserSession() && location.pathname.includes("/app/team") ? getTeamData().assignments : [],
+  );
+  const [showAssignmentForm, setShowAssignmentForm] = useState(false);
+  const [editingAssignmentId, setEditingAssignmentId] = useState(null);
+  const [assignmentForm, setAssignmentForm] = useState({
+    task: "",
+    assigned: "",
+    status: "pending",
+    progress: "0",
+    deadline: new Date().toISOString().slice(0, 10),
+  });
+  const [newMember, setNewMember] = useState({
+    name: "",
+    role: "Digital Marketer",
+    email: "",
+    phone: "",
+    skills: "",
+    projects: "",
+    status: "Active",
+    permissions: [],
+  });
   const TRAINING_PERF_OPTIONS = [
     { id: "certified", label: "Certified" },
     { id: "in_performance", label: "In performance" },
@@ -204,39 +227,74 @@ export default function MarketingHeadTeamManagement() {
     { id: "full_access", label: "Full access" },
   ];
 
+  useEffect(() => {
+    if (!isTrialPm) {
+      if (location.pathname.includes("/app/team")) {
+        setMembers(proposalManagerInitialMembers);
+      }
+      return undefined;
+    }
+    const data = getTeamData();
+    setMembers(data.members);
+    setCustomTrainings(data.trainings);
+    setAssignments(data.assignments);
+    return subscribeTeam((next) => {
+      setMembers(next.members);
+      setCustomTrainings(next.trainings);
+      setAssignments(next.assignments);
+    });
+  }, [isTrialPm, location.pathname]);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+        <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{isArabic ? "جارٍ التحميل..." : "Loading..."}</h1>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const trialMetrics = [
+    { metric: "Team Members", target: Math.max(members.length, 1), achieved: members.length, icon: FiUsers, color: "blue" },
+    { metric: "Open Assignments", target: Math.max(assignments.filter((a) => a.status !== "completed").length, 1), achieved: assignments.filter((a) => a.status !== "completed").length, icon: FiClipboard, color: "green" },
+    { metric: "Completed", target: Math.max(assignments.length, 1), achieved: assignments.filter((a) => a.status === "completed").length, icon: FiCheckCircle, color: "purple" },
+    { metric: "Trainings Logged", target: Math.max(customTrainings.length, 1), achieved: customTrainings.length, icon: FiAward, color: "yellow" },
+  ];
+
   const toggleMemberPermission = (memberId, permId) => {
-    setMembers((prev) =>
-      prev.map((m) => {
+    setMembers((prev) => {
+      const next = prev.map((m) => {
         if (m.id !== memberId) return m;
         const current = new Set(m.permissions || []);
         if (current.has(permId)) current.delete(permId);
         else current.add(permId);
         return { ...m, permissions: [...current] };
-      }),
-    );
+      });
+      if (isTrialPm) {
+        const updated = next.find((m) => m.id === memberId);
+        if (updated) updateTeamMember(memberId, { permissions: updated.permissions });
+      }
+      return next;
+    });
   };
 
   const addCustomTraining = () => {
     const title = newTrainingTitle.trim();
     if (!title || !trainingPerfStatus) return;
-    setCustomTrainings((prev) => [
-      ...prev,
-      { id: `tr_${Date.now()}`, training: title, status: trainingPerfStatus },
-    ]);
+    if (isTrialPm) {
+      const data = addTeamTraining({ training: title, status: trainingPerfStatus });
+      setCustomTrainings(data.trainings);
+    } else {
+      setCustomTrainings((prev) => [
+        ...prev,
+        { id: `tr_${Date.now()}`, training: title, status: trainingPerfStatus },
+      ]);
+    }
     setNewTrainingTitle("");
   };
-
-  // Form state for new team member
-  const [newMember, setNewMember] = useState({
-    name: "",
-    role: "Digital Marketer",
-    email: "",
-    phone: "",
-    skills: "",
-    projects: "",
-    status: "Active",
-    permissions: [],
-  });
 
   const handleMemberClick = (member) => {
     setSelectedMember(member);
@@ -262,6 +320,21 @@ export default function MarketingHeadTeamManagement() {
     const name = newMember.name.trim();
     const email = newMember.email.trim();
     if (!name || !email) return;
+    if (isTrialPm) {
+      const data = addTeamMember({
+        name,
+        role: newMember.role.trim() || "Proposal Writer",
+        email,
+        phone: newMember.phone.trim() || "",
+        status: newMember.status,
+        skills: newMember.skills,
+        projects: newMember.projects,
+        permissions: [...(newMember.permissions || [])],
+      });
+      setMembers(data.members.map((m) => ({ ...m, avatar: m.avatar || "👤", performance: m.performance ?? 80 })));
+      setShowAddModal(false);
+      return;
+    }
     const nextId = members.reduce((max, m) => Math.max(max, Number(m.id) || 0), 0) + 1;
     const added = {
       id: nextId,
@@ -278,10 +351,48 @@ export default function MarketingHeadTeamManagement() {
       projects: newMember.projects
         ? newMember.projects.split(",").map((p) => p.trim()).filter(Boolean)
         : [],
-      permissions: isTrialPm ? [...(newMember.permissions || [])] : undefined,
+      permissions: undefined,
     };
     setMembers((prev) => [...prev, added]);
     setShowAddModal(false);
+  };
+
+  const openAssignmentForm = (existing = null) => {
+    if (existing) {
+      setEditingAssignmentId(existing.id);
+      setAssignmentForm({
+        task: existing.task || "",
+        assigned: existing.assigned || "",
+        status: existing.status || "pending",
+        progress: String(existing.progress || "0").replace("%", ""),
+        deadline: existing.deadline || new Date().toISOString().slice(0, 10),
+      });
+    } else {
+      setEditingAssignmentId(null);
+      setAssignmentForm({
+        task: "",
+        assigned: members[0]?.name || "",
+        status: "pending",
+        progress: "0",
+        deadline: new Date().toISOString().slice(0, 10),
+      });
+    }
+    setShowAssignmentForm(true);
+  };
+
+  const submitAssignment = (e) => {
+    e.preventDefault();
+    if (!isTrialPm) return;
+    if (!assignmentForm.task.trim() || !assignmentForm.deadline) return;
+    if (editingAssignmentId) {
+      const data = updateTeamAssignment(editingAssignmentId, assignmentForm);
+      setAssignments(data.assignments);
+    } else {
+      const result = addTeamAssignment(assignmentForm);
+      if (result.ok) setAssignments(result.data.assignments);
+    }
+    setShowAssignmentForm(false);
+    setEditingAssignmentId(null);
   };
 
   const StatusBadge = ({ status, children }) => {
@@ -445,7 +556,12 @@ export default function MarketingHeadTeamManagement() {
     {isProposalManagerTeam ? pmText('Proposal Team Metrics', 'مؤشرات فريق إعداد العروض') : t('team.sections.teamStructure.performanceOverview')}
   </h2>
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    {(isProposalManagerTeam ? proposalManagerMetrics : performanceMetrics).map((metric, index) => (
+    {(isTrialPm
+      ? trialMetrics
+      : isProposalManagerTeam
+        ? proposalManagerMetrics
+        : performanceMetrics
+    ).map((metric, index) => (
       <MetricCard
         key={index}
         title={pmTranslate(metric.metric)}
@@ -480,9 +596,11 @@ export default function MarketingHeadTeamManagement() {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {isProposalManagerTeam ? pmText('Proposal Team Structure', 'هيكل فريق إعداد العروض') : t('team.sections.teamStructure.title')}
                 </h2>
+                {!isTrialPm && (
                 <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded animate-pulse">
                   {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.teamStructure.aiSuggestion')}
                 </span>
+                )}
               </div>
               
               <div className="space-y-4">
@@ -491,7 +609,10 @@ export default function MarketingHeadTeamManagement() {
                     {isProposalManagerTeam ? pmText('By Role', 'حسب الدور') : t('team.sections.teamStructure.byRole')}
                   </h3>
                   <div className="space-y-2">
-                    {(() => {
+                    {members.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('team.trialEmpty.noMembers', 'No team members yet. Add your first member to build the roster.')}</p>
+                    ) : (
+                    (() => {
                       const byRole = members.reduce((acc, m) => {
                         acc[m.role] = acc[m.role] || [];
                         acc[m.role].push(m.name);
@@ -510,7 +631,8 @@ export default function MarketingHeadTeamManagement() {
                           </div>
                         </div>
                       ));
-                    })()}
+                    })()
+                    )}
                   </div>
                 </div>
                 
@@ -526,9 +648,11 @@ export default function MarketingHeadTeamManagement() {
                           : `${members[0].name} (Supervisor) → ${members.slice(1).map((m) => m.name).join(", ") || "—"}`
                         : "—"}
                     </div>
+                    {!isTrialPm && (
                     <div className="text-xs text-blue-600 animate-bounce">
                       {isProposalManagerTeam ? pmText('AI suggests balancing section ownership across writers.', 'يقترح الذكاء الاصطناعي موازنة ملكية الأقسام بين الكتّاب.') : t('team.sections.teamStructure.aiWorkloadSuggestion')}
                     </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -730,7 +854,20 @@ export default function MarketingHeadTeamManagement() {
                         className="flex items-center justify-between gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                       >
                         <span className="text-sm text-gray-700 dark:text-gray-300">{item.training}</span>
-                        <StatusBadge status={item.status}>{label}</StatusBadge>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <StatusBadge status={item.status}>{label}</StatusBadge>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const data = removeTeamTraining(item.id);
+                              setCustomTrainings(data.trainings);
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-600"
+                            aria-label="Delete"
+                          >
+                            <FiTrash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -807,17 +944,98 @@ export default function MarketingHeadTeamManagement() {
               data-tour-content-ar={isProposalManagerTeam ? "عيّن أقسام العرض، تتبع المسودات، ومواعيد المراجعة." : "قم بتعيين المهام وتتبع التقدم واعرض اقتراحات الذكاء الاصطناعي."}
               data-tour-position="bottom"
             >
-              <div className={`flex items-center gap-3 mb-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <FiClipboard className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <div className={`flex items-center justify-between gap-3 mb-6 flex-wrap ${isRTLMode ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center gap-3 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                    <FiClipboard className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {isProposalManagerTeam ? pmText('Section Assignments & Deadlines', 'تعيين الأقسام والمواعيد النهائية') : t('team.sections.taskAssignment.title')}
+                  </h2>
+                  {!isTrialPm && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded animate-pulse">
+                    {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.taskAssignment.aiSmartAssignment')}
+                  </span>
+                  )}
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {isProposalManagerTeam ? pmText('Section Assignments & Deadlines', 'تعيين الأقسام والمواعيد النهائية') : t('team.sections.taskAssignment.title')}
-                </h2>
-                <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded animate-pulse">
-                  {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.taskAssignment.aiSmartAssignment')}
-                </span>
+                {isTrialPm && (
+                  <button
+                    type="button"
+                    onClick={() => openAssignmentForm()}
+                    className="px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2"
+                  >
+                    <FiPlus className="w-4 h-4" />
+                    {t('team.trialEmpty.addAssignment', 'Add assignment')}
+                  </button>
+                )}
               </div>
+
+              {isTrialPm && showAssignmentForm && (
+                <form
+                  onSubmit={submitAssignment}
+                  className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600"
+                >
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                    placeholder={t('team.sections.taskAssignment.task')}
+                    value={assignmentForm.task}
+                    onChange={(e) => setAssignmentForm((f) => ({ ...f, task: e.target.value }))}
+                    required
+                  />
+                  <input
+                    list="trial-assignees"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                    placeholder={t('team.sections.taskAssignment.assignedTo')}
+                    value={assignmentForm.assigned}
+                    onChange={(e) => setAssignmentForm((f) => ({ ...f, assigned: e.target.value }))}
+                  />
+                  <datalist id="trial-assignees">
+                    {members.map((m) => (
+                      <option key={m.id} value={m.name} />
+                    ))}
+                  </datalist>
+                  <select
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                    value={assignmentForm.status}
+                    onChange={(e) => setAssignmentForm((f) => ({ ...f, status: e.target.value }))}
+                  >
+                    <option value="pending">{t('team.status.pending')}</option>
+                    <option value="inProgress">{t('team.status.inProgress')}</option>
+                    <option value="completed">{t('team.status.completed')}</option>
+                  </select>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                    placeholder={t('team.sections.taskAssignment.progress')}
+                    value={assignmentForm.progress}
+                    onChange={(e) => setAssignmentForm((f) => ({ ...f, progress: e.target.value }))}
+                  />
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+                    value={assignmentForm.deadline}
+                    onChange={(e) => setAssignmentForm((f) => ({ ...f, deadline: e.target.value }))}
+                    required
+                  />
+                  <div className="flex gap-2 lg:col-span-3">
+                    <button type="submit" className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm">
+                      {editingAssignmentId ? t('team.trialEmpty.save', 'Save') : t('team.trialEmpty.add', 'Add')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAssignmentForm(false);
+                        setEditingAssignmentId(null);
+                      }}
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-lg text-sm"
+                    >
+                      {t('team.trialEmpty.cancel', 'Cancel')}
+                    </button>
+                  </div>
+                </form>
+              )}
               
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -828,10 +1046,15 @@ export default function MarketingHeadTeamManagement() {
                       <th className="pb-2 font-medium text-gray-900 dark:text-white">{t('team.sections.taskAssignment.status')}</th>
                       <th className="pb-2 font-medium text-gray-900 dark:text-white">{t('team.sections.taskAssignment.progress')}</th>
                       <th className="pb-2 font-medium text-gray-900 dark:text-white">{t('team.sections.taskAssignment.deadline')}</th>
+                      {isTrialPm && (
+                        <th className="pb-2 font-medium text-gray-900 dark:text-white">{t('team.trialEmpty.actions', 'Actions')}</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {(isProposalManagerTeam
+                    {(isTrialPm
+                      ? assignments
+                      : isProposalManagerTeam
                       ? [
                           { task: "Technical volume draft – DoD IT Services", assigned: "Patricia Sullivan", status: "inProgress", progress: "65%", deadline: "2026-09-15" },
                           { task: "Past Performance section", assigned: "Jennifer Thompson", status: "inProgress", progress: "80%", deadline: "2026-09-12" },
@@ -844,7 +1067,7 @@ export default function MarketingHeadTeamManagement() {
                           { task: "Social Media Audit", assigned: "Khalid Al-Sayed", status: "completed", progress: "100%", deadline: "2026-10-30" }
                         ]
                     ).map((task, index) => (
-                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <tr key={task.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         <td className="py-3 text-gray-700 dark:text-gray-300">{pmTranslate(task.task)}</td>
                         <td className="py-3 text-gray-700 dark:text-gray-300">{task.assigned}</td>
                         <td className="py-3">
@@ -854,13 +1077,39 @@ export default function MarketingHeadTeamManagement() {
                         </td>
                         <td className="py-3 text-gray-700 dark:text-gray-300">{task.progress}</td>
                         <td className="py-3 text-gray-700 dark:text-gray-300">{task.deadline}</td>
+                        {isTrialPm && (
+                          <td className="py-3">
+                            <div className="flex gap-1">
+                              <button type="button" onClick={() => openAssignmentForm(task)} className="p-1 text-gray-400 hover:text-blue-600">
+                                <FiEdit className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const data = removeTeamAssignment(task.id);
+                                  setAssignments(data.assignments);
+                                }}
+                                className="p-1 text-gray-400 hover:text-red-600"
+                              >
+                                <FiTrash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                {isTrialPm && assignments.length === 0 && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
+                    {t('team.trialEmpty.noAssignments', 'No assignments yet. Add a task with a deadline to see it on Alerts and Calendar.')}
+                  </p>
+                )}
+                {!isTrialPm && (
                 <div className="mt-2 text-xs text-green-600 animate-bounce">
                   {isProposalManagerTeam ? pmText('AI suggests assigning Technical Lead for solution narrative.', 'يقترح الذكاء الاصطناعي إسناد السرد الفني إلى القائد الفني.') : t('team.sections.taskAssignment.aiAssignmentSuggestion')}
                 </div>
+                )}
               </div>
             </section>
 

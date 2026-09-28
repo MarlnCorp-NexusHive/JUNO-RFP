@@ -1,5 +1,7 @@
 import { WIN_LOSS_SAMPLES } from "../data/winLossSamples";
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
+import { isTrialMode } from "../../../services/trialAuthSession.js";
+import { persistTrialFeatureData, loadTrialFeatureData, canUseTrialFeatures } from "../../../services/trialFeatureApi.js";
 
 const KEY = "proposal_manager_win_loss_records";
 
@@ -18,14 +20,30 @@ function save(records) {
   } catch (e) {
     console.warn("winLossStorage save failed", e);
   }
+  if (canUseTrialFeatures()) {
+    persistTrialFeatureData("scoring", { records: Array.isArray(records) ? records : [] });
+  }
 }
 
 export function getWinLossRecords() {
   const records = load(null);
   if (!records || !Array.isArray(records) || records.length === 0) {
+    if (isTrialMode()) {
+      save([]);
+      return [];
+    }
     save(WIN_LOSS_SAMPLES);
     return WIN_LOSS_SAMPLES.map((r) => ({ ...r }));
   }
+  return records;
+}
+
+/** Hydrate trial scoring from backend (call on page mount). */
+export async function hydrateWinLossFromBackend() {
+  if (!canUseTrialFeatures()) return getWinLossRecords();
+  const data = await loadTrialFeatureData("scoring", { records: [] });
+  const records = Array.isArray(data?.records) ? data.records : [];
+  save(records);
   return records;
 }
 

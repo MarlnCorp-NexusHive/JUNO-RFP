@@ -5,6 +5,7 @@ import { FiTarget } from 'react-icons/fi';
 import MarketingReplySuggestions from './ai/MarketingReplySuggestions';
 import { useTranslation } from 'react-i18next';
 import { FiMail, FiMessageCircle, FiPhone, FiUsers, FiBell, FiCalendar, FiZap, FiFileText, FiSend, FiUser, FiChevronRight, FiSearch, FiDownload, FiPlus, FiAlertCircle, FiStar, FiInbox, FiClock, FiTrendingUp, FiTrendingDown, FiSettings, FiCheck } from 'react-icons/fi';
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 // Demo data for communication channels
 const communicationChannels = [
   {
@@ -113,6 +114,7 @@ const commLogs = [
 export default function MarketingHeadCommunicationHub() {
   const location = useLocation();
   const isPM = location.pathname.includes("/app/communication");
+  const isTrialPm = isPM && isTrialUserSession();
   const { t, ready, i18n } = useTranslation('marketing');
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isPM ? (isArabic ? ar : en) : en);
@@ -156,8 +158,8 @@ export default function MarketingHeadCommunicationHub() {
     { id: 2, sender: 'David Reynolds', content: 'Go/No-Go for Surplus Tanks – 2 PM today', timestamp: '09:45 AM', channel: 'Proposal Kickoffs' },
     { id: 3, sender: 'Sarah Chen', content: 'Technical approach draft uploaded for review', timestamp: 'Yesterday', channel: 'Color Team Reviews' },
   ];
-  const channelsToUse = isPM ? pmChannels : communicationChannels;
-  const recentMessagesToUse = isPM ? pmRecentMessages : recentMessages;
+  const channelsToUse = isTrialPm ? [] : isPM ? pmChannels : communicationChannels;
+  const recentMessagesToUse = isTrialPm ? [] : isPM ? pmRecentMessages : recentMessages;
   
   // AI Features State
 const [showReplySuggestions, setShowReplySuggestions] = useState(false);
@@ -169,6 +171,12 @@ const [confirmationType, setConfirmationType] = useState('');
 // Refs for auto-scroll functionality
 const replySuggestionsRef = useRef(null);
 
+  const [expanded, setExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [selectedChannel, setSelectedChannel] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+
   useEffect(() => {
     setLanguageVersion(prev => prev + 1);
   }, [i18n.language]);
@@ -178,17 +186,42 @@ const replySuggestionsRef = useRef(null);
     return <div className="flex items-center justify-center min-h-screen">{t('support.messages.loading')}</div>;
   }
 
+  if (isTrialPm) {
+    return (
+      <div className={`flex flex-col gap-8 animate-fade-in ${isRTLMode ? "rtl" : "ltr"}`}>
+        <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-gray-200 dark:border-gray-700 ${isRTLMode ? "flex-row-reverse" : ""}`}>
+          <div className={isRTLMode ? "text-right" : "text-left"}>
+            <h1 className={`text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 ${isRTLMode ? "flex-row-reverse" : ""}`}>
+              {pmText("Proposal Communication", "اتصال العروض")}
+              <FiMessageCircle className="text-blue-500" />
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {pmText(
+                "Kickoffs, reviews, and team messaging for proposals and RFPs.",
+                "اجتماعات الانطلاق، المراجعات، ورسائل الفريق للعروض وطلبات تقديم العروض.",
+              )}
+            </p>
+          </div>
+        </div>
+        <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-8 text-center">
+          <FiInbox className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {pmText(
+              "No channels or messages yet. Start a kickoff or review thread as your team collaborates.",
+              "لا توجد قنوات أو رسائل بعد. ابدأ محادثة انطلاق أو مراجعة مع تعاون الفريق.",
+            )}
+          </p>
+        </section>
+      </div>
+    );
+  }
+
   // Debug: Log translation keys to console
   console.log('Marketing Communication - Language:', i18n.language);
   console.log('Marketing Communication - Ready:', ready);
   console.log('Marketing Communication - Title translation:', t('communication.title'));
 
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
-  const [expanded, setExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [selectedChannel, setSelectedChannel] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [newMessage, setNewMessage] = useState('');
 
   const handleChannelClick = (channel) => {
     setSelectedChannel(channel);

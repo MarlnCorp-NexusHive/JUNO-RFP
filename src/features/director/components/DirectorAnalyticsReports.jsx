@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { directorFeatures } from '../../../components/directorFeatures';
 import DirectorFinancialIntelligence from './ai/DirectorFinancialIntelligence';
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { 
   FiDollarSign, 
   FiTarget, 
@@ -408,6 +409,14 @@ const contentHubData = {
   ],
 };
 
+const EMPTY_BID_VAULT = {
+  submissionFunnel: [],
+  winLossBySegment: [],
+  pipelineByStage: [],
+  submissionsTrend: [],
+  winRateByFiscal: [],
+};
+
 export default function DirectorAnalyticsReports() {
   const location = useLocation();
   const { t, ready, i18n } = useTranslation('director');
@@ -415,6 +424,7 @@ export default function DirectorAnalyticsReports() {
   const isBidVault = location.pathname.includes("/app/bid-vault");
   const isContentHub = location.pathname.includes("/app/content-hub");
   const isPM = isBidVault || isContentHub;
+  const isTrialBidVault = isBidVault && isTrialUserSession();
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [timeRange, setTimeRange] = useState("6M");
   const [activeTab, setActiveTab] = useState(isBidVault ? "submissions" : isContentHub ? "pastPerformance" : "recruitment");
@@ -426,8 +436,8 @@ export default function DirectorAnalyticsReports() {
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isArabic ? ar : en);
   const bidVaultData = useMemo(
-    () => bidVaultDataByRange[timeRange] || bidVaultDataByRange["6M"],
-    [timeRange],
+    () => (isTrialBidVault ? EMPTY_BID_VAULT : bidVaultDataByRange[timeRange] || bidVaultDataByRange["6M"]),
+    [timeRange, isTrialBidVault],
   );
   const bidRangeLabel = timeRange === "1Y"
     ? pmText("Last year", "العام الماضي")
@@ -1620,9 +1630,19 @@ export default function DirectorAnalyticsReports() {
         </div>
 
         {/* Content Sections */}
-        {isBidVault && activeTab === "submissions" && renderBidVaultSubmissions()}
-        {isBidVault && activeTab === "winLoss" && renderBidVaultWinLoss()}
-        {isBidVault && activeTab === "pipeline" && renderBidVaultPipeline()}
+        {isTrialBidVault && (
+          <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-10 text-center mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {pmText(
+                "No bid vault data yet. Submissions, win/loss, and pipeline metrics will appear as you track pursuits.",
+                "لا توجد بيانات لمستودع العطاءات بعد. ستظهر مقاييس التقديم والفوز/الخسارة وخط الأنابيب مع تتبع الفرص.",
+              )}
+            </p>
+          </div>
+        )}
+        {isBidVault && !isTrialBidVault && activeTab === "submissions" && renderBidVaultSubmissions()}
+        {isBidVault && !isTrialBidVault && activeTab === "winLoss" && renderBidVaultWinLoss()}
+        {isBidVault && !isTrialBidVault && activeTab === "pipeline" && renderBidVaultPipeline()}
         {isContentHub && activeTab === "pastPerformance" && renderContentHubPastPerformance()}
         {isContentHub && activeTab === "boilerplate" && renderContentHubBoilerplate()}
         {isContentHub && activeTab === "library" && renderContentHubLibrary()}

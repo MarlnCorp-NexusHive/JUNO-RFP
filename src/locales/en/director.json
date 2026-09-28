@@ -1266,7 +1266,6 @@
       "keyDrivers": "Key Drivers",
       "whatIf": "What-if",
       "lastUpdated": "Last updated",
-      "poweredByNexusAI": "Powered by NexusAI",
       "clickToEnlarge": "Click to enlarge",
       "interactiveBarChart": "Interactive Bar Chart",
       "interactiveRadar": "Interactive Radar"
@@ -1289,8 +1288,15 @@
         "shortlistPastDue": "past due",
         "complianceAreaPending": "Compliance pending: {{name}} needs review",
         "complianceAreaNonCompliant": "Non-compliant area: {{name}} requires action",
-        "complianceHighRisk": "High compliance risk: {{name}}"
+        "complianceHighRisk": "High compliance risk: {{name}}",
+        "assignmentDeadline": "Assignment due {{date}}: {{title}}{{daysPart}}"
       }
+    },
+    "trialEmpty": {
+      "noPipelineYet": "No pipeline data yet",
+      "noAlerts": "No alerts yet. Shortlist opportunities or add compliance items to see updates here.",
+      "chartsFillIn": "Charts fill in as you capture and submit opportunities.",
+      "forecastsAppear": "Forecasts appear as you submit and win."
     },
     "modalContent": {
       "undergraduates": "Full-Time",

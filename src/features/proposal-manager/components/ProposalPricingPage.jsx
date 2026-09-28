@@ -9,6 +9,7 @@ import {
 import { FiDollarSign, FiTrendingUp, FiPackage, FiUsers, FiFileText, FiZap, FiX } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import IssuerFinancialPanel from "./IssuerFinancialPanel";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 const laborRates = [
   { role: "Project Manager", rate: 185, loaded: 220, billable: 185 },
@@ -40,6 +41,10 @@ export default function ProposalPricingPage() {
   const navigate = useNavigate();
   const { issuer, clearLink } = useProposalIssuer();
   const [activeTab, setActiveTab] = useState("labor");
+  const isTrial = isTrialUserSession();
+  const laborData = isTrial ? [] : laborRates;
+  const volumeData = isTrial ? [] : costVolumes;
+  const trendData = isTrial ? [] : pricingTrend;
 
   const monthLabel = (value) =>
     t(`proposalManagerPricing.months.${value}`, { defaultValue: value });
@@ -115,7 +120,18 @@ export default function ProposalPricingPage() {
           </div>
         </div>
 
-        {activeTab === "labor" && (
+        {isTrial && activeTab !== "customer" && (
+          <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-10 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t(
+                "proposalManagerPricing.trialEmpty",
+                "No pricing data yet. Rates, volumes, and trends will appear here as you build proposals.",
+              )}
+            </p>
+          </div>
+        )}
+
+        {activeTab === "labor" && !isTrial && (
           <>
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -127,7 +143,7 @@ export default function ProposalPricingPage() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerPricing.sections.laborRatesByRole")}</h2>
               </div>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={laborRates} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <BarChart data={laborData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="role" tick={{ fontSize: 11 }} tickFormatter={roleLabel} />
                   <YAxis tick={{ fontSize: 10 }} />
@@ -142,7 +158,7 @@ export default function ProposalPricingPage() {
           </>
         )}
 
-        {activeTab === "volumes" && (
+        {activeTab === "volumes" && !isTrial && (
           <>
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -154,7 +170,7 @@ export default function ProposalPricingPage() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerPricing.sections.costVolumesByProposal")}</h2>
               </div>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={costVolumes} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <BarChart data={volumeData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="proposal" tick={{ fontSize: 10 }} tickFormatter={proposalLabel} />
                   <YAxis tick={{ fontSize: 10 }} />
@@ -205,7 +221,7 @@ export default function ProposalPricingPage() {
           </motion.section>
         )}
 
-        {activeTab === "trends" && (
+        {activeTab === "trends" && !isTrial && (
           <>
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -217,7 +233,7 @@ export default function ProposalPricingPage() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerPricing.sections.winPriceVsTargetCost")}</h2>
               </div>
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={pricingTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <LineChart data={trendData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" tick={{ fontSize: 10 }} tickFormatter={monthLabel} />
                   <YAxis tick={{ fontSize: 10 }} />
@@ -231,6 +247,7 @@ export default function ProposalPricingPage() {
           </>
         )}
 
+        {!isTrial && (
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -259,6 +276,7 @@ export default function ProposalPricingPage() {
             </div>
           </div>
         </motion.section>
+        )}
       </main>
     </div>
   );

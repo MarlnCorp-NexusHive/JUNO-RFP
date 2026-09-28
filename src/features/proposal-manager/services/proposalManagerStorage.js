@@ -14,6 +14,8 @@ import {
   packToPlainText,
 } from "../data/boilerplateCapabilities.js";
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
+import { isTrialMode } from "../../../services/trialAuthSession.js";
+import { persistTrialFeatureData, canUseTrialFeatures, loadTrialFeatureData } from "../../../services/trialFeatureApi.js";
 
 const KEYS = {
   FOLDERS: "proposal_manager_workspace_folders",
@@ -36,6 +38,13 @@ function save(key, data) {
     localStorage.setItem(scopedStorageKey(key), JSON.stringify(data));
   } catch (e) {
     console.warn("proposalManagerStorage save failed", key, e);
+  }
+  if (canUseTrialFeatures()) {
+    const folders = key === KEYS.FOLDERS ? data : load(KEYS.FOLDERS, []);
+    const documents = key === KEYS.DOCUMENTS ? data : load(KEYS.DOCUMENTS, []);
+    const qaLibrary = key === KEYS.CONTENT_HUB_QA ? data : load(KEYS.CONTENT_HUB_QA, []);
+    persistTrialFeatureData("workspace", { folders, documents });
+    persistTrialFeatureData("contentHub", { qaLibrary });
   }
 }
 
@@ -179,8 +188,11 @@ export function setResponseSectionContent(sectionId, content) {
   saveResponseSections(sections);
 }
 
-/** Idempotent seed: Workspace folder + docs + Content Hub Q&As for Marln/JUNO capability boilerplate. */
+/** Idempotent seed: Workspace folder + docs + Content Hub Q&As for Marln/JUNO capability boilerplate.
+ *  Demo only — skipped for trial tenants (blank slate). */
 export function ensureBoilerplateLibrary() {
+  if (isTrialMode()) return;
+
   const folders = getFolders();
   if (!folders.some((f) => f.id === BOILERPLATE_FOLDER_ID)) {
     folders.unshift({
@@ -229,4 +241,22 @@ export function ensureBoilerplateLibrary() {
     qaChanged = true;
   }
   if (qaChanged) saveContentHubQAs(qas);
+}
+
+/** Pull trial workspace + content hub from backend into scoped localStorage. */
+export async function hydrateWorkspaceFromBackend() {
+  if (!canUseTrialFeatures()) return;
+  const [ws, hub] = await Promise.all([
+    loadTrialFeatureData("workspace", { folders: [], documents: [] }),
+    loadTrialFeatureData("contentHub", { qaLibrary: [] }),
+  ]);
+  if (Array.isArray(ws?.folders)) {
+    localStorage.setItem(scopedStorageKey(KEYS.FOLDERS), JSON.stringify(ws.folders));
+  }
+  if (Array.isArray(ws?.documents)) {
+    localStorage.setItem(scopedStorageKey(KEYS.DOCUMENTS), JSON.stringify(ws.documents));
+  }
+  if (Array.isArray(hub?.qaLibrary)) {
+    localStorage.setItem(scopedStorageKey(KEYS.CONTENT_HUB_QA), JSON.stringify(hub.qaLibrary));
+  }
 }

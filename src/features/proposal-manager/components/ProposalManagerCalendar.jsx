@@ -26,6 +26,7 @@ import {
 } from "../services/proposalManagerCalendarService.js";
 import { EVENT_TYPE_ICONS } from "../services/proposalManagerCalendarMockData.js";
 import { subscribeShortlist, updateShortlistItem, removeShortlist } from "../services/shortlistStore.js";
+import { subscribeTeam, updateTeamAssignment, removeTeamAssignment } from "../services/teamStore.js";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 const TYPE_OPTIONS = [
   "all",
@@ -100,9 +101,16 @@ export default function ProposalManagerCalendar() {
 
   useEffect(() => {
     if (!isTrialUserSession()) return undefined;
-    return subscribeShortlist(() => {
+    const unsubShort = subscribeShortlist(() => {
       refresh();
     });
+    const unsubTeam = subscribeTeam(() => {
+      refresh();
+    });
+    return () => {
+      unsubShort();
+      unsubTeam();
+    };
   }, [refresh]);
 
   const filteredEvents = useMemo(() => {
@@ -224,6 +232,9 @@ export default function ProposalManagerCalendar() {
   const isShortlistEvent = (ev) =>
     Boolean(ev && (ev.source === "shortlist" || ev.shortlistId || String(ev.id || "").startsWith("shortlist_")));
 
+  const isAssignmentEvent = (ev) =>
+    Boolean(ev && (ev.source === "assignment" || ev.assignmentId || String(ev.id || "").startsWith("assignment_")));
+
   const canEditEvent = (ev) => {
     if (!ev) return false;
     if (isTrial) return ev.source !== "collaboration";
@@ -260,6 +271,18 @@ export default function ProposalManagerCalendar() {
           deadline: form.allDay ? form.start : String(form.start).slice(0, 10),
           number: form.bidName || undefined,
         });
+      } else if (
+        editingId &&
+        isAssignmentEvent({ id: editingId, source: selected?.source, assignmentId: selected?.assignmentId })
+      ) {
+        const assignId = selected?.assignmentId || String(editingId).replace(/^assignment_/, "");
+        let title = form.title.trim();
+        title = title.replace(/^Assignment:\s*/i, "").trim() || title;
+        updateTeamAssignment(assignId, {
+          task: title,
+          assigned: form.bidName || undefined,
+          deadline: form.allDay ? form.start : String(form.start).slice(0, 10),
+        });
       } else if (editingId) {
         await calendarApi.updateEvent(editingId, body);
       } else {
@@ -283,6 +306,8 @@ export default function ProposalManagerCalendar() {
     try {
       if (isShortlistEvent(selected)) {
         removeShortlist(selected.shortlistId || selected.id);
+      } else if (isAssignmentEvent(selected)) {
+        removeTeamAssignment(selected.assignmentId || selected.id);
       } else {
         await calendarApi.deleteEvent(selected.id);
       }

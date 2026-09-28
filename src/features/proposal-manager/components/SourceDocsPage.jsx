@@ -7,6 +7,8 @@ import { ensureBoilerplateLibrary } from "../services/proposalManagerStorage.js"
 import { BOILERPLATE_PACK } from "../data/boilerplateCapabilities.js";
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { persistTrialFeatureData, canUseTrialFeatures, loadTrialFeatureData } from "../../../services/trialFeatureApi.js";
+import { isTrialMode } from "../../../services/trialAuthSession.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const NAME_OVERRIDES_KEY = "proposal_manager_source_docs_names";
@@ -279,6 +281,14 @@ function loadStored() {
   }
 }
 
+function persistSourceDocsSnapshot(docs, nameOverrides) {
+  if (!canUseTrialFeatures()) return;
+  persistTrialFeatureData("sourceDocs", {
+    docs: Array.isArray(docs) ? docs : loadStored(),
+    nameOverrides: nameOverrides && typeof nameOverrides === "object" ? nameOverrides : loadNameOverrides(),
+  });
+}
+
 function loadNameOverrides() {
   try {
     const raw = localStorage.getItem(scopedStorageKey(NAME_OVERRIDES_KEY));
@@ -296,6 +306,7 @@ function saveNameOverrides(map) {
   } catch (e) {
     console.warn("Could not persist source doc names", e);
   }
+  persistSourceDocsSnapshot(undefined, map || {});
 }
 
 function applyNameOverrides(list, overrides) {
@@ -318,6 +329,7 @@ function saveStored(list) {
       return d;
     });
     localStorage.setItem(scopedStorageKey(STORAGE_KEY), JSON.stringify(toSave));
+    persistSourceDocsSnapshot(toSave, undefined);
   } catch (e) {
     console.warn("Could not persist source docs", e);
   }
@@ -335,6 +347,9 @@ export default function SourceDocsPage() {
   const [docs, setDocs] = useState(() => {
     const overrides = loadNameOverrides();
     const uploaded = loadStored().filter((d) => !PREUPLOADED_IDS.has(d.id));
+    if (isTrialMode()) {
+      return applyNameOverrides(uploaded, overrides);
+    }
     return [
       ...applyNameOverrides(PREUPLOADED_DOCS, overrides),
       ...applyNameOverrides(uploaded, overrides),
@@ -351,6 +366,21 @@ export default function SourceDocsPage() {
   const renameInputRef = useRef(null);
 
   useEffect(() => {
+    if (isTrialMode()) {
+      (async () => {
+        const data = await loadTrialFeatureData("sourceDocs", { docs: [], nameOverrides: {} });
+        if (Array.isArray(data?.docs)) {
+          localStorage.setItem(scopedStorageKey(STORAGE_KEY), JSON.stringify(data.docs));
+        }
+        if (data?.nameOverrides && typeof data.nameOverrides === "object") {
+          localStorage.setItem(scopedStorageKey(NAME_OVERRIDES_KEY), JSON.stringify(data.nameOverrides));
+        }
+        const overrides = loadNameOverrides();
+        const uploaded = loadStored().filter((d) => !PREUPLOADED_IDS.has(d.id));
+        setDocs(applyNameOverrides(uploaded, overrides));
+      })();
+      return;
+    }
     ensureBoilerplateLibrary();
   }, []);
 
