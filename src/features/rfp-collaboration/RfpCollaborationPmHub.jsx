@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiLogOut, FiPlus, FiRefreshCw, FiUsers } from "react-icons/fi";
+import { FiPlus, FiRefreshCw, FiUsers } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { rfpCollab } from "../../services/rfpCollabApi.js";
 import { structureRfpRequirementsWithAi } from "../../services/api.js";
 import {
-  clearCollabSession,
   ensureProposalManagerCollabSession,
   isMainAppProposalManager,
   loadCollabSession,
@@ -97,12 +96,6 @@ export default function RfpCollaborationPmHub() {
     } finally {
       setBusy(false);
     }
-  };
-
-  const handleLogout = () => {
-    clearCollabSession();
-    setSession(null);
-    setWorkspaces([]);
   };
 
   const addRow = () => {
@@ -249,14 +242,6 @@ export default function RfpCollaborationPmHub() {
           >
             <FiPlus className="w-4 h-4" />
             {t("rfpCollaboration.newWorkspace")}
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm"
-          >
-            <FiLogOut className="w-4 h-4" />
-            {t("rfpCollaboration.logOut")}
           </button>
         </div>
       </div>

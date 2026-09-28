@@ -1,5 +1,6 @@
 export const proposalManagerFeatures = [
   { label: "director.dashboard", icon: "📊", route: "/rbac/proposal-manager", description: "Performance Overview, KPI Summary, Alerts & Notices" },
+  { label: "proposalManager.grants", icon: "🏛️", route: "/rbac/proposal-manager/grants", description: "Federal Grants.gov (live) + private foundations (live IRS/ProPublica) + state/local-eligible Grants.gov + SAM.gov contracts (curated)" },
   { label: "proposalManager.companyIntelligence", icon: "🌐", route: "/rbac/proposal-manager/company-intelligence", description: "RFP issuer financials, trends, and customers from public sources" },
   { label: "proposalManager.competitiveIntelligence", icon: "🎯", route: "/rbac/proposal-manager/competitive-intelligence", description: "Look up any competitor or compare curated peers — datasheets and differentiators" },
   { label: "proposalManager.sourceDocs", icon: "📄", route: "/rbac/proposal-manager/source-docs", description: "Source documents and reference materials" },
@@ -10,7 +11,6 @@ export const proposalManagerFeatures = [
   { label: "proposalManager.bidVault", icon: "📦", route: "/rbac/proposal-manager/bid-vault", description: "Bid repository and submissions" },
   { label: "proposalManager.scoring", icon: "🏅", route: "/rbac/proposal-manager/scoring", description: "Win/loss scoring, debrief ingest, and product capability gaps" },
   { label: "proposalManager.winSlide", icon: "🖼️", route: "/rbac/proposal-manager/win-slide", description: "Post-selection win slide: POV, proof, and who we won or lost against" },
-  { label: "proposalManager.grants", icon: "🏛️", route: "/rbac/proposal-manager/grants", description: "Federal Grants.gov (live) + private foundations (live IRS/ProPublica) + state/local-eligible Grants.gov + SAM.gov contracts (curated)" },
   { label: "proposalManager.captureStrategy", icon: "🗺️", route: "/rbac/proposal-manager/capture-strategy", description: "Capture strategy and planning" },
   { label: "proposalManager.contentHub", icon: "📝", route: "/rbac/proposal-manager/content-hub", description: "Content library and assets" },
   { label: "proposalManager.pricing", icon: "💰", route: "/rbac/proposal-manager/pricing", description: "Pricing and cost proposals" },

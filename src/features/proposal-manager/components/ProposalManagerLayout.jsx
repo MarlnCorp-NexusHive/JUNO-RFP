@@ -1,105 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Sidebar from "../../director/components/Sidebar";
 import { proposalManagerFeatures } from "./proposalManagerFeatures";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useLocalization } from "../../../hooks/useLocalization";
 import TourOverlay from "../../../components/tours/TourOverlay";
 import { TourProvider } from "../../../components/tours/TourContext";
 import { useTour } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
-import { getTrialSession, setTrialSession } from "../../../services/trialAuthSession.js";
+import { getTrialSession } from "../../../services/trialAuthSession.js";
 import { getProposalManagerTourPage } from "../../../components/tours/data/proposalManagerTourPages.js";
-import { useTranslation } from "react-i18next";
-import TrialChangePasswordModal from "./TrialChangePasswordModal.jsx";
-import { fetchTrialMe } from "../../../services/api.js";
-
-function TrialBanner() {
-  const { t } = useTranslation("common");
-  const [pwOpen, setPwOpen] = useState(false);
-  const session = getTrialSession();
-  const user = parseLocalStorageJson("rbac_current_user");
-  const [trialEndsAt, setTrialEndsAt] = useState(
-    () => session?.trialEndsAt || user?.trialEndsAt || "",
-  );
-
-  useEffect(() => {
-    if (!session?.token) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const me = await fetchTrialMe();
-        if (cancelled || !me?.tenant) return;
-        const ends = me.tenant.trialEndsAt || "";
-        setTrialEndsAt(ends);
-        setTrialSession({
-          ...session,
-          tenant: me.tenant,
-          user: me.user || session.user,
-          usage: me.usage || session.usage,
-          trialEndsAt: ends,
-        });
-        try {
-          const rbac = parseLocalStorageJson("rbac_current_user");
-          if (rbac?.isTrialUser) {
-            localStorage.setItem(
-              "rbac_current_user",
-              JSON.stringify({ ...rbac, trialEndsAt: ends, tenantName: me.tenant.name || rbac.tenantName }),
-            );
-          }
-        } catch {
-          /* ignore */
-        }
-      } catch {
-        /* keep cached banner values */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-    // Only refresh once per mount / token
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.token]);
-
-  if (!session?.tenantId && !user?.isTrialUser) return null;
-
-  const company = session?.tenantName || user?.tenantName || t("proposalManagerTrial.tenant");
-  const ends = trialEndsAt || session?.trialEndsAt || user?.trialEndsAt;
-  let daysLeft = null;
-  if (ends) {
-    const ms = Date.parse(ends) - Date.now();
-    daysLeft = Number.isFinite(ms) ? Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000))) : null;
-  }
-
-  return (
-    <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm text-indigo-950 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-100">
-        <div>
-          <span className="font-semibold">{t("proposalManagerTrial.badge")}</span>
-          {" · "}
-          {company}
-          {daysLeft != null && (
-            <>
-              {" · "}
-              {t("proposalManagerTrial.daysLeft", { count: daysLeft })}
-            </>
-          )}
-          <span className="opacity-70"> · {t("proposalManagerTrial.isolatedHint")}</span>
-        </div>
-        {session?.token && (
-          <button
-            type="button"
-            onClick={() => setPwOpen(true)}
-            className="rounded-lg border border-indigo-300 bg-white/80 px-3 py-1 text-xs font-semibold text-indigo-800 hover:bg-white dark:border-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-100 dark:hover:bg-indigo-900"
-          >
-            {t("proposalManagerTrial.changePassword")}
-          </button>
-        )}
-      </div>
-      <TrialChangePasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
-    </>
-  );
-}
 
 function AutoStartTour({ role }) {
   const location = useLocation();
@@ -127,9 +37,42 @@ function AutoStartTour({ role }) {
   return null;
 }
 
+function isTrialUser() {
+  const session = getTrialSession();
+  const user = parseLocalStorageJson("rbac_current_user");
+  return Boolean(session?.token || user?.isTrialUser);
+}
+
+function sidebarUserLabel() {
+  const session = getTrialSession();
+  const user = parseLocalStorageJson("rbac_current_user");
+  if (isTrialUser()) {
+    const name = String(
+      session?.user?.name || user?.name || user?.displayName || "",
+    ).trim();
+    if (name) return name;
+  }
+  return "Proposal Manager";
+}
+
+function sidebarFeatures() {
+  if (!isTrialUser()) return proposalManagerFeatures;
+  return proposalManagerFeatures.filter(
+    (f) => !String(f.route || "").includes("/topology"),
+  );
+}
+
 export default function ProposalManagerLayout() {
   const [expanded, setExpanded] = useState(false);
   const { isRTLMode } = useLocalization();
+  const location = useLocation();
+  const userLabel = sidebarUserLabel();
+  const features = sidebarFeatures();
+
+  // Trial: Topology tab is hidden — bounce direct URL hits back to dashboard
+  if (isTrialUser() && String(location.pathname || "").includes("/topology")) {
+    return <Navigate to="/rbac/proposal-manager" replace />;
+  }
 
   return (
     <TourProvider>
@@ -140,8 +83,8 @@ export default function ProposalManagerLayout() {
           isRTLMode ? 'right-0' : 'left-0'
         }`}>
           <Sidebar
-            features={proposalManagerFeatures}
-            userLabel="Proposal Manager"
+            features={features}
+            userLabel={userLabel}
             expanded={expanded}
             setExpanded={setExpanded}
             role="proposal-manager"
@@ -154,7 +97,6 @@ export default function ProposalManagerLayout() {
             : (isRTLMode ? 'mr-12' : 'ml-12')
         }`}>
           <AutoStartTour role="proposal-manager" />
-          <TrialBanner />
           <Outlet />
         </main>
 

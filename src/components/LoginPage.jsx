@@ -380,13 +380,10 @@ function LoginPageContent() {
         {/* Left Side - Logo & Tagline */}
         <div className={`hidden md:flex flex-col items-center justify-center w-1/2 bg-white/10 p-10 ${isRTL ? 'rounded-r-3xl' : 'rounded-l-3xl'}`}>
           <img
-            src="/marlncorplogo.png"
+            src="/juno-rfp-logo.png"
             alt="JUNO RFP"
-            className="w-full max-w-48 mb-4 object-contain"
+            className="w-full max-w-56 object-contain drop-shadow-lg"
           />
-          <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-lg text-center">
-            JUNO RFP
-          </h2>
         </div>
         {/* Right Side - Login Form */}
         <div className={`flex-1 flex flex-col justify-center items-center p-8 md:p-16 bg-white/20 ${isRTL ? 'rounded-l-3xl' : 'rounded-r-3xl'} form-container`}>
