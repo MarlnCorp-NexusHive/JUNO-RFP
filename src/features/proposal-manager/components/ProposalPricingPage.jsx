@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, Legend,
 } from "recharts";
-import { FiDollarSign, FiTrendingUp, FiPackage, FiUsers, FiFileText, FiZap, FiX } from "react-icons/fi";
+import { FiTrendingUp, FiPackage, FiUsers, FiFileText, FiZap, FiX } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
-import IssuerFinancialPanel from "./IssuerFinancialPanel";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 const laborRates = [
@@ -38,7 +36,6 @@ const pricingTrend = [
 
 export default function ProposalPricingPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { issuer, clearLink } = useProposalIssuer();
   const [activeTab, setActiveTab] = useState("labor");
   const isTrial = isTrialUserSession();
@@ -55,19 +52,10 @@ export default function ProposalPricingPage() {
   const proposalLabel = (value) =>
     t(`proposalManagerPricing.proposals.${value}`, { defaultValue: value });
 
-  useEffect(() => {
-    if (issuer?.linkedAt) setActiveTab("customer");
-  }, [issuer?.linkedAt]);
-
-  useEffect(() => {
-    if (!issuer && activeTab === "customer") setActiveTab("labor");
-  }, [issuer, activeTab]);
-
   const tabs = [
     { id: "labor", label: t("proposalManagerPricing.tabs.laborRates") },
     { id: "volumes", label: t("proposalManagerPricing.tabs.costVolumes") },
     { id: "trends", label: t("proposalManagerPricing.tabs.trends") },
-    { id: "customer", label: t("proposalManagerPricing.tabs.customerIntel") },
   ];
 
   return (
@@ -109,10 +97,9 @@ export default function ProposalPricingPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                disabled={tab.id === "customer" && !issuer}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === tab.id ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900"
-                } ${tab.id === "customer" && !issuer ? "opacity-50 cursor-not-allowed" : ""}`}
+                }`}
               >
                 {tab.label}
               </button>
@@ -120,7 +107,7 @@ export default function ProposalPricingPage() {
           </div>
         </div>
 
-        {isTrial && activeTab !== "customer" && (
+        {isTrial && (
           <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-10 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {t(
@@ -184,41 +171,6 @@ export default function ProposalPricingPage() {
               </ResponsiveContainer>
             </motion.section>
           </>
-        )}
-
-        {activeTab === "customer" && issuer && (
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-indigo-100 dark:border-indigo-900/40"
-          >
-            <div className="flex items-center gap-2 mb-6">
-              <FiZap className="w-6 h-6 text-indigo-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerPricing.sections.customerFinancialProfile")}</h2>
-            </div>
-            <IssuerFinancialPanel snapshot={issuer} />
-          </motion.section>
-        )}
-
-        {activeTab === "customer" && !issuer && (
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border border-gray-100 dark:border-gray-700 text-center"
-          >
-            <FiZap className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("proposalManagerPricing.emptyCustomer.title")}</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 max-w-md mx-auto">
-              {t("proposalManagerPricing.emptyCustomer.description")}
-            </p>
-            <button
-              type="button"
-              onClick={() => navigate("/app/company-intelligence")}
-              className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500"
-            >
-              {t("proposalManagerPricing.emptyCustomer.cta")}
-            </button>
-          </motion.section>
         )}
 
         {activeTab === "trends" && !isTrial && (

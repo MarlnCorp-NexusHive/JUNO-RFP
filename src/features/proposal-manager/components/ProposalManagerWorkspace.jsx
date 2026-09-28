@@ -205,7 +205,8 @@ export default function ProposalManagerWorkspace() {
   const t = useTrialCollabT();
   const navigate = useNavigate();
   const isTrial = isTrialUserSession();
-  const { issuer, linkFromIntelligence, clearLink } = useProposalIssuer();
+  const { issuer, linkFromIntelligence, clearLink, disableIssuerTailoring, setDisableIssuerTailoring, effectiveIssuerName } =
+    useProposalIssuer();
   const [issuerBrief, setIssuerBrief] = useState("");
   const [companyQuery, setCompanyQuery] = useState("");
   const [companyPickerOpen, setCompanyPickerOpen] = useState(false);
@@ -849,7 +850,7 @@ export default function ProposalManagerWorkspace() {
     setAiLoading(true);
     const key = rfpQuestionKey(selectedQuestionIndex);
     const draftAnswer = (answers[key] || "").trim();
-    const context = (issuerBrief || "").trim().slice(0, 4000);
+    const context = disableIssuerTailoring ? "" : (issuerBrief || "").trim().slice(0, 4000);
     const qLine = row.question.trim();
     const docNum = qLine.match(/^(\d+)[\.)]\s/);
     const numberingNote = docNum
@@ -894,7 +895,7 @@ export default function ProposalManagerWorkspace() {
     } finally {
       setAiLoading(false);
     }
-  }, [rfpId, selectedQuestionIndex, questions, answers, issuerBrief, handleAnswerChange]);
+  }, [rfpId, selectedQuestionIndex, questions, answers, issuerBrief, disableIssuerTailoring, handleAnswerChange]);
 
   const selectedKey =
     selectedQuestionIndex != null && selectedQuestionIndex >= 0
@@ -978,7 +979,7 @@ export default function ProposalManagerWorkspace() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const base = workspaceResponseDownloadBase(issuer?.name, activeRfpDoc?.name);
+      const base = workspaceResponseDownloadBase(effectiveIssuerName || activeRfpDoc?.name, activeRfpDoc?.name);
       a.download = `${base} (Q&A).docx`;
       document.body.appendChild(a);
       a.click();
@@ -990,7 +991,7 @@ export default function ProposalManagerWorkspace() {
     } finally {
       setWorkspaceDocExporting(false);
     }
-  }, [workspaceDocId, computedDocumentModel, activeRfpDoc?.name, issuer?.name]);
+  }, [workspaceDocId, computedDocumentModel, activeRfpDoc?.name, effectiveIssuerName]);
 
   const handleDownloadStyledWorkspaceDocument = useCallback(async () => {
     if (!workspaceDocId) return;
@@ -1003,8 +1004,8 @@ export default function ProposalManagerWorkspace() {
         await seedWorkspaceDocument(workspaceDocId, { questions, answers });
         await saveWorkspaceDocument(workspaceDocId, computedDocumentModel);
       }
-      const blob = await exportWorkspaceDocumentStyled(workspaceDocId, issuer?.name);
-      const base = workspaceResponseDownloadBase(issuer?.name, activeRfpDoc?.name);
+      const blob = await exportWorkspaceDocumentStyled(workspaceDocId, effectiveIssuerName || undefined);
+      const base = workspaceResponseDownloadBase(effectiveIssuerName || activeRfpDoc?.name, activeRfpDoc?.name);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -1025,7 +1026,7 @@ export default function ProposalManagerWorkspace() {
     activeRfpDoc?.name,
     questions,
     answers,
-    issuer?.name,
+    effectiveIssuerName,
   ]);
 
   return (
@@ -1169,14 +1170,31 @@ export default function ProposalManagerWorkspace() {
           )}
 
           {issuer && (
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t("proposalManagerWorkspace.issuerOverviewLabel")}</label>
-              <textarea
-                value={issuerBrief}
-                onChange={(e) => setIssuerBrief(e.target.value)}
-                rows={5}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm"
-              />
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t("proposalManagerWorkspace.issuerOverviewLabel")}</label>
+                <textarea
+                  value={issuerBrief}
+                  onChange={(e) => setIssuerBrief(e.target.value)}
+                  rows={5}
+                  disabled={disableIssuerTailoring}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm disabled:opacity-60"
+                />
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white/70 dark:bg-gray-900/40 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  checked={disableIssuerTailoring}
+                  onChange={(e) => setDisableIssuerTailoring(e.target.checked)}
+                />
+                <span>
+                  {t(
+                    "proposalManagerTechnicalSolutioning.disableTailoring",
+                    "Do not tailor this solution to the linked issuer",
+                  )}
+                </span>
+              </label>
             </div>
           )}
         </section>

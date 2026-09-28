@@ -211,6 +211,7 @@ export function getSettings() {
     autoIndexOnUpload: true,
     selectedWorkspaceDocId: "",
     requirementsSource: "workspace",
+    disableIssuerTailoring: false,
   });
 }
 

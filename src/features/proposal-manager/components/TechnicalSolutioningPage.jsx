@@ -61,7 +61,8 @@ function ConfidenceBadge({ value, label }) {
 export default function TechnicalSolutioningPage() {
   const { t } = useTranslation();
   const { isRTLMode } = useLocalization();
-  const { issuer } = useProposalIssuer();
+  const { issuer, disableIssuerTailoring, setDisableIssuerTailoring, effectiveIssuerName } =
+    useProposalIssuer();
   const fileInputRef = useRef(null);
 
   const [assets, setAssets] = useState(() => getReferenceAssets());
@@ -224,7 +225,7 @@ export default function TechnicalSolutioningPage() {
           text: a.text,
         })),
         indexedPatterns: indexed,
-        issuerName: issuer?.name || issuer?.displayName || "",
+        issuerName: effectiveIssuerName,
         solutionTitle: solutionTitle.trim() || t("proposalManagerTechnicalSolutioning.defaultSolutionTitle"),
         designGoals: designGoals.trim(),
       });
@@ -285,9 +286,31 @@ export default function TechnicalSolutioningPage() {
             {t("proposalManagerTechnicalSolutioning.subtitle")}
           </p>
           {issuer?.name ? (
-            <p className="mt-4 text-sm text-indigo-200/80">
-              {t("proposalManagerTechnicalSolutioning.linkedIssuer", { name: issuer.name })}
-            </p>
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-indigo-200/80">
+                {disableIssuerTailoring
+                  ? t(
+                      "proposalManagerTechnicalSolutioning.tailoringOff",
+                      "Issuer linked ({{name}}) — tailoring is turned off for this design.",
+                      { name: issuer.name },
+                    )
+                  : t("proposalManagerTechnicalSolutioning.linkedIssuer", { name: issuer.name })}
+              </p>
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none rounded-lg bg-white/10 hover:bg-white/15 px-3 py-2 text-sm text-indigo-50 backdrop-blur border border-white/10">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-400"
+                  checked={disableIssuerTailoring}
+                  onChange={(e) => setDisableIssuerTailoring(e.target.checked)}
+                />
+                <span>
+                  {t(
+                    "proposalManagerTechnicalSolutioning.disableTailoring",
+                    "Do not tailor this solution to the linked issuer",
+                  )}
+                </span>
+              </label>
+            </div>
           ) : null}
         </div>
       </div>

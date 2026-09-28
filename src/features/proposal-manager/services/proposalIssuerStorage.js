@@ -85,3 +85,24 @@ export function clearLinkedIssuer() {
     /* ignore */
   }
 }
+
+const TAILORING_OFF_BASE_KEY = "proposal_manager_disable_issuer_tailoring";
+export const DISABLE_ISSUER_TAILORING_BASE_KEY = TAILORING_OFF_BASE_KEY;
+
+export function getDisableIssuerTailoring() {
+  try {
+    return localStorage.getItem(scopedStorageKey(TAILORING_OFF_BASE_KEY)) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setDisableIssuerTailoring(disabled) {
+  try {
+    const key = scopedStorageKey(TAILORING_OFF_BASE_KEY);
+    if (disabled) localStorage.setItem(key, "1");
+    else localStorage.removeItem(key);
+  } catch (e) {
+    console.warn("proposalIssuerStorage setDisableIssuerTailoring failed", e);
+  }
+}

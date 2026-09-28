@@ -6,70 +6,100 @@ import { generateSlideDeck } from "../../../services/api.js";
 import { COMPETITORS } from "../data/competitiveIntelligenceSamples";
 import { buildWinSlideDeckContent, defaultWinSlideFromPursuit } from "../data/winSlideTemplates";
 import { getWinLossRecords, hydrateWinLossFromBackend } from "../services/winLossStorage";
-import { loadWinSlideDraft, saveWinSlideDraft, hydrateWinSlideFromBackend } from "../services/winSlideStorage";
+import {
+  loadWinSlideDraft,
+  saveWinSlideDraft,
+  hydrateWinSlideFromBackend,
+  emptyWinSlideDraft,
+} from "../services/winSlideStorage";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+
+function applyDraftToState(draft, setters) {
+  const d = draft || emptyWinSlideDraft();
+  setters.setPursuitId(d.pursuitId || "");
+  setters.setCompetitorIds(Array.isArray(d.competitorIds) ? d.competitorIds : []);
+  setters.setOutcome(d.outcome || "");
+  setters.setPov(d.pov || "");
+  setters.setTesting(d.testing || "");
+  setters.setWhyUs(d.whyUs || "");
+  setters.setWhyThem(d.whyThem || "");
+}
 
 export default function WinSlidePage() {
   const { t } = useTranslation("common");
   const { isRTLMode } = useLocalization();
   const { issuer } = useProposalIssuer();
-  const [pursuits, setPursuits] = useState(() => getWinLossRecords());
-  const draft = loadWinSlideDraft();
+  const trial = isTrialUserSession();
+  const [pursuits, setPursuits] = useState(() => (trial ? [] : getWinLossRecords()));
+  const draft = trial ? null : loadWinSlideDraft();
 
-  const [pursuitId, setPursuitId] = useState(draft?.pursuitId || pursuits[0]?.id || "");
-  const [competitorIds, setCompetitorIds] = useState(draft?.competitorIds || ["accenture", "dxc"]);
-  const [outcome, setOutcome] = useState(draft?.outcome || pursuits[0]?.outcome || "won");
+  const [pursuitId, setPursuitId] = useState(draft?.pursuitId || (trial ? "" : pursuits[0]?.id) || "");
+  const [competitorIds, setCompetitorIds] = useState(
+    draft?.competitorIds || (trial ? [] : ["accenture", "dxc"])
+  );
+  const [outcome, setOutcome] = useState(draft?.outcome || (trial ? "" : pursuits[0]?.outcome || "won"));
   const [pov, setPov] = useState(draft?.pov || "");
   const [testing, setTesting] = useState(draft?.testing || "");
   const [whyUs, setWhyUs] = useState(draft?.whyUs || "");
   const [whyThem, setWhyThem] = useState(draft?.whyThem || "");
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
-  const [seeded, setSeeded] = useState(!!draft?.pov);
+  const [seeded, setSeeded] = useState(trial ? true : !!draft?.pov);
 
   useEffect(() => {
-    if (!isTrialUserSession()) return undefined;
+    if (!trial) return undefined;
     let cancelled = false;
     (async () => {
       await hydrateWinLossFromBackend();
-      const nextDraft = await hydrateWinSlideFromBackend();
+      let nextDraft = await hydrateWinSlideFromBackend();
       if (cancelled) return;
       const nextPursuits = getWinLossRecords();
       setPursuits(nextPursuits);
-      if (nextDraft?.pursuitId) setPursuitId(nextDraft.pursuitId);
-      if (nextDraft?.pov) setPov(nextDraft.pov);
-      if (nextDraft?.testing) setTesting(nextDraft.testing);
-      if (nextDraft?.whyUs) setWhyUs(nextDraft.whyUs);
-      if (nextDraft?.whyThem) setWhyThem(nextDraft.whyThem);
-      if (nextDraft?.pov) setSeeded(true);
+      // No scoring pursuits yet → drop orphaned demo drafts so the tab stays blank.
+      if (nextPursuits.length === 0) {
+        nextDraft = emptyWinSlideDraft();
+        saveWinSlideDraft(nextDraft);
+      }
+      applyDraftToState(nextDraft, {
+        setPursuitId,
+        setCompetitorIds,
+        setOutcome,
+        setPov,
+        setTesting,
+        setWhyUs,
+        setWhyThem,
+      });
+      setSeeded(true);
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [trial]);
 
   const pursuit = pursuits.find((p) => p.id === pursuitId) || null;
   const selectedCompetitors = COMPETITORS.filter((c) => competitorIds.includes(c.id));
 
   useEffect(() => {
-    if (seeded || !pursuit) return;
+    // Demo only: auto-fill template once when a pursuit is available.
+    if (trial || seeded || !pursuit) return;
     applyTemplate(pursuit, selectedCompetitors, pursuit.outcome || outcome);
     setSeeded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pursuit?.id, seeded]);
+  }, [pursuit?.id, seeded, trial]);
 
   const applyTemplate = (nextPursuit = pursuit, nextCompetitors = selectedCompetitors, nextOutcome = nextPursuit?.outcome || outcome) => {
+    if (!nextPursuit) return;
     const copy = defaultWinSlideFromPursuit(nextPursuit, nextCompetitors);
     setPov(copy.pov);
     setTesting(copy.testing);
     setWhyUs(copy.whyUs.join("\n"));
     setWhyThem(copy.whyThem.join("\n"));
-    setOutcome(nextOutcome);
+    setOutcome(nextOutcome || "");
     persist({
       pursuitId: nextPursuit?.id,
       competitorIds,
-      outcome: nextOutcome,
+      outcome: nextOutcome || "",
       pov: copy.pov,
       testing: copy.testing,
       whyUs: copy.whyUs.join("\n"),
@@ -160,16 +190,8 @@ export default function WinSlidePage() {
             <h1 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white md:text-3xl">
               {t("proposalManagerWinSlide.title")}
             </h1>
-            <p className="mt-1 max-w-3xl text-sm text-slate-600 dark:text-slate-400">{t("proposalManagerWinSlide.subtitle")}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => applyTemplate()}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              {t("proposalManagerWinSlide.applyTemplate")}
-            </button>
             <button
               type="button"
               onClick={downloadDeck}
@@ -196,16 +218,24 @@ export default function WinSlidePage() {
                   setPursuitId(id);
                   const next = pursuits.find((p) => p.id === id);
                   persist({ pursuitId: id, outcome: next?.outcome || outcome });
-                  if (next) applyTemplate(next, selectedCompetitors, next.outcome);
+                  if (next) {
+                    setOutcome(next.outcome || outcome || "");
+                    // Demo auto-fills; trial stays blank until "Fill from scoring template".
+                    if (!trial) applyTemplate(next, selectedCompetitors, next.outcome);
+                  }
                 }}
                 className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               >
+                <option value="">{t("proposalManagerWinSlide.pursuitPlaceholder")}</option>
                 {pursuits.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.rfpName} ({p.outcome})
                   </option>
                 ))}
               </select>
+              {trial && pursuits.length === 0 ? (
+                <p className="mt-2 text-[11px] text-slate-400">{t("proposalManagerWinSlide.noPursuits")}</p>
+              ) : null}
               <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {t("proposalManagerWinSlide.postSelection")}
               </label>
@@ -259,6 +289,7 @@ export default function WinSlidePage() {
                   persist({ pov: e.target.value });
                 }}
                 rows={3}
+                placeholder={trial ? t("proposalManagerWinSlide.povPlaceholder") : undefined}
                 className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
               <label className="mt-3 block text-xs font-semibold uppercase text-slate-500">{t("proposalManagerWinSlide.testing")}</label>
@@ -269,6 +300,7 @@ export default function WinSlidePage() {
                   persist({ testing: e.target.value });
                 }}
                 rows={2}
+                placeholder={trial ? t("proposalManagerWinSlide.testingPlaceholder") : undefined}
                 className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
               <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -281,6 +313,7 @@ export default function WinSlidePage() {
                       persist({ whyUs: e.target.value });
                     }}
                     rows={5}
+                    placeholder={trial ? t("proposalManagerWinSlide.whyUsPlaceholder") : undefined}
                     className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                   />
                 </div>
@@ -293,6 +326,7 @@ export default function WinSlidePage() {
                       persist({ whyThem: e.target.value });
                     }}
                     rows={5}
+                    placeholder={trial ? t("proposalManagerWinSlide.whyThemPlaceholder") : undefined}
                     className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                   />
                 </div>
@@ -302,8 +336,7 @@ export default function WinSlidePage() {
             <div className="overflow-hidden rounded-xl border border-slate-800 shadow-lg">
               <div className="aspect-video bg-[#1E3A5F] text-white">
                 <div className="flex h-full flex-col p-6 md:p-8">
-                  <div className="flex items-start justify-between gap-3 text-[10px] uppercase tracking-[0.16em] text-teal-300">
-                    <span>JUNO RFP · Marln</span>
+                  <div className="flex items-start justify-end gap-3 text-[10px] uppercase tracking-[0.16em] text-teal-300">
                     <span>{t("proposalManagerWinSlide.slideKicker")}</span>
                   </div>
                   <h2 className="mt-2 text-xl font-semibold md:text-2xl">

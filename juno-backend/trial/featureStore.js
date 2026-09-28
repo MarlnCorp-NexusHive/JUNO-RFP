@@ -23,7 +23,7 @@ const EMPTY_BY_KEY = {
   contentHub: { qaLibrary: [] },
   techSolutioning: { assets: [], patterns: [], designs: [], settings: {} },
   scoring: { records: [] },
-  winSlide: { slides: [], settings: {} },
+  winSlide: { draft: null, settings: {} },
   userManagement: { users: [] },
   communication: { channels: [], messages: [] },
   pricing: { laborRates: [], volumes: [], trends: [] },

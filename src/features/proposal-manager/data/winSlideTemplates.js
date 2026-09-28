@@ -60,7 +60,7 @@ ${pov}
 ## Proof / testing
 ${testing}
 
-## Why JUNO / Marln
+## Why us
 ${whyUsLines || "- (add win themes)"}
 
 ## Why them / where they scored
