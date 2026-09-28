@@ -1,0 +1,38 @@
+# Pings the Render API on a schedule so the trial backend stays warm
+# (avoids cold-start failures on first login after idle time).
+
+name: Keep Render awake
+
+on:
+  schedule:
+    # Every 5 minutes (UTC). GitHub may delay slightly under load.
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Wake juno-backend on Render
+        env:
+          RENDER_URL: https://juno-rfp.onrender.com
+        run: |
+          set -e
+          echo "Pinging ${RENDER_URL}/trial/auth/storage-status ..."
+          code=$(curl -sS -o /tmp/wake-body.json -w "%{http_code}" \
+            --connect-timeout 30 --max-time 90 \
+            "${RENDER_URL}/trial/auth/storage-status" || true)
+          echo "HTTP ${code}"
+          head -c 500 /tmp/wake-body.json || true
+          echo
+          if [ "$code" != "200" ]; then
+            echo "storage-status failed; trying /test-ai ..."
+            code2=$(curl -sS -o /tmp/wake-body2.txt -w "%{http_code}" \
+              --connect-timeout 30 --max-time 90 \
+              "${RENDER_URL}/test-ai" || true)
+            echo "HTTP ${code2}"
+            head -c 200 /tmp/wake-body2.txt || true
+            echo
+            [ "$code2" = "200" ] || exit 1
+          fi
