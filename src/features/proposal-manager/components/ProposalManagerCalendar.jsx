@@ -25,6 +25,8 @@ import {
   toFullCalendarEvent,
 } from "../services/proposalManagerCalendarService.js";
 import { EVENT_TYPE_ICONS } from "../services/proposalManagerCalendarMockData.js";
+import { subscribeShortlist, updateShortlistItem, removeShortlist } from "../services/shortlistStore.js";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 const TYPE_OPTIONS = [
   "all",
   "deadline",
@@ -62,6 +64,7 @@ function typeBadgeClass(type) {
 
 export default function ProposalManagerCalendar() {
   const { t } = useTranslation("common");
+  const isTrial = isTrialUserSession();
   const [events, setEvents] = useState([]);
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -93,6 +96,13 @@ export default function ProposalManagerCalendar() {
 
   useEffect(() => {
     refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!isTrialUserSession()) return undefined;
+    return subscribeShortlist(() => {
+      refresh();
+    });
   }, [refresh]);
 
   const filteredEvents = useMemo(() => {
@@ -175,16 +185,17 @@ export default function ProposalManagerCalendar() {
   };
 
   const openEditManual = (ev) => {
-    if (ev.source === "collaboration" || ev.source === "demo") {
+    if (!isTrial && (ev.source === "collaboration" || ev.source === "demo")) {
       setSelected(ev);
       return;
     }
     setEditingId(ev.id);
+    setSelected(ev);
     setForm({
       title: ev.title || "",
       start: ev.allDay ? String(ev.start).slice(0, 10) : ev.start?.slice(0, 16) || "",
       end: ev.end ? (ev.allDay ? String(ev.end).slice(0, 10) : ev.end.slice(0, 16)) : "",
-      allDay: Boolean(ev.allDay),
+      allDay: Boolean(ev.allDay ?? true),
       type: ev.type || "meeting",
       location: ev.location || "",
       description: ev.description || "",
@@ -194,12 +205,29 @@ export default function ProposalManagerCalendar() {
   };
 
   const handleEventClick = (info) => {
-    const ev = info.event.extendedProps;
+    const props = info.event.extendedProps || {};
+    const ev = {
+      ...props,
+      id: props.id || info.event.id,
+      title: props.title || info.event.title,
+      start: props.start || (info.event.allDay ? info.event.startStr : info.event.start?.toISOString?.()),
+      end: props.end || info.event.endStr || null,
+      allDay: props.allDay ?? info.event.allDay,
+    };
     setSelected(ev);
   };
 
   const handleDateClick = (info) => {
     openCreate(info.dateStr);
+  };
+
+  const isShortlistEvent = (ev) =>
+    Boolean(ev && (ev.source === "shortlist" || ev.shortlistId || String(ev.id || "").startsWith("shortlist_")));
+
+  const canEditEvent = (ev) => {
+    if (!ev) return false;
+    if (isTrial) return ev.source !== "collaboration";
+    return ev.source !== "collaboration" && ev.source !== "rfp-deadline" && ev.source !== "demo";
   };
 
   const saveForm = async (e) => {
@@ -221,7 +249,18 @@ export default function ProposalManagerCalendar() {
         description: form.description || null,
         bidName: form.bidName || null,
       };
-      if (editingId) {
+
+      if (editingId && isShortlistEvent({ id: editingId, source: selected?.source, shortlistId: selected?.shortlistId })) {
+        const shortId = selected?.shortlistId || String(editingId).replace(/^shortlist_/, "");
+        // Strip "Grant deadline: " / "SAM deadline: " prefix if user left it
+        let title = form.title.trim();
+        title = title.replace(/^(Grant|SAM)\s+deadline:\s*/i, "").trim() || title;
+        updateShortlistItem(shortId, {
+          title,
+          deadline: form.allDay ? form.start : String(form.start).slice(0, 10),
+          number: form.bidName || undefined,
+        });
+      } else if (editingId) {
         await calendarApi.updateEvent(editingId, body);
       } else {
         await calendarApi.createEvent(body);
@@ -229,6 +268,7 @@ export default function ProposalManagerCalendar() {
       setFormOpen(false);
       setForm(EMPTY_FORM);
       setEditingId(null);
+      setSelected(null);
       await refresh();
     } catch (err) {
       setError(err?.response?.data?.error || err?.message || "Save failed");
@@ -241,7 +281,11 @@ export default function ProposalManagerCalendar() {
     if (!selected || selected.source === "collaboration") return;
     if (!window.confirm(t("proposalManagerCalendar.confirmDelete"))) return;
     try {
-      await calendarApi.deleteEvent(selected.id);
+      if (isShortlistEvent(selected)) {
+        removeShortlist(selected.shortlistId || selected.id);
+      } else {
+        await calendarApi.deleteEvent(selected.id);
+      }
       setSelected(null);
       await refresh();
     } catch (err) {
@@ -400,7 +444,12 @@ export default function ProposalManagerCalendar() {
               {t("proposalManagerCalendar.upcoming")}
             </h2>
             <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-              {upcomingList.map((ev) => (
+              {upcomingList.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                  {t("proposalManagerCalendar.noUpcoming")}
+                </p>
+              ) : (
+                upcomingList.map((ev) => (
                 <button
                   key={ev.id}
                   type="button"
@@ -417,10 +466,12 @@ export default function ProposalManagerCalendar() {
                     </div>
                   </div>
                 </button>
-              ))}
+              ))
+              )}
             </div>
           </div>
 
+          {!isTrial && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
             <h2 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
               <FiUsers className="w-5 h-5 text-purple-600" />
@@ -488,6 +539,7 @@ export default function ProposalManagerCalendar() {
               <p className="text-sm text-gray-500">{t("proposalManagerCalendar.teamLoading")}</p>
             )}
           </div>
+          )}
 
           {selected && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
@@ -531,12 +583,12 @@ export default function ProposalManagerCalendar() {
                 )}
               </div>
               <div className="mt-4 flex gap-2">
-                {selected.source !== "collaboration" && selected.source !== "rfp-deadline" && selected.source !== "demo" && (
+                {canEditEvent(selected) && (
                   <>
                     <button
                       type="button"
                       onClick={() => openEditManual(selected)}
-                      className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      className="px-3 py-1.5 text-sm rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium"
                     >
                       {t("proposalManagerCalendar.edit")}
                     </button>
@@ -550,7 +602,7 @@ export default function ProposalManagerCalendar() {
                     </button>
                   </>
                 )}
-                {(selected.source === "collaboration" || selected.source === "demo") && (
+                {!canEditEvent(selected) && (selected.source === "collaboration" || selected.source === "demo") && (
                   <p className="text-xs text-gray-500 flex items-center gap-1">
                     <FiAlertCircle className="w-3 h-3" />
                     {selected.source === "demo"

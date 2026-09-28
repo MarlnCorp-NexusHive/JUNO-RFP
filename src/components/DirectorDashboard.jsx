@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,21 @@ import DirectorUserManagement from '../features/director/components/DirectorUser
 import DirectorCommunicationHub from '../features/director/components/DirectorCommunicationHub';
 import { parseLocalStorageJson } from "../utils/safeStorage.js";
 import { getTrialSession } from "../services/trialAuthSession.js";
+import {
+  daysUntilDeadline,
+  listShortlist,
+  subscribeShortlist,
+  urgencyAlertColor,
+} from "../features/proposal-manager/services/shortlistStore.js";
+import {
+  getComplianceData,
+  subscribeCompliance,
+  getComplianceScore,
+  getUnaddressedClauseCount,
+  getFarRiskFlag,
+  getPastPerformanceScore,
+  buildComplianceAlerts,
+} from "../features/proposal-manager/services/complianceStore.js";
 
 function isTrialUserSession() {
   const session = getTrialSession();
@@ -382,6 +397,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const welcomeMessage = welcomeMessageProp ?? t(`welcome:${user?.username || 'director'}`);
   const [modalCard, setModalCard] = useState(null);
   const [modalChart, setModalChart] = useState(null);
+  const [shortlistItems, setShortlistItems] = useState(() => listShortlist());
+  const [complianceData, setComplianceData] = useState(() => getComplianceData());
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
   const pmText = (en, ar) => (isArabic ? ar : en);
   const pmLabel = (text) => {
@@ -502,7 +519,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: t('dashboard.kpis.academics'), value: 8.2, icon: "📚", color: "bg-yellow-100 text-yellow-700" },
     { label: t('dashboard.kpis.attendance'), value: 92, icon: "📅", color: "bg-pink-100 text-pink-700" },
   ];
-  const proposalManagerKpis = [
+  const proposalManagerKpisBase = [
     { label: pmText("RFP MTTR", "متوسط وقت الاستجابة لطلب العروض"), value: pmText("3 days", "3 أيام"), formatType: "text", icon: "⏱️", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200", spark: [5.5, 5.0, 4.4, 3.9, 3.4, 3.0], sparkColor: { light: "#f59e0b", dark: "#fbbf24" } },
     { label: pmText("RFPs Responded (Last Quarter)", "طلبات العروض المُجاب عليها (الربع الأخير)"), value: 27, formatType: "number", icon: "📨", color: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200", spark: [18, 20, 22, 24, 25, 27], sparkColor: { light: "#0ea5e9", dark: "#7dd3fc" } },
     { label: pmText("Compliance Coverage %", "نسبة تغطية الامتثال"), value: 94, formatType: "percent", icon: "✅", color: "bg-green-100 text-green-700" },
@@ -510,7 +527,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: pmText("FAR / Regulatory Risk Flag (if federal)", "مؤشر مخاطر FAR / المخاطر التنظيمية"), value: pmText("Low", "منخفض"), formatType: "text", icon: "🚩", color: "bg-purple-100 text-purple-700" },
     { label: pmText("Past Performance Alignment Score", "درجة توافق الأداء السابق"), value: 87, formatType: "percent", icon: "🎯", color: "bg-pink-100 text-pink-700" },
   ];
-  const kpis = basePath === "/app" ? proposalManagerKpis : directorKpis;
 
   // Proposal Manager dashboard: RFP-focused summary cards; Director: translated summary cards
   const proposalManagerSummaryCards = [
@@ -533,16 +549,80 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   // Generate translated alerts: Proposal Manager = RFP/bid/compliance alerts; Director = budget/compliance/HR
   const isPM = basePath === "/app";
-  const hideAiRevenueSection = isPM && isTrialUserSession();
-  const alerts = isPM
+  const isTrialPm = isPM && isTrialUserSession();
+  const hideAiRevenueSection = isTrialPm;
+
+  const farFlag = getFarRiskFlag(complianceData);
+  const farFlagLabel =
+    farFlag === "None"
+      ? pmText("None", "لا يوجد")
+      : farFlag === "High"
+        ? pmText("High", "مرتفع")
+        : farFlag === "Medium"
+          ? pmText("Medium", "متوسط")
+          : pmText("Low", "منخفض");
+
+  const proposalManagerKpis = isTrialPm
+    ? proposalManagerKpisBase.map((kpi, idx) => {
+        if (idx === 2) return { ...kpi, value: getComplianceScore(complianceData) };
+        if (idx === 3) return { ...kpi, value: getUnaddressedClauseCount(complianceData) };
+        if (idx === 4) return { ...kpi, value: farFlagLabel };
+        if (idx === 5) return { ...kpi, value: getPastPerformanceScore(complianceData) };
+        return kpi;
+      })
+    : proposalManagerKpisBase;
+  const kpis = basePath === "/app" ? proposalManagerKpis : directorKpis;
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    setShortlistItems(listShortlist());
+    return subscribeShortlist(setShortlistItems);
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    setComplianceData(getComplianceData());
+    return subscribeCompliance(setComplianceData);
+  }, [isTrialPm]);
+
+  const staticPmAlerts = isTrialPm
     ? [
+        { text: t('dashboard.alerts.proposalManager.rfpSubmissionDeadline'), color: 'text-red-500' },
+        { text: t('dashboard.alerts.proposalManager.bidApprovalPending'), color: 'text-blue-500' },
+        { text: t('dashboard.alerts.proposalManager.teamAssignmentNeeded'), color: 'text-indigo-500' },
+        { text: t('dashboard.alerts.proposalManager.pastPerformanceUpdate'), color: 'text-purple-500' },
+        { text: t('dashboard.alerts.proposalManager.pricingReviewRequired'), color: 'text-green-600 dark:text-green-400' },
+      ]
+    : [
         { text: t('dashboard.alerts.proposalManager.rfpSubmissionDeadline'), color: 'text-red-500' },
         { text: t('dashboard.alerts.proposalManager.complianceReviewDue'), color: 'text-amber-500' },
         { text: t('dashboard.alerts.proposalManager.bidApprovalPending'), color: 'text-blue-500' },
         { text: t('dashboard.alerts.proposalManager.teamAssignmentNeeded'), color: 'text-indigo-500' },
         { text: t('dashboard.alerts.proposalManager.pastPerformanceUpdate'), color: 'text-purple-500' },
         { text: t('dashboard.alerts.proposalManager.pricingReviewRequired'), color: 'text-green-600 dark:text-green-400' },
-      ]
+      ];
+  const shortlistAlerts = isTrialPm
+    ? shortlistItems.map((item) => {
+        const days = daysUntilDeadline(item.deadline);
+        const daysPart =
+          days == null
+            ? ""
+            : days < 0
+              ? ` (${t("dashboard.alerts.proposalManager.shortlistPastDue")})`
+              : ` (${t("dashboard.alerts.proposalManager.shortlistDaysLeft", { count: days })})`;
+        return {
+          text: t("dashboard.alerts.proposalManager.shortlistDeadline", {
+            date: item.deadline,
+            title: item.title,
+            daysPart,
+          }),
+          color: urgencyAlertColor(days),
+        };
+      })
+    : [];
+  const complianceAlerts = isTrialPm ? buildComplianceAlerts(complianceData, t) : [];
+  const alerts = isPM
+    ? [...shortlistAlerts, ...complianceAlerts, ...staticPmAlerts]
     : [
         { icon: '🚨', text: t('dashboard.alerts.pendingBudgetApprovals'), color: 'text-red-500' },
         { icon: '⚠️', text: t('dashboard.alerts.complianceAlert'), color: 'text-yellow-500' },
@@ -1117,7 +1197,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           </p>
             {basePath === "/app" && (
             <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mt-4">
-              {pmText("Portfolio Overview", "نظرة عامة على المحفظة")}
+              {isTrialPm
+                ? pmText("Portfolio Overview", "نظرة عامة على المحفظة")
+                : pmText("Bids Portfolio Health Overview", "نظرة عامة على صحة محفظة العطاءات")}
             </h2>
           )}
         </div>
@@ -1276,35 +1358,32 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           ))}
         </div>
 
-        {/* Alerts & Notifications Widget — 3rd place */}
+        {/* Alerts — trial PM only: 3rd place after KPI grid */}
+        {isTrialPm && (
         <section
           className="mt-8"
           data-tour="3.5"
           data-tour-title-en="Alerts & Notifications"
-          data-tour-content-en={isPM ? "Submission deadlines, compliance, bid approvals, and team assignments." : "System alerts and important updates."}
+          data-tour-content-en="Submission deadlines, compliance, bid approvals, and team assignments."
           data-tour-title-ar="التنبيهات والإشعارات"
-          data-tour-content-ar={isPM ? "مواعيد التقديم، الامتثال، موافقات العروض، وتعيينات الفريق." : "تنبيهات النظام والتحديثات المهمة."}
+          data-tour-content-ar="مواعيد التقديم، الامتثال، موافقات العروض، وتعيينات الفريق."
           data-tour-position="top"
         >
           <div className="flex items-center gap-2 mb-2">
-            {!isPM && <span className="text-xl">🔔</span>}
             <h2 className="text-lg font-bold tracking-wide">{t('dashboard.sections.alertsNotifications')}</h2>
           </div>
           <div className="w-full">
-            <div className={`w-full rounded-2xl shadow-lg p-6 flex flex-col gap-3 ${isPM ? 'bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-900' : 'bg-gradient-to-r from-blue-100 to-blue-50 dark:from-gray-800 dark:to-gray-900 animate-pulse'}`}>
+            <div className="w-full rounded-2xl shadow-lg p-6 flex flex-col gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
               {alerts.map((alert, idx) => (
                 <div key={idx} className={`flex items-center gap-3 font-medium ${alert.color}`}>
-                  {isPM ? (
-                    <span className="shrink-0 w-6 text-gray-600 dark:text-gray-400 font-semibold">{idx + 1}.</span>
-                  ) : (
-                    <span className="text-xl">{alert.icon}</span>
-                  )}
+                  <span className="shrink-0 w-6 text-gray-600 dark:text-gray-400 font-semibold">{idx + 1}.</span>
                   <span>{alert.text}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
+        )}
 
         {/* Animated Charts Section */}
         <div
@@ -1551,7 +1630,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           )}
         </section>
 
-        {/* Capture & Proposal Pipeline Intelligence (Proposal Manager) / HR & Staff Analytics (Director) */}
+        {/* Capture & Proposal Pipeline (demo PM) / HR & Staff (Director). Hidden for trial PM. */}
+        {(!isPM || !isTrialPm) && (
         <section
           className="mt-8"
           data-tour="8"
@@ -1634,10 +1714,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             )}
           </div>
         </section>
+        )}
 
         {basePath === "/app" && (
           <>
-            {/* Operational Quality Intelligence (Production Discipline & Efficiency) */}
+            {!isTrialPm && (
             <section className="mt-8" data-tour-position="bottom">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-bold tracking-wide">{pmText("Operational Quality Intelligence (Production Discipline & Efficiency)", "ذكاء الجودة التشغيلية (انضباط الإنتاج والكفاءة)")}</h2>
@@ -1671,6 +1752,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 </div>
               </div>
             </section>
+            )}
 
             {/* Competitive Intelligence (Positioning & Win Probability) */}
             <section className="mt-8" data-tour-position="bottom">
@@ -1705,6 +1787,38 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               </div>
             </section>
           </>
+        )}
+
+        {/* Alerts — demo PM + Director (original placement before AI widgets) */}
+        {!isTrialPm && (
+        <section
+          className="mt-8"
+          data-tour="9"
+          data-tour-title-en={isPM ? "RFP Alerts & Notifications" : "Alerts & Notifications"}
+          data-tour-content-en={isPM ? "Submission deadlines, compliance, bid approvals, and team assignments." : "System alerts and important updates."}
+          data-tour-title-ar={isPM ? "تنبيهات وعروض RFP والإشعارات" : "التنبيهات والإشعارات"}
+          data-tour-content-ar={isPM ? "مواعيد التقديم، الامتثال، موافقات العروض، وتعيينات الفريق." : "تنبيهات النظام والتحديثات المهمة."}
+          data-tour-position="top"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            {!isPM && <span className="text-xl">🔔</span>}
+            <h2 className="text-lg font-bold tracking-wide">{isPM ? t('dashboard.sections.alertsNotificationsProposalManager') : t('dashboard.sections.alertsNotifications')}</h2>
+          </div>
+          <div className="w-full">
+            <div className={`w-full rounded-2xl shadow-lg p-6 flex flex-col gap-3 ${isPM ? 'bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-900' : 'bg-gradient-to-r from-blue-100 to-blue-50 dark:from-gray-800 dark:to-gray-900 animate-pulse'}`}>
+              {alerts.map((alert, idx) => (
+                <div key={idx} className={`flex items-center gap-3 font-medium ${alert.color}`}>
+                  {isPM ? (
+                    <span className="shrink-0 w-6 text-gray-600 dark:text-gray-400 font-semibold">{idx + 1}.</span>
+                  ) : (
+                    <span className="text-xl">{alert.icon}</span>
+                  )}
+                  <span>{alert.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
         )}
 
         {/* AI Widgets: Modern Side-by-Side Layout */}
@@ -1761,6 +1875,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                   </div>
                 </div>
+                {!isTrialPm && (
+                <>
                 {/* Elimination Risk Forecast */}
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
                   <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('dropout')} title={t('dashboard.aiLabels.clickToEnlarge')}>
@@ -1829,7 +1945,81 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     </div>
                   </div>
                 </div>
+                </>
+                )}
+                {isTrialPm && (
+                <>
+                {/* Win Probability Trend (trial: same row as Submission Forecast) */}
+                <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
+                  <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('leadConversion')} title={t('dashboard.aiLabels.clickToEnlarge')}>
+                    <ResponsiveContainer width="100%" height={140}>
+                      <LineChart data={proposalWinProbabilityTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
+                        <YAxis domain={[25, 40]} tickFormatter={v => `${v}%`} />
+                        <Tooltip formatter={v => `${v}%`} labelFormatter={(label) => pmGraphLabel(label)} />
+                        <Line type="monotone" dataKey="Rate" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-blue-700 dark:text-blue-300">{pmText("Win Probability Trend", "اتجاه احتمالية الفوز")}</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
+                      </div>
+                      <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
+                        {pmText("Weighted win rate trending to", "اتجاه معدل الفوز الموزون نحو")} <span className="font-bold text-green-600 dark:text-green-400">~35%</span> (+2%).<br />
+                        {pmText("Strongest", "الأقوى")}: <span className="font-semibold">Sole Source, FAR 16 Task</span>.
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">90%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Past Performance, Price Position, Technical Score", "الأداء السابق، تموضع السعر، الدرجة الفنية")}</span></div>
+                      <div className="text-xs text-blue-600 dark:text-blue-300 mb-1">{pmText("What-if: +5% technical score -> +1.5% win rate", "ماذا لو: +5% في الدرجة الفنية -> +1.5% معدل فوز")}</div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
+                      <span>{t('dashboard.aiLabels.lastUpdated')}: 1h ago</span>
+                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Revenue from Wins/Grants Awarded */}
+                <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
+                  <div className="flex-1 min-w-[140px] flex items-center justify-center cursor-pointer group" onClick={() => setModalChart('applicationFee')} title={t('dashboard.aiLabels.clickToEnlarge')}>
+                    <ResponsiveContainer width="100%" height={140}>
+                      <BarChart data={revenueFromWinsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
+                        <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                        <Tooltip formatter={(v, name) => [`$${Number(v).toLocaleString()}`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
+                        <Bar dataKey="Revenue" name={pmGraphLabel("Revenue")} fill="#22c55e" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="Pending" name={pmGraphLabel("Pending")} fill="#f59e0b" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-green-700 dark:text-green-300">{pmText("Revenue from Wins/Grants Awarded", "إيرادات من الفوز / المنح الممنوحة")}</span>
+                        <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-xs text-green-700 dark:text-green-200 font-semibold">{t('dashboard.aiLabels.ai')}</span>
+                      </div>
+                      <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">
+                        {pmText("YTD revenue from won proposals", "إيرادات السنة حتى الآن من العروض الفائزة")}: <span className="font-bold text-blue-600 dark:text-blue-400">~$2.93M</span>.<br />
+                        {pmText("Pending (award not yet funded)", "معلّق (ترسية غير ممولة بعد)")}: <span className="font-semibold">~$1.28M</span>.
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.confidence')}: <span className="font-bold text-green-500">91%</span> | {t('dashboard.aiLabels.model')}: v2.1</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.aiLabels.keyDrivers')}: <span className="font-medium">{pmText("Win Rate, Contract Value, Award Timing", "معدل الفوز، قيمة العقد، توقيت الترسية")}</span></div>
+                      <div className="text-xs text-green-600 dark:text-green-300 mb-1">{pmText("What-if: +2 wins/month -> +$0.4M revenue", "ماذا لو: +2 فوز/شهر -> +$0.4M إيرادات")}</div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mt-2">
+                      <span>{t('dashboard.aiLabels.lastUpdated')}: 2h ago</span>
+                      <span className="italic">{t('dashboard.aiLabels.poweredByNexusAI')}</span>
+                    </div>
+                  </div>
+                </div>
+                </>
+                )}
               </div>
+              {!isTrialPm && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 {/* Win Probability Trend */}
                 <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
@@ -1932,6 +2122,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   </div>
                 </div>
               </div>
+              )}
             </>
           ) : (
             <>

@@ -6,6 +6,7 @@ import { useProposalIssuer } from "./ProposalIssuerContext";
 import { ensureBoilerplateLibrary } from "../services/proposalManagerStorage.js";
 import { BOILERPLATE_PACK } from "../data/boilerplateCapabilities.js";
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const NAME_OVERRIDES_KEY = "proposal_manager_source_docs_names";
@@ -648,7 +649,13 @@ export default function SourceDocsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("proposalManagerSourceDocs.title")}</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">{t("proposalManagerSourceDocs.subtitle")}</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          {isTrialUserSession()
+            ? t("proposalManagerSourceDocs.subtitleTrial", {
+                defaultValue: "Upload and manage Grants/RFP source documents.",
+              })
+            : t("proposalManagerSourceDocs.subtitle")}
+        </p>
       </div>
 
       {issuer && (

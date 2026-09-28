@@ -438,7 +438,22 @@
       "trainingMonitoring": "تدريب، مراقبة",
       "systemUpdates": "تحديثات النظام",
       "accessControl": "التحكم في الوصول"
-    }
+    },
+    "trialSubtitle": "تتبع بيانات امتثال FAR وطلبات العروض والمنح الخاصة بك.",
+    "trialEmptyAreas": "لا توجد مجالات امتثال بعد. أضف أول مجال لبدء تتبع التغطية.",
+    "trialEmptyLogs": "لا توجد سجلات تدقيق بعد. سجّل الإجراءات أثناء عمل فريقك على العروض والمنح.",
+    "trialEmptyRisks": "لا توجد مخاطر بعد. أضف المخاطر لإبقاء لوحة المعلومات والتنبيهات محدّثة.",
+    "trialAddArea": "إضافة مجال",
+    "trialAddLog": "إضافة سجل",
+    "trialAddRisk": "إضافة مخاطر",
+    "trialAdd": "إضافة",
+    "trialSave": "حفظ",
+    "trialCancel": "إلغاء",
+    "trialEdit": "تعديل",
+    "trialDelete": "حذف",
+    "trialAreaName": "اسم المجال",
+    "trialRiskName": "اسم المخاطر",
+    "trialScore": "الدرجة %"
   },
   "userManagement": {
     "title": "إدارة المستخدمين",
@@ -1200,7 +1215,7 @@
       "financialOverview": "نظرة عامة مالية",
       "hrStaffAnalytics": "تحليلات الموارد البشرية والموظفين",
       "alertsNotifications": "التنبيهات والإشعارات",
-      "alertsNotificationsProposalManager": "التنبيهات والإشعارات",
+      "alertsNotificationsProposalManager": "تنبيهات وعروض RFP والإشعارات",
       "aiPoweredForecasts": "التوقعات المدعومة بالذكاء الاصطناعي",
       "aiPoweredRevenue": "تحليلات الإيرادات والتحويل المدعومة بالذكاء الاصطناعي"
     },
@@ -1265,7 +1280,14 @@
         "bidApprovalPending": "قرار تقديم/عدم تقديم معلق: فرصة واحدة بانتظار موافقتك",
         "teamAssignmentNeeded": "تعيين الفريق مطلوب: قائد استراتيجية الاستحواذ غير معين لـ GSA BPA",
         "pastPerformanceUpdate": "تحديث الأداء السابق: استبيان PP جديد لإكماله لمتابعة NASA",
-        "pricingReviewRequired": "مراجعة التسعير مطلوبة: أسعار العمالة تحتاج تحقق لإعادة منافسة DHS"
+        "pricingReviewRequired": "مراجعة التسعير مطلوبة: أسعار العمالة تحتاج تحقق لإعادة منافسة DHS",
+        "shortlistDeadline": "الموعد النهائي {{date}}: {{title}}{{daysPart}}",
+        "shortlistDaysLeft": "{{count}} أيام متبقية",
+        "shortlistDaysLeft_one": "يوم واحد متبقٍ",
+        "shortlistPastDue": "منتهٍ",
+        "complianceAreaPending": "امتثال معلّق: {{name}} يحتاج مراجعة",
+        "complianceAreaNonCompliant": "مجال غير متوافق: {{name}} يتطلب إجراءً",
+        "complianceHighRisk": "مخاطر امتثال مرتفعة: {{name}}"
       }
     },
     "modalContent": {

@@ -437,7 +437,22 @@
       "trainingMonitoring": "Training, Monitoring",
       "systemUpdates": "System Updates",
       "accessControl": "Access Control"
-    }
+    },
+    "trialSubtitle": "Track your own FAR, RFP, and grant compliance data.",
+    "trialEmptyAreas": "No compliance areas yet. Add your first area to start tracking coverage.",
+    "trialEmptyLogs": "No audit logs yet. Record actions as your team works proposals and grants.",
+    "trialEmptyRisks": "No risks yet. Add risks to keep the dashboard and alerts up to date.",
+    "trialAddArea": "Add area",
+    "trialAddLog": "Add log",
+    "trialAddRisk": "Add risk",
+    "trialAdd": "Add",
+    "trialSave": "Save",
+    "trialCancel": "Cancel",
+    "trialEdit": "Edit",
+    "trialDelete": "Delete",
+    "trialAreaName": "Area name",
+    "trialRiskName": "Risk name",
+    "trialScore": "Score %"
   },
   "userManagement": {
     "title": "User Management",
@@ -1202,7 +1217,7 @@
       "financialOverview": "Financial Overview",
       "hrStaffAnalytics": "HR & Team Analytics",
       "alertsNotifications": "Alerts & Notifications",
-      "alertsNotificationsProposalManager": "Alerts & Notifications",
+      "alertsNotificationsProposalManager": "RFP Alerts & Notifications",
       "aiPoweredForecasts": "AI-Powered Forecasts",
       "aiPoweredRevenue": "AI-Powered Revenue & Conversion Analytics"
     },
@@ -1267,7 +1282,14 @@
         "bidApprovalPending": "Bid/No-Bid decision pending: 1 opportunity awaiting your approval",
         "teamAssignmentNeeded": "Team assignment needed: Capture Strategy lead not assigned for GSA BPA",
         "pastPerformanceUpdate": "Past performance update: 1 new PP questionnaire to complete for NASA follow-on",
-        "pricingReviewRequired": "Pricing review required: Labor rates need validation for DHS recompete"
+        "pricingReviewRequired": "Pricing review required: Labor rates need validation for DHS recompete",
+        "shortlistDeadline": "Deadline {{date}}: {{title}}{{daysPart}}",
+        "shortlistDaysLeft": "{{count}} days left",
+        "shortlistDaysLeft_one": "{{count}} day left",
+        "shortlistPastDue": "past due",
+        "complianceAreaPending": "Compliance pending: {{name}} needs review",
+        "complianceAreaNonCompliant": "Non-compliant area: {{name}} requires action",
+        "complianceHighRisk": "High compliance risk: {{name}}"
       }
     },
     "modalContent": {

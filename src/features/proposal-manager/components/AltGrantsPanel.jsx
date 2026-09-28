@@ -20,6 +20,7 @@ import {
   grantExpandChevronHintClass,
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
+import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -519,13 +520,14 @@ export default function AltGrantsPanel({ variant }) {
                 key={opp.id}
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
               >
+                <div className="flex items-stretch">
                 <button
                   type="button"
                   onClick={() => {
                     dismissExpandHint();
                     setExpandedId(open ? null : opp.id);
                   }}
-                  className="flex w-full items-start gap-3 p-4 text-left hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                  className="flex min-w-0 flex-1 items-start gap-3 p-4 text-left hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
                 >
                   <div className="min-w-0 flex-1 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -566,6 +568,17 @@ export default function AltGrantsPanel({ variant }) {
                     <FiChevronDown className={`h-5 w-5 transition-transform ${open ? "rotate-180" : ""}`} />
                   </span>
                 </button>
+                <div className="flex shrink-0 items-start border-s border-slate-100 p-3 dark:border-slate-800">
+                  <OpportunityShortlistButton
+                    id={`alt:${opp.id}`}
+                    source="alt"
+                    title={opp.title}
+                    number={opp.id}
+                    agency={opp.funder}
+                    deadline={opp.closeDate}
+                  />
+                </div>
+                </div>
 
                 {open && (
                   <div className="space-y-4 border-t border-slate-100 px-4 pb-4 pt-3 dark:border-slate-800">

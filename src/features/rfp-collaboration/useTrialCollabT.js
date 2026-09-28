@@ -15,6 +15,7 @@ export function isTrialUserSession() {
  * that say "Team member" instead. API roles / field names stay "auditor".
  */
 const TRIAL_COPY_KEYS = {
+  "rfpCollaboration.pmHubTitle": "rfpCollaboration.trial.pmHubTitle",
   "rfpCollaboration.pmOnlyPortal": "rfpCollaboration.trial.pmOnlyPortal",
   "rfpCollaboration.auditorOnlyPortal": "rfpCollaboration.trial.auditorOnlyPortal",
   "rfpCollaboration.signInAsAuditor": "rfpCollaboration.trial.signInAsAuditor",

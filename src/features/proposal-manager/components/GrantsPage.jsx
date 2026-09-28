@@ -24,6 +24,7 @@ import {
   grantExpandChevronHintClass,
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
+import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 
 const STATUS_OPTIONS = [
   { value: "posted|forecasted", labelKey: "openAndForecasted" },
@@ -890,13 +891,14 @@ export default function GrantsPage() {
                       : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
                   }`}
                 >
+                  <div className="flex items-stretch">
                   <button
                     type="button"
                     id={headerId}
                     aria-expanded={open}
                     aria-controls={panelId}
                     onClick={() => toggleExpand(hit.id)}
-                    className="flex w-full items-start gap-3 p-4 text-start hover:bg-slate-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:hover:bg-slate-800/50"
+                    className="flex min-w-0 flex-1 items-start gap-3 p-4 text-start hover:bg-slate-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:hover:bg-slate-800/50"
                   >
                     <span
                       className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition dark:border-slate-600 dark:text-slate-300 ${
@@ -949,6 +951,17 @@ export default function GrantsPage() {
                       </div>
                     </div>
                   </button>
+                  <div className="flex shrink-0 items-start border-s border-slate-100 p-3 dark:border-slate-800">
+                    <OpportunityShortlistButton
+                      id={`grants:${hit.id}`}
+                      source="grants"
+                      title={hit.title}
+                      number={hit.number}
+                      agency={hit.agency || hit.agencyCode}
+                      deadline={hit.closeDate}
+                    />
+                  </div>
+                  </div>
 
                   {open && (
                     <div

@@ -8,6 +8,7 @@
 
 export const SAM_DATA_SNAPSHOT = "2026-09-28";
 export const SAM_SOURCE_LABEL = "SAM.gov (curated excerpt)";
+export const SAM_REFRESH_INTERVAL_MS = 60 * 60 * 1000;
 
 export const SAM_QUICK_AGENCIES = ["DHS", "DOD", "IRS", "USMC", "ARMY", "NAVY"];
 
@@ -401,6 +402,52 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     notes: "RFI only (as of 28 Sep 2026) — responses are not offers. Confirm live SAM status before responding.",
   },
 ];
+
+/** Deterministic PRNG for hourly reshuffles (no network). */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function getSamHourBucket(now = Date.now()) {
+  return Math.floor(now / SAM_REFRESH_INTERVAL_MS);
+}
+
+/**
+ * Client-only hourly refresh of the curated SAM list (shuffle + refresh timestamps).
+ * No SAM.gov API — same underlying notices, new order each UTC hour.
+ */
+export function buildHourlySamView(now = Date.now()) {
+  const bucket = getSamHourBucket(now);
+  const rng = mulberry32(bucket ^ 0x5a30000);
+  const list = SAM_CONTRACT_OPPORTUNITIES.map((o) => ({ ...o }));
+  for (let i = list.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = list[i];
+    list[i] = list[j];
+    list[j] = tmp;
+  }
+  const refreshedAt = new Date(bucket * SAM_REFRESH_INTERVAL_MS);
+  const nextRefreshAt = new Date((bucket + 1) * SAM_REFRESH_INTERVAL_MS);
+  return {
+    opportunities: list,
+    bucket,
+    refreshedAt,
+    nextRefreshAt,
+    refreshedLabel: refreshedAt.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }),
+  };
+}
 
 /**
  * Client-side filter for curated SAM opportunities.

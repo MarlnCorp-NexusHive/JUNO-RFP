@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FiCalendar,
@@ -12,12 +12,15 @@ import {
   FiX,
 } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import {
   SAM_CONTRACT_OPPORTUNITIES,
   SAM_DATA_SNAPSHOT,
   SAM_QUICK_AGENCIES,
+  SAM_REFRESH_INTERVAL_MS,
   SAM_SET_ASIDES,
   SAM_SOURCE_LABEL,
+  buildHourlySamView,
   filterSamOpportunities,
 } from "../data/samContractOpportunities";
 import {
@@ -25,6 +28,7 @@ import {
   grantExpandChevronHintClass,
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
+import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -72,6 +76,7 @@ function Field({ label, children }) {
 export default function SamContractsPanel() {
   const { t } = useTranslation("common");
   const { isRTLMode } = useLocalization();
+  const isTrial = isTrialUserSession();
 
   const [draftKeyword, setDraftKeyword] = useState("");
   const [keyword, setKeyword] = useState("");
@@ -82,7 +87,32 @@ export default function SamContractsPanel() {
   const [noticeType, setNoticeType] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [copiedId, setCopiedId] = useState("");
+  const [hourTick, setHourTick] = useState(0);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
+
+  useEffect(() => {
+    if (!isTrial) return undefined;
+    let intervalId = null;
+    const msToNextHour = SAM_REFRESH_INTERVAL_MS - (Date.now() % SAM_REFRESH_INTERVAL_MS);
+    const timeoutId = window.setTimeout(() => {
+      setHourTick((n) => n + 1);
+      intervalId = window.setInterval(() => setHourTick((n) => n + 1), SAM_REFRESH_INTERVAL_MS);
+    }, msToNextHour);
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (intervalId != null) window.clearInterval(intervalId);
+    };
+  }, [isTrial]);
+
+  const samPool = useMemo(() => {
+    if (!isTrial) {
+      return {
+        opportunities: SAM_CONTRACT_OPPORTUNITIES,
+        refreshedLabel: SAM_DATA_SNAPSHOT,
+      };
+    }
+    return buildHourlySamView();
+  }, [isTrial, hourTick]);
 
   const toggleExpand = (id) => {
     dismissExpandHint();
@@ -91,7 +121,7 @@ export default function SamContractsPanel() {
 
   const filtered = useMemo(
     () =>
-      filterSamOpportunities(SAM_CONTRACT_OPPORTUNITIES, {
+      filterSamOpportunities(samPool.opportunities, {
         keyword,
         naics,
         psc,
@@ -99,7 +129,7 @@ export default function SamContractsPanel() {
         setAside,
         noticeType,
       }),
-    [keyword, naics, psc, agency, setAside, noticeType],
+    [samPool.opportunities, keyword, naics, psc, agency, setAside, noticeType],
   );
 
   const filtersDirty =
@@ -157,10 +187,15 @@ export default function SamContractsPanel() {
             </h2>
           </div>
           <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600">
-            {t("proposalManagerSam.curatedFrom", {
-              source: SAM_SOURCE_LABEL,
-              date: SAM_DATA_SNAPSHOT,
-            })}
+            {isTrial
+              ? t("proposalManagerSam.hourlyRefresh", {
+                  source: SAM_SOURCE_LABEL,
+                  time: samPool.refreshedLabel,
+                })
+              : t("proposalManagerSam.curatedFrom", {
+                  source: SAM_SOURCE_LABEL,
+                  date: SAM_DATA_SNAPSHOT,
+                })}
           </p>
         </div>
       </header>
@@ -369,10 +404,11 @@ export default function SamContractsPanel() {
                 key={opp.id}
                 className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
               >
+                <div className="flex items-stretch">
                 <button
                   type="button"
                   onClick={() => toggleExpand(opp.id)}
-                  className="flex w-full items-start gap-3 p-4 text-start hover:bg-slate-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:hover:bg-slate-800/50"
+                  className="flex min-w-0 flex-1 items-start gap-3 p-4 text-start hover:bg-slate-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:hover:bg-slate-800/50"
                   aria-expanded={open}
                 >
                   <div className="min-w-0 flex-1 space-y-2">
@@ -433,6 +469,17 @@ export default function SamContractsPanel() {
                     <FiChevronDown className={`transition-transform ${open ? "rotate-180" : ""}`} />
                   </span>
                 </button>
+                <div className="flex shrink-0 items-start border-s border-slate-100 p-3 dark:border-slate-800">
+                  <OpportunityShortlistButton
+                    id={`sam:${opp.id}`}
+                    source="sam"
+                    title={opp.title}
+                    number={opp.noticeId}
+                    agency={opp.agencyCode}
+                    deadline={opp.responseDeadline}
+                  />
+                </div>
+                </div>
 
                 {open && (
                   <div className="space-y-4 border-t border-slate-100 px-4 py-4 dark:border-slate-700">

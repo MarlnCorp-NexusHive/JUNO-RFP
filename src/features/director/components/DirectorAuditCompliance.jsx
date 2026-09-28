@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { directorFeatures } from '../../../components/directorFeatures';
+import TrialCompliancePanel from "./TrialCompliancePanel.jsx";
 import { 
   FiShield, 
   FiFileText, 
@@ -29,6 +31,7 @@ import {
 export default function DirectorAuditCompliance() {
   const location = useLocation();
   const isPM = location.pathname.includes("/app/compliance");
+  const isTrialPm = isPM && isTrialUserSession();
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [logFilter, setLogFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -74,6 +77,7 @@ export default function DirectorAuditCompliance() {
       "Low Risk": "مخاطر منخفضة",
       "Risk Score": "درجة المخاطر",
       "Proposal & RFP Compliance": "امتثال العروض وطلبات تقديم العروض",
+      "Grants and RFP Compliance": "امتثال المنح وطلبات تقديم العروض",
       "FAR conformance, RFP requirements, proposal audit trail, and past performance.": "التوافق مع FAR، متطلبات طلبات العروض، سجل تدقيق العرض، والأداء السابق.",
       "Loading...": "جارٍ التحميل...",
     };
@@ -92,6 +96,10 @@ export default function DirectorAuditCompliance() {
         </main>
       </div>
     );
+  }
+
+  if (isTrialPm) {
+    return <TrialCompliancePanel isArabic={isArabic} />;
   }
 
   const pmAuditLogs = [
@@ -293,7 +301,9 @@ export default function DirectorAuditCompliance() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 <FiShield className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                {isPM ? pmLabel("Proposal & RFP Compliance") : t('auditCompliance.title')}
+                {isPM
+                  ? pmLabel(isTrialPm ? "Grants and RFP Compliance" : "Proposal & RFP Compliance")
+                  : t('auditCompliance.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-2">
                 {isPM ? pmLabel("FAR conformance, RFP requirements, proposal audit trail, and past performance.") : t('auditCompliance.subtitle')}

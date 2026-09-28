@@ -28,6 +28,7 @@ import {
 } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useLocalization } from "../../../hooks/useLocalization";
+import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 // Proposal Manager team roles (Team Structure & Hierarchy)
 const PROPOSAL_MANAGER_ROLES = [
   "Capture Manager",
@@ -118,6 +119,7 @@ export default function MarketingHeadTeamManagement() {
   const [languageVersion, setLanguageVersion] = useState(0);
   const { isRTLMode } = useLocalization();
   const isProposalManagerTeam = location.pathname.includes('/app/team');
+  const isTrialPm = isProposalManagerTeam && isTrialUserSession();
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isProposalManagerTeam ? (isArabic ? ar : en) : en);
   const pmTranslate = (text) => {
@@ -159,7 +161,7 @@ export default function MarketingHeadTeamManagement() {
 
   useEffect(() => {
     if (location.pathname.includes('/app/team')) {
-      setMembers(proposalManagerInitialMembers);
+      setMembers(isTrialUserSession() ? [] : proposalManagerInitialMembers);
     }
   }, [location.pathname]);
 
@@ -182,6 +184,47 @@ export default function MarketingHeadTeamManagement() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [trainingPerfStatus, setTrainingPerfStatus] = useState("certified");
+  const [newTrainingTitle, setNewTrainingTitle] = useState("");
+  /** Trial starts empty — users add their own trainings/certs. */
+  const [customTrainings, setCustomTrainings] = useState([]);
+  const TRAINING_PERF_OPTIONS = [
+    { id: "certified", label: "Certified" },
+    { id: "in_performance", label: "In performance" },
+    { id: "opt_out", label: "Opt out" },
+    { id: "expired", label: "Expired" },
+  ];
+  const TRIAL_PERMISSION_OPTIONS = [
+    { id: "view_rfps", label: "View RFPs" },
+    { id: "edit_sections", label: "Edit sections" },
+    { id: "compliance", label: "Compliance" },
+    { id: "past_performance", label: "Past performance" },
+    { id: "pricing", label: "Pricing" },
+    { id: "assign_questions", label: "Assign questions" },
+    { id: "full_access", label: "Full access" },
+  ];
+
+  const toggleMemberPermission = (memberId, permId) => {
+    setMembers((prev) =>
+      prev.map((m) => {
+        if (m.id !== memberId) return m;
+        const current = new Set(m.permissions || []);
+        if (current.has(permId)) current.delete(permId);
+        else current.add(permId);
+        return { ...m, permissions: [...current] };
+      }),
+    );
+  };
+
+  const addCustomTraining = () => {
+    const title = newTrainingTitle.trim();
+    if (!title || !trainingPerfStatus) return;
+    setCustomTrainings((prev) => [
+      ...prev,
+      { id: `tr_${Date.now()}`, training: title, status: trainingPerfStatus },
+    ]);
+    setNewTrainingTitle("");
+  };
 
   // Form state for new team member
   const [newMember, setNewMember] = useState({
@@ -192,6 +235,7 @@ export default function MarketingHeadTeamManagement() {
     skills: "",
     projects: "",
     status: "Active",
+    permissions: [],
   });
 
   const handleMemberClick = (member) => {
@@ -208,6 +252,7 @@ export default function MarketingHeadTeamManagement() {
       skills: "",
       projects: "",
       status: "Active",
+      permissions: [],
     });
     setShowAddModal(true);
   };
@@ -217,7 +262,7 @@ export default function MarketingHeadTeamManagement() {
     const name = newMember.name.trim();
     const email = newMember.email.trim();
     if (!name || !email) return;
-    const nextId = Math.max(0, ...members.map((m) => m.id)) + 1;
+    const nextId = members.reduce((max, m) => Math.max(max, Number(m.id) || 0), 0) + 1;
     const added = {
       id: nextId,
       name,
@@ -233,6 +278,7 @@ export default function MarketingHeadTeamManagement() {
       projects: newMember.projects
         ? newMember.projects.split(",").map((p) => p.trim()).filter(Boolean)
         : [],
+      permissions: isTrialPm ? [...(newMember.permissions || [])] : undefined,
     };
     setMembers((prev) => [...prev, added]);
     setShowAddModal(false);
@@ -246,7 +292,10 @@ export default function MarketingHeadTeamManagement() {
       completed: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
       inProgress: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
       resolved: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      certified: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+      certified: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      in_performance: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      opt_out: "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200",
+      expired: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
     };
 
     return (
@@ -503,7 +552,68 @@ export default function MarketingHeadTeamManagement() {
                   {isProposalManagerTeam ? pmText('Role Access & Permissions', 'صلاحيات الوصول حسب الدور') : t('team.sections.roleAccess.title')}
                 </h2>
               </div>
-              
+
+              {isTrialPm ? (
+                <div className="space-y-4">
+                  {members.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No team members yet. Add a team member, then choose which permissions to grant them here.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {members.map((member) => {
+                        const selected = new Set(member.permissions || []);
+                        return (
+                          <div
+                            key={member.id}
+                            className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{member.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {pmTranslate(member.role)}
+                                  {member.email ? ` · ${member.email}` : ""}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                              Permissions for this team member:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {TRIAL_PERMISSION_OPTIONS.map((opt) => {
+                                const on = selected.has(opt.id);
+                                return (
+                                  <button
+                                    key={opt.id}
+                                    type="button"
+                                    onClick={() => toggleMemberPermission(member.id, opt.id)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                                      on
+                                        ? "bg-purple-600 text-white border-purple-600"
+                                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-purple-400"
+                                    }`}
+                                  >
+                                    {opt.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={openAddModal}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium"
+                  >
+                    <FiPlus className="w-4 h-4" />
+                    Add team member
+                  </button>
+                </div>
+              ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -552,6 +662,7 @@ export default function MarketingHeadTeamManagement() {
                   {isProposalManagerTeam ? pmText('AI suggests assigning Compliance review to specialists only.', 'يقترح الذكاء الاصطناعي إسناد مراجعة الامتثال للمتخصصين فقط.') : t('team.sections.roleAccess.aiPermissionSuggestion')}
                 </div>
               </div>
+              )}
             </section>
 
             {/* Training & Development Tracker */}
@@ -571,37 +682,115 @@ export default function MarketingHeadTeamManagement() {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {isProposalManagerTeam ? pmText('Training & Certifications', 'التدريب والشهادات') : t('team.sections.trainingDevelopment.title')}
                 </h2>
+                {!isTrialPm && (
                 <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded animate-pulse">
                   {isProposalManagerTeam ? pmText('AI', 'ذكاء اصطناعي') : t('team.sections.trainingDevelopment.aiRecommendations')}
                 </span>
+                )}
               </div>
               
               <div className="space-y-3">
-                {(isProposalManagerTeam
-                  ? [
-                      { name: "Michael Anderson", training: "FAR/DFARS Overview", status: "certified" },
-                      { name: "Jennifer Thompson", training: "Proposal Writing Workshop", status: "inProgress" },
-                      { name: "Karen Brooks", training: "Compliance Certification", status: "certified" },
-                      { name: "Patricia Sullivan", training: "Solution Architecture Training", status: "pending" }
-                    ]
-                  : [
-                      { name: "Abdullah Al-Rashid", training: "Digital Marketing Bootcamp", status: "certified" },
-                      { name: "Noura Al-Zahra", training: "Content Strategy Seminar", status: "inProgress" },
-                      { name: "Khalid Al-Sayed", training: "Not attended recent training", status: "pending" }
-                    ]
-                ).map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}: {pmTranslate(item.training)}</span>
+                {!isTrialPm &&
+                  (isProposalManagerTeam
+                    ? [
+                        { name: "Michael Anderson", training: "FAR/DFARS Overview", status: "certified" },
+                        { name: "Jennifer Thompson", training: "Proposal Writing Workshop", status: "inProgress" },
+                        { name: "Karen Brooks", training: "Compliance Certification", status: "certified" },
+                        { name: "Patricia Sullivan", training: "Solution Architecture Training", status: "pending" },
+                      ]
+                    : [
+                        { name: "Abdullah Al-Rashid", training: "Digital Marketing Bootcamp", status: "certified" },
+                        { name: "Noura Al-Zahra", training: "Content Strategy Seminar", status: "inProgress" },
+                        { name: "Khalid Al-Sayed", training: "Not attended recent training", status: "pending" },
+                      ]
+                  ).map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {item.name}: {pmTranslate(item.training)}
+                        </span>
+                      </div>
+                      <StatusBadge status={item.status}>
+                        {t(`team.sections.trainingDevelopment.${item.status}`)}
+                      </StatusBadge>
                     </div>
-                    <StatusBadge status={item.status}>
-                      {t(`team.sections.trainingDevelopment.${item.status}`)}
-                    </StatusBadge>
+                  ))}
+                {isTrialPm && customTrainings.length === 0 && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    No trainings or certifications yet. Add your first below.
+                  </p>
+                )}
+                {isTrialPm &&
+                  customTrainings.map((item) => {
+                    const label =
+                      TRAINING_PERF_OPTIONS.find((o) => o.id === item.status)?.label || item.status;
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                      >
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{item.training}</span>
+                        <StatusBadge status={item.status}>{label}</StatusBadge>
+                      </div>
+                    );
+                  })}
+                {isTrialPm ? (
+                  <div className="mt-3 space-y-3 rounded-lg border border-yellow-200/60 dark:border-yellow-800/40 bg-yellow-50/40 dark:bg-yellow-950/20 p-3">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      Add Training / Certification
+                    </p>
+                    <input
+                      type="text"
+                      value={newTrainingTitle}
+                      onChange={(e) => setNewTrainingTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addCustomTraining();
+                        }
+                      }}
+                      placeholder="e.g. FAR/DFARS Refresh, Capture Planning Cert"
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+                    />
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Update your training and performance :
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {TRAINING_PERF_OPTIONS.map((opt) => {
+                          const selected = trainingPerfStatus === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setTrainingPerfStatus(opt.id)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                                selected
+                                  ? "bg-yellow-500 text-white border-yellow-500"
+                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-yellow-400"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addCustomTraining}
+                      disabled={!newTrainingTitle.trim()}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FiPlus className="w-4 h-4" />
+                      Add
+                    </button>
                   </div>
-                ))}
+                ) : (
                 <div className="text-xs text-yellow-600 animate-bounce">
                   {isProposalManagerTeam ? pmText('AI recommends FAR/DFARS refresh for new team members.', 'يوصي الذكاء الاصطناعي بتحديث تدريب FAR/DFARS لأعضاء الفريق الجدد.') : t('team.sections.trainingDevelopment.aiTrainingRecommendation')}
                 </div>
+                )}
               </div>
             </section>
           </div>
@@ -675,7 +864,8 @@ export default function MarketingHeadTeamManagement() {
               </div>
             </section>
 
-            {/* Performance Dashboard */}
+            {/* Performance Dashboard — hidden for trial PM */}
+            {!isTrialPm && (
             <section
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
               data-tour="5"
@@ -754,6 +944,7 @@ export default function MarketingHeadTeamManagement() {
                 </div>
               </div>
             </section>
+            )}
 
             {/* Communication Center */}
             <section
@@ -908,6 +1099,39 @@ export default function MarketingHeadTeamManagement() {
                     <option>{isProposalManagerTeam ? pmText('Pending', 'قيد الانتظار') : 'Pending'}</option>
                   </select>
                 </div>
+                {isTrialPm && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Permissions for this team member
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {TRIAL_PERMISSION_OPTIONS.map((opt) => {
+                        const on = (newMember.permissions || []).includes(opt.id);
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() =>
+                              setNewMember((p) => {
+                                const set = new Set(p.permissions || []);
+                                if (set.has(opt.id)) set.delete(opt.id);
+                                else set.add(opt.id);
+                                return { ...p, permissions: [...set] };
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                              on
+                                ? "bg-purple-600 text-white border-purple-600"
+                                : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <div className={`flex gap-3 pt-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
                   <button
                     type="button"
