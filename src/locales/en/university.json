@@ -155,7 +155,7 @@
   },
   "marlnCrm": {
     "title": "JUNO RFP",
-      "subtitle": "Transform Your corporate organization with AI-Powered ERP Management",
+      "subtitle": "AI-assisted capture for grants, contracts, and complex RFPs — from discovery to audit-ready proposals",
       "watchDemo": "Watch Demo",
       "downloadBrochure": "Download Brochure",
       "trustedBy": "Trusted by 500+ corporate organizations",
@@ -179,8 +179,8 @@
     },
     "overview": {
       "title": "Why Choose JUNO RFP?",
-      "description1": "Our comprehensive ERP solution is designed specifically for corporate organizations, providing everything you need to manage employees, teams, and business processes in one unified platform.",
-      "description2": "With advanced AI capabilities, real-time analytics, and seamless integration options, we help organizations streamline operations and enhance business success.",
+      "description1": "JUNO RFP is an AI-assisted proposal and capture platform for teams that chase federal grants, private funders, SAM.gov contracts, and complex RFP responses — from opportunity discovery through submission-ready drafts.",
+      "description2": "Unify Grants.gov and funder research, source documents, team collaboration, competitive intelligence, technical solutioning, and compliance checks in one workspace built for audit-ready proposals.",
       "platformType": "Platform Type",
       "deployment": "Deployment",
       "security": "Security",
@@ -191,36 +191,66 @@
       "supportValue": "24/7 Expert Support"
     },
     "features": {
-      "title": "Powerful Features for Modern Business",
-      "studentManagement": {
-        "title": "Client Management",
-        "description": "Comprehensive client lifecycle management from lead to conversion",
-        "benefits": ["Lead Tracking", "Client Records", "Progress Monitoring", "Communication Hub"]
+      "title": "Built for modern capture & proposal teams",
+      "opportunityDiscovery": {
+        "title": "RFP & Grants Discovery",
+        "description": "Find and triage live opportunities across federal, private, state/local, and contract channels in one place.",
+        "benefits": [
+          "Live Grants.gov search & detail",
+          "Private foundations via IRS/ProPublica",
+          "State & local–eligible opportunities",
+          "Curated SAM.gov contract notices"
+        ]
       },
-      "academicAnalytics": {
-        "title": "Business Analytics",
-        "description": "Real-time insights and reporting for data-driven decisions",
-        "benefits": ["Performance Metrics", "Trend Analysis", "Custom Reports", "Predictive Analytics"]
+      "proposalWorkspace": {
+        "title": "Proposal Workspace & Source Docs",
+        "description": "Ground every response in your boilerplate, NOFOs, and prior work — then draft and export from a shared workspace.",
+        "benefits": [
+          "Source docs & reference library",
+          "Content hub & boilerplate",
+          "Workspace tasks & document drafts",
+          "Bid vault for submissions"
+        ]
       },
-      "financialManagement": {
-        "title": "Financial Management",
-        "description": "Complete financial tracking and payment management system",
-        "benefits": ["Payment Collection", "Payment Tracking", "Financial Reports", "Budget Planning"]
+      "teamCollaboration": {
+        "title": "Team Collaboration",
+        "description": "Assign RFP questions to teammates, review AI drafts together, and keep a clear activity trail.",
+        "benefits": [
+          "Question-level assignments",
+          "AI-assisted draft responses",
+          "Review & approval flow",
+          "Activity log for accountability"
+        ]
       },
-      "communicationHub": {
-        "title": "Communication Hub",
-        "description": "Multi-channel communication platform for all stakeholders",
-        "benefits": ["Email Integration", "SMS Notifications", "Push Alerts", "Bulk Messaging"]
+      "marketIntelligence": {
+        "title": "Company & Competitive Intelligence",
+        "description": "Research issuers and competitors with public financials, trends, and differentiators before you bid.",
+        "benefits": [
+          "Issuer financials & trends",
+          "Competitor datasheets",
+          "Peer comparison views",
+          "Public-source grounded insights"
+        ]
       },
-      "documentManagement": {
-        "title": "Document Management",
-        "description": "Secure document storage and verification system",
-        "benefits": ["Digital Storage", "Version Control", "Access Control", "Audit Trail"]
+      "technicalSolutioning": {
+        "title": "Technical Solutioning & Capture",
+        "description": "Turn requirements into architecture, capture plans, and win/loss learning — not just narrative text.",
+        "benefits": [
+          "AI solution architecture from references",
+          "Capture strategy planning",
+          "Win/loss scoring & debriefs",
+          "Win slides with POV and proof"
+        ]
       },
-      "aiInsights": {
-        "title": "AI-Powered Insights",
-        "description": "Advanced AI features for predictive analytics and automation",
-        "benefits": ["Predictive Analytics", "Automated Workflows", "Smart Recommendations", "Chat Support"]
+      "compliancePricing": {
+        "title": "Compliance, Pricing & Delivery",
+        "description": "Stay audit-ready with compliance checks, pricing support, meetings, and team controls.",
+        "benefits": [
+          "Audit & compliance tracking",
+          "Pricing & cost proposal support",
+          "Meetings & calendar",
+          "Roles, settings & support"
+        ]
       }
     },
     "testimonials": {

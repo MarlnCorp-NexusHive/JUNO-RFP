@@ -8,7 +8,15 @@ import { clearCollabSession } from "../../rfp-collaboration/rfpCollabSession.js"
 import { clearTrialSession } from "../../../services/trialAuthSession.js";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
 
-export default function Sidebar({ features, userLabel, expanded, setExpanded, role = "director" }) {
+export default function Sidebar({
+  features,
+  userLabel,
+  expanded,
+  setExpanded,
+  role = "director",
+  brandLogoSrc,
+  brandLogoAlt,
+}) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -60,9 +68,11 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded, ro
           className={`flex items-center hover:opacity-80 transition-opacity ${isRTLMode ? 'space-x-reverse space-x-3' : 'space-x-3'}`}
         >
           <img
-            src="/marlncorplogo.png"
-            alt={t('sidebar.mbscLogo')}
-            className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'}`}
+            src={brandLogoSrc || "/marlncorplogo.png"}
+            alt={brandLogoAlt || t('sidebar.mbscLogo')}
+            className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'} ${
+              brandLogoSrc ? 'rounded-md bg-white object-contain p-0.5' : ''
+            }`}
           />
           {expanded && (
             <span className={`text-2xl font-bold tracking-wide text-white ${isRTLMode ? 'mr-3' : 'ml-3'}`}>{userLabel}</span>

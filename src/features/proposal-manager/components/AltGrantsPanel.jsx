@@ -15,6 +15,11 @@ import {
 } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { searchAltGrants } from "../../../services/api.js";
+import {
+  GrantExpandHintBanner,
+  grantExpandChevronHintClass,
+  useGrantExpandCoach,
+} from "./GrantExpandCoach.jsx";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -105,6 +110,7 @@ export default function AltGrantsPanel({ variant }) {
   const [sortBy, setSortBy] = useState("relevance");
   const [page, setPage] = useState(0);
   const [expandedId, setExpandedId] = useState(null);
+  const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   const [results, setResults] = useState([]);
   const [hitCount, setHitCount] = useState(0);
@@ -501,10 +507,13 @@ export default function AltGrantsPanel({ variant }) {
           <p className="mt-1 text-sm text-slate-500">{t(`${i18nRoot}.emptyHint`)}</p>
         </div>
       ) : (
-        <ul className={`space-y-3 ${loading ? "opacity-60" : ""}`}>
-          {results.map((opp) => {
+        <div className="space-y-3">
+          <GrantExpandHintBanner show={showHint && results.length > 0} onDismiss={dismissExpandHint} />
+          <ul className={`space-y-3 ${loading ? "opacity-60" : ""}`}>
+          {results.map((opp, index) => {
             const open = expandedId === opp.id;
             const days = daysUntil(opp.closeDate);
+            const highlightExpand = showHint && index === 0 && !open;
             return (
               <li
                 key={opp.id}
@@ -512,7 +521,10 @@ export default function AltGrantsPanel({ variant }) {
               >
                 <button
                   type="button"
-                  onClick={() => setExpandedId(open ? null : opp.id)}
+                  onClick={() => {
+                    dismissExpandHint();
+                    setExpandedId(open ? null : opp.id);
+                  }}
                   className="flex w-full items-start gap-3 p-4 text-left hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
                 >
                   <div className="min-w-0 flex-1 space-y-2">
@@ -545,9 +557,14 @@ export default function AltGrantsPanel({ variant }) {
                       )}
                     </div>
                   </div>
-                  <FiChevronDown
-                    className={`mt-1 h-5 w-5 shrink-0 text-slate-400 transition ${open ? "rotate-180" : ""}`}
-                  />
+                  <span
+                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition dark:border-slate-600 dark:text-slate-300 ${
+                      highlightExpand ? grantExpandChevronHintClass : ""
+                    }`}
+                    aria-hidden
+                  >
+                    <FiChevronDown className={`h-5 w-5 transition-transform ${open ? "rotate-180" : ""}`} />
+                  </span>
                 </button>
 
                 {open && (
@@ -621,6 +638,7 @@ export default function AltGrantsPanel({ variant }) {
             );
           })}
         </ul>
+        </div>
       )}
     </div>
   );

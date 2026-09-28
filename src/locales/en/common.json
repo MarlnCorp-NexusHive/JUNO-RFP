@@ -588,6 +588,8 @@
     "clearKeyword": "Clear keyword",
     "clearFilters": "Clear filters",
     "quickAgencies": "Quick agency:",
+    "expandHintBody": "To expand a result and see full details, click the dropdown on the first opportunity (highlighted below).",
+    "expandHintDismiss": "Got it",
     "retry": "Try again",
     "pagination": "Results pagination",
     "showingRange": "Showing {{start}}–{{end}} of {{count}}",

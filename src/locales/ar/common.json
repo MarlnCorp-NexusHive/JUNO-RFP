@@ -588,6 +588,8 @@
     "clearKeyword": "مسح الكلمة المفتاحية",
     "clearFilters": "مسح المرشحات",
     "quickAgencies": "جهات سريعة:",
+    "expandHintBody": "لتوسيع نتيجة وعرض التفاصيل الكاملة، انقر سهم القائمة المنسدلة في أول فرصة (مميزة أدناه).",
+    "expandHintDismiss": "حسناً",
     "retry": "إعادة المحاولة",
     "pagination": "تصفح النتائج",
     "showingRange": "عرض {{start}}–{{end}} من {{count}}",

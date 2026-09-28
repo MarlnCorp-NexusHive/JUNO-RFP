@@ -19,6 +19,11 @@ import { useLocalization } from "../../../hooks/useLocalization";
 import { fetchFederalGrantOpportunity, searchFederalGrants } from "../../../services/api.js";
 import SamContractsPanel from "./SamContractsPanel.jsx";
 import AltGrantsPanel from "./AltGrantsPanel.jsx";
+import {
+  GrantExpandHintBanner,
+  grantExpandChevronHintClass,
+  useGrantExpandCoach,
+} from "./GrantExpandCoach.jsx";
 
 const STATUS_OPTIONS = [
   { value: "posted|forecasted", labelKey: "openAndForecasted" },
@@ -417,6 +422,7 @@ export default function GrantsPage() {
   const [loadingIds, setLoadingIds] = useState({});
   const [errorById, setErrorById] = useState({});
   const [copiedId, setCopiedId] = useState("");
+  const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   const runSearch = useCallback(
     async ({
@@ -503,13 +509,14 @@ export default function GrantsPage() {
 
   const toggleExpand = useCallback(
     (id) => {
+      dismissExpandHint();
       setExpandedId((current) => {
         const next = current === id ? null : id;
         if (next) loadDetail(next);
         return next;
       });
     },
-    [loadDetail],
+    [loadDetail, dismissExpandHint],
   );
 
   const clearFilters = () => {
@@ -858,8 +865,10 @@ export default function GrantsPage() {
             </div>
           )}
 
+          <GrantExpandHintBanner show={showHint && results.length > 0} onDismiss={dismissExpandHint} />
+
           <ul className="space-y-2" aria-label={t("proposalManagerGrants.resultsList")}>
-            {results.map((hit) => {
+            {results.map((hit, index) => {
               const days = daysUntil(hit.closeDate);
               const open = expandedId === hit.id;
               const panelId = `grant-panel-${hit.id}`;
@@ -870,6 +879,7 @@ export default function GrantsPage() {
               const alnPreview = formatAlnPreview(hit.cfdaList, (n) =>
                 t("proposalManagerGrants.alnMore", { count: n }),
               );
+              const highlightExpand = showHint && index === 0 && !open;
 
               return (
                 <li
@@ -891,7 +901,7 @@ export default function GrantsPage() {
                     <span
                       className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition dark:border-slate-600 dark:text-slate-300 ${
                         open ? "rotate-0 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300" : ""
-                      }`}
+                      } ${highlightExpand ? grantExpandChevronHintClass : ""}`}
                       aria-hidden
                     >
                       <FiChevronDown className={`transition-transform ${open ? "rotate-180" : ""}`} />

@@ -62,12 +62,21 @@ function sidebarFeatures() {
   );
 }
 
+function sidebarBrandLogo() {
+  if (!isTrialUser()) return null;
+  return {
+    src: "/wbec-pacific-logo.png",
+    alt: "WBEC Pacific",
+  };
+}
+
 export default function ProposalManagerLayout() {
   const [expanded, setExpanded] = useState(false);
   const { isRTLMode } = useLocalization();
   const location = useLocation();
   const userLabel = sidebarUserLabel();
   const features = sidebarFeatures();
+  const brandLogo = sidebarBrandLogo();
 
   // Trial: Topology tab is hidden — bounce direct URL hits back to dashboard
   if (isTrialUser() && String(location.pathname || "").includes("/topology")) {
@@ -88,6 +97,8 @@ export default function ProposalManagerLayout() {
             expanded={expanded}
             setExpanded={setExpanded}
             role="proposal-manager"
+            brandLogoSrc={brandLogo?.src}
+            brandLogoAlt={brandLogo?.alt}
           />
         </div>
         {/* Main content with dynamic margin */}

@@ -20,6 +20,11 @@ import {
   SAM_SOURCE_LABEL,
   filterSamOpportunities,
 } from "../data/samContractOpportunities";
+import {
+  GrantExpandHintBanner,
+  grantExpandChevronHintClass,
+  useGrantExpandCoach,
+} from "./GrantExpandCoach.jsx";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -77,6 +82,12 @@ export default function SamContractsPanel() {
   const [noticeType, setNoticeType] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [copiedId, setCopiedId] = useState("");
+  const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
+
+  const toggleExpand = (id) => {
+    dismissExpandHint();
+    setExpandedId((current) => (current === id ? null : id));
+  };
 
   const filtered = useMemo(
     () =>
@@ -346,10 +357,13 @@ export default function SamContractsPanel() {
           )}
         </div>
       ) : (
-        <ul className="space-y-2">
-          {filtered.map((opp) => {
+        <div className="space-y-2">
+          <GrantExpandHintBanner show={showHint && filtered.length > 0} onDismiss={dismissExpandHint} />
+          <ul className="space-y-2">
+          {filtered.map((opp, index) => {
             const open = expandedId === opp.id;
             const days = daysUntil(opp.responseDeadline);
+            const highlightExpand = showHint && index === 0 && !open;
             return (
               <li
                 key={opp.id}
@@ -357,7 +371,7 @@ export default function SamContractsPanel() {
               >
                 <button
                   type="button"
-                  onClick={() => setExpandedId(open ? null : opp.id)}
+                  onClick={() => toggleExpand(opp.id)}
                   className="flex w-full items-start gap-3 p-4 text-start hover:bg-slate-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo-500 dark:hover:bg-slate-800/50"
                   aria-expanded={open}
                 >
@@ -410,10 +424,14 @@ export default function SamContractsPanel() {
                       )}
                     </div>
                   </div>
-                  <FiChevronDown
+                  <span
+                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition dark:border-slate-600 dark:text-slate-300 ${
+                      highlightExpand ? grantExpandChevronHintClass : ""
+                    }`}
                     aria-hidden
-                    className={`mt-1 shrink-0 text-slate-400 transition ${open ? "rotate-180" : ""}`}
-                  />
+                  >
+                    <FiChevronDown className={`transition-transform ${open ? "rotate-180" : ""}`} />
+                  </span>
                 </button>
 
                 {open && (
@@ -575,6 +593,7 @@ export default function SamContractsPanel() {
             );
           })}
         </ul>
+        </div>
       )}
     </div>
   );

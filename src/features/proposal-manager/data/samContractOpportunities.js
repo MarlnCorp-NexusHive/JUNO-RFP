@@ -1,12 +1,12 @@
 /**
  * Curated SAM.gov Contract Opportunities — public notice fields only.
  * Snapshot extracted from sam.gov opportunity pages (no API key / no live API calls).
- * Sourced ~2026-09-27 for JUNO demo capture desk.
+ * Sourced ~2026-09-28 for JUNO demo / trial capture desk.
  *
  * Each record keeps the Notice ID and sam.gov URL so users can verify on the source.
  */
 
-export const SAM_DATA_SNAPSHOT = "2026-09-27";
+export const SAM_DATA_SNAPSHOT = "2026-09-28";
 export const SAM_SOURCE_LABEL = "SAM.gov (curated excerpt)";
 
 export const SAM_QUICK_AGENCIES = ["DHS", "DOD", "IRS", "USMC", "ARMY", "NAVY"];
@@ -17,6 +17,7 @@ export const SAM_NOTICE_TYPES = [
   "Sources Sought",
   "Special Notice",
   "Combined Synopsis/Solicitation",
+  "Award Notice",
 ];
 
 export const SAM_SET_ASIDES = [
@@ -78,7 +79,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     setAside: "Women-Owned Small Business (WOSB)",
     placeOfPerformance: "Marine Corps Base Quantico, VA",
     postedDate: "2026-09-17",
-    responseDeadline: "2026-09-30",
+    responseDeadline: null,
     inactiveDate: "2027-09-17",
     awardCeiling: 45000000,
     awardFloor: null,
@@ -104,7 +105,8 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     ],
     attachments: [],
     samUrl: "https://sam.gov/opp/7c474918c191423f99e32039c4b7e006/view",
-    notes: "Presolicitation — full RFP expected ~30 Sep 2026 on PIEE. Opportunity inactive date listed ~17 Sep 2027.",
+    notes:
+      "Presolicitation still Active (as of 28 Sep 2026). Watch PIEE for formal RFP on/about 30 Sep 2026. Opportunity inactive date ~17 Sep 2027.",
   },
   {
     id: "sam-irs-data-pipeline",
@@ -131,7 +133,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     awardCeilingLabel: "$15M–$20M (market research estimate)",
     periodOfPerformance: "1-year base + two 12-month options",
     description:
-      "IRS Sources Sought (Notice 5000233302) for market research on Enterprise Data Pipeline Modernization and Data Consumption Services supporting Individual Master File (IMF) modernization and related taxpayer-account processing. Contemplated scope: enterprise data pipeline modernization; data engineering and integration (including Databricks / AWS alongside legacy mainframe sources); data product development and BI; metadata, governance, security, and data quality; self-service analytics and natural-language query; AI-assisted legacy modernization; DevSecOps and automation; testing and readiness; O&M; and transition / knowledge-transfer. Capability statements were due Friday, September 25, 2026, 2:00 PM ET to the listed POCs. Planning only — not a solicitation; no award from this notice.",
+      "IRS Sources Sought (Notice 5000233302) for market research on Enterprise Data Pipeline Modernization and Data Consumption Services supporting Individual Master File (IMF) modernization and related taxpayer-account processing. Contemplated scope: enterprise data pipeline modernization; data engineering and integration (including Databricks / AWS alongside legacy mainframe sources); data product development and BI; metadata, governance, security, and data quality; self-service analytics and natural-language query; AI-assisted legacy modernization; DevSecOps and automation; testing and readiness; O&M; and transition / knowledge-transfer. Capability statements were due Friday, September 25, 2026, 2:00 PM ET. Planning only — not a solicitation; no award from this notice.",
     keywords: [
       "data pipeline",
       "IRS",
@@ -150,7 +152,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     ],
     attachments: [{ name: "Attachment 1 — Draft Performance Work Statement (PWS)", updated: "2026-09" }],
     samUrl: "https://sam.gov/opp/6d4373433c504f7994f117458c9e3f9e/view",
-    notes: "Response window closed 25 Sep 2026 — retained for capture history / follow-on watch.",
+    notes: "Inactive — response window closed 25 Sep 2026. Retained for capture history / follow-on watch.",
   },
   {
     id: "sam-aie-its-cso",
@@ -167,16 +169,16 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     psc: "DA01",
     pscTitle: "IT and Telecom — Business Application / Application Development Support Services (Labor)",
     setAside: "None",
-    placeOfPerformance: "CONUS and OCONUS (Army Intelligence enterprise)",
+    placeOfPerformance: "CONUS and OCONUS (Army Intelligence enterprise; Fort Belvoir VA footprint)",
     postedDate: "2026-09-10",
-    responseDeadline: "2036-09-11",
-    inactiveDate: null,
+    responseDeadline: "2027-09-11",
+    inactiveDate: "2027-09-26",
     awardCeiling: null,
     awardFloor: null,
     awardCeilingLabel: null,
-    periodOfPerformance: "Open CSO through 11 Sep 2036",
+    periodOfPerformance: "Standing CSO — SAM offers-due date 11 Sep 2027 (program text cites open through 2036)",
     description:
-      "Commercial Solutions Opening (CSO) for Army Intelligence Enterprise Information Technology Services (AIE-ITS). Objective: enhance, secure, sustain, and modernize the global IT environment supporting Army Intelligence operations at Project, Activity, or Enterprise scale. Seeks outcome-oriented commercial solutions from innovators, small businesses, and nontraditional defense contractors. Multi-phase: Phase 1 written solution brief; Phase 2 presentation/pitch (if applicable); Phase 3 commercial solution proposal. Awards may be FAR Part 12 fixed-price or non-FAR agreements. Remains open until September 11, 2036.",
+      "Commercial Solutions Opening (CSO) for Army Intelligence Enterprise Information Technology Services (AIE-ITS). Objective: enhance, secure, sustain, and modernize the global IT environment supporting Army Intelligence operations at Project, Activity, or Enterprise scale. Dual-track: Track 1 continuous solution briefs against open Areas of Interest; Track 2 timed Calls for Innovative Solutions. Multi-phase: Phase 1 written solution brief; Phase 2 presentation/pitch (if applicable); Phase 3 commercial solution proposal. Awards may be FAR Part 12 fixed-price or non-FAR agreements. Mandatory eligibility commonly includes a valid Top Secret facility clearance and TS/SCI-eligible U.S. personnel. Submissions via PIEE Solicitation Module.",
     keywords: [
       "Army Intelligence",
       "CSO",
@@ -185,11 +187,14 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
       "cyber",
       "OCONUS",
       "commercial solutions",
+      "Top Secret",
+      "PIEE",
     ],
     contacts: [],
     attachments: [],
     samUrl: "https://sam.gov/opp/907ad2ce08a243079f41847b51acebe0/view",
-    notes: "Continuously open CSO — submissions accepted through 2036.",
+    notes:
+      "Active as of 28 Sep 2026. SAM lists offers due 11 Sep 2027 / inactive ~26 Sep 2027. Verify live AOIs and security gates on SAM/PIEE before submitting.",
   },
   {
     id: "sam-seco-it",
@@ -252,7 +257,8 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
       { name: "N4571A-26-R-0016 0005.pdf", updated: "2026-09-18" },
     ],
     samUrl: "https://sam.gov/opp/33c64e266b8e457fb6512f991779da5a/view",
-    notes: "Active solicitation — proposals due 5 Oct 2026 10:00 AM CDT (Amendment 0005).",
+    notes:
+      "Active as of 28 Sep 2026 — proposals due 5 Oct 2026 10:00 AM CDT (Amendment 0005). Archive/inactive ~6 Oct 2026.",
   },
   {
     id: "sam-dhs-nccs",
@@ -269,7 +275,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     psc: "DF01",
     pscTitle: "IT and Telecom — IT Management Support Services (Labor)",
     setAside: "None",
-    placeOfPerformance: "United States (DHS department-wide; NCR footprint)",
+    placeOfPerformance: "United States (DHS department-wide; NCR / MS / AZ NOSC footprint)",
     postedDate: "2026-09-17",
     responseDeadline: "2026-10-06",
     inactiveDate: "2026-12-15",
@@ -278,7 +284,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     awardCeilingLabel: "~$626M single-award department-wide IDIQ ($10K minimum)",
     periodOfPerformance: "Five-year ordering period (department-wide IDIQ)",
     description:
-      "DHS Network, Cloud, and Cybersecurity Services (NCCS) 2.0 — department-wide single-award IDIQ consolidating NOSC network, cloud, and cyber operations. Final draft solicitation posted 17 Sep 2026 for industry review. Scope includes Tier 1/2 network, cloud, and cyber operations: NOC/SOC, threat hunting, incident response, vulnerability management, penetration testing, cyber forensics, log management, email security, and cloud/platform tenant support. Compressed timeline: industry questions on draft due 22 Sep 2026; final solicitation ~1 Oct 2026; Phase 1 proposals 6 Oct 2026 (pass/fail — reporting indicates Top Secret facility clearance gate); Phase 2 notification ~9 Oct; Phase 2 proposals 21 Oct; anticipated award late Nov 2026. Cumulative task-order ceiling reported ~$625,996,046.",
+      "DHS Network, Cloud, and Cybersecurity Services (NCCS) 2.0 — department-wide single-award IDIQ consolidating NOSC network, cloud, and cyber operations. Final draft solicitation posted 17 Sep 2026 for industry review. Scope includes Tier 1/2 network, cloud, and cyber operations: NOC/SOC, threat hunting, incident response, vulnerability management, penetration testing, cyber forensics, log management, email security, and cloud/platform tenant support. Timeline (as published): industry questions on draft due 22 Sep 2026 (closed); final solicitation ~1 Oct 2026; Phase 1 proposals 6 Oct 2026 (pass/fail — reporting indicates Top Secret facility clearance gate); Phase 2 notification ~9 Oct; Phase 2 proposals 21 Oct; anticipated award late Nov 2026 ahead of bridge-order expiry ~8 Dec 2026. Cumulative task-order ceiling reported ~$625,996,046.",
     keywords: [
       "DHS",
       "cybersecurity",
@@ -305,7 +311,8 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
       { name: "Draft NCCS RFP Questions from Vendors.xlsx", updated: "2026-09-17" },
     ],
     samUrl: "https://sam.gov/opp/01d7d3901484484f9235e48c04327d0f/view",
-    notes: "Watch final RFP ~1 Oct 2026; Phase 1 due ~6 Oct 2026. Verify live SAM.gov notice before bidding.",
+    notes:
+      "As of 28 Sep 2026: draft Q&A window closed (22 Sep). Watch final RFP ~1 Oct 2026; Phase 1 due ~6 Oct 2026. Verify live SAM.gov notice before bidding.",
   },
   {
     id: "sam-dhs-cumulus",
@@ -315,7 +322,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     status: "Inactive",
     department: "HOMELAND SECURITY, DEPARTMENT OF",
     subtier: "Office of Procurement Operations",
-    office: "DHS — Department-Wide Cloud (Cumulus)",
+    office: "DHS — Department-Wide Cloud (Cumulus) / Info Tech Acq Center",
     agencyCode: "DHS",
     naics: "518210",
     naicsTitle: "Computing Infrastructure Providers, Data Processing, Web Hosting, and Related Services",
@@ -328,10 +335,10 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     inactiveDate: "2026-09-29",
     awardCeiling: null,
     awardFloor: null,
-    awardCeilingLabel: null,
-    periodOfPerformance: "Multiple-award IDIQ — see solicitation",
+    awardCeilingLabel: "Related awards: AWS ~$2.56B; Google Public Sector ~$876M (see notes)",
+    periodOfPerformance: "Multiple-award / CSP IDIQ ordering — see award notices",
     description:
-      "DHS Cumulus multiple-award IDIQ for commercial cloud solutions department-wide. Scope: commercially available Anything as a Service (XaaS) covering IaaS, PaaS, SaaS, professional services, marketplace solutions, and training — provided by Cloud Service Providers (CSPs). Proposal due date listed as 14 Sep 2026; archive/inactive policy around 29 Sep 2026. Retained for capture history — verify any reissue or amendment on SAM.gov.",
+      "DHS Cumulus vehicle for commercial cloud solutions department-wide. Scope: commercially available Anything as a Service (XaaS) covering IaaS, PaaS, SaaS, professional services, marketplace solutions, and training — provided by Cloud Service Providers (CSPs). Solicitation 70RTAC26R00000004 proposal window closed mid-Sep 2026. Related award notices on SAM.gov include 70RTAC26D00000004 to Amazon Web Services, Inc. (~$2.565B, awarded ~11 Jun 2026) and 70RTAC26D00000007 to Google Public Sector LLC (~$875.6M, awarded ~14 Sep 2026). Retained for capture history and subcontract / task-order watch — verify live SAM award and ordering vehicles before pursuit.",
     keywords: [
       "Cumulus",
       "DHS",
@@ -342,13 +349,16 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
       "SaaS",
       "CSP",
       "IDIQ",
+      "AWS",
+      "Google",
     ],
     contacts: [
       { name: "Gregory Blaszko", email: "gregory.blaszko@hq.dhs.gov", role: "Contracting Officer" },
     ],
     attachments: [{ name: "Solicitation Amendment 0002", updated: "2026-09-10" }],
     samUrl: "https://sam.gov/opp/3e6ef0d1090448dd97081f7c868447ff/view",
-    notes: "Proposal window closed mid-Sep 2026 — retained for history / recompete watch.",
+    notes:
+      "Solicitation inactive as of late Sep 2026. Related awards: AWS 70RTAC26D00000004 (~$2.56B); Google 70RTAC26D00000007 (~$876M, 14 Sep 2026). Re-check SAM before any Cumulus pursuit.",
   },
   {
     id: "sam-af-soar-rfi",
@@ -388,7 +398,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     contacts: [],
     attachments: [],
     samUrl: "https://sam.gov/opp/cbf53e623da947f3acd7220fdf448791/view",
-    notes: "RFI only — responses are not offers.",
+    notes: "RFI only (as of 28 Sep 2026) — responses are not offers. Confirm live SAM status before responding.",
   },
 ];
 
