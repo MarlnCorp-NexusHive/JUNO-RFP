@@ -17,7 +17,6 @@ import {
   FiShield, 
   FiCheckCircle, 
   FiXCircle, 
-  FiClock, 
   FiTrendingUp, 
   FiTrendingDown, 
   FiMinus,
@@ -25,7 +24,6 @@ import {
   FiUpload,
   FiSettings,
   FiUser,
-  FiUserCheck,
   FiUserX,
   FiAward, // Changed from FiCrown to FiAward
   FiBookOpen,
@@ -77,6 +75,9 @@ export default function DirectorUserManagement() {
       Status: "الحالة",
       Cancel: "إلغاء",
       "Add User": "إضافة مستخدم",
+      "Edit User": "تعديل المستخدم",
+      Edit: "تعديل",
+      Save: "حفظ",
       "Proposal Manager": "مدير العروض",
       "Capture Manager": "مدير الالتقاط",
       "Proposal Writer": "كاتب العروض",
@@ -85,6 +86,12 @@ export default function DirectorUserManagement() {
       "Compliance Specialist": "أخصائي الامتثال",
       Proposals: "العروض",
       Capture: "الالتقاط",
+      Pricing: "التسعير",
+      Technical: "تقني",
+      Compliance: "الامتثال",
+      Operations: "العمليات",
+      "Other (custom)": "أخرى (مخصص)",
+      "Enter department name": "أدخل اسم القسم",
     };
     return map[value] || value;
   };
@@ -119,74 +126,224 @@ export default function DirectorUserManagement() {
   ];
   const initialUsers = isTrialPm ? [] : isPM ? pmInitialUsers : directorInitialUsers;
   const [users, setUsers] = useState(initialUsers);
+  const [usersReady, setUsersReady] = useState(!isTrialPm);
+
+  const persistUsers = React.useCallback(
+    (nextUsers) => {
+      if (!isTrialPm || !canUseTrialFeatures()) return;
+      void persistTrialFeatureData("userManagement", { users: Array.isArray(nextUsers) ? nextUsers : [] });
+    },
+    [isTrialPm],
+  );
+
+  const hydrateUsers = React.useCallback(async () => {
+    if (!isTrialPm) return;
+    const data = await loadTrialFeatureData("userManagement", { users: [] });
+    setUsers(Array.isArray(data?.users) ? data.users : []);
+    setUsersReady(true);
+  }, [isTrialPm]);
+
   React.useEffect(() => {
     if (!isTrialPm) {
       setUsers(initialUsers);
+      setUsersReady(true);
       return undefined;
     }
     let cancelled = false;
+    setUsersReady(false);
     (async () => {
       const data = await loadTrialFeatureData("userManagement", { users: [] });
       if (cancelled) return;
       setUsers(Array.isArray(data?.users) ? data.users : []);
+      setUsersReady(true);
     })();
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPM, isTrialPm]);
 
+  // Persist only after hydrate so an empty initial state does not wipe tenant data.
   React.useEffect(() => {
-    if (!isTrialPm || !canUseTrialFeatures()) return;
-    persistTrialFeatureData("userManagement", { users });
-  }, [users, isTrialPm]);
+    if (!isTrialPm || !usersReady || !canUseTrialFeatures()) return;
+    persistUsers(users);
+  }, [users, isTrialPm, usersReady, persistUsers]);
+
+  // Pull latest company roster when returning to the tab (shared across same tenant).
+  React.useEffect(() => {
+    if (!isTrialPm) return undefined;
+    const onFocus = () => {
+      void hydrateUsers();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") onFocus();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [isTrialPm, hydrateUsers]);
 
   const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
   const [newUser, setNewUser] = useState({
     displayName: "",
     email: "",
     roleKey: "roles.employee",
     departmentKey: "departments.engineering",
+    department: "Proposals",
+    customDepartment: "",
     statusKey: "userStatuses.active",
   });
+
+  const resetUserForm = () => {
+    setEditingUserId(null);
+    setNewUser({
+      displayName: "",
+      email: "",
+      roleKey: "roles.employee",
+      departmentKey: "departments.engineering",
+      department: "Proposals",
+      customDepartment: "",
+      statusKey: "userStatuses.active",
+    });
+  };
+
+  const openAddUser = () => {
+    resetUserForm();
+    setShowAddUserModal(true);
+  };
+
+  const openEditUser = (u) => {
+    let display = "";
+    if (isPM && u.name) display = u.name;
+    else if (u.displayName) display = u.displayName;
+    else if (u.name) display = u.name;
+    else if (u.nameKey) {
+      try {
+        display = t(`userManagement.${u.nameKey}`);
+      } catch {
+        display = "";
+      }
+    }
+    if (!display) display = String(u.email || "").split("@")[0];
+    const dept = u.department || "Proposals";
+    const isPreset = ["Proposals", "Capture", "Pricing", "Technical", "Compliance", "Operations"].includes(dept);
+    setEditingUserId(u.id);
+    setNewUser({
+      displayName: display,
+      email: u.email || "",
+      roleKey: u.roleKey || "roles.employee",
+      departmentKey: u.departmentKey || "departments.engineering",
+      department: isPreset ? dept : "__custom__",
+      customDepartment: isPreset ? "" : dept,
+      statusKey: u.statusKey || "userStatuses.active",
+    });
+    setShowAddUserModal(true);
+  };
 
   const handleAddUserSubmit = (e) => {
     e.preventDefault();
     const name = newUser.displayName.trim();
     const email = newUser.email.trim();
     if (!name || !email) return;
-    const nextId = Math.max(0, ...users.map((u) => u.id)) + 1;
     const initials = name.split(/\s+/).map((s) => s[0]).join("").toUpperCase().slice(0, 2);
-    const joinDate = new Date().toISOString().slice(0, 10);
-    setUsers((prev) => [
-      ...prev,
-      {
-        id: nextId,
-        nameKey: "demoUsers.newUser",
-        displayName: name,
-        roleKey: newUser.roleKey,
-        departmentKey: newUser.departmentKey,
-        statusKey: newUser.statusKey,
-        email,
-        lastLogin: "—",
-        avatar: initials,
-        permissions: 3,
-        joinDate,
-      },
-    ]);
+    const customDept = String(newUser.customDepartment || "").trim();
+    if (isPM && newUser.department === "__custom__" && !customDept) return;
+    const department = isPM
+      ? newUser.department === "__custom__"
+        ? customDept
+        : newUser.department || "Proposals"
+      : undefined;
+
+    if (editingUserId != null) {
+      setUsers((prev) => {
+        const next = prev.map((u) =>
+          u.id === editingUserId
+            ? {
+                ...u,
+                displayName: name,
+                name,
+                email,
+                avatar: initials,
+                department: isPM ? department : u.department,
+                departmentKey: isPM ? u.departmentKey : newUser.departmentKey,
+                updatedAt: new Date().toISOString(),
+              }
+            : u
+        );
+        persistUsers(next);
+        return next;
+      });
+    } else {
+      const nextId =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `u_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const joinDate = new Date().toISOString().slice(0, 10);
+      setUsers((prev) => {
+        const next = [
+          ...prev,
+          {
+            id: nextId,
+            nameKey: "demoUsers.newUser",
+            displayName: name,
+            name,
+            role: isPM ? "Proposal Manager" : undefined,
+            roleKey: isPM ? "roles.employee" : "roles.employee",
+            department,
+            departmentKey: isPM ? undefined : newUser.departmentKey,
+            statusKey: "userStatuses.active",
+            email,
+            lastLogin: "—",
+            avatar: initials,
+            permissions: 3,
+            joinDate,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ];
+        persistUsers(next);
+        return next;
+      });
+    }
     setShowAddUserModal(false);
-    setNewUser({ displayName: "", email: "", roleKey: "roles.employee", departmentKey: "departments.engineering", statusKey: "userStatuses.active" });
+    resetUserForm();
+  };
+
+  const handleRemoveSelected = () => {
+    if (selectedUsers.length === 0) return;
+    setUsers((prev) => {
+      const next = prev.filter((u) => !selectedUsers.includes(u.id));
+      persistUsers(next);
+      return next;
+    });
+    setSelectedUsers([]);
   };
 
   const roles = isPM ? ["Proposal Manager", "Capture Manager", "Proposal Writer", "Technical Lead", "Pricing Lead", "Compliance Specialist"] : ["director", "dean", "hod", "team", "employee", "admin"];
+  const pmDepartments = ["Proposals", "Capture", "Pricing", "Technical", "Compliance", "Operations"];
+  const learnedDepartments = Array.from(
+    new Set(
+      users
+        .map((u) => String(u.department || "").trim())
+        .filter((d) => d && !pmDepartments.includes(d))
+    )
+  ).sort((a, b) => a.localeCompare(b));
+  const pmDepartmentOptions = [...pmDepartments, ...learnedDepartments];
+  const directorDepartments = [
+    { key: "departments.engineering", labelKey: "userManagement.departments.engineering" },
+    { key: "departments.science", labelKey: "userManagement.departments.science" },
+    { key: "departments.math", labelKey: "userManagement.departments.math" },
+    { key: "departments.computer", labelKey: "userManagement.departments.computer" },
+    { key: "departments.eee", labelKey: "userManagement.departments.eee" },
+    { key: "departments.business", labelKey: "userManagement.departments.business" },
+  ];
 
-  const isUserActive = (u) => {
-    const key = String(u?.statusKey || u?.status || "").toLowerCase();
-    return key.includes("active") && !key.includes("inactive");
-  };
   const trialTotalUsers = users.length;
-  const trialActiveUsers = users.filter(isUserActive).length;
   const trialNewUsers = 0;
-  const trialAvgActivity = trialTotalUsers > 0 ? "—" : "0%";
 
   // Demo data for user metrics using translation keys (trial derives from live user list)
   const userMetrics = isTrialPm
@@ -202,30 +359,12 @@ export default function DirectorUserManagement() {
         },
         {
           id: 2,
-          titleKey: "metrics.activeUsers",
-          value: String(trialActiveUsers),
-          change: "—",
-          trend: "flat",
-          icon: FiUserCheck,
-          color: "green",
-        },
-        {
-          id: 3,
           titleKey: "metrics.newUsers",
           value: String(trialNewUsers),
           change: "—",
           trend: "flat",
           icon: FiUserPlus,
           color: "purple",
-        },
-        {
-          id: 4,
-          titleKey: "metrics.avgActivity",
-          value: trialAvgActivity,
-          change: "—",
-          trend: "flat",
-          icon: FiTrendingUp,
-          color: "orange",
         },
       ]
     : [
@@ -240,30 +379,12 @@ export default function DirectorUserManagement() {
         },
         {
           id: 2,
-          titleKey: "metrics.activeUsers",
-          value: "230",
-          change: "+8",
-          trend: "up",
-          icon: FiUserCheck,
-          color: "green",
-        },
-        {
-          id: 3,
           titleKey: "metrics.newUsers",
           value: "15",
           change: "+5",
           trend: "up",
           icon: FiUserPlus,
           color: "purple",
-        },
-        {
-          id: 4,
-          titleKey: "metrics.avgActivity",
-          value: "85%",
-          change: "+2%",
-          trend: "up",
-          icon: FiTrendingUp,
-          color: "orange",
         },
       ];
 
@@ -371,12 +492,6 @@ export default function DirectorUserManagement() {
                   {isTrialPm ? trialTotalUsers : 245}
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">{t('userManagement.userStatuses.active')}</div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {isTrialPm ? trialActiveUsers : 230}
-                </div>
-              </div>
             </div>
           </div>
         </motion.div>
@@ -386,12 +501,12 @@ export default function DirectorUserManagement() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
           data-tour="2"
           data-tour-title-en="User Metrics"
           data-tour-title-ar="مقاييس المستخدمين"
-          data-tour-content-en="Key user stats: total, active, new, and activity levels."
-          data-tour-content-ar="إحصاءات المستخدمين الرئيسية: الإجمالي، النشط، الجديد، ومستويات النشاط."
+          data-tour-content-en="Key user stats: total and new users."
+          data-tour-content-ar="إحصاءات المستخدمين الرئيسية: الإجمالي والجديد."
           data-tour-position="bottom"
         >
           {userMetrics.map((metric) => (
@@ -442,41 +557,47 @@ export default function DirectorUserManagement() {
                 placeholder={t('userManagement.searchPlaceholder')} 
               />
             </div>
-            <select 
-              value={roleFilter} 
-              onChange={e => setRoleFilter(e.target.value)} 
-              className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            >
-              <option value="">{t('userManagement.allRoles')}</option>
-              {roles.map(r => (
-                <option key={r} value={r}>
-                  {isPM ? pmText(r) : t(`userManagement.roles.${r}`)}
-                </option>
-              ))}
-            </select>
-            <select 
-              value={statusFilter} 
-              onChange={e => setStatusFilter(e.target.value)} 
-              className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            >
-              <option value="all">{pmText("All Status")}</option>
-              <option value="active">{t('userManagement.userStatuses.active')}</option>
-              <option value="inactive">{t('userManagement.userStatuses.inactive')}</option>
-              <option value="pending">{t('userManagement.userStatuses.pending')}</option>
-            </select>
+            {!isTrialPm && (
+              <select 
+                value={roleFilter} 
+                onChange={e => setRoleFilter(e.target.value)} 
+                className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              >
+                <option value="">{t('userManagement.allRoles')}</option>
+                {roles.map(r => (
+                  <option key={r} value={r}>
+                    {isPM ? pmText(r) : t(`userManagement.roles.${r}`)}
+                  </option>
+                ))}
+              </select>
+            )}
+            {!isTrialPm && (
+              <select 
+                value={statusFilter} 
+                onChange={e => setStatusFilter(e.target.value)} 
+                className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              >
+                <option value="all">{pmText("All Status")}</option>
+                <option value="active">{t('userManagement.userStatuses.active')}</option>
+                <option value="inactive">{t('userManagement.userStatuses.inactive')}</option>
+                <option value="pending">{t('userManagement.userStatuses.pending')}</option>
+              </select>
+            )}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setShowAddUserModal(true)}
+                onClick={openAddUser}
                 className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
               >
                 <FiUserPlus className="w-4 h-4" />
                 {t('userManagement.addUser')}
               </button>
-              <button className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
-                <FiDownload className="w-4 h-4" />
-                {pmText("Export")}
-              </button>
+              {!isTrialPm && (
+                <button className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
+                  <FiDownload className="w-4 h-4" />
+                  {pmText("Export")}
+                </button>
+              )}
             </div>
           </div>
         </motion.section>
@@ -509,7 +630,11 @@ export default function DirectorUserManagement() {
                 {selectedUsers.length === filteredUsers.length ? pmText('Deselect All') : pmText('Select All')}
               </button>
               {selectedUsers.length > 0 && (
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRemoveSelected}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                >
                   <FiUserX className="w-4 h-4" />
                   {pmText("Remove")} ({selectedUsers.length})
                 </button>
@@ -523,8 +648,8 @@ export default function DirectorUserManagement() {
                 {pmText("No users yet. Add your first team member to manage roles and access.")}
               </p>
             )}
-            {filteredUsers.map((u, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow">
+            {filteredUsers.map((u) => (
+              <div key={u.id} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <input 
@@ -541,8 +666,8 @@ export default function DirectorUserManagement() {
                         <h3 className="font-semibold text-gray-900 dark:text-white">
                           {getUserDisplayName(u)}
                         </h3>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(u.statusKey.split('.').pop())}`}>
-                          {t(`userManagement.${u.statusKey}`)}
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(String(u.statusKey || "userStatuses.active").split(".").pop())}`}>
+                          {t(`userManagement.${u.statusKey || "userStatuses.active"}`)}
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-2">
@@ -556,10 +681,6 @@ export default function DirectorUserManagement() {
                           <FiMail className="w-4 h-4" />
                           {u.email}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <FiClock className="w-4 h-4" />
-                          {pmText("Last login:")} {u.lastLogin}
-                        </div>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <span>{pmText("Department")}: {isPM ? pmText(u.department) : (u.displayDepartment ?? t(`userManagement.${u.departmentKey}`))}</span>
@@ -570,14 +691,14 @@ export default function DirectorUserManagement() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <button className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                      <FiEye className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => openEditUser(u)}
+                      className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                      aria-label={pmText("Edit")}
+                      title={pmText("Edit")}
+                    >
                       <FiEdit3 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                      <FiMoreHorizontal className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -588,11 +709,13 @@ export default function DirectorUserManagement() {
 
         {showAddUserModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="absolute inset-0" onClick={() => setShowAddUserModal(false)} />
+            <div className="absolute inset-0" onClick={() => { setShowAddUserModal(false); resetUserForm(); }} />
             <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('userManagement.addUser')}</h2>
-                <button type="button" onClick={() => setShowAddUserModal(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold" aria-label={pmText("Close")}>&times;</button>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {editingUserId != null ? pmText("Edit User") : t('userManagement.addUser')}
+                </h2>
+                <button type="button" onClick={() => { setShowAddUserModal(false); resetUserForm(); }} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold" aria-label={pmText("Close")}>&times;</button>
               </div>
               <form onSubmit={handleAddUserSubmit} className="space-y-4">
                 <div>
@@ -604,32 +727,62 @@ export default function DirectorUserManagement() {
                   <input type="email" required value={newUser.email} onChange={(e) => setNewUser((p) => ({ ...p, email: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="email@company.com" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Role")}</label>
-                  <select value={newUser.roleKey} onChange={(e) => setNewUser((p) => ({ ...p, roleKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    {roles.map((r) => <option key={r} value={`roles.${r}`}>{isPM ? pmText(r) : t(`userManagement.roles.${r}`)}</option>)}
-                  </select>
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Department")}</label>
-                  <select value={newUser.departmentKey} onChange={(e) => setNewUser((p) => ({ ...p, departmentKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    <option value="departments.engineering">{t('userManagement.departments.engineering')}</option>
-                    <option value="departments.science">{t('userManagement.departments.science')}</option>
-                    <option value="departments.math">{t('userManagement.departments.math')}</option>
-                    <option value="departments.computer">{t('userManagement.departments.computer')}</option>
-                    <option value="departments.eee">{t('userManagement.departments.eee')}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{pmText("Status")}</label>
-                  <select value={newUser.statusKey} onChange={(e) => setNewUser((p) => ({ ...p, statusKey: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    <option value="userStatuses.active">{t('userManagement.userStatuses.active')}</option>
-                    <option value="userStatuses.inactive">{t('userManagement.userStatuses.inactive')}</option>
-                    <option value="userStatuses.pending">{t('userManagement.userStatuses.pending')}</option>
-                  </select>
+                  {isPM ? (
+                    <div className="space-y-2">
+                      <select
+                        value={
+                          newUser.department === "__custom__" || pmDepartmentOptions.includes(newUser.department)
+                            ? newUser.department
+                            : "__custom__"
+                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setNewUser((p) => ({
+                            ...p,
+                            department: value,
+                            customDepartment: value === "__custom__" ? p.customDepartment : "",
+                          }));
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      >
+                        {pmDepartmentOptions.map((dept) => (
+                          <option key={dept} value={dept}>
+                            {pmText(dept)}
+                          </option>
+                        ))}
+                        <option value="__custom__">{pmText("Other (custom)")}</option>
+                      </select>
+                      {newUser.department === "__custom__" && (
+                        <input
+                          type="text"
+                          required
+                          value={newUser.customDepartment}
+                          onChange={(e) => setNewUser((p) => ({ ...p, customDepartment: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          placeholder={pmText("Enter department name")}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <select
+                      value={newUser.departmentKey}
+                      onChange={(e) => setNewUser((p) => ({ ...p, departmentKey: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    >
+                      {directorDepartments.map((dept) => (
+                        <option key={dept.key} value={dept.key}>
+                          {t(dept.labelKey)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setShowAddUserModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{pmText("Cancel")}</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">{pmText("Add User")}</button>
+                  <button type="button" onClick={() => { setShowAddUserModal(false); resetUserForm(); }} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{pmText("Cancel")}</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    {editingUserId != null ? pmText("Save") : pmText("Add User")}
+                  </button>
                 </div>
               </form>
             </div>
