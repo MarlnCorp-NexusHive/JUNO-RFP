@@ -25,7 +25,7 @@ import { directorFeatures } from './directorFeatures';
 
 export default function DirectorWorkspace() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/workspace");
+  const isPM = location.pathname.includes("/app/workspace");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [expanded, setExpanded] = useState(false);
   const { t, ready } = useTranslation('director');

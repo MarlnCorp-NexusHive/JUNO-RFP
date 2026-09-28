@@ -23,7 +23,7 @@ import {
 
 export default function DirectorSupport() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/help-support");
+  const isPM = location.pathname.includes("/app/help-support");
   const [activeFaq, setActiveFaq] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState("all");

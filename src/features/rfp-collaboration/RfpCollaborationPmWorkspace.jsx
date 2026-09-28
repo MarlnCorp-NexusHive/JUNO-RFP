@@ -231,7 +231,7 @@ export default function RfpCollaborationPmWorkspace() {
     return (
       <p className="text-sm text-gray-600 dark:text-gray-300">
         {t("rfpCollaboration.usePmPortal")}{" "}
-        <Link className="text-indigo-600 underline" to="/rbac/proposal-manager/rfp-collaboration">
+        <Link className="text-indigo-600 underline" to="/app/rfp-collaboration">
           {t("rfpCollaboration.openPmHub")}
         </Link>
       </p>
@@ -244,7 +244,7 @@ export default function RfpCollaborationPmWorkspace() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
         <Link
-          to="/rbac/proposal-manager/rfp-collaboration"
+          to="/app/rfp-collaboration"
           className="inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400"
         >
           <FiArrowLeft className="w-4 h-4" />
@@ -271,13 +271,13 @@ export default function RfpCollaborationPmWorkspace() {
               <p className="text-amber-900/90 dark:text-amber-100/90">{t("rfpCollaboration.workspaceMissingBody")}</p>
               <div className="flex flex-wrap gap-2 pt-1">
                 <Link
-                  to="/rbac/proposal-manager/source-docs"
+                  to="/app/source-docs"
                   className="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700"
                 >
                   {t("rfpCollaboration.workspaceMissingOpenSourceDocs")}
                 </Link>
                 <Link
-                  to="/rbac/proposal-manager/rfp-collaboration"
+                  to="/app/rfp-collaboration"
                   className="inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   {t("rfpCollaboration.workspaceMissingOpenHub")}

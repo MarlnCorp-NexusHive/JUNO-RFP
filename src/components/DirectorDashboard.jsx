@@ -13,6 +13,13 @@ import DirectorMeetingsCalendar from '../features/director/components/DirectorMe
 import DirectorUserManagement from '../features/director/components/DirectorUserManagement';
 import DirectorCommunicationHub from '../features/director/components/DirectorCommunicationHub';
 import { parseLocalStorageJson } from "../utils/safeStorage.js";
+import { getTrialSession } from "../services/trialAuthSession.js";
+
+function isTrialUserSession() {
+  const session = getTrialSession();
+  const user = parseLocalStorageJson("rbac_current_user");
+  return Boolean(session?.token || user?.isTrialUser);
+}
 
 const features = [
   { label: "Dashboard", icon: "📊", route: "/rbac/director", description: "Corporate Performance Overview, KPI Summary, Alerts & Notices" },
@@ -448,7 +455,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     return key;
   };
   const displayWelcomeMessage =
-    basePath === "/rbac/proposal-manager"
+    basePath === "/app"
       ? pmText(
           welcomeMessage,
           "مرحبًا بك في JUNO RFP - جاهز للتدقيق. جاهز للتسليم. جاهز للفوز."
@@ -456,7 +463,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
       : welcomeMessage;
 
   const displayDashboardTitle =
-    basePath === "/rbac/proposal-manager"
+    basePath === "/app"
       ? pmText(dashboardTitle ?? "JUNO RFP Dashboard", "لوحة JUNO RFP")
       : dashboardTitle ?? (t('dashboard.title') || 'Director Dashboard');
 
@@ -503,11 +510,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: pmText("FAR / Regulatory Risk Flag (if federal)", "مؤشر مخاطر FAR / المخاطر التنظيمية"), value: pmText("Low", "منخفض"), formatType: "text", icon: "🚩", color: "bg-purple-100 text-purple-700" },
     { label: pmText("Past Performance Alignment Score", "درجة توافق الأداء السابق"), value: 87, formatType: "percent", icon: "🎯", color: "bg-pink-100 text-pink-700" },
   ];
-  const kpis = basePath === "/rbac/proposal-manager" ? proposalManagerKpis : directorKpis;
+  const kpis = basePath === "/app" ? proposalManagerKpis : directorKpis;
 
   // Proposal Manager dashboard: RFP-focused summary cards; Director: translated summary cards
   const proposalManagerSummaryCards = [
-    { label: pmText("Active RFPs in Pipeline", "طلبات العروض النشطة في خط الأنابيب"), value: 18, formatType: "number", icon: "📋", color: "from-blue-400 to-blue-600", trend: "", trendColor: "", sub: pmText("In progress", "قيد التنفيذ"), spark: [12, 14, 15, 16, 17, 18], sparkColor: { light: "#3b82f6", dark: "#fff" } },
+    { label: pmText("Active RFPs/Grant in Pipeline", "طلبات العروض/المنح النشطة في خط الأنابيب"), value: 18, formatType: "number", icon: "📋", color: "from-blue-400 to-blue-600", trend: "", trendColor: "", sub: pmText("In progress", "قيد التنفيذ"), spark: [12, 14, 15, 16, 17, 18], sparkColor: { light: "#3b82f6", dark: "#fff" } },
     { label: pmText("Total Pipeline Value ($)", "إجمالي قيمة خط الأنابيب ($)"), value: 8450000, formatType: "currency", icon: "💰", color: "from-green-400 to-green-600", trend: "", trendColor: "", sub: pmText("Combined opportunity value", "القيمة الإجمالية للفرص"), spark: [6200000, 6800000, 7200000, 7800000, 8100000, 8450000], sparkColor: { light: "#22c55e", dark: "#fff" } },
     { label: pmText("Average Deal Size", "متوسط حجم الصفقة"), value: 425000, formatType: "currency", icon: "📊", color: "from-purple-400 to-purple-600", trend: "", trendColor: "", sub: pmText("Per RFP", "لكل طلب عروض"), spark: [380000, 392000, 398000, 405000, 412000, 425000], sparkColor: { light: "#a78bfa", dark: "#fff" } },
     { label: pmText("Win Rate (Trailing 6–12 Months)", "معدل الفوز (آخر 6-12 شهراً)"), value: 31, formatType: "percent", icon: "🏆", color: "from-pink-400 to-pink-600", trend: "", trendColor: "", sub: pmText("Percentage", "نسبة مئوية"), spark: [26, 27, 28, 29, 30, 31], sparkColor: { light: "#ec4899", dark: "#fff" } },
@@ -522,10 +529,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { label: t('dashboard.summaryCards.vehiclesRunning'), value: 42, icon: "🚌", color: "from-green-400 to-green-600", trend: "", trendColor: "", sub: t('dashboard.summaryCards.routesActive'), spark: [40, 41, 43, 44, 43, 42], sparkColor: { light: "#22c55e", dark: "#fff" } },
     { label: t('dashboard.summaryCards.upcomingEvents'), value: 7, icon: "📅", color: "from-orange-400 to-orange-600", trend: "", trendColor: "", sub: t('dashboard.summaryCards.next7Days'), spark: [3, 4, 5, 6, 7, 7], sparkColor: { light: "#fb923c", dark: "#fff" } },
   ];
-  const summaryCards = basePath === "/rbac/proposal-manager" ? proposalManagerSummaryCards : directorSummaryCards;
+  const summaryCards = basePath === "/app" ? proposalManagerSummaryCards : directorSummaryCards;
 
   // Generate translated alerts: Proposal Manager = RFP/bid/compliance alerts; Director = budget/compliance/HR
-  const isPM = basePath === "/rbac/proposal-manager";
+  const isPM = basePath === "/app";
+  const hideAiRevenueSection = isPM && isTrialUserSession();
   const alerts = isPM
     ? [
         { text: t('dashboard.alerts.proposalManager.rfpSubmissionDeadline'), color: 'text-red-500' },
@@ -774,7 +782,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   // Modal for large chart view (titles and data vary by basePath for Proposal Manager)
   const ChartModal = ({ chartId, onClose }) => {
-    const isPM = basePath === '/rbac/proposal-manager';
+    const isPM = basePath === '/app';
     let content = null;
     if (!chartId) return null;
     if (chartId === 'recruitment') {
@@ -1107,9 +1115,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <p className="text-gray-600 dark:text-gray-300">
             {displayWelcomeMessage}
           </p>
-            {basePath === "/rbac/proposal-manager" && (
+            {basePath === "/app" && (
             <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mt-4">
-              {pmText("Bids Portfolio Health Overview", "نظرة عامة على صحة محفظة العطاءات")}
+              {pmText("Portfolio Overview", "نظرة عامة على المحفظة")}
             </h2>
           )}
         </div>
@@ -1130,7 +1138,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
-              className={`flex flex-col justify-between rounded-xl shadow-lg px-4 py-3 bg-gradient-to-br ${card.color} text-white min-h-[100px] ${basePath === "/rbac/proposal-manager" ? "min-h-[120px]" : ""} relative overflow-visible cursor-pointer hover:scale-[1.03] active:scale-95 transition-transform`}
+              className={`flex flex-col justify-between rounded-xl shadow-lg px-4 py-3 bg-gradient-to-br ${card.color} text-white min-h-[100px] ${basePath === "/app" ? "min-h-[120px]" : ""} relative overflow-visible cursor-pointer hover:scale-[1.03] active:scale-95 transition-transform`}
               style={{ boxShadow: '0 4px 16px 0 rgba(60,60,100,0.10)' }}
               onClick={() => setModalCard(card)}
             >
@@ -1268,6 +1276,36 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           ))}
         </div>
 
+        {/* Alerts & Notifications Widget — 3rd place */}
+        <section
+          className="mt-8"
+          data-tour="3.5"
+          data-tour-title-en="Alerts & Notifications"
+          data-tour-content-en={isPM ? "Submission deadlines, compliance, bid approvals, and team assignments." : "System alerts and important updates."}
+          data-tour-title-ar="التنبيهات والإشعارات"
+          data-tour-content-ar={isPM ? "مواعيد التقديم، الامتثال، موافقات العروض، وتعيينات الفريق." : "تنبيهات النظام والتحديثات المهمة."}
+          data-tour-position="top"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            {!isPM && <span className="text-xl">🔔</span>}
+            <h2 className="text-lg font-bold tracking-wide">{t('dashboard.sections.alertsNotifications')}</h2>
+          </div>
+          <div className="w-full">
+            <div className={`w-full rounded-2xl shadow-lg p-6 flex flex-col gap-3 ${isPM ? 'bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-900' : 'bg-gradient-to-r from-blue-100 to-blue-50 dark:from-gray-800 dark:to-gray-900 animate-pulse'}`}>
+              {alerts.map((alert, idx) => (
+                <div key={idx} className={`flex items-center gap-3 font-medium ${alert.color}`}>
+                  {isPM ? (
+                    <span className="shrink-0 w-6 text-gray-600 dark:text-gray-400 font-semibold">{idx + 1}.</span>
+                  ) : (
+                    <span className="text-xl">{alert.icon}</span>
+                  )}
+                  <span>{alert.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Animated Charts Section */}
         <div
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
@@ -1285,7 +1323,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             transition={{ delay: 0.3 }}
             className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6"
           >
-            {basePath === "/rbac/proposal-manager" ? (
+            {basePath === "/app" ? (
               <>
                 <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Rolling Win Rate by Procurement Type", "معدل الفوز المتحرك حسب نوع الشراء")}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Trailing 12 months — win rate %", "آخر 12 شهراً — نسبة معدل الفوز %")}</p>
@@ -1337,7 +1375,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             transition={{ delay: 0.4 }}
             className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6"
           >
-            {basePath === "/rbac/proposal-manager" ? (
+            {basePath === "/app" ? (
               <>
                 <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Win Rate vs Capture Lead Time", "معدل الفوز مقابل مدة الالتقاط")}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Win rate % by proposal lead time (days)", "نسبة الفوز حسب مدة تجهيز العرض (بالأيام)")}</p>
@@ -1384,14 +1422,14 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           transition={{ delay: 0.5 }}
           className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6"
         >
-          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? pmText("Proposal Quality Intelligence", "ذكاء جودة العروض") : t('dashboard.charts.departmentPerformance')}</h3>
-          <ResponsiveContainer width="100%" height={basePath === "/rbac/proposal-manager" ? 300 : 220}>
-            <BarChart data={basePath === "/rbac/proposal-manager" ? proposalQualityIntelligenceData : deptPerformance} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/app" ? pmText("Proposal Quality Intelligence", "ذكاء جودة العروض") : t('dashboard.charts.departmentPerformance')}</h3>
+          <ResponsiveContainer width="100%" height={basePath === "/app" ? 300 : 220}>
+            <BarChart data={basePath === "/app" ? proposalQualityIntelligenceData : deptPerformance} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="dept" tick={{ fontSize: 12 }} tickFormatter={basePath === "/rbac/proposal-manager" ? pmGraphLabel : undefined} />
+              <XAxis dataKey="dept" tick={{ fontSize: 12 }} tickFormatter={basePath === "/app" ? pmGraphLabel : undefined} />
               <YAxis />
-              <Tooltip formatter={basePath === "/rbac/proposal-manager" ? ((value, name) => [value, pmGraphLabel(name)]) : undefined} labelFormatter={basePath === "/rbac/proposal-manager" ? ((label) => pmGraphLabel(label)) : undefined} />
-              <Legend formatter={basePath === "/rbac/proposal-manager" ? ((value) => pmGraphLabel(value)) : undefined} />
+              <Tooltip formatter={basePath === "/app" ? ((value, name) => [value, pmGraphLabel(name)]) : undefined} labelFormatter={basePath === "/app" ? ((label) => pmGraphLabel(label)) : undefined} />
+              <Legend formatter={basePath === "/app" ? ((value) => pmGraphLabel(value)) : undefined} />
               <Bar dataKey="KPI" fill="#74c69d" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -1408,15 +1446,15 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-2 mb-2">
-            {basePath !== "/rbac/proposal-manager" && <span className="text-xl">🧪</span>}
-            <h2 className="text-lg font-bold tracking-wide" title={basePath === "/rbac/proposal-manager" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : undefined}>{basePath === "/rbac/proposal-manager" ? pmText("Core Evaluation Intelligence", "ذكاء التقييم الأساسي") : t('dashboard.sections.academicInsights')}</h2>
+            {basePath !== "/app" && <span className="text-xl">🧪</span>}
+            <h2 className="text-lg font-bold tracking-wide" title={basePath === "/app" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : undefined}>{basePath === "/app" ? pmText("Core Evaluation Intelligence", "ذكاء التقييم الأساسي") : t('dashboard.sections.academicInsights')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Multi-year Pipeline/Graduation Chart */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-3">
-              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/rbac/proposal-manager" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : t('dashboard.charts.enrollmentGraduation')}</h3>
-              <ResponsiveContainer width="100%" height={basePath === "/rbac/proposal-manager" ? 340 : 180}>
-                {basePath === "/rbac/proposal-manager" ? (
+              <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{basePath === "/app" ? pmText("Section M–Driven Scoring Optimization", "تحسين التقييم المدفوع بالقسم M") : t('dashboard.charts.enrollmentGraduation')}</h3>
+              <ResponsiveContainer width="100%" height={basePath === "/app" ? 340 : 180}>
+                {basePath === "/app" ? (
                   <LineChart data={sectionMScoringData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="period" tick={{ fontSize: 11 }} />
@@ -1451,17 +1489,17 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         <section
           className="mt-8"
           data-tour="7"
-          data-tour-title-en={basePath === "/rbac/proposal-manager" ? "Risk & Compliance Intelligence" : "Financial Overview"}
-          data-tour-content-en={basePath === "/rbac/proposal-manager" ? "Elimination risk, FAR conformance, and compliance metrics." : "Monthly fees and budget usage overview."}
+          data-tour-title-en={basePath === "/app" ? "Risk & Compliance Intelligence" : "Financial Overview"}
+          data-tour-content-en={basePath === "/app" ? "Elimination risk, FAR conformance, and compliance metrics." : "Monthly fees and budget usage overview."}
           data-tour-title-ar="نظرة عامة مالية"
           data-tour-content-ar="الرسوم الشهرية واستخدام الميزانية."
           data-tour-position="top"
         >
           <div className="flex items-center gap-2 mb-2">
-            {basePath !== "/rbac/proposal-manager" && <span className="text-xl">💸</span>}
-            <h2 className="text-lg font-bold tracking-wide">{basePath === "/rbac/proposal-manager" ? pmText("Risk & Compliance Intelligence", "ذكاء المخاطر والامتثال") : t('dashboard.sections.financialOverview')}</h2>
+            {basePath !== "/app" && <span className="text-xl">💸</span>}
+            <h2 className="text-lg font-bold tracking-wide">{basePath === "/app" ? pmText("Risk & Compliance Intelligence", "ذكاء المخاطر والامتثال") : t('dashboard.sections.financialOverview')}</h2>
           </div>
-          {basePath === "/rbac/proposal-manager" ? (
+          {basePath === "/app" ? (
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 w-full">
               <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">{pmText("Risk & Compliance — Tracked Metrics", "المخاطر والامتثال — المؤشرات المتتبعة")}</h3>
               <ResponsiveContainer width="100%" height={220}>
@@ -1517,18 +1555,18 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         <section
           className="mt-8"
           data-tour="8"
-          data-tour-title-en={basePath === "/rbac/proposal-manager" ? "Capture & Proposal Pipeline Intelligence" : "HR & Staff Analytics"}
-          data-tour-content-en={basePath === "/rbac/proposal-manager" ? "Pipeline by stage and win rate trend." : "Staff mix and attrition trends."}
+          data-tour-title-en={basePath === "/app" ? "Capture & Proposal Pipeline Intelligence" : "HR & Staff Analytics"}
+          data-tour-content-en={basePath === "/app" ? "Pipeline by stage and win rate trend." : "Staff mix and attrition trends."}
           data-tour-title-ar="تحليلات الموارد البشرية والموظفين"
           data-tour-content-ar="مزيج الموظفين واتجاهات التسرب."
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-2 mb-2">
-            {basePath !== "/rbac/proposal-manager" && <span className="text-xl">🧑‍💼</span>}
-            <h2 className="text-lg font-bold tracking-wide">{basePath === "/rbac/proposal-manager" ? pmText("Capture & Proposal Pipeline Intelligence", "ذكاء الالتقاط وخط أنابيب العروض") : t('dashboard.sections.hrStaffAnalytics')}</h2>
+            {basePath !== "/app" && <span className="text-xl">🧑‍💼</span>}
+            <h2 className="text-lg font-bold tracking-wide">{basePath === "/app" ? pmText("Capture & Proposal Pipeline Intelligence", "ذكاء الالتقاط وخط أنابيب العروض") : t('dashboard.sections.hrStaffAnalytics')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {basePath === "/rbac/proposal-manager" ? (
+            {basePath === "/app" ? (
               <>
                 {/* Proposal Pipeline by Stage (stacked) */}
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 col-span-2">
@@ -1597,7 +1635,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           </div>
         </section>
 
-        {basePath === "/rbac/proposal-manager" && (
+        {basePath === "/app" && (
           <>
             {/* Operational Quality Intelligence (Production Discipline & Efficiency) */}
             <section className="mt-8" data-tour-position="bottom">
@@ -1669,36 +1707,6 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           </>
         )}
 
-        {/* Alerts & Notifications Widget */}
-        <section
-          className="mt-8"
-          data-tour="9"
-          data-tour-title-en={isPM ? "RFP Alerts & Notifications" : "Alerts & Notifications"}
-          data-tour-content-en={isPM ? "Submission deadlines, compliance, bid approvals, and team assignments." : "System alerts and important updates."}
-          data-tour-title-ar={isPM ? "تنبيهات وعروض RFP والإشعارات" : "التنبيهات والإشعارات"}
-          data-tour-content-ar={isPM ? "مواعيد التقديم، الامتثال، موافقات العروض، وتعيينات الفريق." : "تنبيهات النظام والتحديثات المهمة."}
-          data-tour-position="top"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            {!isPM && <span className="text-xl">🔔</span>}
-            <h2 className="text-lg font-bold tracking-wide">{isPM ? t('dashboard.sections.alertsNotificationsProposalManager') : t('dashboard.sections.alertsNotifications')}</h2>
-          </div>
-          <div className="w-full">
-            <div className={`w-full rounded-2xl shadow-lg p-6 flex flex-col gap-3 ${isPM ? 'bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-900' : 'bg-gradient-to-r from-blue-100 to-blue-50 dark:from-gray-800 dark:to-gray-900 animate-pulse'}`}>
-              {alerts.map((alert, idx) => (
-                <div key={idx} className={`flex items-center gap-3 font-medium ${alert.color}`}>
-                  {isPM ? (
-                    <span className="shrink-0 w-6 text-gray-600 dark:text-gray-400 font-semibold">{idx + 1}.</span>
-                  ) : (
-                    <span className="text-xl">{alert.icon}</span>
-                  )}
-                  <span>{alert.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* AI Widgets: Modern Side-by-Side Layout */}
         <section
           className="mt-8"
@@ -1710,13 +1718,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-2 mb-2">
-            {basePath !== "/rbac/proposal-manager" && <span className="text-xl">🤖</span>}
+            {basePath !== "/app" && <span className="text-xl">🤖</span>}
             <h2 className="text-lg font-bold tracking-wide flex items-center gap-2">
               {t('dashboard.sections.aiPoweredForecasts')}
               <span className="ml-2 px-2 py-0.5 rounded bg-gradient-to-r from-blue-500 to-purple-500 text-xs text-white font-semibold uppercase">{t('dashboard.aiLabels.ai')}</span>
             </h2>
           </div>
-          {basePath === '/rbac/proposal-manager' ? (
+          {basePath === '/app' ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Submission Forecast */}
@@ -2109,7 +2117,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           )}
         </section>
 
-        {basePath !== '/rbac/proposal-manager' && (
+        {basePath !== '/app' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             {/* Department Revenue Breakdown */}
             <div className="flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 items-stretch min-h-[260px] border border-gray-100 dark:border-gray-800">
@@ -2149,7 +2157,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           </div>
         )}
 
-        {/* --- New Section: AI-Powered Revenue & Conversion Analytics --- */}
+        {/* --- New Section: AI-Powered Revenue & Conversion Analytics (hidden for trial) --- */}
+        {!hideAiRevenueSection && (
         <section
           className="mt-12"
           data-tour="11"
@@ -2160,13 +2169,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           data-tour-position="top"
         >
           <div className="flex items-center gap-2 mb-2">
-            {basePath !== "/rbac/proposal-manager" && <span className="text-xl">📈</span>}
+            {basePath !== "/app" && <span className="text-xl">📈</span>}
             <h2 className="text-lg font-bold tracking-wide flex items-center gap-2">
               {t('dashboard.sections.aiPoweredRevenue')}
               <span className="ml-2 px-2 py-0.5 rounded bg-gradient-to-r from-green-500 to-blue-500 text-xs text-white font-semibold uppercase">{t('dashboard.aiLabels.ai')}</span>
             </h2>
           </div>
-          {basePath === '/rbac/proposal-manager' ? (
+          {basePath === '/app' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Win Rate Trend (Conversion) */}
               <div className="flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 gap-4 min-h-[260px] border border-gray-100 dark:border-gray-800">
@@ -2585,6 +2594,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
             </div>
           )}
         </section>
+        )}
       </main>
       {/* Modal for card details */}
       {modalCard && !modalCard.isKpi && <Modal card={modalCard} onClose={() => setModalCard(null)} />}

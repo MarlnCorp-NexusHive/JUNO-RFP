@@ -412,8 +412,8 @@ export default function DirectorAnalyticsReports() {
   const location = useLocation();
   const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
-  const isBidVault = location.pathname.includes("/rbac/proposal-manager/bid-vault");
-  const isContentHub = location.pathname.includes("/rbac/proposal-manager/content-hub");
+  const isBidVault = location.pathname.includes("/app/bid-vault");
+  const isContentHub = location.pathname.includes("/app/content-hub");
   const isPM = isBidVault || isContentHub;
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [timeRange, setTimeRange] = useState("6M");

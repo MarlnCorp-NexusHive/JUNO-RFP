@@ -19,7 +19,7 @@ import {
 
 export default function DirectorSettings() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/settings");
+  const isPM = location.pathname.includes("/app/settings");
   const user = JSON.parse(localStorage.getItem('rbac_current_user') || "null");
   const trialSession = getTrialSession();
   const isTrialUser = Boolean(trialSession?.token || user?.isTrialUser);

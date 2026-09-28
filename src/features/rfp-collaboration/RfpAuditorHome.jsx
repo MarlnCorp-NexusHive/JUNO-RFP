@@ -114,7 +114,7 @@ export default function RfpAuditorHome() {
         </form>
         <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
           {t("rfpCollaboration.pmLinkPrefix")}{" "}
-          <Link to="/rbac/proposal-manager/rfp-collaboration" className="text-indigo-600 dark:text-indigo-400 underline">
+          <Link to="/app/rfp-collaboration" className="text-indigo-600 dark:text-indigo-400 underline">
             {t("rfpCollaboration.pmHubLink")}
           </Link>
         </p>

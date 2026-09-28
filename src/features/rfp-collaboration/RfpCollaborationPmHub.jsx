@@ -150,7 +150,7 @@ export default function RfpCollaborationPmHub() {
       setRows([{ number: 1, text: "" }]);
       await refresh();
       if (data?.workspace?.id) {
-        navigate(`/rbac/proposal-manager/rfp-collaboration/w/${data.workspace.id}`);
+        navigate(`/app/rfp-collaboration/w/${data.workspace.id}`);
       }
     } catch (err) {
       setListError(err?.response?.data?.error || err.message);
@@ -264,7 +264,7 @@ export default function RfpCollaborationPmHub() {
             {workspaces.map((w) => (
               <li key={w.id}>
                 <Link
-                  to={`/rbac/proposal-manager/rfp-collaboration/w/${w.id}`}
+                  to={`/app/rfp-collaboration/w/${w.id}`}
                   className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                 >
                   <span className="font-medium text-gray-900 dark:text-white">{w.title}</span>

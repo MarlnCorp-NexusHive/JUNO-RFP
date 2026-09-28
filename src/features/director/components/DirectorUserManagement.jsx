@@ -36,7 +36,7 @@ import {
 
 export default function DirectorUserManagement() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/user-management");
+  const isPM = location.pathname.includes("/app/user-management");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");

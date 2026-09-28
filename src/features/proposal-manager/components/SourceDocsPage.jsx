@@ -8,6 +8,7 @@ import { BOILERPLATE_PACK } from "../data/boilerplateCapabilities.js";
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
+const NAME_OVERRIDES_KEY = "proposal_manager_source_docs_names";
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
 const MAX_PREVIEW_STORAGE_BYTES = 1.5 * 1024 * 1024;
@@ -277,6 +278,34 @@ function loadStored() {
   }
 }
 
+function loadNameOverrides() {
+  try {
+    const raw = localStorage.getItem(scopedStorageKey(NAME_OVERRIDES_KEY));
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveNameOverrides(map) {
+  try {
+    localStorage.setItem(scopedStorageKey(NAME_OVERRIDES_KEY), JSON.stringify(map || {}));
+  } catch (e) {
+    console.warn("Could not persist source doc names", e);
+  }
+}
+
+function applyNameOverrides(list, overrides) {
+  if (!overrides || !Object.keys(overrides).length) return list;
+  return list.map((d) => {
+    const label = overrides[d.id];
+    if (!label || typeof label !== "string") return d;
+    return { ...d, shareLabel: label };
+  });
+}
+
 function saveStored(list) {
   try {
     const toSave = list.map((d) => {
@@ -302,24 +331,43 @@ const SORT_OPTIONS = [
 export default function SourceDocsPage() {
   const { t } = useTranslation();
   const { issuer } = useProposalIssuer();
-  const [docs, setDocs] = useState(() => [...PREUPLOADED_DOCS, ...loadStored().filter((d) => !PREUPLOADED_IDS.has(d.id))]);
+  const [docs, setDocs] = useState(() => {
+    const overrides = loadNameOverrides();
+    const uploaded = loadStored().filter((d) => !PREUPLOADED_IDS.has(d.id));
+    return [
+      ...applyNameOverrides(PREUPLOADED_DOCS, overrides),
+      ...applyNameOverrides(uploaded, overrides),
+    ];
+  });
   const [uploadError, setUploadError] = useState("");
   const [dragging, setDragging] = useState(false);
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
   const [copiedId, setCopiedId] = useState("");
+  const [editingId, setEditingId] = useState("");
+  const [editDraft, setEditDraft] = useState("");
   const inputRef = useRef(null);
+  const renameInputRef = useRef(null);
 
   useEffect(() => {
     ensureBoilerplateLibrary();
   }, []);
+
+  useEffect(() => {
+    if (editingId && renameInputRef.current) {
+      renameInputRef.current.focus();
+      renameInputRef.current.select();
+    }
+  }, [editingId]);
 
   const sortedDocs = React.useMemo(() => {
     const list = [...docs];
     const mult = sortOrder === "asc" ? 1 : -1;
     list.sort((a, b) => {
       if (sortBy === "name") {
-        return mult * (a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+        const an = (a.shareLabel || a.name || "").toString();
+        const bn = (b.shareLabel || b.name || "").toString();
+        return mult * an.localeCompare(bn, undefined, { sensitivity: "base" });
       }
       if (sortBy === "date") {
         return mult * (new Date(a.uploadedAt) - new Date(b.uploadedAt));
@@ -343,6 +391,13 @@ export default function SourceDocsPage() {
 
   useEffect(() => {
     saveStored(docs.filter((d) => !d.preUploaded));
+    const overrides = {};
+    docs.forEach((d) => {
+      if (d.shareLabel && String(d.shareLabel).trim()) {
+        overrides[d.id] = String(d.shareLabel).trim();
+      }
+    });
+    saveNameOverrides(overrides);
   }, [docs]);
 
   const readFileAsDataUrl = (file) =>
@@ -400,7 +455,34 @@ export default function SourceDocsPage() {
     e.target.value = "";
   };
 
-  const removeDoc = (id) => setDocs((prev) => prev.filter((d) => d.id !== id));
+  const removeDoc = (id) => {
+    setDocs((prev) => prev.filter((d) => d.id !== id));
+    if (editingId === id) {
+      setEditingId("");
+      setEditDraft("");
+    }
+  };
+
+  const startRename = (doc) => {
+    setEditingId(doc.id);
+    setEditDraft(doc.shareLabel || doc.name || "");
+  };
+
+  const cancelRename = () => {
+    setEditingId("");
+    setEditDraft("");
+  };
+
+  const commitRename = (id) => {
+    const next = String(editDraft || "").trim();
+    if (!next) {
+      cancelRename();
+      return;
+    }
+    setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, shareLabel: next } : d)));
+    setEditingId("");
+    setEditDraft("");
+  };
 
   const getSafeFileName = (doc) => {
     const n = doc?.name;
@@ -494,19 +576,10 @@ export default function SourceDocsPage() {
     }
   };
 
-  const emailBoilerplateFolder = () => {
-    const lines = boilerplateDocs.map((d) => {
-      const label = d.shareLabel || d.name;
-      return `${label}\n${window.location.origin}${d.url}`;
-    });
-    const subject = encodeURIComponent("Marln JUNO RFP — Winning capability boilerplate");
-    const body = encodeURIComponent(
-      `Please find Marln Corporation / JUNO RFP winning-capability boilerplate (share with any prospect or lead):\n\n${lines.join("\n\n")}\n\nAudit-Ready. Submission-Ready. Win-Ready.`
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  };
-
-  const renderDocCard = (doc) => (
+  const renderDocCard = (doc) => {
+    const isEditing = editingId === doc.id;
+    const displayName = doc.shareLabel || doc.name;
+    return (
     <li
       key={doc.id}
       className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm flex flex-col"
@@ -514,34 +587,47 @@ export default function SourceDocsPage() {
       <div className="flex items-center gap-3">
         <span className="text-2xl">{getDocIcon(doc.type)}</span>
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-gray-900 dark:text-white truncate" title={doc.name}>
-            {doc.shareLabel || doc.name}
-          </p>
+          {isEditing ? (
+            <input
+              ref={renameInputRef}
+              type="text"
+              value={editDraft}
+              onChange={(e) => setEditDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  commitRename(doc.id);
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  cancelRename();
+                }
+              }}
+              onBlur={() => commitRename(doc.id)}
+              className="w-full rounded-lg border border-indigo-300 dark:border-indigo-600 bg-white dark:bg-gray-900 px-2 py-1 text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              aria-label={t("proposalManagerSourceDocs.renameAriaLabel")}
+            />
+          ) : (
+            <p className="font-medium text-gray-900 dark:text-white truncate" title={displayName}>
+              {displayName}
+            </p>
+          )}
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString()}
           </p>
         </div>
         <div className="shrink-0 flex items-center gap-1">
-          {doc.url ? (
+          {!isEditing && (
             <button
               type="button"
-              onClick={() => copyShareLink(doc)}
-              className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-xs font-medium"
-              title={t("proposalManagerSourceDocs.copyLink")}
-              aria-label={t("proposalManagerSourceDocs.copyLink")}
+              onClick={() => startRename(doc)}
+              className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+              title={t("proposalManagerSourceDocs.renameTitle")}
+              aria-label={t("proposalManagerSourceDocs.renameAriaLabel")}
             >
-              {copiedId === doc.id ? "✓" : "🔗"}
+              <span className="text-lg">✏️</span>
             </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => handleEmail(doc)}
-            className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-            title={t("proposalManagerSourceDocs.emailTitle")}
-            aria-label={t("proposalManagerSourceDocs.emailAriaLabel")}
-          >
-            <span className="text-lg">✉️</span>
-          </button>
+          )}
           <button
             type="button"
             onClick={() => removeDoc(doc.id)}
@@ -555,7 +641,8 @@ export default function SourceDocsPage() {
       </div>
       <DocPreview doc={doc} />
     </li>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -606,28 +693,16 @@ export default function SourceDocsPage() {
       </div>
 
       <section className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-              {t("proposalManagerSourceDocs.boilerplateEyebrow")}
-            </p>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {t("proposalManagerSourceDocs.boilerplateTitle")}
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-3xl">
-              {t("proposalManagerSourceDocs.boilerplateSubtitle")}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={emailBoilerplateFolder}
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 shadow-sm"
-          >
-            ✉️ {t("proposalManagerSourceDocs.shareFolder")}
-          </button>
+        <div className="mb-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+            {t("proposalManagerSourceDocs.boilerplateEyebrow")}
+          </p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {t("proposalManagerSourceDocs.boilerplateTitle")}
+          </h2>
         </div>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-          {boilerplateDocs.map(renderDocCard)}
+          {boilerplateDocs.map((doc) => renderDocCard(doc))}
         </ul>
       </section>
 
@@ -665,7 +740,7 @@ export default function SourceDocsPage() {
           </div>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {libraryDocs.map(renderDocCard)}
+            {libraryDocs.map((doc) => renderDocCard(doc))}
           </ul>
         )}
       </section>

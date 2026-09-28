@@ -40,7 +40,7 @@ const dashboardRoute = (user) => {
   if (user.team === "Transport Team" && user.role === "Head") return "/rbac/transport-head";
   if (user.team === "Procurement Team" && user.role === "Manager") return "/rbac/marketing-head";
   if (user.team === "Sales Enablement Team" && user.role === "Manager") return "/rbac/marketing-head";
-  if (user.team === "Proposal Team" && user.role === "Proposal Manager") return "/rbac/proposal-manager";
+  if (user.team === "Proposal Team" && user.role === "Proposal Manager") return "/app/dashboard";
   if (user.team === "RFP Collaboration" && user.role === "RFP Auditor") return "/rbac/rfp-auditor";
   // Add more as you build more dashboards
   // Default fallback
@@ -251,7 +251,7 @@ function LoginPageContent() {
         );
         setTrialSession(data);
         localStorage.setItem("rbac_current_user", JSON.stringify(trialUserToRbacUser(data)));
-        navigate("/rbac/proposal-manager", { replace: true });
+        navigate("/app/dashboard", { replace: true });
         return;
       } catch (trialErr) {
         const code = trialErr?.response?.data?.code;

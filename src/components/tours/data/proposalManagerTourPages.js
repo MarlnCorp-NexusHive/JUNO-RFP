@@ -3,7 +3,10 @@
  */
 export function getProposalManagerTourPage(pathname = "") {
   const segments = String(pathname).split("/").filter(Boolean);
-  if (!segments.includes("proposal-manager")) return null;
+  // Product shell: /app/... (legacy: /dashboard, /rbac/proposal-manager)
+  if (!segments.includes("app") && !segments.includes("dashboard") && !segments.includes("proposal-manager")) {
+    return null;
+  }
 
   const pageOrder = [
     "source-docs",

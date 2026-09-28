@@ -30,7 +30,7 @@ import {
 
 export default function DirectorMeetingsCalendar() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/meetings-calendar");
+  const isPM = location.pathname.includes("/app/meetings-calendar");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");

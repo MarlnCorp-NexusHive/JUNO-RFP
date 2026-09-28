@@ -478,7 +478,7 @@ export default function ProposalManagerCalendar() {
                   ))}
                 </div>
                 <Link
-                  to="/rbac/proposal-manager/rfp-collaboration"
+                  to="/app/rfp-collaboration"
                   className="mt-4 block text-center text-sm text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   {t("proposalManagerCalendar.openCollab")}
@@ -523,7 +523,7 @@ export default function ProposalManagerCalendar() {
                 {selected.description && <p className="text-xs mt-2">{selected.description}</p>}
                 {selected.source === "collaboration" && selected.workspaceId && (
                   <Link
-                    to={`/rbac/proposal-manager/rfp-collaboration/w/${selected.workspaceId}`}
+                    to={`/app/rfp-collaboration/w/${selected.workspaceId}`}
                     className="inline-block text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     {t("proposalManagerCalendar.openWorkspace")}

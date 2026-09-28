@@ -95,7 +95,7 @@ import AdminProcurement from "./features/admin-head/pages/AdminProcurement";
 import AdminWorkspace from "./features/admin-head/pages/AdminWorkspace";
 import AdminSupportTickets from "./features/admin-head/pages/AdminSupportTickets";
 // Dean role removed - replaced with Department Head
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import DirectorLayout from './features/director/components/DirectorLayout';
 import DirectorWorkspace from './features/director/components/DirectorWorkspace';
 import DirectorSupport from './features/director/components/DirectorSupport';
@@ -128,6 +128,22 @@ import AdmissionHeadEnhanced from './features/ai-enhanced/admission-head/pages/A
 import DirectorAIChat from "./features/director/pages/DirectorAIChat";
 import MarketingHeadAIChat from "./features/marketing-head/pages/MarketingHeadAIChat";
 import AdmissionHeadAIChat from "./features/admission-head/pages/AdmissionHeadAIChat";
+
+/** Old bookmarks: /rbac/proposal-manager/... → /app/... (index → /app/dashboard). */
+function LegacyProposalManagerRedirect() {
+  const location = useLocation();
+  const rest = location.pathname.replace(/^\/rbac\/proposal-manager\/?/, "");
+  const to = `/app/${rest || "dashboard"}${location.search}${location.hash}`;
+  return <Navigate to={to} replace />;
+}
+
+/** Brief /dashboard paths → /app/... */
+function LegacyDashboardRedirect() {
+  const location = useLocation();
+  const rest = location.pathname.replace(/^\/dashboard\/?/, "");
+  const to = `/app/${rest || "dashboard"}${location.search}${location.hash}`;
+  return <Navigate to={to} replace />;
+}
 
 export default function App() {
   return (
@@ -230,9 +246,12 @@ export default function App() {
           <Route path="support" element={<DirectorSupport />} />
           <Route path="ai-chat" element={<DirectorAIChat />} />
         </Route>
-        {/* Proposal Manager: Dashboard, Source Docs, Company Intelligence, etc. */}
-        <Route path="/rbac/proposal-manager" element={<ProposalManagerLayout />}>
-          <Route index element={<DirectorDashboard basePath="/rbac/proposal-manager" dashboardTitle="JUNO RFP Dashboard" welcomeMessage="Welcome to JUNO RFP - Audit-Ready. Submission-Ready. Win-Ready." />} />
+        {/* JUNO app shell — /app/dashboard, /app/source-docs, ... */}
+        <Route path="/rbac/proposal-manager/*" element={<LegacyProposalManagerRedirect />} />
+        <Route path="/dashboard/*" element={<LegacyDashboardRedirect />} />
+        <Route path="/app" element={<ProposalManagerLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DirectorDashboard basePath="/app" dashboardTitle="JUNO RFP Dashboard" welcomeMessage="Welcome to JUNO RFP - Audit-Ready. Submission-Ready. Win-Ready." />} />
           <Route path="source-docs" element={<SourceDocsPage />} />
           <Route path="company-intelligence" element={<CompanyIntelligencePage />} />
           <Route path="competitive-intelligence" element={<CompetitiveIntelligencePage />} />

@@ -28,7 +28,7 @@ import {
 
 export default function DirectorAuditCompliance() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/compliance");
+  const isPM = location.pathname.includes("/app/compliance");
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
   const [logFilter, setLogFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");

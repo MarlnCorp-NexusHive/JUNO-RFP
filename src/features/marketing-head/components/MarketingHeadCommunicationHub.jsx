@@ -112,7 +112,7 @@ const commLogs = [
 
 export default function MarketingHeadCommunicationHub() {
   const location = useLocation();
-  const isPM = location.pathname.includes("/rbac/proposal-manager/communication");
+  const isPM = location.pathname.includes("/app/communication");
   const { t, ready, i18n } = useTranslation('marketing');
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isPM ? (isArabic ? ar : en) : en);

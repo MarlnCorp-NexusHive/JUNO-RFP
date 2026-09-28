@@ -117,7 +117,7 @@ export default function MarketingHeadTeamManagement() {
   const location = useLocation();
   const [languageVersion, setLanguageVersion] = useState(0);
   const { isRTLMode } = useLocalization();
-  const isProposalManagerTeam = location.pathname.includes('/rbac/proposal-manager/team');
+  const isProposalManagerTeam = location.pathname.includes('/app/team');
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isProposalManagerTeam ? (isArabic ? ar : en) : en);
   const pmTranslate = (text) => {
@@ -158,7 +158,7 @@ export default function MarketingHeadTeamManagement() {
   }, [i18n.language]);
 
   useEffect(() => {
-    if (location.pathname.includes('/rbac/proposal-manager/team')) {
+    if (location.pathname.includes('/app/team')) {
       setMembers(proposalManagerInitialMembers);
     }
   }, [location.pathname]);

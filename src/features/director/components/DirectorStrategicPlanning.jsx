@@ -44,7 +44,7 @@ const years = ["2024", "2025", "2026", "2027", "2028"];
 
 export default function DirectorStrategicPlanning() {
   const location = useLocation();
-  const isCaptureStrategy = location.pathname.includes("/rbac/proposal-manager/capture-strategy");
+  const isCaptureStrategy = location.pathname.includes("/app/capture-strategy");
   const { t, ready, i18n } = useTranslation('director');
   const { isRTLMode } = useLocalization();
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");

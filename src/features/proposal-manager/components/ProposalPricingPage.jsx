@@ -197,7 +197,7 @@ export default function ProposalPricingPage() {
             </p>
             <button
               type="button"
-              onClick={() => navigate("/rbac/proposal-manager/company-intelligence")}
+              onClick={() => navigate("/app/company-intelligence")}
               className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500"
             >
               {t("proposalManagerPricing.emptyCustomer.cta")}

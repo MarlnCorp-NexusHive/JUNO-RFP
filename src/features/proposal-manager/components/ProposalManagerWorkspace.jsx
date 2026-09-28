@@ -1561,7 +1561,7 @@ export default function ProposalManagerWorkspace() {
                                 </p>
                                 {activeRfpDoc?.rfpCollabWorkspaceId ? (
                                   <Link
-                                    to={`/rbac/proposal-manager/rfp-collaboration/w/${activeRfpDoc.rfpCollabWorkspaceId}`}
+                                    to={`/app/rfp-collaboration/w/${activeRfpDoc.rfpCollabWorkspaceId}`}
                                     className="text-xs font-medium text-violet-700 dark:text-violet-300 hover:underline"
                                   >
                                     {t("proposalManagerWorkspace.rfpWorkspace.auditOpenHub")}

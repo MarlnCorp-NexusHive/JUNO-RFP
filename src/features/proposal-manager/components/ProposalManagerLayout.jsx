@@ -57,9 +57,10 @@ function sidebarUserLabel() {
 
 function sidebarFeatures() {
   if (!isTrialUser()) return proposalManagerFeatures;
-  return proposalManagerFeatures.filter(
-    (f) => !String(f.route || "").includes("/topology"),
-  );
+  return proposalManagerFeatures.filter((f) => {
+    const route = String(f.route || "");
+    return !route.includes("/topology") && !route.includes("/capture-strategy");
+  });
 }
 
 function sidebarBrandLogo() {
@@ -78,9 +79,13 @@ export default function ProposalManagerLayout() {
   const features = sidebarFeatures();
   const brandLogo = sidebarBrandLogo();
 
-  // Trial: Topology tab is hidden — bounce direct URL hits back to dashboard
-  if (isTrialUser() && String(location.pathname || "").includes("/topology")) {
-    return <Navigate to="/rbac/proposal-manager" replace />;
+  // Trial: hide Topology + Capture Strategy — bounce direct URL hits back to dashboard
+  const trialBlocked =
+    isTrialUser() &&
+    (String(location.pathname || "").includes("/topology") ||
+      String(location.pathname || "").includes("/capture-strategy"));
+  if (trialBlocked) {
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   return (
