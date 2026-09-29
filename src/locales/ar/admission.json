@@ -973,7 +973,7 @@
       "geoFencing": {
         "title": "السياج الجغرافي",
         "checkedIn": "تم تسجيل الدخول من المقر الرئيسي",
-        "time": "@ 9:02 ص",
+        "time": "@ 09:02",
         "alert": "تنبيه",
         "outOfZoneAttendanceAttempt": "محاولة حضور خارج المنطقة"
       }

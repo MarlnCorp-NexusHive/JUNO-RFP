@@ -40,6 +40,7 @@ import {
 } from "../../../services/api.js";
 import SolutionArchitectureDiagram from "./solutioning/SolutionArchitectureDiagram";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { formatDateTime24 } from '../../../utils/dateTime';
 
 const STEPS = ["library", "requirements", "blueprint"];
 
@@ -577,7 +578,7 @@ export default function TechnicalSolutioningPage() {
                       <ConfidenceBadge value={design.confidenceOverall} label={t("proposalManagerTechnicalSolutioning.overallConfidence")} />
                       <span className="text-xs text-gray-500 self-center">
                         {t("proposalManagerTechnicalSolutioning.generatedAt", {
-                          date: new Date(design.generatedAt).toLocaleString(),
+                          date: formatDateTime24(design.generatedAt),
                         })}
                       </span>
                     </div>

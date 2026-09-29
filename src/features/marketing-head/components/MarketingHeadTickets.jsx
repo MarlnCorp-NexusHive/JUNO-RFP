@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { formatDateTime24 } from '../../../utils/dateTime';
 
 // Demo data for tickets
 const tickets = [
@@ -19,13 +20,13 @@ const tickets = [
         id: 1,
         user: 'Noura Al-Zahra',
         text: 'Please update the pricing page with the new enterprise tier',
-        timestamp: '2026-09-15 10:30 AM',
+        timestamp: '2026-09-15 10:30',
       },
       {
         id: 2,
         user: 'Abdullah Al-Rashid',
         text: 'I\'ll start working on this today',
-        timestamp: '2026-09-15 11:45 AM',
+        timestamp: '2026-09-15 11:45',
       },
     ],
   },
@@ -45,7 +46,7 @@ const tickets = [
         id: 1,
         user: 'Layla Al-Mansour',
         text: 'Please review the campaign content for Q2',
-        timestamp: '2026-09-14 09:15 AM',
+        timestamp: '2026-09-14 09:15',
       },
     ],
   },
@@ -65,19 +66,19 @@ const tickets = [
         id: 1,
         user: 'Khalid Al-Sayed',
         text: 'Please update the welcome email with new branding',
-        timestamp: '2026-09-13 02:30 PM',
+        timestamp: '2026-09-13 14:30',
       },
       {
         id: 2,
         user: 'Fatima Al-Rashid',
         text: 'I\'ve updated the template with the new branding',
-        timestamp: '2026-09-14 11:20 AM',
+        timestamp: '2026-09-14 11:20',
       },
       {
         id: 3,
         user: 'Khalid Al-Sayed',
         text: 'Looks great, thanks!',
-        timestamp: '2026-09-15 09:45 AM',
+        timestamp: '2026-09-15 09:45',
       },
     ],
   },
@@ -132,7 +133,7 @@ const MarketingHeadTickets = () => {
         id: selectedTicket.comments.length + 1,
         user: 'Current User',
         text: newComment,
-        timestamp: new Date().toLocaleString(),
+        timestamp: formatDateTime24(new Date()),
       };
       selectedTicket.comments.push(comment);
       setNewComment('');

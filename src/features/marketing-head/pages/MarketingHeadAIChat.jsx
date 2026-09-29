@@ -6,6 +6,7 @@ import aiService from '../../../services/aiService';
 import chatHistoryService from '../../../services/chatHistoryService';
 import trialService from '../../../services/trialService';
 import aiLanguageService from '../../../services/aiLanguageService';
+import { formatTime24 } from '../../../utils/dateTime';
 
 const MarketingHeadAIChat = () => {
   const { t } = useTranslation();
@@ -80,7 +81,7 @@ const MarketingHeadAIChat = () => {
   ];
 
   const handleSendMessage = async (message) => {
-    const timestamp = new Date().toLocaleTimeString();
+    const timestamp = formatTime24(new Date());
     
     // Check trial limit before sending
     if (!trialService.canAskQuestion()) {
@@ -133,7 +134,7 @@ const MarketingHeadAIChat = () => {
         chatHistoryService.addMessage('marketing-head', currentChatId, {
           sender: 'ai',
           content: response.content,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: formatTime24(new Date()),
           usage: response.usage,
           model: response.model
         });
@@ -143,7 +144,7 @@ const MarketingHeadAIChat = () => {
       setChatHistory(prev => [...prev, {
         sender: 'ai',
         content: response.content,
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: formatTime24(new Date()),
         usage: response.usage,
         model: response.model
       }]);
@@ -163,7 +164,7 @@ const MarketingHeadAIChat = () => {
         chatHistoryService.addMessage('marketing-head', currentChatId, {
           sender: 'ai',
           content: `Sorry, I encountered an error: ${error.message}. Please check your API configuration and try again.`,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: formatTime24(new Date()),
           isError: true
         });
       }
@@ -172,7 +173,7 @@ const MarketingHeadAIChat = () => {
       setChatHistory(prev => [...prev, {
         sender: 'ai',
         content: `Sorry, I encountered an error: ${error.message}. Please check your API configuration and try again.`,
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: formatTime24(new Date()),
         isError: true
       }]);
     } finally {
@@ -213,7 +214,7 @@ const MarketingHeadAIChat = () => {
         setChatHistory(prev => [...prev, {
           sender: 'user',
           content: fileMessage,
-          timestamp: new Date().toLocaleTimeString()
+          timestamp: formatTime24(new Date())
         }]);
   
         // Convert chat history to API format
@@ -239,7 +240,7 @@ const MarketingHeadAIChat = () => {
         setChatHistory(prev => [...prev, {
           sender: 'ai',
           content: response.content,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: formatTime24(new Date()),
           usage: response.usage,
           model: response.model,
           hasAttachment: true,
@@ -440,7 +441,7 @@ const MarketingHeadAIChat = () => {
                       const formattedMessages = chat.messages.map(msg => ({
                         sender: msg.sender,
                         content: msg.content,
-                        timestamp: new Date(msg.timestamp).toLocaleTimeString(),
+                        timestamp: formatTime24(msg.timestamp),
                         usage: msg.usage,
                         model: msg.model,
                         isError: msg.isError
@@ -454,7 +455,7 @@ const MarketingHeadAIChat = () => {
                       {chat.title}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(chat.updatedAt).toLocaleDateString()} • {chat.messages.length} messages
+                      {new Date(chat.updatedAt).toLocaleDateString()} ï¿½ {chat.messages.length} messages
                     </p>
                   </div>
                 ))

@@ -78,8 +78,8 @@ const AdmissionHeadInterviewScheduling = () => {
   ];
 
   const timeSlots = [
-    "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
-    "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM"
+    "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00"
   ];
 
   // Initialize with some mock data
@@ -91,7 +91,7 @@ const AdmissionHeadInterviewScheduling = () => {
         program: "Federal IT",
         interviewType: "Technical Interview",
         scheduledDate: "2026-09-20",
-        scheduledTime: "10:00 AM",
+        scheduledTime: "10:00",
         status: 'scheduled',
         aiRecommendations: isRTLMode ? "توصيات الذكاء الاصطناعي: مقابلة تقنية لمدة 60 دقيقة مع تركيز على مهارات البرمجة" : "AI Recommendations: 60-minute technical interview focusing on programming skills",
         notes: isRTLMode ? "مرشح قوي مع خبرة في تطوير البرمجيات" : "Strong candidate with software development experience",
@@ -103,7 +103,7 @@ const AdmissionHeadInterviewScheduling = () => {
         program: "Professional Services",
         interviewType: "Capability Interview",
         scheduledDate: "2026-09-22",
-        scheduledTime: "02:00 PM",
+        scheduledTime: "14:00",
         status: 'scheduled',
         aiRecommendations: isRTLMode ? "توصيات الذكاء الاصطناعي: مقابلة قدرات لمدة 45 دقيقة مع التركيز على الأهداف المهنية" : "AI Recommendations: 45-minute capability interview focusing on career goals",
         notes: isRTLMode ? "خبرة في التسويق وطموحة" : "Marketing experience and ambitious",

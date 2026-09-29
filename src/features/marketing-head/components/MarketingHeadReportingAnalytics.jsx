@@ -30,9 +30,9 @@ const spendROI = [
 ];
 
 const campaignPerformance = [
-  { id: 1, name: "Spring Email Blast", type: "Email", open: 0.42, click: 0.18, sent: 2000, bestTime: "Tue 10am", rank: 2 },
-  { id: 2, name: "Summer Google Ads", type: "Paid Ads", ctr: 0.09, impressions: 12000, cpc: 1.2, bestTime: "Mon 9am", rank: 1 },
-  { id: 3, name: "Corporate Event", type: "Event", leads: 150, cpl: 20, cost: 3000, bestTime: "Sat 2pm", rank: 3 },
+  { id: 1, name: "Spring Email Blast", type: "Email", open: 0.42, click: 0.18, sent: 2000, bestTime: "Tue 10:00", rank: 2 },
+  { id: 2, name: "Summer Google Ads", type: "Paid Ads", ctr: 0.09, impressions: 12000, cpc: 1.2, bestTime: "Mon 09:00", rank: 1 },
+  { id: 3, name: "Corporate Event", type: "Event", leads: 150, cpl: 20, cost: 3000, bestTime: "Sat 14:00", rank: 3 },
 ];
 
 const audienceEngagement = [
@@ -310,7 +310,7 @@ export default function MarketingHeadReportingAnalytics() {
         <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
           <div className="font-medium mb-1">{t('analytics.campaignPerformance.aiCampaignInsights')}</div>
           <div className="text-sm text-blue-700 dark:text-blue-300">
-            {isRTLMode ? 'أفضل وقت للنشر: الاثنين 9 صباحاً. أفضل حملة: إعلانات جوجل الصيفية.' : 'Best time to post: Mon 9am. Top campaign: Summer Google Ads.'}
+            {isRTLMode ? 'أفضل وقت للنشر: الاثنين 09:00. أفضل حملة: إعلانات جوجل الصيفية.' : 'Best time to post: Mon 09:00. Top campaign: Summer Google Ads.'}
           </div>
         </div>
       </section>

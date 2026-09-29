@@ -13,7 +13,7 @@ const templates = [
     type: 'email',
     subject: 'Complete Your Application - Documents Required',
     body: 'Dear {name},\n\nWe noticed that some required documents are still pending for your application. Please upload them at your earliest convenience to avoid any delays in processing.\n\nRequired documents:\n- ID Proof\n- Past Performance Docs\n- Address Proof\n\nBest regards,\nCapture Team',
-    aiSuggestions: ['Best time to send: 10 AM', 'Personalize with program details', 'Include direct upload link']
+    aiSuggestions: ['Best time to send: 10:00', 'Personalize with program details', 'Include direct upload link']
   },
   {
     id: 'payment_reminder',

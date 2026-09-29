@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import applicationProcessingService from '../../../services/applicationProcessingService'; // ← Fixed: changed '../services/' to '../../../services/'
+import { formatDateTime24 } from '../../../../utils/dateTime';
 
 const ApplicationProcessingAI = ({ 
   applicationData, 
@@ -453,7 +454,7 @@ const ApplicationProcessingAI = ({
                       {item.result.summary || 'Processing completed'}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(item.timestamp).toLocaleString()}
+                      {formatDateTime24(item.timestamp)}
                     </p>
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${

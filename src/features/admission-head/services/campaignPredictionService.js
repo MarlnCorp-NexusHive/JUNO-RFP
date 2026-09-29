@@ -76,7 +76,7 @@ FORMAT AS JSON:
   },
   "optimalTiming": {
     "bestDay": "Tuesday",
-    "bestTime": "10:00 AM",
+    "bestTime": "10:00",
     "reasoning": "Peak engagement time for target audience"
   },
   "targetAudience": {
@@ -255,11 +255,11 @@ FORMAT AS JSON:
   // Get fallback optimal timing
   getFallbackTiming(campaignData) {
     const timings = {
-      'email': { day: 'Tuesday', time: '10:00 AM', reasoning: 'Peak email engagement time' },
-      'social-media': { day: 'Wednesday', time: '7:00 PM', reasoning: 'Evening social media activity' },
-      'event': { day: 'Saturday', time: '2:00 PM', reasoning: 'Weekend availability' },
-      'content': { day: 'Monday', time: '9:00 AM', reasoning: 'Start of week content consumption' },
-      'paid-advertising': { day: 'Thursday', time: '11:00 AM', reasoning: 'Mid-week advertising effectiveness' }
+      'email': { day: 'Tuesday', time: '10:00', reasoning: 'Peak email engagement time' },
+      'social-media': { day: 'Wednesday', time: '19:00', reasoning: 'Evening social media activity' },
+      'event': { day: 'Saturday', time: '14:00', reasoning: 'Weekend availability' },
+      'content': { day: 'Monday', time: '09:00', reasoning: 'Start of week content consumption' },
+      'paid-advertising': { day: 'Thursday', time: '11:00', reasoning: 'Mid-week advertising effectiveness' }
     };
 
     return timings[campaignData.type] || timings['email'];

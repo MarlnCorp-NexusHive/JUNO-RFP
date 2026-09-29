@@ -258,7 +258,7 @@ function LoginPageContent() {
         const msg = trialErr?.response?.data?.error;
         if (code === "trial_expired" || code === "tenant_disabled") {
           clearTrialSession();
-          setError(msg || t("auth.login.trialExpired"));
+          setError(msg || t("auth.login.trialExpiredDetail"));
           return;
         }
         if (code === "email_not_verified") {
@@ -396,7 +396,12 @@ function LoginPageContent() {
                 {t("auth.signup.subtitle")}
               </p>
             )}
-            {mode === "login" && <div className="mb-8" />}
+            {mode === "login" && !info && (
+              <p className={`text-center text-sm mb-6 ${darkTheme ? "text-white/70" : "text-white/85"}`}>
+                {t("auth.login.subtitle")}
+              </p>
+            )}
+            {mode === "login" && info && <div className="mb-2" />}
 
             {mode === "login" ? (
             <form onSubmit={handleLogin} className="space-y-6">
@@ -499,6 +504,9 @@ function LoginPageContent() {
               >
                 {t("auth.login.noAccount")} {t("auth.login.signUp")}
               </button>
+              <p className={`text-center text-xs mt-1 ${darkTheme ? "text-white/55" : "text-white/75"}`}>
+                {t("auth.login.trialSignupHint")}
+              </p>
               <button
                 type="button"
                 onClick={handleReloadDemoUsers}
@@ -590,10 +598,28 @@ function LoginPageContent() {
                   </button>
                 </div>
               </div>
-              {error && (
-                <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-red-400 bg-red-900/20' : 'text-red-500 bg-red-50'}`}>
-                  {error}
+              {(error || info) && (
+                <div
+                  className={`text-sm text-center p-3 rounded-lg ${
+                    error
+                      ? darkTheme
+                        ? "text-red-400 bg-red-900/20"
+                        : "text-red-500 bg-red-50"
+                      : darkTheme
+                        ? "text-emerald-300 bg-emerald-900/20"
+                        : "text-emerald-700 bg-emerald-50"
+                  }`}
+                >
+                  {error || info}
                 </div>
+              )}
+              {devConfirmUrl && (
+                <a
+                  href={devConfirmUrl}
+                  className="block text-center text-sm font-semibold text-[#4f3cc9] underline"
+                >
+                  {t("auth.signup.openConfirmLink")}
+                </a>
               )}
               <button
                 type="submit"

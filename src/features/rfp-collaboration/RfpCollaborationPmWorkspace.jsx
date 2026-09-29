@@ -17,6 +17,7 @@ import {
   loadCollabSession,
 } from "./rfpCollabSession.js";
 import { useTrialCollabT } from "./useTrialCollabT.js";
+import { formatDateTime24 } from '../../utils/dateTime';
 
 const STATUS_KEYS = {
   unassigned: "rfpCollaboration.status.unassigned",
@@ -418,7 +419,7 @@ export default function RfpCollaborationPmWorkspace() {
                         className="rounded-lg border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm"
                       >
                         <div className="text-xs text-gray-500 mb-1">
-                          {nameById.get(m.fromUserId) || m.fromUserId} · {new Date(m.createdAt).toLocaleString()}
+                          {nameById.get(m.fromUserId) || m.fromUserId} · {formatDateTime24(m.createdAt)}
                         </div>
                         <div className="whitespace-pre-wrap">{m.body}</div>
                       </div>

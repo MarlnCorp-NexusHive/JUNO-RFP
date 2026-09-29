@@ -71,8 +71,8 @@
       "afternoon": "Afternoon",
       "evening": "Evening",
       "night": "Night",
-      "am": "AM",
-      "pm": "PM"
+      "am": "",
+      "pm": ""
     },
     "units": {
       "students": "Students",

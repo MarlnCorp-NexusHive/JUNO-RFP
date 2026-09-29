@@ -8,6 +8,7 @@ import {
   FiDownload, FiUpload, FiFilter, FiSearch, FiEye, FiEdit2,
   FiChevronDown, FiChevronUp, FiZap, FiTarget, FiBarChart2
 } from 'react-icons/fi';
+import { formatTime24 } from '../../../../utils/dateTime';
 
 const ApplicationManager = ({ leads }) => {
   const { t } = useTranslation(['admission']);
@@ -321,7 +322,7 @@ const ApplicationManager = ({ leads }) => {
                       {lead.application.interviewScheduled ? (
                         <div>
                           <div>{new Date(lead.application.interviewScheduled).toLocaleDateString()}</div>
-                          <div className="text-xs text-gray-400">{new Date(lead.application.interviewScheduled).toLocaleTimeString()}</div>
+                          <div className="text-xs text-gray-400">{formatTime24(lead.application.interviewScheduled)}</div>
                         </div>
                       ) : (
                         'Not Scheduled'

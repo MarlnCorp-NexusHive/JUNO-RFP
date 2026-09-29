@@ -7,6 +7,7 @@ import { Textarea } from "../../../../components/ui/textarea";
 import { useLocalization } from "../../../../hooks/useLocalization";
 import { useRTL } from "../../../../hooks/useRTL";
 import documentVerificationService from "../../services/documentVerificationService.js";
+import { formatDateTime24 } from '../../../../utils/dateTime';
 
 const AdmissionHeadDocumentVerification = () => {
   const { language } = useLocalization();
@@ -803,7 +804,7 @@ const AdmissionHeadDocumentVerification = () => {
                           {isRTL ? "تم التحقق في" : "Verified At"}
                         </label>
                         <p className="text-gray-900 dark:text-white">
-                          {new Date(selectedDocument.verifiedAt).toLocaleString()}
+                          {formatDateTime24(selectedDocument.verifiedAt)}
                         </p>
                       </div>
                     )}

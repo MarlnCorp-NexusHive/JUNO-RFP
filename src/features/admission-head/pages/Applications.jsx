@@ -262,9 +262,9 @@ export default function Applications() {
   const [assignApplicant, setAssignApplicant] = useState(null);
 
   const [interviews, setInterviews] = useState(() => getLS('interviews', [
-    { ...mockApplications[0], time: '10:00 AM', completed: false },
-    { ...mockApplications[5], time: '2:00 PM', completed: false },
-    { ...mockApplications[6], time: '4:30 PM', completed: false },
+    { ...mockApplications[0], time: '10:00', completed: false },
+    { ...mockApplications[5], time: '14:00', completed: false },
+    { ...mockApplications[6], time: '16:30', completed: false },
   ]));
   const [showInterviewModal, setShowInterviewModal] = useState(false);
   const [interviewApplicant, setInterviewApplicant] = useState(null);
@@ -729,7 +729,7 @@ export default function Applications() {
       <Modal open={showInterviewModal} onClose={() => setShowInterviewModal(false)} title={t('applications.sections.scheduleInterview')}>
         <div className="flex flex-col gap-2">
           {mockApplications.map(app => (
-            <button key={app.id} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-pink-100 dark:hover:bg-pink-900/30" onClick={() => handleScheduleInterview(app, `${Math.floor(Math.random()*12+9)}:00 AM`)}>
+            <button key={app.id} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-pink-100 dark:hover:bg-pink-900/30" onClick={() => handleScheduleInterview(app, `${String(Math.floor(Math.random()*8+9)).padStart(2,"0")}:00`)}>
               <img src={app.avatar} alt={app.name} className="w-6 h-6 rounded-full border-2 border-pink-200" />
               <span className="text-xs font-medium text-gray-700 dark:text-gray-200">{app.name}</span>
             </button>

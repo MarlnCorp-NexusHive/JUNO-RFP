@@ -7,6 +7,7 @@ import AdmissionHeadInterviewScheduling from '../components/AdmissionHeadIntervi
 import ApplicationProcessingAI from '../../shared/components/ApplicationProcessingAI';
 import enTranslations from '../../locals/en.json';
 import arTranslations from '../../locals/ar.json';
+import { formatDateTime24 } from '../../../../utils/dateTime';
 
 const AdmissionHeadEnhanced = () => {
   const { t } = useTranslation();
@@ -309,7 +310,7 @@ const getTranslation = (key, fallback) => {
               <p><strong>{getTranslation('recruitment.dashboard.status', 'Status')}:</strong> {applicationProcessing.status}</p>
               <p><strong>{getTranslation('recruitment.dashboard.score', 'Score')}:</strong> {applicationProcessing.overallScore || 0}/100</p>
               <p><strong>{getTranslation('recruitment.dashboard.recommendation', 'Recommendation')}:</strong> {applicationProcessing.recommendation || 'N/A'}</p>
-              <p><strong>{getTranslation('recruitment.dashboard.processedAt', 'Processed At')}:</strong> {new Date(applicationProcessing.processedAt || Date.now()).toLocaleString()}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.processedAt', 'Processed At')}:</strong> {formatDateTime24(applicationProcessing.processedAt || Date.now())}</p>
             </div>
           </div>
         )}
@@ -326,7 +327,7 @@ const getTranslation = (key, fallback) => {
               <p><strong>{getTranslation('recruitment.dashboard.status', 'Status')}:</strong> {documentVerification.status}</p>
               <p><strong>{getTranslation('recruitment.dashboard.authenticityScore', 'Authenticity Score')}:</strong> {documentVerification.scores?.authenticity || 0}/100</p>
               <p><strong>{getTranslation('recruitment.dashboard.completenessScore', 'Completeness Score')}:</strong> {documentVerification.scores?.completeness || 0}/100</p>
-              <p><strong>{getTranslation('recruitment.dashboard.verifiedAt', 'Verified At')}:</strong> {new Date(documentVerification.verifiedAt || Date.now()).toLocaleString()}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.verifiedAt', 'Verified At')}:</strong> {formatDateTime24(documentVerification.verifiedAt || Date.now())}</p>
             </div>
           </div>
         )}
@@ -344,7 +345,7 @@ const getTranslation = (key, fallback) => {
               <p><strong>{getTranslation('recruitment.dashboard.scheduledDate', 'Scheduled Date')}:</strong> {interviewScheduling.scheduledDate}</p>
               <p><strong>{getTranslation('recruitment.dashboard.scheduledTime', 'Scheduled Time')}:</strong> {interviewScheduling.scheduledTime}</p>
               <p><strong>{getTranslation('recruitment.dashboard.status', 'Status')}:</strong> {interviewScheduling.status}</p>
-              <p><strong>{getTranslation('recruitment.dashboard.scheduledAt', 'Scheduled At')}:</strong> {new Date(interviewScheduling.createdAt || Date.now()).toLocaleString()}</p>
+              <p><strong>{getTranslation('recruitment.dashboard.scheduledAt', 'Scheduled At')}:</strong> {formatDateTime24(interviewScheduling.createdAt || Date.now())}</p>
             </div>
           </div>
         )}

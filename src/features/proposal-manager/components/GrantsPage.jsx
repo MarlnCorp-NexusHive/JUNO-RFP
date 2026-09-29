@@ -25,6 +25,7 @@ import {
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
+import { formatDateTime24 } from '../../../utils/dateTime';
 
 const STATUS_OPTIONS = [
   { value: "posted|forecasted", labelKey: "openAndForecasted" },
@@ -255,7 +256,7 @@ function GrantDetailBody({ detail, t, copied, onCopy }) {
           <span className="text-[11px] text-slate-500">
             {t("proposalManagerGrants.liveFrom", {
               source: detail.source || "Grants.gov",
-              time: new Date(detail.fetchedAt).toLocaleString(),
+              time: formatDateTime24(detail.fetchedAt),
             })}
           </span>
         )}
@@ -634,7 +635,7 @@ export default function GrantsPage() {
             <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-800">
               {t("proposalManagerGrants.liveFrom", {
                 source: payload.source || "Grants.gov",
-                time: new Date(payload.fetchedAt).toLocaleString(),
+                time: formatDateTime24(payload.fetchedAt),
               })}
             </p>
           )}

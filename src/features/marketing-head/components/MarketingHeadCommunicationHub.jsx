@@ -12,7 +12,7 @@ const communicationChannels = [
     id: 1,
     name: 'Team Announcements',
     type: 'Internal',
-    lastMessage: 'Q2 Marketing Strategy Meeting - Tomorrow at 10 AM',
+    lastMessage: 'Q2 Marketing Strategy Meeting - Tomorrow at 10:00',
     participants: 15,
     unread: 3,
     status: 'Active'
@@ -43,14 +43,14 @@ const recentMessages = [
     id: 1,
     sender: 'John Doe',
     content: 'Please review the latest campaign metrics',
-    timestamp: '10:30 AM',
+    timestamp: '10:30',
     channel: 'Campaign Updates'
   },
   {
     id: 2,
     sender: 'Jane Smith',
     content: 'Team meeting agenda has been updated',
-    timestamp: '09:45 AM',
+    timestamp: '09:45',
     channel: 'Team Announcements'
   },
   {
@@ -149,13 +149,13 @@ export default function MarketingHeadCommunicationHub() {
   const { isRTLMode } = useLocalization();
 
   const pmChannels = [
-    { id: 1, name: 'Proposal Kickoffs', type: 'Internal', lastMessage: 'Water Wastewater RFP – Kickoff tomorrow 10 AM', participants: 8, unread: 2, status: 'Active' },
+    { id: 1, name: 'Proposal Kickoffs', type: 'Internal', lastMessage: 'Water Wastewater RFP – Kickoff tomorrow 10:00', participants: 8, unread: 2, status: 'Active' },
     { id: 2, name: 'Color Team Reviews', type: 'Project', lastMessage: 'Landscape Maintenance draft ready for review', participants: 5, unread: 1, status: 'Active' },
     { id: 3, name: 'Pricing & Compliance', type: 'Internal', lastMessage: 'FAR 52.219-9 checklist due Friday', participants: 4, unread: 0, status: 'Active' },
   ];
   const pmRecentMessages = [
-    { id: 1, sender: 'Michael Anderson', content: 'Section assignments for Water Wastewater are in the workspace', timestamp: '10:30 AM', channel: 'Proposal Kickoffs' },
-    { id: 2, sender: 'David Reynolds', content: 'Go/No-Go for Surplus Tanks – 2 PM today', timestamp: '09:45 AM', channel: 'Proposal Kickoffs' },
+    { id: 1, sender: 'Michael Anderson', content: 'Section assignments for Water Wastewater are in the workspace', timestamp: '10:30', channel: 'Proposal Kickoffs' },
+    { id: 2, sender: 'David Reynolds', content: 'Go/No-Go for Surplus Tanks – 14:00 today', timestamp: '09:45', channel: 'Proposal Kickoffs' },
     { id: 3, sender: 'Sarah Chen', content: 'Technical approach draft uploaded for review', timestamp: 'Yesterday', channel: 'Color Team Reviews' },
   ];
   const channelsToUse = isTrialPm ? [] : isPM ? pmChannels : communicationChannels;
@@ -501,7 +501,7 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.campaignMessaging.aiSendTimeOptimization')}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">{pmText("Best time to send: 10:00 AM for max engagement.", "أفضل وقت للإرسال: 10:00 صباحاً لتحقيق أعلى تفاعل.")}</div>
+            <div className="text-sm text-green-700 dark:text-green-300">{pmText("Best time to send: 10:00 for max engagement.", "أفضل وقت للإرسال: 10:00 لتحقيق أعلى تفاعل.")}</div>
           </div>
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.campaignMessaging.aiSubjectLinePredictor')}</div>
@@ -593,7 +593,7 @@ const handleShowReplySuggestions = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationCalendar.aiSmartScheduling')}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("No message overlaps. Next free slot: 11:00 AM, 25th September.", "لا يوجد تداخل في الرسائل. أقرب وقت متاح: 11:00 صباحاً، 25 سبتمبر.")}</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">{pmText("No message overlaps. Next free slot: 11:00, 25th September.", "لا يوجد تداخل في الرسائل. أقرب وقت متاح: 11:00، 25 سبتمبر.")}</div>
           </div>
           <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg flex-1">
             <div className="font-medium mb-1">{t('communication.communicationCalendar.aiMissedOpportunityAlert')}</div>

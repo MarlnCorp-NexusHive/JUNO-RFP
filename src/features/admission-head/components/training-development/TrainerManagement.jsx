@@ -34,13 +34,13 @@ const initialTrainers = [
       {
         title: "CRM Masterclass",
         date: "2026-09-01",
-        time: "10:00 AM",
+        time: "10:00",
         participants: 15
       },
       {
         title: "Policy Update Training",
         date: "2026-09-03",
-        time: "2:00 PM",
+        time: "14:00",
         participants: 20
       }
     ],
@@ -91,7 +91,7 @@ const initialTrainers = [
       {
         title: "Advanced CRM Features",
         date: "2026-09-02",
-        time: "11:00 AM",
+        time: "11:00",
         participants: 12
       }
     ],

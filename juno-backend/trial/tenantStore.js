@@ -35,8 +35,33 @@ function emptyDb() {
 
 const USED_TOKEN_TTL_MS = 48 * 60 * 60 * 1000;
 
-/** Default self-serve / provisioned trial length. Clock starts on email confirm (or first login fallback). */
+/** Default self-serve / provisioned trial length (weekdays only). Clock starts on email confirm (or first login fallback). */
 export const DEFAULT_TRIAL_DAYS = 7;
+
+function isWeekend(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+
+/**
+ * End instant after `businessDays` weekdays, counting the start day when it is a weekday.
+ * Weekends are skipped and do not count toward the allowance.
+ * @param {Date} start
+ * @param {number} businessDays
+ * @returns {Date}
+ */
+export function trialEndsAtAfterBusinessDays(start, businessDays) {
+  const days = Number(businessDays) > 0 ? Number(businessDays) : DEFAULT_TRIAL_DAYS;
+  const end = start instanceof Date ? new Date(start.getTime()) : new Date(start);
+  if (days <= 0) return end;
+
+  let counted = isWeekend(end) ? 0 : 1;
+  while (counted < days) {
+    end.setDate(end.getDate() + 1);
+    if (!isWeekend(end)) counted += 1;
+  }
+  return end;
+}
 
 /**
  * Start the trial window once. No-op if trialEndsAt is already set.
@@ -50,7 +75,7 @@ export function startTrialClockIfNeeded(tenant, { now = new Date() } = {}) {
   const start = now instanceof Date ? now : new Date(now);
   tenant.trialDays = days;
   tenant.trialStartsAt = start.toISOString();
-  tenant.trialEndsAt = new Date(start.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
+  tenant.trialEndsAt = trialEndsAtAfterBusinessDays(start, days).toISOString();
   return true;
 }
 
@@ -62,12 +87,11 @@ function pruneUsedEmailTokens(db) {
 }
 
 /**
- * Cap every tenant trial window at DEFAULT_TRIAL_DAYS from its start.
+ * Align every started tenant trial to `days` business days from its start.
  * Leaves pending accounts (no trialEndsAt) untouched so the clock still starts on confirm.
  * @returns {number} tenants updated
  */
 export function capTrialWindowsToDefaultDays(db, { days = DEFAULT_TRIAL_DAYS } = {}) {
-  const ms = Number(days) * 24 * 60 * 60 * 1000;
   let updated = 0;
   for (const tenant of db.tenants || []) {
     if (!tenant) continue;
@@ -84,27 +108,28 @@ export function capTrialWindowsToDefaultDays(db, { days = DEFAULT_TRIAL_DAYS } =
     const startMs = Date.parse(
       tenant.trialStartsAt || tenant.activatedAt || tenant.createdAt || "",
     );
-    const start = Number.isFinite(startMs) ? startMs : Date.now();
+    const start = Number.isFinite(startMs) ? new Date(startMs) : new Date();
     if (!Number.isFinite(Date.parse(tenant.trialStartsAt || ""))) {
-      tenant.trialStartsAt = new Date(start).toISOString();
+      tenant.trialStartsAt = start.toISOString();
     }
-    const maxEnd = start + ms;
-    const currentEnd = Date.parse(tenant.trialEndsAt);
-    if (!Number.isFinite(currentEnd) || currentEnd > maxEnd) {
-      tenant.trialEndsAt = new Date(maxEnd).toISOString();
+    const expectedEnd = trialEndsAtAfterBusinessDays(start, days).toISOString();
+    if (prevEnds !== expectedEnd || prevDays !== days) {
+      tenant.trialEndsAt = expectedEnd;
+      updated += 1;
     }
-    if (prevEnds !== tenant.trialEndsAt || prevDays !== days) updated += 1;
   }
   return updated;
 }
 
-/** Load DB, apply 7-day cap migration once per process start, persist if needed. */
+/** Load DB, apply business-day trial window migration once per process start, persist if needed. */
 export function migrateTrialDurationsOnBoot() {
   const db = loadTrialDb();
   const n = capTrialWindowsToDefaultDays(db);
   if (n > 0) {
     saveTrialDb(db);
-    console.log(`[trial] capped ${n} tenant trial window(s) to ${DEFAULT_TRIAL_DAYS} days`);
+    console.log(
+      `[trial] aligned ${n} tenant trial window(s) to ${DEFAULT_TRIAL_DAYS} business days`,
+    );
   }
   return n;
 }
@@ -259,7 +284,7 @@ export function createTrialTenant({
 
   const now = new Date();
   const days = Number(trialDays) > 0 ? Number(trialDays) : DEFAULT_TRIAL_DAYS;
-  const ends = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+  const ends = trialEndsAtAfterBusinessDays(now, days);
   const { salt, hash } = hashPassword(password);
 
   let tenant = findTenantByCompanyName(companyName, db);
@@ -585,7 +610,7 @@ export function confirmTrialEmail(token) {
     tenant.status = "active";
     tenant.activatedAt = new Date().toISOString();
   }
-  // 7-day (or tenant.trialDays) window begins at confirmation — not at signup.
+  // Business-day trial window (tenant.trialDays) begins at confirmation — not at signup.
   startTrialClockIfNeeded(tenant);
 
   db.emailTokens = (db.emailTokens || []).filter((t) => t.token !== raw);

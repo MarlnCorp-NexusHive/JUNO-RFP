@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocalization } from '../../../../hooks/useLocalization';
+import { formatTime24 } from '../../../../utils/dateTime';
 
 const EmailConfirmationModal = ({ isOpen, onClose, email, type = 'success' }) => {
   const { t } = useTranslation();
@@ -158,7 +159,7 @@ const EmailConfirmationModal = ({ isOpen, onClose, email, type = 'success' }) =>
                   <span className="text-gray-600 dark:text-gray-400">Sent:</span>
                 </div>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {new Date().toLocaleTimeString()}
+                  {formatTime24(new Date())}
                 </p>
               </div>
               

@@ -278,7 +278,7 @@
       "geoFencing": {
         "title": "Geo-Fencing",
         "items": {
-          "checkedIn": "Checked in from Main Office @ 9:02 AM",
+          "checkedIn": "Checked in from Main Office @ 09:02",
           "outOfZoneAlert": "Alert: Out-of-zone attendance attempt"
         }
       }

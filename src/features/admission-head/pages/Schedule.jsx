@@ -23,13 +23,13 @@ const mockStaff = [
 const today = new Date();
 function addDays(date, days) { const d = new Date(date); d.setDate(d.getDate() + days); return d; }
 const mockAppointments = [
-  { id: 1, title: 'Interview: Abdullah Al-Rashid', type: 'Student Interview', staff: mockStaff[0], date: today, time: '10:00 AM', status: 'Confirmed', mode: 'Online', applicant: 'Abdullah Al-Rashid', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
-  { id: 2, title: 'Parent Counseling: Layla Al-Mansour', type: 'Parent Counseling', staff: mockStaff[1], date: addDays(today, 1), time: '2:00 PM', status: 'Pending', mode: 'Offline', applicant: 'Layla Al-Mansour', color: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' },
-  { id: 3, title: 'Agent Meeting: EduWorld', type: 'Agent Meeting', staff: mockStaff[2], date: addDays(today, 2), time: '4:00 PM', status: 'Confirmed', mode: 'Online', applicant: 'EduWorld', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' },
-  { id: 4, title: 'Outreach: St. Xavier School', type: 'High School Outreach', staff: mockStaff[3], date: addDays(today, 3), time: '11:00 AM', status: 'Confirmed', mode: 'Offline', applicant: 'St. Xavier School', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/20 dark:text-pink-400' },
-  { id: 5, title: 'Site Visit: Omar Al-Mutairi', type: 'Site Visit', staff: mockStaff[0], date: addDays(today, 4), time: '9:00 AM', status: 'Pending', mode: 'Offline', applicant: 'Omar Al-Mutairi', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' },
-  { id: 6, title: 'Team Sync', type: 'Team Sync', staff: mockStaff[1], date: addDays(today, 5), time: '3:00 PM', status: 'Confirmed', mode: 'Offline', applicant: '', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400' },
-  { id: 7, title: 'Walk-In: Fatima Al-Rashid', type: 'Walk-In', staff: mockStaff[2], date: addDays(today, 6), time: '1:00 PM', status: 'Pending', mode: 'Offline', applicant: 'Fatima Al-Rashid', color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400' },
+  { id: 1, title: 'Interview: Abdullah Al-Rashid', type: 'Student Interview', staff: mockStaff[0], date: today, time: '10:00', status: 'Confirmed', mode: 'Online', applicant: 'Abdullah Al-Rashid', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
+  { id: 2, title: 'Parent Counseling: Layla Al-Mansour', type: 'Parent Counseling', staff: mockStaff[1], date: addDays(today, 1), time: '14:00', status: 'Pending', mode: 'Offline', applicant: 'Layla Al-Mansour', color: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' },
+  { id: 3, title: 'Agent Meeting: EduWorld', type: 'Agent Meeting', staff: mockStaff[2], date: addDays(today, 2), time: '16:00', status: 'Confirmed', mode: 'Online', applicant: 'EduWorld', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' },
+  { id: 4, title: 'Outreach: St. Xavier School', type: 'High School Outreach', staff: mockStaff[3], date: addDays(today, 3), time: '11:00', status: 'Confirmed', mode: 'Offline', applicant: 'St. Xavier School', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/20 dark:text-pink-400' },
+  { id: 5, title: 'Site Visit: Omar Al-Mutairi', type: 'Site Visit', staff: mockStaff[0], date: addDays(today, 4), time: '09:00', status: 'Pending', mode: 'Offline', applicant: 'Omar Al-Mutairi', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' },
+  { id: 6, title: 'Team Sync', type: 'Team Sync', staff: mockStaff[1], date: addDays(today, 5), time: '15:00', status: 'Confirmed', mode: 'Offline', applicant: '', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400' },
+  { id: 7, title: 'Walk-In: Fatima Al-Rashid', type: 'Walk-In', staff: mockStaff[2], date: addDays(today, 6), time: '13:00', status: 'Pending', mode: 'Offline', applicant: 'Fatima Al-Rashid', color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400' },
 ];
 
 function formatDate(date) {
@@ -53,7 +53,7 @@ function isThisMonth(date) {
 // AI Smart Suggestions Panel
 function AISmartPanel({ appointments, staff }) {
   // Mock logic for best slot, no-show risk, load balancer
-  const bestSlot = 'Tomorrow, 11:00 AM';
+  const bestSlot = 'Tomorrow, 11:00';
   const noShowRisk = appointments.filter(a => a.status === 'No-Show').length > 2 ? 'High' : 'Low';
   const overloaded = staff.find(s => appointments.filter(a => a.staff.name === s.name && isToday(a.date)).length > 3);
   return (

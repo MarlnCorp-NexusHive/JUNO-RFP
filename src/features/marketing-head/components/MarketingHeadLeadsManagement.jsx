@@ -216,7 +216,7 @@ export function CommunicationModal({
 
   const smsTemplates = [
     { id: 1, name: 'Quick Follow-up', content: 'Hi {name}, thank you for your interest. Would you like to schedule a call?' },
-    { id: 2, name: 'Event Reminder', content: 'Reminder: Our information session is tomorrow at 2 PM. RSVP: {link}' },
+    { id: 2, name: 'Event Reminder', content: 'Reminder: Our information session is tomorrow at 14:00. RSVP: {link}' },
     { id: 3, name: 'Application Check', content: 'Hi {name}, just checking if you need any help with your application?' },
   ];
 

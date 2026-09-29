@@ -144,9 +144,9 @@
           "saturday": "Saturday"
         },
         "times": {
-          "sundayThursday": "8:00 AM - 4:00 PM",
+          "sundayThursday": "08:00 - 16:00",
           "friday": "Closed",
-          "saturday": "9:00 AM - 1:00 PM"
+          "saturday": "09:00 - 13:00"
         },
         "note": "Note:",
         "emergencyNote": "For urgent matters outside office hours, please contact our emergency hotline."

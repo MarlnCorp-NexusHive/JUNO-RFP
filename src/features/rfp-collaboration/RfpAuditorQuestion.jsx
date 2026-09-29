@@ -5,6 +5,7 @@ import { rfpCollab } from "../../services/rfpCollabApi.js";
 import { loadCollabSession } from "./rfpCollabSession.js";
 import { getRfpAuditorBasePath } from "./rfpAuditorPaths.js";
 import { useTrialCollabT } from "./useTrialCollabT.js";
+import { formatDateTime24 } from '../../utils/dateTime';
 
 const STATUS_KEYS = {
   unassigned: "rfpCollaboration.status.unassigned",
@@ -248,7 +249,7 @@ export default function RfpAuditorQuestion() {
         <div className="space-y-2 max-h-40 overflow-y-auto text-sm">
           {messages.map((m) => (
             <div key={m.id} className="rounded-lg border border-gray-100 dark:border-gray-600 px-3 py-2">
-              <div className="text-xs text-gray-500">{new Date(m.createdAt).toLocaleString()}</div>
+              <div className="text-xs text-gray-500">{formatDateTime24(m.createdAt)}</div>
               <div className="whitespace-pre-wrap">{m.body}</div>
             </div>
           ))}

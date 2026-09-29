@@ -134,7 +134,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     awardCeilingLabel: "$15M–$20M (market research estimate)",
     periodOfPerformance: "1-year base + two 12-month options",
     description:
-      "IRS Sources Sought (Notice 5000233302) for market research on Enterprise Data Pipeline Modernization and Data Consumption Services supporting Individual Master File (IMF) modernization and related taxpayer-account processing. Contemplated scope: enterprise data pipeline modernization; data engineering and integration (including Databricks / AWS alongside legacy mainframe sources); data product development and BI; metadata, governance, security, and data quality; self-service analytics and natural-language query; AI-assisted legacy modernization; DevSecOps and automation; testing and readiness; O&M; and transition / knowledge-transfer. Capability statements were due Friday, September 25, 2026, 2:00 PM ET. Planning only — not a solicitation; no award from this notice.",
+      "IRS Sources Sought (Notice 5000233302) for market research on Enterprise Data Pipeline Modernization and Data Consumption Services supporting Individual Master File (IMF) modernization and related taxpayer-account processing. Contemplated scope: enterprise data pipeline modernization; data engineering and integration (including Databricks / AWS alongside legacy mainframe sources); data product development and BI; metadata, governance, security, and data quality; self-service analytics and natural-language query; AI-assisted legacy modernization; DevSecOps and automation; testing and readiness; O&M; and transition / knowledge-transfer. Capability statements were due Friday, September 25, 2026, 14:00 ET. Planning only — not a solicitation; no award from this notice.",
     keywords: [
       "data pipeline",
       "IRS",
@@ -221,7 +221,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     awardCeilingLabel: null,
     periodOfPerformance: "See solicitation package (Amendment 0005)",
     description:
-      "Navy/CNIC solicitation to unify and modernize military-spouse employment-support applications (SECO, MySECO, MSEP, MyCAA, SECO Administration Portal, VEMIS, PECS) into an integrated responsive web platform. Scope: application development and maintenance, migration/integration, PMO, data management and analytics, UX, accessibility (Section 508), O&M, help desk, cybersecurity compliance, automated security testing, RMF/ATO support, 24/7 availability in Government-furnished AWS GovCloud IL4. Best-value tradeoff. Latest package includes Amendment 0005 (18 Sep 2026). Proposals due 5 October 2026, 10:00 AM CDT.",
+      "Navy/CNIC solicitation to unify and modernize military-spouse employment-support applications (SECO, MySECO, MSEP, MyCAA, SECO Administration Portal, VEMIS, PECS) into an integrated responsive web platform. Scope: application development and maintenance, migration/integration, PMO, data management and analytics, UX, accessibility (Section 508), O&M, help desk, cybersecurity compliance, automated security testing, RMF/ATO support, 24/7 availability in Government-furnished AWS GovCloud IL4. Best-value tradeoff. Latest package includes Amendment 0005 (18 Sep 2026). Proposals due 5 October 2026, 10:00 CDT.",
     keywords: [
       "SECO",
       "Navy",
@@ -259,7 +259,7 @@ export const SAM_CONTRACT_OPPORTUNITIES = [
     ],
     samUrl: "https://sam.gov/opp/33c64e266b8e457fb6512f991779da5a/view",
     notes:
-      "Active as of 28 Sep 2026 — proposals due 5 Oct 2026 10:00 AM CDT (Amendment 0005). Archive/inactive ~6 Oct 2026.",
+      "Active as of 28 Sep 2026 — proposals due 5 Oct 2026 10:00 CDT (Amendment 0005). Archive/inactive ~6 Oct 2026.",
   },
   {
     id: "sam-dhs-nccs",
@@ -443,8 +443,9 @@ export function buildHourlySamView(now = Date.now()) {
     refreshedLabel: refreshedAt.toLocaleString(undefined, {
       month: "short",
       day: "numeric",
-      hour: "numeric",
+      hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     }),
   };
 }

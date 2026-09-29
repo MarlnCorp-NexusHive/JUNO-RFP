@@ -196,7 +196,7 @@ router.post("/login", (req, res) => {
       return res.status(403).json({ error: status.message, code: status.code });
     }
 
-    // Fallback: start 7-day clock on first login if confirm didn't (legacy rows).
+    // Fallback: start business-day trial clock on first login if confirm didn't (legacy rows).
     const tenantFresh = ensureTrialClockStarted(user.tenantId) || tenant;
 
     const { token, expiresAt } = createSession(user, tenantFresh);

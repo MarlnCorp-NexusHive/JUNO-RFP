@@ -6,6 +6,8 @@ import trialService from '../../services/trialService';
 import ChatHistory from './ChatHistory';
 import chatHistoryService from '../../services/chatHistoryService';
 import aiLanguageService from '../../services/aiLanguageService';
+import { formatTime24 } from '../../utils/dateTime';
+
 const ChatLayout = ({ 
   roleName, 
   roleColor = 'blue', 
@@ -174,7 +176,7 @@ const handleDrop = (e) => {
     const formattedMessages = chat.messages.map(msg => ({
       sender: msg.sender,
       content: msg.content,
-      timestamp: new Date(msg.timestamp).toLocaleTimeString(),
+      timestamp: formatTime24(msg.timestamp),
       usage: msg.usage,
       model: msg.model,
       isError: msg.isError
@@ -490,22 +492,22 @@ const handleToggleAILanguage = () => {
       }
       
       // Check if paragraph is a list
-      if (paragraph.includes('�') || paragraph.includes('-') || paragraph.includes('*')) {
+      if (paragraph.includes('ï¿½') || paragraph.includes('-') || paragraph.includes('*')) {
         const lines = paragraph.split('\n');
         return (
           <div key={index} className="mb-4">
             {lines.map((line, lineIndex) => {
               const trimmedLine = line.trim();
-              if (trimmedLine.startsWith('�') || trimmedLine.startsWith('-') || trimmedLine.startsWith('*')) {
+              if (trimmedLine.startsWith('ï¿½') || trimmedLine.startsWith('-') || trimmedLine.startsWith('*')) {
                 // Remove the bullet point and clean up the text
-                const cleanText = trimmedLine.replace(/^[�\-*]\s*/, '');
+                const cleanText = trimmedLine.replace(/^[ï¿½\-*]\s*/, '');
                 
                 // Check if the text contains bold formatting
                 const hasBoldText = cleanText.includes('**');
                 
                 return (
                   <div key={lineIndex} className="flex items-start gap-3 mb-2">
-                    <span className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0 text-lg">�</span>
+                    <span className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0 text-lg">ï¿½</span>
                     <div className="flex-1">
                       {hasBoldText ? (
                         <span className="text-gray-700 dark:text-gray-300 leading-relaxed">

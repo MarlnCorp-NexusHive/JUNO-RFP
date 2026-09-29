@@ -25,6 +25,7 @@ import {
   toFullCalendarEvent,
 } from "../services/proposalManagerCalendarService.js";
 import { EVENT_TYPE_ICONS } from "../services/proposalManagerCalendarMockData.js";
+import { FULLCALENDAR_TIME_24 } from "../../../utils/dateTime.js";
 import { subscribeShortlist, updateShortlistItem, removeShortlist } from "../services/shortlistStore.js";
 import { subscribeTeam, updateTeamAssignment, removeTeamAssignment } from "../services/teamStore.js";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
@@ -464,6 +465,8 @@ export default function ProposalManagerCalendar() {
                 weekends
                 slotMinTime="07:00:00"
                 slotMaxTime="20:00:00"
+                eventTimeFormat={FULLCALENDAR_TIME_24}
+                slotLabelFormat={FULLCALENDAR_TIME_24}
               />
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-center">

@@ -39,7 +39,7 @@ Required:
 Optional:
   --name "Contact Name"
   --password "TempPass123!"   (auto-generated if omitted)
-  --days ${DEFAULT_TRIAL_DAYS}
+  --days ${DEFAULT_TRIAL_DAYS}   (business days; weekends excluded)
   --daily 80
   --monthly 800
 

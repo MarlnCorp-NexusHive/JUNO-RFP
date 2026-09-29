@@ -1086,7 +1086,7 @@
       "geoFencing": {
         "title": "Geo-Fencing",
         "checkedIn": "Checked in from HQ",
-        "time": "@ 9:02 AM",
+        "time": "@ 09:02",
         "alert": "Alert",
         "outOfZoneAttendanceAttempt": "Out-of-zone attendance attempt"
       }

@@ -2,6 +2,7 @@ import React from "react";
 import { FiDollarSign, FiTrendingUp, FiGlobe } from "react-icons/fi";
 import { formatUsd } from "../services/proposalIssuerStorage";
 import FinancialTrendsChart from "./FinancialTrendsChart";
+import { formatDateTime24 } from '../../../utils/dateTime';
 
 export default function IssuerFinancialPanel({ snapshot, className = "" }) {
   if (!snapshot?.financials) return null;
@@ -69,7 +70,7 @@ export default function IssuerFinancialPanel({ snapshot, className = "" }) {
       )}
 
       <p className="text-xs text-gray-400 dark:text-gray-500">
-        Source: {snapshot.source || "Company Intelligence"} · Linked {snapshot.linkedAt ? new Date(snapshot.linkedAt).toLocaleString() : ""}
+        Source: {snapshot.source || "Company Intelligence"} · Linked {snapshot.linkedAt ? formatDateTime24(snapshot.linkedAt) : ""}
       </p>
     </div>
   );

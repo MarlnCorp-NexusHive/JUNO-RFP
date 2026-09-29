@@ -86,6 +86,7 @@ function formatFetchedAt(iso, locale) {
     return new Intl.DateTimeFormat(locale || undefined, {
       dateStyle: "medium",
       timeStyle: "short",
+      hour12: false,
     }).format(new Date(iso));
   } catch {
     return iso;

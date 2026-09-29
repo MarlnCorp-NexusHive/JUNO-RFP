@@ -71,8 +71,8 @@
       "afternoon": "ظهراً",
       "evening": "مساءً",
       "night": "ليلاً",
-      "am": "ص",
-      "pm": "م"
+      "am": "",
+      "pm": ""
     },
     "units": {
       "students": "المرشحون",
