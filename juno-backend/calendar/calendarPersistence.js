@@ -1,25 +1,46 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { manualEventsById } from "./store.js";
+import { DEMO_CALENDAR_KEY, eventsByScope, getManualEventsMap } from "./store.js";
+import { getTrialDataPath } from "../trial/tenantStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const STATE_FILE = path.join(__dirname, "..", "data", "calendar-runtime-state.json");
+/** Legacy path (pre tenant-scoped). Still loaded once for migration. */
+const LEGACY_STATE_FILE = path.join(__dirname, "..", "data", "calendar-runtime-state.json");
 
 let persistTimer = null;
 
+function getStateFile() {
+  // Prefer same directory as trial-tenants.json so Render Persistent Disk keeps calendar too.
+  try {
+    return path.join(path.dirname(getTrialDataPath()), "calendar-runtime-state.json");
+  } catch {
+    return LEGACY_STATE_FILE;
+  }
+}
+
 function persistNow() {
   try {
-    const dir = path.dirname(STATE_FILE);
+    const stateFile = getStateFile();
+    const dir = path.dirname(stateFile);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+    const demo = Object.fromEntries(getManualEventsMap(null));
+    const tenants = {};
+    for (const [scope, map] of eventsByScope) {
+      if (scope === DEMO_CALENDAR_KEY) continue;
+      tenants[scope] = { manualEvents: Object.fromEntries(map) };
+    }
+
     const payload = {
-      version: 1,
+      version: 2,
       savedAt: new Date().toISOString(),
-      manualEvents: Object.fromEntries(manualEventsById),
+      demo: { manualEvents: demo },
+      tenants,
     };
-    const tmp = `${STATE_FILE}.tmp`;
+    const tmp = `${stateFile}.tmp`;
     fs.writeFileSync(tmp, JSON.stringify(payload, null, 2), "utf8");
-    fs.renameSync(tmp, STATE_FILE);
+    fs.renameSync(tmp, stateFile);
   } catch (e) {
     console.warn("CALENDAR PERSIST: save failed", e?.message || e);
   }
@@ -33,16 +54,56 @@ export function scheduleCalendarPersist() {
   }, 400);
 }
 
+function hydrateMap(targetMap, manualEvents) {
+  targetMap.clear();
+  for (const [id, ev] of Object.entries(manualEvents || {})) {
+    if (ev && typeof ev === "object") targetMap.set(id, ev);
+  }
+}
+
+function loadFromPayload(raw) {
+  eventsByScope.clear();
+  if (raw.version === 2) {
+    hydrateMap(getManualEventsMap(null), raw.demo?.manualEvents || raw.manualEvents || {});
+    for (const [tenantId, bucket] of Object.entries(raw.tenants || {})) {
+      if (!tenantId || tenantId === DEMO_CALENDAR_KEY) continue;
+      hydrateMap(getManualEventsMap(tenantId), bucket?.manualEvents || {});
+    }
+    return;
+  }
+  if (raw.version === 1) {
+    // Pre-tenant file → demo bucket only (does not leak into trial tenants).
+    hydrateMap(getManualEventsMap(null), raw.manualEvents || {});
+  }
+}
+
 export function loadCalendarState() {
   try {
-    if (!fs.existsSync(STATE_FILE)) return;
-    const raw = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
-    if (raw.version !== 1) return;
-    manualEventsById.clear();
-    for (const [id, ev] of Object.entries(raw.manualEvents || {})) {
-      if (ev && typeof ev === "object") manualEventsById.set(id, ev);
+    const stateFile = getStateFile();
+    let loadedFrom = null;
+    if (fs.existsSync(stateFile)) {
+      const raw = JSON.parse(fs.readFileSync(stateFile, "utf8"));
+      loadFromPayload(raw);
+      loadedFrom = stateFile;
+    } else if (stateFile !== LEGACY_STATE_FILE && fs.existsSync(LEGACY_STATE_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(LEGACY_STATE_FILE, "utf8"));
+      loadFromPayload(raw);
+      loadedFrom = LEGACY_STATE_FILE;
+      // Rewrite into the preferred path so future boots use tenant file.
+      persistNow();
+    } else {
+      return;
     }
-    console.log(`CALENDAR PERSIST: loaded ${manualEventsById.size} manual event(s) from disk`);
+
+    let total = 0;
+    let tenantCount = 0;
+    for (const [scope, map] of eventsByScope) {
+      total += map.size;
+      if (scope !== DEMO_CALENDAR_KEY) tenantCount += 1;
+    }
+    console.log(
+      `CALENDAR PERSIST: loaded ${total} manual event(s) across ${tenantCount} tenant(s) from ${loadedFrom}`,
+    );
   } catch (e) {
     console.warn("CALENDAR PERSIST: load failed", e?.message || e);
   }

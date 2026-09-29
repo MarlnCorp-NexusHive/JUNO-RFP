@@ -1,6 +1,6 @@
 /**
  * @typedef {'deadline'|'milestone'|'meeting'|'assignment'|'submission'|'review'|'task'} CalendarEventType
- * @typedef {'manual'|'collaboration'|'rfp-deadline'} CalendarEventSource
+ * @typedef {'manual'|'collaboration'|'rfp-deadline'|'shortlist'|'assignment'|'source-doc'} CalendarEventSource
  *
  * @typedef {{
  *   id: string;

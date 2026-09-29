@@ -1287,12 +1287,13 @@
         "complianceAreaPending": "امتثال معلّق: {{name}} يحتاج مراجعة",
         "complianceAreaNonCompliant": "مجال غير متوافق: {{name}} يتطلب إجراءً",
         "complianceHighRisk": "مخاطر امتثال مرتفعة: {{name}}",
-        "assignmentDeadline": "موعد التسليم {{date}}: {{title}}{{daysPart}}"
+        "assignmentDeadline": "موعد التسليم {{date}}: {{title}}{{daysPart}}",
+        "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}"
       }
     },
     "trialEmpty": {
       "noPipelineYet": "لا توجد بيانات خط أنابيب بعد",
-      "noAlerts": "لا توجد تنبيهات بعد. أضف فرصاً إلى القائمة المختصرة أو عناصر امتثال لرؤية التحديثات هنا.",
+      "noAlerts": "لا توجد تنبيهات بعد. أضف مواعيد منح/RFP إلى القائمة المختصرة أو احصل على مهمة مسندة إليك لرؤية التحديثات هنا.",
       "chartsFillIn": "تُملأ المخططات مع التقاط الفرص وتقديمها.",
       "forecastsAppear": "تظهر التوقعات مع التقديم والفوز."
     },

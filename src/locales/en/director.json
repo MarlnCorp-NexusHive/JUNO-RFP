@@ -1289,12 +1289,13 @@
         "complianceAreaPending": "Compliance pending: {{name}} needs review",
         "complianceAreaNonCompliant": "Non-compliant area: {{name}} requires action",
         "complianceHighRisk": "High compliance risk: {{name}}",
-        "assignmentDeadline": "Assignment due {{date}}: {{title}}{{daysPart}}"
+        "assignmentDeadline": "Assignment due {{date}}: {{title}}{{daysPart}}",
+        "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}"
       }
     },
     "trialEmpty": {
       "noPipelineYet": "No pipeline data yet",
-      "noAlerts": "No alerts yet. Shortlist opportunities or add compliance items to see updates here.",
+      "noAlerts": "No alerts yet. Shortlist grants/RFPs, upload a source doc with a deadline, or get assigned a task.",
       "chartsFillIn": "Charts fill in as you capture and submit opportunities.",
       "forecastsAppear": "Forecasts appear as you submit and win."
     },

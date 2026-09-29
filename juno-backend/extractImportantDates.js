@@ -101,16 +101,17 @@ function dedupeAndSort(items) {
   );
 }
 
-const SYSTEM_PROMPT = `You extract explicit calendar dates from RFP, RFQ, ITB, solicitation, or procurement text.
+const SYSTEM_PROMPT = `You extract explicit calendar dates from RFP, RFQ, ITB, solicitation, grant, or procurement text. Scan thoroughly — do not skip dates buried in tables, footers, cover pages, calendars, or "Key Dates" / "Schedule" sections.
 
 STRICT RULES:
 1. Only include dates that are clearly written or unambiguously stated in the provided text. Never invent or infer dates not supported by the text.
 2. For each date, output:
-   - "event": A short English label. Prefer: "Bid Submission Deadline", "Pre-bid Meeting", "Pre-bid Conference", "Site Visit", "Questions Due", "Addendum Deadline", "Bid Opening", "Contract Start", "Project Start", "Project End", "Period of Performance End", "Proposal Due", "Intent to Bid Due", or similar when the text supports it. If the event type is unclear, use "Unknown Event".
+   - "event": A short English label. Prefer: "Bid Submission Deadline", "Proposal Due", "Application Deadline", "Response Due", "Pre-bid Meeting", "Pre-bid Conference", "Site Visit", "Questions Due", "Addendum Deadline", "Bid Opening", "Contract Start", "Project Start", "Project End", "Period of Performance End", "Intent to Bid Due", "Closing Date", or similar when the text supports it. If the event type is unclear, use "Unknown Event".
    - "date": Must be ISO 8601 calendar date only: YYYY-MM-DD. Convert from any format found in the text (e.g. March 15, 2026 → 2026-03-15). If the text is relative without an anchor ("30 days from award") and no calendar day can be resolved, OMIT that item.
    - "raw_text": Copy the shortest contiguous excerpt from the text that contains the date (sentence or phrase), verbatim (same wording), max 500 characters.
-3. If no qualifying dates exist in this excerpt, return an empty important_dates array.
-4. Output a single JSON object: {"important_dates":[...]} with no extra keys.`;
+3. Prioritize finding every application / proposal / bid submission deadline and closing date. Still include other explicit schedule dates when present.
+4. If no qualifying dates exist in this excerpt, return an empty important_dates array.
+5. Output a single JSON object: {"important_dates":[...]} with no extra keys.`;
 
 async function extractFromChunk(openai, chunkText, chunkIndex, totalChunks) {
   const user =

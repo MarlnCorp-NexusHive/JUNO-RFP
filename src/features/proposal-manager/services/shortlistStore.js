@@ -1,7 +1,16 @@
 import { scopedStorageKey, isScopedStorageEventKey } from "../../../services/tenantScopedStorage.js";
+import {
+  canUseTrialFeatures,
+  loadTrialFeatureData,
+  persistTrialFeatureData,
+} from "../../../services/trialFeatureApi.js";
+import { calendarApi } from "../../../services/calendarApi.js";
+import { parseDateToISO } from "./calendarDateParse.js";
 
 const BASE_KEY = "juno_grant_rfp_shortlist";
 export const SHORTLIST_CHANGED_EVENT = "juno-grant-rfp-shortlist-changed";
+
+const SHORTLIST_DEADLINE_COLOR = "#dc2626";
 
 function storageKey() {
   return scopedStorageKey(BASE_KEY);
@@ -24,6 +33,63 @@ function writeRaw(items) {
     window.dispatchEvent(new CustomEvent(SHORTLIST_CHANGED_EVENT, { detail: { items } }));
   } catch {
     /* ignore */
+  }
+  void persistShortlistCompanyWide(items);
+}
+
+async function persistShortlistCompanyWide(items) {
+  if (!canUseTrialFeatures()) return;
+  await persistTrialFeatureData("shortlist", { items: Array.isArray(items) ? items : [] });
+}
+
+function shortlistEventId(id) {
+  return `shortlist_${String(id || "")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 120)}`;
+}
+
+export { shortlistEventId };
+
+function sourceLabel(source) {
+  if (source === "sam") return "SAM";
+  return "Grant";
+}
+
+/** Push or remove a shortlist deadline on the shared tenant calendar. */
+export async function syncShortlistDeadlineToCalendar(item, shortlisted) {
+  if (!canUseTrialFeatures() || !item?.id) return;
+  const eventId = shortlistEventId(item.id);
+  if (!shortlisted) {
+    try {
+      await calendarApi.deleteEvent(eventId);
+    } catch {
+      /* already gone */
+    }
+    return;
+  }
+  const iso = parseDateToISO(item.deadline);
+  if (!iso) return;
+  const body = {
+    id: eventId,
+    title: `${sourceLabel(item.source)} deadline: ${item.title || item.number || item.id}`,
+    start: iso,
+    end: null,
+    allDay: true,
+    type: "deadline",
+    source: "shortlist",
+    shortlistId: String(item.id),
+    bidName: item.number || item.title || null,
+    description: [item.agency, item.number].filter(Boolean).join(" · ") || null,
+    color: SHORTLIST_DEADLINE_COLOR,
+  };
+  try {
+    await calendarApi.updateEvent(eventId, body);
+  } catch {
+    try {
+      await calendarApi.createEvent(body);
+    } catch (err) {
+      console.warn("[shortlist] calendar sync failed:", err?.message || err);
+    }
   }
 }
 
@@ -51,15 +117,20 @@ export function toggleShortlist(item) {
   const existing = readRaw();
   const idx = existing.findIndex((x) => x.id === item.id);
   if (idx >= 0) {
+    const removed = existing[idx];
     existing.splice(idx, 1);
     writeRaw(existing);
+    void syncShortlistDeadlineToCalendar(removed, false);
     return { ok: true, shortlisted: false, items: listShortlist() };
   }
   const deadline = item.deadline != null ? String(item.deadline).trim() : "";
   if (!deadline) {
     return { ok: false, error: "missing_deadline", items: listShortlist() };
   }
-  existing.push({
+  if (!parseDateToISO(deadline)) {
+    return { ok: false, error: "missing_deadline", items: listShortlist() };
+  }
+  const row = {
     id: String(item.id),
     source: item.source || "grants",
     title: item.title || item.number || String(item.id),
@@ -67,15 +138,22 @@ export function toggleShortlist(item) {
     agency: item.agency || "",
     deadline,
     shortlistedAt: new Date().toISOString(),
-  });
+  };
+  existing.push(row);
   writeRaw(existing);
+  void syncShortlistDeadlineToCalendar(row, true);
   return { ok: true, shortlisted: true, items: listShortlist() };
 }
 
 export function removeShortlist(id) {
   if (!id) return listShortlist();
-  const next = readRaw().filter((x) => x.id !== id && `shortlist_${x.id}` !== id);
+  const existing = readRaw();
+  const removed = existing.find((x) => x.id === id || `shortlist_${x.id}` === id || shortlistEventId(x.id) === id);
+  const next = existing.filter(
+    (x) => x.id !== id && `shortlist_${x.id}` !== id && shortlistEventId(x.id) !== id,
+  );
   writeRaw(next);
+  if (removed) void syncShortlistDeadlineToCalendar(removed, false);
   return listShortlist();
 }
 
@@ -86,7 +164,9 @@ export function removeShortlist(id) {
 export function updateShortlistItem(id, patch = {}) {
   if (!id) return listShortlist();
   const existing = readRaw();
-  const idx = existing.findIndex((x) => x.id === id || `shortlist_${x.id}` === id);
+  const idx = existing.findIndex(
+    (x) => x.id === id || `shortlist_${x.id}` === id || shortlistEventId(x.id) === id,
+  );
   if (idx < 0) return listShortlist();
   const cur = existing[idx];
   const nextTitle = patch.title != null ? String(patch.title).trim() : cur.title;
@@ -100,7 +180,34 @@ export function updateShortlistItem(id, patch = {}) {
     agency: patch.agency != null ? String(patch.agency) : cur.agency,
   };
   writeRaw(existing);
+  void syncShortlistDeadlineToCalendar(existing[idx], true);
   return listShortlist();
+}
+
+/** Load company-wide shortlist into local cache (trial).
+ * @param {{ notify?: boolean }} [opts] — when notify is false, skip change events (avoids refresh loops).
+ */
+export async function hydrateShortlistFromServer(opts = {}) {
+  const notify = opts.notify !== false;
+  if (!canUseTrialFeatures()) return listShortlist();
+  try {
+    const data = await loadTrialFeatureData("shortlist", { items: [] });
+    const items = Array.isArray(data?.items) ? data.items : [];
+    const nextJson = JSON.stringify(items);
+    const prevJson = localStorage.getItem(storageKey());
+    if (prevJson === nextJson) return listShortlist();
+    localStorage.setItem(storageKey(), nextJson);
+    if (notify) {
+      try {
+        window.dispatchEvent(new CustomEvent(SHORTLIST_CHANGED_EVENT, { detail: { items } }));
+      } catch {
+        /* ignore */
+      }
+    }
+    return listShortlist();
+  } catch {
+    return listShortlist();
+  }
 }
 
 /** Subscribe to shortlist changes (same tab + cross-tab storage). Returns unsubscribe. */

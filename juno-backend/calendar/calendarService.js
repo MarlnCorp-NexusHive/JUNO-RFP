@@ -1,5 +1,5 @@
 import { store as collabStore } from "../collaboration/store.js";
-import { manualEventsById } from "./store.js";
+import { getManualEventsMap } from "./store.js";
 import { scheduleCalendarPersist } from "./calendarPersistence.js";
 
 const TYPE_COLORS = {
@@ -31,6 +31,13 @@ function serializeEvent(record) {
   return withColor(record);
 }
 
+/** Normalize optional tenant scope from the request (null = demo bucket). */
+export function resolveCalendarScope(tenantId) {
+  if (!tenantId) return null;
+  const id = String(tenantId).trim();
+  return id || null;
+}
+
 /** @param {import('./types.js').CalendarEventRecord} input */
 function normalizeManualInput(input, existing = null) {
   const title = String(input.title || "").trim();
@@ -53,14 +60,36 @@ function normalizeManualInput(input, existing = null) {
     throw e;
   }
   const now = new Date().toISOString();
+  const source =
+    input.source === "rfp-deadline"
+      ? "rfp-deadline"
+      : input.source === "shortlist"
+        ? "shortlist"
+        : input.source === "assignment"
+          ? "assignment"
+          : input.source === "source-doc"
+            ? "source-doc"
+            : "manual";
+  const requestedId = input.id != null ? String(input.id).trim() : "";
+  const id =
+    existing?.id ||
+    (requestedId &&
+    (source === "shortlist" ||
+      source === "assignment" ||
+      source === "source-doc" ||
+      requestedId.startsWith("shortlist_") ||
+      requestedId.startsWith("assignment_") ||
+      requestedId.startsWith("srcdoc_"))
+      ? requestedId.slice(0, 160)
+      : generateId("manual"));
   return {
-    id: existing?.id || generateId("manual"),
+    id,
     title: title.slice(0, 300),
     start,
     end: input.end ? String(input.end) : null,
     allDay: Boolean(input.allDay),
     type,
-    source: input.source === "rfp-deadline" ? "rfp-deadline" : "manual",
+    source,
     workspaceId: input.workspaceId || null,
     documentId: input.documentId || null,
     assigneeIds: Array.isArray(input.assigneeIds) ? input.assigneeIds : [],
@@ -71,24 +100,31 @@ function normalizeManualInput(input, existing = null) {
     bidName: input.bidName ? String(input.bidName).slice(0, 300) : null,
     questionNumber: Number.isFinite(Number(input.questionNumber)) ? Number(input.questionNumber) : null,
     color: input.color || null,
+    shortlistId: input.shortlistId != null ? String(input.shortlistId) : existing?.shortlistId || null,
+    assignmentId: input.assignmentId != null ? String(input.assignmentId) : existing?.assignmentId || null,
     createdAt: existing?.createdAt || now,
     updatedAt: now,
   };
 }
 
-export function listManualEvents() {
-  return [...manualEventsById.values()].map(serializeEvent);
+export function listManualEvents(tenantId = null) {
+  const map = getManualEventsMap(resolveCalendarScope(tenantId));
+  return [...map.values()].map(serializeEvent);
 }
 
-export function createManualEvent(body) {
-  const record = normalizeManualInput(body);
-  manualEventsById.set(record.id, record);
+export function createManualEvent(body, tenantId = null) {
+  const map = getManualEventsMap(resolveCalendarScope(tenantId));
+  const requestedId = body?.id != null ? String(body.id).trim() : "";
+  const existing = requestedId ? map.get(requestedId) : null;
+  const record = normalizeManualInput(body || {}, existing || (requestedId ? { id: requestedId } : null));
+  map.set(record.id, record);
   scheduleCalendarPersist();
   return serializeEvent(record);
 }
 
-export function updateManualEvent(id, body) {
-  const existing = manualEventsById.get(id);
+export function updateManualEvent(id, body, tenantId = null) {
+  const map = getManualEventsMap(resolveCalendarScope(tenantId));
+  const existing = map.get(id);
   if (!existing) {
     const e = new Error("Event not found");
     e.statusCode = 404;
@@ -96,34 +132,68 @@ export function updateManualEvent(id, body) {
   }
   if (existing.source === "rfp-deadline") {
     const record = normalizeManualInput({ ...existing, ...body, source: "rfp-deadline" }, existing);
-    manualEventsById.set(id, record);
+    map.set(id, record);
+    scheduleCalendarPersist();
+    return serializeEvent(record);
+  }
+  if (existing.source === "shortlist") {
+    const record = normalizeManualInput(
+      { ...existing, ...body, source: "shortlist", shortlistId: existing.shortlistId || body.shortlistId },
+      existing,
+    );
+    map.set(id, record);
+    scheduleCalendarPersist();
+    return serializeEvent(record);
+  }
+  if (existing.source === "assignment") {
+    const record = normalizeManualInput(
+      {
+        ...existing,
+        ...body,
+        source: "assignment",
+        assignmentId: existing.assignmentId || body.assignmentId,
+      },
+      existing,
+    );
+    map.set(id, record);
+    scheduleCalendarPersist();
+    return serializeEvent(record);
+  }
+  if (existing.source === "source-doc") {
+    const record = normalizeManualInput(
+      { ...existing, ...body, source: "source-doc", documentId: existing.documentId || body.documentId },
+      existing,
+    );
+    map.set(id, record);
     scheduleCalendarPersist();
     return serializeEvent(record);
   }
   const record = normalizeManualInput({ ...existing, ...body }, existing);
-  manualEventsById.set(id, record);
+  map.set(id, record);
   scheduleCalendarPersist();
   return serializeEvent(record);
 }
 
-export function deleteManualEvent(id) {
-  if (!manualEventsById.has(id)) {
+export function deleteManualEvent(id, tenantId = null) {
+  const map = getManualEventsMap(resolveCalendarScope(tenantId));
+  if (!map.has(id)) {
     const e = new Error("Event not found");
     e.statusCode = 404;
     throw e;
   }
-  manualEventsById.delete(id);
+  map.delete(id);
   scheduleCalendarPersist();
   return { ok: true };
 }
 
 /** Upsert deadline events synced from the Proposal Manager browser (source docs). */
-export function syncRfpDeadlines(events = []) {
+export function syncRfpDeadlines(events = [], tenantId = null) {
   if (!Array.isArray(events)) {
     const e = new Error("events array required");
     e.statusCode = 400;
     throw e;
   }
+  const map = getManualEventsMap(resolveCalendarScope(tenantId));
   const incomingIds = new Set();
   const saved = [];
   for (const row of events) {
@@ -131,7 +201,7 @@ export function syncRfpDeadlines(events = []) {
     if (!stableKey) continue;
     const id = `rfp_dl_${stableKey.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 120)}`;
     incomingIds.add(id);
-    const existing = manualEventsById.get(id);
+    const existing = map.get(id);
     const record = normalizeManualInput(
       {
         ...row,
@@ -142,12 +212,12 @@ export function syncRfpDeadlines(events = []) {
       },
       existing || { id },
     );
-    manualEventsById.set(id, record);
+    map.set(id, record);
     saved.push(serializeEvent(record));
   }
-  for (const [id, ev] of manualEventsById) {
+  for (const [id, ev] of map) {
     if (ev.source === "rfp-deadline" && !incomingIds.has(id)) {
-      manualEventsById.delete(id);
+      map.delete(id);
     }
   }
   scheduleCalendarPersist();
@@ -273,7 +343,16 @@ function synthesizeCollaborationEvents() {
   return events;
 }
 
-export function getTeamSummary() {
+export function getTeamSummary(tenantId = null) {
+  // Trial / tenant calendars do not share the demo auditor roster.
+  if (resolveCalendarScope(tenantId)) {
+    return {
+      workspaces: 0,
+      auditors: [],
+      totals: { unassigned: 0, assigned: 0, submitted: 0, approved: 0 },
+    };
+  }
+
   const auditors = [...collabStore.usersById.values()].filter((u) => u.role === "auditor");
   const byAuditor = auditors.map((aud) => {
     const assigned = [...collabStore.questions.values()].filter((q) => q.assignedTo === aud.id);
@@ -303,9 +382,11 @@ export function getTeamSummary() {
   };
 }
 
-export function listAllCalendarEvents() {
-  const manual = listManualEvents();
-  const team = synthesizeCollaborationEvents();
+export function listAllCalendarEvents(tenantId = null) {
+  const scope = resolveCalendarScope(tenantId);
+  const manual = listManualEvents(scope);
+  // Demo only: overlay team-collab activity. Trial tenants share only their own events.
+  const team = scope ? [] : synthesizeCollaborationEvents();
   const byId = new Map();
   for (const ev of [...manual, ...team]) {
     byId.set(ev.id, ev);

@@ -8,6 +8,7 @@ import { PDFParse } from "pdf-parse";
 
 import { buildGeneratedRfpDocument } from "./rfpDocumentBuilder.js";
 import { extractImportantDates } from "./extractImportantDates.js";
+import { extractQaLibraryItems } from "./extractQaLibrary.js";
 import { initCollaboration, collaborationRouter } from "./collaboration/index.js";
 import { registerRfpAssistantEndpoints } from "./rfpAssistantEndpoints.js";
 import {
@@ -197,10 +198,29 @@ app.post("/extract-dates", async (req, res) => {
   }
 });
 
+// EXTRACT Q&A LIBRARY ITEMS (RFP / grant text → Content Hub)
+app.post("/extract-qas", async (req, res) => {
+  try {
+    const { document: documentText } = req.body || {};
+
+    if (typeof documentText !== "string") {
+      return res.status(400).json({
+        error: 'Request body must include string field "document"',
+      });
+    }
+
+    const result = await extractQaLibraryItems(openai, documentText);
+    res.json(result);
+  } catch (err) {
+    console.error("EXTRACT QAS ERROR:", err.message);
+    res.status(500).json({ error: err.message || "Q&A extraction failed" });
+  }
+});
+
 // GENERATE ANSWER
 app.post("/generate-answer", async (req, res) => {
   try {
-    const { question } = req.body || {};
+    const { question, libraryContext } = req.body || {};
 
     if (!question || typeof question !== "string") {
       return res.status(400).json({
@@ -208,12 +228,28 @@ app.post("/generate-answer", async (req, res) => {
       });
     }
 
+    const library = typeof libraryContext === "string" ? libraryContext.trim() : "";
+    const systemParts = [
+      "You are a professional RFP / grant proposal writer.",
+      "Draft clear, formal, submission-ready responses.",
+    ];
+    if (library) {
+      systemParts.push(
+        "When a Q&A library is provided, prefer those approved answers for matching topics. Adapt wording to the current requirement; do not invent facts that contradict the library; if the library is silent, answer professionally and note uncertainty only when material.",
+      );
+    }
+
+    const userContent = library
+      ? `APPROVED Q&A LIBRARY (company knowledge base):\n${library.slice(0, 60000)}\n\n---\n\nTASK:\n${question}`
+      : question;
+
     const response = await openai.chat.completions.create({
       model: "gpt-4.1",
       messages: [
-        { role: "system", content: "You are a professional RFP writer." },
-        { role: "user", content: question },
+        { role: "system", content: systemParts.join(" ") },
+        { role: "user", content: userContent },
       ],
+      temperature: 0.3,
     });
 
     res.json({
@@ -557,6 +593,7 @@ app.listen(PORT, () => {
   console.log("POST /generate-rfp-document");
   console.log("POST /ask-with-file");
   console.log("POST /extract-dates");
+  console.log("POST /extract-qas");
   console.log("POST /extract-structured-data");
   console.log("GET  /get-tables/:workspaceId");
   console.log("POST /workspace-document/:workspaceId");

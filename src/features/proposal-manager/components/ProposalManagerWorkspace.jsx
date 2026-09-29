@@ -15,6 +15,8 @@ import {
   replaceExtractedQAsInContentHub,
   ensureBoilerplateLibrary,
   hydrateWorkspaceFromBackend,
+  hydrateContentHubFromBackend,
+  buildQaLibraryContextForRequirement,
 } from "../services/proposalManagerStorage";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
@@ -882,7 +884,11 @@ export default function ProposalManagerWorkspace() {
     }
     promptParts.push("", "Respond in clear prose. Do not repeat the question as a heading unless necessary.");
     try {
-      const text = await generateAnswer(promptParts.join("\n"));
+      if (isTrialUserSession()) {
+        await hydrateContentHubFromBackend().catch(() => {});
+      }
+      const libraryContext = buildQaLibraryContextForRequirement(qLine, { limit: 14 });
+      const text = await generateAnswer(promptParts.join("\n"), { libraryContext });
       handleAnswerChange(key, text);
       setWorkspaceDocumentModel((prev) => ({
         ...prev,

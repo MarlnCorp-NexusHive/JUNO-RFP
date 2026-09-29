@@ -19,6 +19,7 @@ const METERED_PATH_PREFIXES = [
   "/generate-work-document",
   "/generate-slide-deck",
   "/extract-dates",
+  "/extract-qas",
   "/extract-structured-data",
   "/technical-solution/",
 ];

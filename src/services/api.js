@@ -71,8 +71,13 @@ async function assertBlobIsDocxOrThrow(response, label) {
 }
 
 /* ================= BASIC AI ================= */
-export const generateAnswer = async (question) => {
-  const res = await API.post("/generate-answer", { question });
+export const generateAnswer = async (question, options = {}) => {
+  const libraryContext =
+    typeof options?.libraryContext === "string" ? options.libraryContext : "";
+  const res = await API.post("/generate-answer", {
+    question,
+    ...(libraryContext ? { libraryContext } : {}),
+  });
   return res.data.answer;
 };
 
@@ -130,6 +135,11 @@ export const askWithFile = async (file, question) => {
 /* ================= RFP IMPORTANT DATES ================= */
 export const extractImportantDatesFromDocument = async (document) => {
   const res = await API.post("/extract-dates", { document });
+  return res.data;
+};
+
+export const extractQaLibraryFromDocument = async (document) => {
+  const res = await API.post("/extract-qas", { document }, { timeout: 600_000 });
   return res.data;
 };
 

@@ -9,6 +9,13 @@ import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { persistTrialFeatureData, canUseTrialFeatures, loadTrialFeatureData } from "../../../services/trialFeatureApi.js";
 import { isTrialMode } from "../../../services/trialAuthSession.js";
+import {
+  scanFileForImportantDates,
+  syncSourceDocDeadlinesForDoc,
+  removeSourceDocDeadlinesFromCalendar,
+  isApplicationDeadlineEvent,
+  ingestSourceDocQAsToLibrary,
+} from "../services/sourceDocsDeadlineService.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const NAME_OVERRIDES_KEY = "proposal_manager_source_docs_names";
@@ -443,7 +450,7 @@ export default function SourceDocsPage() {
     if (!files?.length) return;
     setUploadError("");
     const allowed = ACCEPT.split(",").map((e) => e.trim().toLowerCase());
-    const toAdd = [];
+    const queued = [];
     for (const file of Array.from(files)) {
       const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
       if (!allowed.includes(ext)) {
@@ -469,16 +476,55 @@ export default function SourceDocsPage() {
       } catch {
         // continue without preview
       }
-      toAdd.push({
-        id: crypto.randomUUID?.() ?? Date.now() + Math.random(),
+      const doc = {
+        id: crypto.randomUUID?.() ?? `${Date.now()}_${Math.random()}`,
         name: file.name,
         size: file.size,
         type: file.type,
         uploadedAt: new Date().toISOString(),
         dataUrl,
-      });
+        deadlineScanStatus: "scanning",
+        importantDates: [],
+        qaIngestCount: 0,
+      };
+      queued.push({ file, doc });
     }
-    setDocs((prev) => [...prev, ...toAdd]);
+    if (!queued.length) return;
+
+    setDocs((prev) => [...prev, ...queued.map((q) => q.doc)]);
+
+    for (const { file, doc } of queued) {
+      try {
+        const isPdf = (file.type || "").includes("pdf") || file.name.toLowerCase().endsWith(".pdf");
+        const { importantDates, qaItems } = await scanFileForImportantDates(
+          file,
+          isPdf ? undefined : null,
+        );
+        const qaAdded = ingestSourceDocQAsToLibrary(doc.id, qaItems);
+        const patched = {
+          ...doc,
+          importantDates,
+          qaIngestCount: qaAdded,
+          deadlineScanStatus: "done",
+          deadlineScanAt: new Date().toISOString(),
+        };
+        setDocs((prev) => prev.map((d) => (d.id === doc.id ? { ...d, ...patched } : d)));
+        await syncSourceDocDeadlinesForDoc(patched);
+      } catch (err) {
+        console.warn("[source-docs] AI scan failed:", file.name, err);
+        setDocs((prev) =>
+          prev.map((d) =>
+            d.id === doc.id
+              ? {
+                  ...d,
+                  deadlineScanStatus: "error",
+                  deadlineScanError: err?.response?.data?.error || err?.message || "Scan failed",
+                }
+              : d,
+          ),
+        );
+      }
+    }
   };
 
   const handleInputChange = (e) => {
@@ -487,6 +533,8 @@ export default function SourceDocsPage() {
   };
 
   const removeDoc = (id) => {
+    const existing = docs.find((d) => d.id === id);
+    if (existing) void removeSourceDocDeadlinesFromCalendar(existing);
     setDocs((prev) => prev.filter((d) => d.id !== id));
     if (editingId === id) {
       setEditingId("");
@@ -646,6 +694,50 @@ export default function SourceDocsPage() {
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString()}
           </p>
+          {doc.deadlineScanStatus === "scanning" && (
+            <p className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+              {t("proposalManagerSourceDocs.scanningDeadlines", {
+                defaultValue: "AI deep-scanning for deadlines and Q&As…",
+              })}
+            </p>
+          )}
+          {doc.deadlineScanStatus === "done" && (
+            <div className="mt-1 space-y-0.5">
+              <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                {(() => {
+                  const n = (doc.importantDates || []).filter((r) =>
+                    isApplicationDeadlineEvent(r.event),
+                  ).length;
+                  return n > 0
+                    ? t("proposalManagerSourceDocs.deadlinesFound", {
+                        count: n,
+                        defaultValue: "{{count}} application deadline(s) found — added to calendar & alerts",
+                      })
+                    : t("proposalManagerSourceDocs.noDeadlinesFound", {
+                        defaultValue: "No application deadlines detected in this document",
+                      });
+                })()}
+              </p>
+              <p className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
+                {(doc.qaIngestCount || 0) > 0
+                  ? t("proposalManagerSourceDocs.qaLibraryIngested", {
+                      count: doc.qaIngestCount,
+                      defaultValue: "{{count}} Q&A(s) added to Content Hub library",
+                    })
+                  : t("proposalManagerSourceDocs.qaLibraryNone", {
+                      defaultValue: "No reusable Q&As extracted for the library",
+                    })}
+              </p>
+            </div>
+          )}
+          {doc.deadlineScanStatus === "error" && (
+            <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">
+              {t("proposalManagerSourceDocs.deadlineScanFailed", {
+                defaultValue: "Deadline scan failed",
+              })}
+              {doc.deadlineScanError ? `: ${doc.deadlineScanError}` : ""}
+            </p>
+          )}
         </div>
         <div className="shrink-0 flex items-center gap-1">
           {!isEditing && (

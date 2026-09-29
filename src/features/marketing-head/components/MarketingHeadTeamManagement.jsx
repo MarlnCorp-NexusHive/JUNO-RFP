@@ -40,6 +40,7 @@ import {
   addTeamAssignment,
   updateTeamAssignment,
   removeTeamAssignment,
+  hydrateTeamFromServer,
 } from "../../proposal-manager/services/teamStore.js";
 // Proposal Manager team roles (Team Structure & Hierarchy)
 const PROPOSAL_MANAGER_ROLES = [
@@ -197,6 +198,7 @@ export default function MarketingHeadTeamManagement() {
   const [assignmentForm, setAssignmentForm] = useState({
     task: "",
     assigned: "",
+    assignedEmail: "",
     status: "pending",
     progress: "0",
     deadline: new Date().toISOString().slice(0, 10),
@@ -234,16 +236,33 @@ export default function MarketingHeadTeamManagement() {
       }
       return undefined;
     }
+    let cancelled = false;
+    hydrateTeamFromServer()
+      .then((data) => {
+        if (cancelled) return;
+        setMembers(data.members);
+        setCustomTrainings(data.trainings);
+        setAssignments(data.assignments);
+      })
+      .catch(() => {});
     const data = getTeamData();
     setMembers(data.members);
     setCustomTrainings(data.trainings);
     setAssignments(data.assignments);
+    return () => {
+      cancelled = true;
+      return undefined;
+    };
+  }, [isTrialPm, location.pathname]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
     return subscribeTeam((next) => {
       setMembers(next.members);
       setCustomTrainings(next.trainings);
       setAssignments(next.assignments);
     });
-  }, [isTrialPm, location.pathname]);
+  }, [isTrialPm]);
 
   if (!ready) {
     return (
@@ -404,15 +423,18 @@ export default function MarketingHeadTeamManagement() {
       setAssignmentForm({
         task: existing.task || "",
         assigned: existing.assigned || "",
+        assignedEmail: existing.assignedEmail || "",
         status: existing.status || "pending",
         progress: String(existing.progress || "0").replace("%", ""),
         deadline: existing.deadline || new Date().toISOString().slice(0, 10),
       });
     } else {
       setEditingAssignmentId(null);
+      const first = members[0];
       setAssignmentForm({
         task: "",
-        assigned: members[0]?.name || "",
+        assigned: first?.name || "",
+        assignedEmail: first?.email || "",
         status: "pending",
         progress: "0",
         deadline: new Date().toISOString().slice(0, 10),
@@ -1028,18 +1050,26 @@ export default function MarketingHeadTeamManagement() {
                     onChange={(e) => setAssignmentForm((f) => ({ ...f, task: e.target.value }))}
                     required
                   />
-                  <input
-                    list="trial-assignees"
+                  <select
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
-                    placeholder={t('team.sections.taskAssignment.assignedTo')}
                     value={assignmentForm.assigned}
-                    onChange={(e) => setAssignmentForm((f) => ({ ...f, assigned: e.target.value }))}
-                  />
-                  <datalist id="trial-assignees">
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      const match = members.find((m) => m.name === name);
+                      setAssignmentForm((f) => ({
+                        ...f,
+                        assigned: name,
+                        assignedEmail: match?.email || "",
+                      }));
+                    }}
+                  >
+                    <option value="">{t('team.sections.taskAssignment.assignedTo')}</option>
                     {members.map((m) => (
-                      <option key={m.id} value={m.name} />
+                      <option key={m.id} value={m.name}>
+                        {m.name}{m.email ? ` (${m.email})` : ""}
+                      </option>
                     ))}
-                  </datalist>
+                  </select>
                   <select
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
                     value={assignmentForm.status}

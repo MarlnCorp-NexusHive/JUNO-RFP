@@ -6,7 +6,8 @@ import {
   updateContentHubQA,
   deleteContentHubQA,
   ensureBoilerplateLibrary,
-  hydrateWorkspaceFromBackend,
+  hydrateContentHubFromBackend,
+  CONTENT_HUB_CHANGED_EVENT,
 } from "../services/proposalManagerStorage";
 import { FiTag, FiPlus, FiTrash2, FiCopy, FiFileText, FiZap, FiRefreshCw, FiLayers, FiUpload, FiX, FiDownload, FiSearch } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
@@ -93,14 +94,19 @@ export default function ProposalManagerContentHub() {
     let cancelled = false;
     (async () => {
       if (isTrialUserSession()) {
-        await hydrateWorkspaceFromBackend();
+        await hydrateContentHubFromBackend();
       } else {
         ensureBoilerplateLibrary();
       }
       if (!cancelled) setQas(getContentHubQAs());
     })();
+    const onChanged = () => {
+      if (!cancelled) setQas(getContentHubQAs());
+    };
+    window.addEventListener(CONTENT_HUB_CHANGED_EVENT, onChanged);
     return () => {
       cancelled = true;
+      window.removeEventListener(CONTENT_HUB_CHANGED_EVENT, onChanged);
     };
   }, [location.pathname]);
 

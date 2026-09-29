@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiStar } from "react-icons/fi";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
-import { isShortlisted, subscribeShortlist, toggleShortlist } from "../services/shortlistStore.js";
+import { isShortlisted, subscribeShortlist, toggleShortlist, hydrateShortlistFromServer } from "../services/shortlistStore.js";
 
 /**
- * Trial-only shortlist toggle. Persists deadline for dashboard Alerts.
+ * Trial-only shortlist toggle. Persists deadline for dashboard Alerts + shared calendar.
  */
 export default function OpportunityShortlistButton({
   id,
@@ -20,6 +20,20 @@ export default function OpportunityShortlistButton({
   const trial = isTrialUserSession();
   const [on, setOn] = useState(() => (trial ? isShortlisted(id) : false));
   const [hint, setHint] = useState("");
+
+  useEffect(() => {
+    if (!trial) return undefined;
+    let cancelled = false;
+    hydrateShortlistFromServer()
+      .then(() => {
+        if (!cancelled) setOn(isShortlisted(id));
+      })
+      .catch(() => {});
+    setOn(isShortlisted(id));
+    return () => {
+      cancelled = true;
+    };
+  }, [trial, id]);
 
   useEffect(() => {
     if (!trial) return undefined;

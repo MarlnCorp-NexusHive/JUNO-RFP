@@ -79,35 +79,46 @@ export default function ProposalManagerCalendar() {
   const calendarRef = useRef(null);
   const [visibleMonthLabel, setVisibleMonthLabel] = useState("");
   const [hasDemo, setHasDemo] = useState(false);
+  const refreshSeq = useRef(0);
+  const hydrateOnce = useRef(false);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async ({ soft = false } = {}) => {
+    const seq = ++refreshSeq.current;
+    if (!soft) setLoading(true);
     setError("");
     try {
-      const data = await loadCalendarBundle();
+      const shouldHydrate = !hydrateOnce.current;
+      const data = await loadCalendarBundle({ hydrate: shouldHydrate });
+      hydrateOnce.current = true;
+      if (seq !== refreshSeq.current) return;
       setEvents(data.events);
       setTeam(data.team);
       setHasDemo(Boolean(data.hasDemo));
     } catch (e) {
+      if (seq !== refreshSeq.current) return;
       setError(e?.response?.data?.error || e?.message || "Could not load calendar");
     } finally {
-      setLoading(false);
+      if (seq === refreshSeq.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    refresh();
+    refresh({ soft: false });
   }, [refresh]);
 
   useEffect(() => {
     if (!isTrialUserSession()) return undefined;
-    const unsubShort = subscribeShortlist(() => {
-      refresh();
-    });
-    const unsubTeam = subscribeTeam(() => {
-      refresh();
-    });
+    let timer = null;
+    const softRefresh = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        refresh({ soft: true });
+      }, 300);
+    };
+    const unsubShort = subscribeShortlist(softRefresh);
+    const unsubTeam = subscribeTeam(softRefresh);
     return () => {
+      if (timer) clearTimeout(timer);
       unsubShort();
       unsubTeam();
     };
@@ -440,10 +451,9 @@ export default function ProposalManagerCalendar() {
                 eventClick={handleEventClick}
                 dateClick={handleDateClick}
                 datesSet={(arg) => {
-                  const d = arg.start;
-                  setVisibleMonthLabel(
-                    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
-                  );
+                  const d = arg.view?.currentStart || arg.start;
+                  const next = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                  setVisibleMonthLabel((prev) => (prev === next ? prev : next));
                 }}
                 editable={false}
                 selectable

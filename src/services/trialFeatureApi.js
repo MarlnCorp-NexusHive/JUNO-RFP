@@ -17,6 +17,8 @@ export const TRIAL_FEATURE_KEYS = [
   "pricing",
   "bidVault",
   "teamCollab",
+  "shortlist",
+  "manageTeam",
 ];
 
 export function canUseTrialFeatures() {

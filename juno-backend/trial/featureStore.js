@@ -15,6 +15,8 @@ export const FEATURE_KEYS = [
   "pricing",
   "bidVault",
   "teamCollab",
+  "shortlist",
+  "manageTeam",
 ];
 
 const EMPTY_BY_KEY = {
@@ -29,6 +31,8 @@ const EMPTY_BY_KEY = {
   pricing: { laborRates: [], volumes: [], trends: [] },
   bidVault: { submissions: [], winLoss: [], pipeline: [] },
   teamCollab: { workspaces: [] },
+  shortlist: { items: [] },
+  manageTeam: { members: [], trainings: [], assignments: [] },
 };
 
 function getFeaturesDataPath() {

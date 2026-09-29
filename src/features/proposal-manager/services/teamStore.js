@@ -1,7 +1,18 @@
 import { scopedStorageKey, isScopedStorageEventKey } from "../../../services/tenantScopedStorage.js";
+import {
+  canUseTrialFeatures,
+  loadTrialFeatureData,
+  persistTrialFeatureData,
+} from "../../../services/trialFeatureApi.js";
+import { calendarApi } from "../../../services/calendarApi.js";
+import { parseDateToISO } from "./calendarDateParse.js";
+import { getTrialSession } from "../../../services/trialAuthSession.js";
+import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 
 const BASE_KEY = "juno_trial_team";
 export const TEAM_CHANGED_EVENT = "juno-trial-team-changed";
+
+const ASSIGNMENT_DEADLINE_COLOR = "#2563eb";
 
 const EMPTY = { members: [], trainings: [], assignments: [] };
 
@@ -56,7 +67,80 @@ function writeRaw(data) {
   } catch {
     /* ignore */
   }
+  void persistTeamCompanyWide(next);
   return next;
+}
+
+async function persistTeamCompanyWide(data) {
+  if (!canUseTrialFeatures()) return;
+  await persistTrialFeatureData("manageTeam", {
+    members: data.members || [],
+    trainings: data.trainings || [],
+    assignments: data.assignments || [],
+  });
+}
+
+export function assignmentEventId(id) {
+  return `assignment_${String(id || "")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 120)}`;
+}
+
+function resolveAssigneeFields(input, members = []) {
+  const assigned = String(input.assigned || "").trim();
+  let assignedEmail = String(input.assignedEmail || "").trim();
+  if (!assignedEmail && assigned) {
+    const match = members.find(
+      (m) =>
+        String(m.name || "").trim().toLowerCase() === assigned.toLowerCase() ||
+        String(m.email || "").trim().toLowerCase() === assigned.toLowerCase(),
+    );
+    if (match?.email) assignedEmail = String(match.email).trim();
+    if (match?.name && !assigned) return { assigned: String(match.name).trim(), assignedEmail };
+  }
+  return { assigned: assigned || "Unassigned", assignedEmail };
+}
+
+/** Push or remove an assignment deadline on the shared tenant calendar. */
+export async function syncAssignmentDeadlineToCalendar(item, present) {
+  if (!canUseTrialFeatures() || !item?.id) return;
+  const eventId = assignmentEventId(item.id);
+  if (!present) {
+    try {
+      await calendarApi.deleteEvent(eventId);
+    } catch {
+      /* already gone */
+    }
+    return;
+  }
+  const iso = parseDateToISO(item.deadline);
+  if (!iso) return;
+  const body = {
+    id: eventId,
+    title: `Assignment: ${item.task || "Task"}`,
+    start: iso,
+    end: null,
+    allDay: true,
+    type: "deadline",
+    source: "assignment",
+    assignmentId: String(item.id),
+    bidName: item.assigned || item.task || null,
+    description: [item.assigned, item.assignedEmail, item.status, item.progress]
+      .filter(Boolean)
+      .join(" · "),
+    assigneeNames: item.assigned ? [item.assigned] : [],
+    color: ASSIGNMENT_DEADLINE_COLOR,
+    status: item.status || null,
+  };
+  try {
+    await calendarApi.updateEvent(eventId, body);
+  } catch {
+    try {
+      await calendarApi.createEvent(body);
+    } catch (err) {
+      console.warn("[team] calendar sync failed:", err?.message || err);
+    }
+  }
 }
 
 export function getTeamData() {
@@ -69,6 +153,43 @@ export function listAssignments() {
     const db = Date.parse(b.deadline) || 0;
     return da - db;
   });
+}
+
+/** Current trial / RBAC user identity for personal alert filtering. */
+export function getCurrentUserIdentity() {
+  const session = getTrialSession();
+  const rbac = parseLocalStorageJson("rbac_current_user") || {};
+  return {
+    name: String(session?.user?.name || rbac?.name || "").trim(),
+    email: String(session?.user?.email || rbac?.email || "").trim().toLowerCase(),
+  };
+}
+
+/** True when an assignment is for the signed-in user (name or email). */
+export function assignmentBelongsToCurrentUser(item, identity = getCurrentUserIdentity()) {
+  if (!item) return false;
+  const myName = String(identity?.name || "")
+    .trim()
+    .toLowerCase();
+  const myEmail = String(identity?.email || "")
+    .trim()
+    .toLowerCase();
+  const assigned = String(item.assigned || "")
+    .trim()
+    .toLowerCase();
+  const assignedEmail = String(item.assignedEmail || "")
+    .trim()
+    .toLowerCase();
+  if (myEmail && assignedEmail && myEmail === assignedEmail) return true;
+  if (myName && assigned && myName === assigned) return true;
+  if (myEmail && assigned && myEmail === assigned) return true;
+  return false;
+}
+
+/** Assignments for the current user (dashboard alerts). */
+export function listMyAssignments() {
+  const me = getCurrentUserIdentity();
+  return listAssignments().filter((a) => assignmentBelongsToCurrentUser(a, me));
 }
 
 export function listMembers() {
@@ -179,41 +300,96 @@ export function addTeamAssignment(input = {}) {
   if (!deadline) {
     return { ok: false, error: "missing_deadline", data };
   }
+  if (!parseDateToISO(deadline)) {
+    return { ok: false, error: "missing_deadline", data };
+  }
+  const { assigned, assignedEmail } = resolveAssigneeFields(input, data.members);
   const assignment = {
     id: input.id || newId("assignment"),
     task: String(input.task || "").trim() || "Untitled assignment",
-    assigned: String(input.assigned || "").trim() || "Unassigned",
+    assigned,
+    assignedEmail,
     status: normalizeAssignmentStatus(input.status),
     progress: normalizeProgress(input.progress),
     deadline,
   };
   data.assignments = [assignment, ...data.assignments];
   writeRaw(data);
-  return { ok: true, data };
+  void syncAssignmentDeadlineToCalendar(assignment, true);
+  return { ok: true, data: readRaw() };
 }
 
 export function updateTeamAssignment(id, patch = {}) {
   const data = readRaw();
-  const idx = data.assignments.findIndex((a) => a.id === id || `assignment_${a.id}` === id);
+  const idx = data.assignments.findIndex(
+    (a) => a.id === id || `assignment_${a.id}` === id || assignmentEventId(a.id) === id,
+  );
   if (idx < 0) return data;
   const cur = data.assignments[idx];
+  const nextAssigned =
+    patch.assigned != null ? String(patch.assigned).trim() || cur.assigned : cur.assigned;
+  const resolved = resolveAssigneeFields(
+    {
+      assigned: nextAssigned,
+      assignedEmail: patch.assignedEmail != null ? patch.assignedEmail : cur.assignedEmail,
+    },
+    data.members,
+  );
   data.assignments[idx] = {
     ...cur,
     task: patch.task != null ? String(patch.task).trim() || cur.task : cur.task,
-    assigned: patch.assigned != null ? String(patch.assigned).trim() || cur.assigned : cur.assigned,
+    assigned: resolved.assigned,
+    assignedEmail: resolved.assignedEmail,
     status: patch.status != null ? normalizeAssignmentStatus(patch.status) : cur.status,
     progress: patch.progress != null ? normalizeProgress(patch.progress) : cur.progress,
     deadline: patch.deadline != null ? String(patch.deadline).trim() || cur.deadline : cur.deadline,
   };
-  return writeRaw(data);
+  writeRaw(data);
+  void syncAssignmentDeadlineToCalendar(data.assignments[idx], true);
+  return readRaw();
 }
 
 export function removeTeamAssignment(id) {
   const data = readRaw();
-  data.assignments = data.assignments.filter(
-    (a) => a.id !== id && `assignment_${a.id}` !== id,
+  const removed = data.assignments.find(
+    (a) => a.id === id || `assignment_${a.id}` === id || assignmentEventId(a.id) === id,
   );
-  return writeRaw(data);
+  data.assignments = data.assignments.filter(
+    (a) => a.id !== id && `assignment_${a.id}` !== id && assignmentEventId(a.id) !== id,
+  );
+  writeRaw(data);
+  if (removed) void syncAssignmentDeadlineToCalendar(removed, false);
+  return readRaw();
+}
+
+/** Load company-wide manage-team data into local cache (trial).
+ * @param {{ notify?: boolean }} [opts] — when notify is false, skip change events (avoids refresh loops).
+ */
+export async function hydrateTeamFromServer(opts = {}) {
+  const notify = opts.notify !== false;
+  if (!canUseTrialFeatures()) return getTeamData();
+  try {
+    const data = await loadTrialFeatureData("manageTeam", EMPTY);
+    const next = {
+      members: Array.isArray(data?.members) ? data.members : [],
+      trainings: Array.isArray(data?.trainings) ? data.trainings : [],
+      assignments: Array.isArray(data?.assignments) ? data.assignments : [],
+    };
+    const nextJson = JSON.stringify(next);
+    const prevJson = localStorage.getItem(storageKey());
+    if (prevJson === nextJson) return next;
+    localStorage.setItem(storageKey(), nextJson);
+    if (notify) {
+      try {
+        window.dispatchEvent(new CustomEvent(TEAM_CHANGED_EVENT, { detail: next }));
+      } catch {
+        /* ignore */
+      }
+    }
+    return next;
+  } catch {
+    return getTeamData();
+  }
 }
 
 /** Subscribe to team changes (same tab + cross-tab storage). Returns unsubscribe. */

@@ -24,6 +24,16 @@ const KEYS = {
   RESPONSE_SECTIONS: "proposal_manager_response_sections",
 };
 
+export const CONTENT_HUB_CHANGED_EVENT = "juno-content-hub-changed";
+
+function notifyContentHubChanged() {
+  try {
+    window.dispatchEvent(new CustomEvent(CONTENT_HUB_CHANGED_EVENT));
+  } catch {
+    /* ignore */
+  }
+}
+
 function load(key, defaultValue = []) {
   try {
     const raw = localStorage.getItem(scopedStorageKey(key));
@@ -40,11 +50,17 @@ function save(key, data) {
     console.warn("proposalManagerStorage save failed", key, e);
   }
   if (canUseTrialFeatures()) {
-    const folders = key === KEYS.FOLDERS ? data : load(KEYS.FOLDERS, []);
-    const documents = key === KEYS.DOCUMENTS ? data : load(KEYS.DOCUMENTS, []);
-    const qaLibrary = key === KEYS.CONTENT_HUB_QA ? data : load(KEYS.CONTENT_HUB_QA, []);
-    persistTrialFeatureData("workspace", { folders, documents });
-    persistTrialFeatureData("contentHub", { qaLibrary });
+    if (key === KEYS.FOLDERS || key === KEYS.DOCUMENTS) {
+      const folders = key === KEYS.FOLDERS ? data : load(KEYS.FOLDERS, []);
+      const documents = key === KEYS.DOCUMENTS ? data : load(KEYS.DOCUMENTS, []);
+      void persistTrialFeatureData("workspace", { folders, documents });
+    }
+    if (key === KEYS.CONTENT_HUB_QA) {
+      void persistTrialFeatureData("contentHub", { qaLibrary: Array.isArray(data) ? data : [] });
+      notifyContentHubChanged();
+    }
+  } else if (key === KEYS.CONTENT_HUB_QA) {
+    notifyContentHubChanged();
   }
 }
 
@@ -143,29 +159,122 @@ export function deleteContentHubQA(id) {
   saveContentHubQAs(getContentHubQAs().filter((q) => q.id !== id));
 }
 
-// Append extracted Q&As from Workspace (merge tags with document-type tags)
+// Append extracted Q&As from Workspace / Source Docs (merge tags with document-type tags)
 export function appendExtractedQAs(extractedQAs, documentTypeId, sourceDocumentId, documentTypeToTags) {
-  const tagFromType = documentTypeToTags[documentTypeId] || ["General"];
+  const tagFromType = documentTypeToTags?.[documentTypeId] || ["General"];
   const qas = getContentHubQAs();
-  extractedQAs.forEach(({ question, answer }) => {
+  const existingKeys = new Set(
+    qas.map((q) =>
+      String(q.question || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 240),
+    ),
+  );
+  let added = 0;
+  (extractedQAs || []).forEach(({ question, answer, tags }) => {
+    const qText = String(question || "").trim() || "(No question text)";
+    const key = qText.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 240);
+    if (existingKeys.has(key)) return;
+    existingKeys.add(key);
     const id = `qa_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    const mergedTags = [
+      ...new Set([
+        ...(Array.isArray(tags) ? tags.map((t) => String(t).trim()).filter(Boolean) : []),
+        ...tagFromType,
+      ]),
+    ].slice(0, 10);
     qas.push({
       id,
-      question: question || "(No question text)",
-      answer: answer || "(No answer text)",
-      tags: [...new Set([...tagFromType])],
-      sourceDocumentId,
+      question: qText,
+      answer: String(answer || "").trim() || "(No answer text)",
+      tags: mergedTags.length ? mergedTags : ["General"],
+      sourceDocumentId: sourceDocumentId || null,
       createdAt: new Date().toISOString(),
     });
+    added += 1;
   });
-  saveContentHubQAs(qas);
+  if (added > 0) saveContentHubQAs(qas);
+  return added;
 }
 
 /** Remove prior hub rows for this source doc, then append the new list (keeps Content Hub in sync after AI re-split). */
 export function replaceExtractedQAsInContentHub(sourceDocumentId, extractedQAs, documentTypeId, documentTypeToTags) {
   const without = getContentHubQAs().filter((q) => q.sourceDocumentId !== sourceDocumentId);
   saveContentHubQAs(without);
-  appendExtractedQAs(extractedQAs, documentTypeId, sourceDocumentId, documentTypeToTags);
+  return appendExtractedQAs(extractedQAs, documentTypeId, sourceDocumentId, documentTypeToTags);
+}
+
+/**
+ * Rank Content Hub Q&As for a workspace requirement and format as AI library context.
+ * @param {string} requirementText
+ * @param {{ limit?: number }} [opts]
+ */
+export function buildQaLibraryContextForRequirement(requirementText, opts = {}) {
+  const limit = Math.max(3, Math.min(Number(opts.limit) || 12, 25));
+  const qas = getContentHubQAs();
+  if (!qas.length) return "";
+  const tokens = String(requirementText || "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 3);
+  const uniqueTokens = [...new Set(tokens)].slice(0, 40);
+
+  const scored = qas
+    .map((qa) => {
+      const hay = `${qa.question || ""} ${qa.answer || ""} ${(qa.tags || []).join(" ")}`.toLowerCase();
+      let score = 0;
+      for (const tok of uniqueTokens) {
+        if (hay.includes(tok)) score += 1;
+      }
+      // Prefer tagged Q&A / Past Performance / Technical for RFP work
+      const tags = (qa.tags || []).map((t) => String(t).toLowerCase());
+      if (tags.some((t) => t.includes("q&a") || t.includes("clarification"))) score += 1.5;
+      if (tags.some((t) => t.includes("past performance") || t.includes("technical"))) score += 0.5;
+      return { qa, score };
+    })
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const picked = (scored.length ? scored : qas.map((qa) => ({ qa, score: 0 }))).slice(0, limit);
+
+  return picked
+    .map(({ qa }, i) => {
+      const tags = (qa.tags || []).length ? ` [${(qa.tags || []).join(", ")}]` : "";
+      return `Q${i + 1}${tags}: ${qa.question}\nA${i + 1}: ${qa.answer}`;
+    })
+    .join("\n\n")
+    .slice(0, 50000);
+}
+
+/** Pull trial workspace + content hub from backend into scoped localStorage. */
+export async function hydrateWorkspaceFromBackend() {
+  if (!canUseTrialFeatures()) return;
+  const [ws, hub] = await Promise.all([
+    loadTrialFeatureData("workspace", { folders: [], documents: [] }),
+    loadTrialFeatureData("contentHub", { qaLibrary: [] }),
+  ]);
+  if (Array.isArray(ws?.folders)) {
+    localStorage.setItem(scopedStorageKey(KEYS.FOLDERS), JSON.stringify(ws.folders));
+  }
+  if (Array.isArray(ws?.documents)) {
+    localStorage.setItem(scopedStorageKey(KEYS.DOCUMENTS), JSON.stringify(ws.documents));
+  }
+  if (Array.isArray(hub?.qaLibrary)) {
+    localStorage.setItem(scopedStorageKey(KEYS.CONTENT_HUB_QA), JSON.stringify(hub.qaLibrary));
+    notifyContentHubChanged();
+  }
+}
+
+/** Trial: load Content Hub Q&A library from backend only. */
+export async function hydrateContentHubFromBackend() {
+  if (!canUseTrialFeatures()) return getContentHubQAs();
+  const hub = await loadTrialFeatureData("contentHub", { qaLibrary: [] });
+  if (Array.isArray(hub?.qaLibrary)) {
+    localStorage.setItem(scopedStorageKey(KEYS.CONTENT_HUB_QA), JSON.stringify(hub.qaLibrary));
+  }
+  return getContentHubQAs();
 }
 
 // ——— RFP Response document sections (for auto-generate) ———
@@ -243,20 +352,3 @@ export function ensureBoilerplateLibrary() {
   if (qaChanged) saveContentHubQAs(qas);
 }
 
-/** Pull trial workspace + content hub from backend into scoped localStorage. */
-export async function hydrateWorkspaceFromBackend() {
-  if (!canUseTrialFeatures()) return;
-  const [ws, hub] = await Promise.all([
-    loadTrialFeatureData("workspace", { folders: [], documents: [] }),
-    loadTrialFeatureData("contentHub", { qaLibrary: [] }),
-  ]);
-  if (Array.isArray(ws?.folders)) {
-    localStorage.setItem(scopedStorageKey(KEYS.FOLDERS), JSON.stringify(ws.folders));
-  }
-  if (Array.isArray(ws?.documents)) {
-    localStorage.setItem(scopedStorageKey(KEYS.DOCUMENTS), JSON.stringify(ws.documents));
-  }
-  if (Array.isArray(hub?.qaLibrary)) {
-    localStorage.setItem(scopedStorageKey(KEYS.CONTENT_HUB_QA), JSON.stringify(hub.qaLibrary));
-  }
-}

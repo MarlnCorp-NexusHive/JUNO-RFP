@@ -18,8 +18,10 @@ import {
   daysUntilDeadline,
   listShortlist,
   subscribeShortlist,
+  hydrateShortlistFromServer,
   urgencyAlertColor,
 } from "../features/proposal-manager/services/shortlistStore.js";
+import { buildSourceDocDeadlineAlerts } from "../features/proposal-manager/services/sourceDocsDeadlineService.js";
 import {
   getComplianceData,
   subscribeCompliance,
@@ -27,17 +29,22 @@ import {
   getUnaddressedClauseCount,
   getFarRiskFlag,
   getPastPerformanceScore,
-  buildComplianceAlerts,
 } from "../features/proposal-manager/services/complianceStore.js";
 import {
   subscribeTeam,
-  listAssignments,
+  listMyAssignments,
+  hydrateTeamFromServer,
 } from "../features/proposal-manager/services/teamStore.js";
 
 function isTrialUserSession() {
   const session = getTrialSession();
   const user = parseLocalStorageJson("rbac_current_user");
   return Boolean(session?.token || user?.isTrialUser);
+}
+
+function normalizeAssignmentOpen(item) {
+  const status = String(item?.status || "").toLowerCase().replace(/\s+/g, "");
+  return status !== "completed" && status !== "complete";
 }
 
 const features = [
@@ -436,7 +443,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const [modalChart, setModalChart] = useState(null);
   const [shortlistItems, setShortlistItems] = useState(() => listShortlist());
   const [complianceData, setComplianceData] = useState(() => getComplianceData());
-  const [assignmentItems, setAssignmentItems] = useState(() => listAssignments());
+  const [assignmentItems, setAssignmentItems] = useState(() => listMyAssignments());
+  const [sourceDocAlertTick, setSourceDocAlertTick] = useState(0);
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
   const pmText = (en, ar) => (isArabic ? ar : en);
   const pmLabel = (text) => {
@@ -635,8 +643,18 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
+    let cancelled = false;
+    hydrateShortlistFromServer()
+      .then((items) => {
+        if (!cancelled) setShortlistItems(items);
+      })
+      .catch(() => {});
     setShortlistItems(listShortlist());
-    return subscribeShortlist(setShortlistItems);
+    const unsub = subscribeShortlist(setShortlistItems);
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, [isTrialPm]);
 
   useEffect(() => {
@@ -647,8 +665,26 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
-    setAssignmentItems(listAssignments());
-    return subscribeTeam((data) => setAssignmentItems(data.assignments || []));
+    let cancelled = false;
+    hydrateTeamFromServer()
+      .then(() => {
+        if (!cancelled) setAssignmentItems(listMyAssignments());
+      })
+      .catch(() => {});
+    setAssignmentItems(listMyAssignments());
+    return subscribeTeam(() => setAssignmentItems(listMyAssignments()));
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    const bump = () => setSourceDocAlertTick((n) => n + 1);
+    bump();
+    window.addEventListener("juno-source-docs-deadlines-changed", bump);
+    window.addEventListener("focus", bump);
+    return () => {
+      window.removeEventListener("juno-source-docs-deadlines-changed", bump);
+      window.removeEventListener("focus", bump);
+    };
   }, [isTrialPm]);
 
   const staticPmAlerts = [
@@ -678,30 +714,34 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         };
       })
     : [];
+  const sourceDocAlerts = isTrialPm ? buildSourceDocDeadlineAlerts(t) : [];
+  void sourceDocAlertTick; // recompute alerts when source-doc scan notifies
   const assignmentAlerts = isTrialPm
-    ? assignmentItems.map((item) => {
-        const days = daysUntilDeadline(item.deadline);
-        const daysPart =
-          days == null
-            ? ""
-            : days < 0
-              ? ` (${t("dashboard.alerts.proposalManager.shortlistPastDue")})`
-              : ` (${t("dashboard.alerts.proposalManager.shortlistDaysLeft", { count: days })})`;
-        return {
-          text: t("dashboard.alerts.proposalManager.assignmentDeadline", {
-            date: item.deadline,
-            title: item.task,
-            assignee: item.assigned || "",
-            daysPart,
-          }),
-          color: urgencyAlertColor(days),
-        };
-      })
+    ? assignmentItems
+        .filter((item) => normalizeAssignmentOpen(item))
+        .map((item) => {
+          const days = daysUntilDeadline(item.deadline);
+          const daysPart =
+            days == null
+              ? ""
+              : days < 0
+                ? ` (${t("dashboard.alerts.proposalManager.shortlistPastDue")})`
+                : ` (${t("dashboard.alerts.proposalManager.shortlistDaysLeft", { count: days })})`;
+          return {
+            text: t("dashboard.alerts.proposalManager.assignmentDeadline", {
+              date: item.deadline,
+              title: item.task,
+              assignee: item.assigned || "",
+              daysPart,
+            }),
+            color: urgencyAlertColor(days),
+          };
+        })
     : [];
-  const complianceAlerts = isTrialPm ? buildComplianceAlerts(complianceData, t) : [];
+  // Trial dashboard: RFP/grant shortlist + source-doc application deadlines + my tasks
   const alerts = isPM
     ? isTrialPm
-      ? [...shortlistAlerts, ...assignmentAlerts, ...complianceAlerts]
+      ? [...shortlistAlerts, ...sourceDocAlerts, ...assignmentAlerts]
       : [...shortlistAlerts, ...staticPmAlerts]
     : [
         { icon: '🚨', text: t('dashboard.alerts.pendingBudgetApprovals'), color: 'text-red-500' },
