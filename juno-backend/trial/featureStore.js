@@ -29,7 +29,11 @@ const EMPTY_BY_KEY = {
   winSlide: { draft: null, settings: {} },
   userManagement: { users: [] },
   communication: { channels: [], messages: [], readState: {} },
-  pricing: { laborRates: [], volumes: [], trends: [] },
+  pricing: {
+    laborRates: [],
+    volumes: [],
+    settings: { currency: "USD", defaultWrap: 1.2 },
+  },
   bidVault: { submissions: [], winLoss: [], pipeline: [] },
   teamCollab: { workspaces: [] },
   shortlist: { items: [] },

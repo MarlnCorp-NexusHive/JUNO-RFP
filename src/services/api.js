@@ -118,6 +118,50 @@ export const coachCommunicationReply = async (payload) => {
   return res.data;
 };
 
+/* ================= PRICING AI ================= */
+export const suggestPricingRates = async (payload) => {
+  const res = await API.post("/pricing/ai/suggest-rates", payload || {}, {
+    timeout: 60_000,
+  });
+  return res.data;
+};
+
+export const estimatePricingHours = async (payload) => {
+  const res = await API.post("/pricing/ai/estimate-hours", payload || {}, {
+    timeout: 60_000,
+  });
+  return res.data;
+};
+
+export const pricingRiskNote = async (payload) => {
+  const res = await API.post("/pricing/ai/risk-note", payload || {}, {
+    timeout: 60_000,
+  });
+  return res.data;
+};
+
+/* ================= PURSUIT LIFECYCLE AI ================= */
+export const suggestBidVaultFromSources = async (payload) => {
+  const res = await API.post("/pursuit/ai/suggest-bid-vault", payload || {}, {
+    timeout: 90_000,
+  });
+  return res.data;
+};
+
+export const parseScoringDebriefAi = async (payload) => {
+  const res = await API.post("/pursuit/ai/parse-scoring", payload || {}, {
+    timeout: 90_000,
+  });
+  return res.data;
+};
+
+export const draftWinSlideAi = async (payload) => {
+  const res = await API.post("/pursuit/ai/draft-win-slide", payload || {}, {
+    timeout: 90_000,
+  });
+  return res.data;
+};
+
 /* ================= COMPANY INTELLIGENCE ================= */
 export const fetchCompanyIntelligenceRemote = async ({ query }) => {
   const res = await API.post("/company-intelligence-remote", { query });

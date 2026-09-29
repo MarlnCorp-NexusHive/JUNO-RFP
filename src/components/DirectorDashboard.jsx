@@ -42,6 +42,18 @@ import {
   hydrateCommunicationFromServer,
   buildCommunicationAlerts,
 } from "../features/proposal-manager/services/communicationStore.js";
+import {
+  getPricingData,
+  subscribePricing,
+  hydratePricingFromServer,
+  buildPricingAlerts,
+} from "../features/proposal-manager/services/pricingStore.js";
+import {
+  getBidVaultData,
+  subscribeBidVault,
+  hydrateBidVaultFromServer,
+  buildBidVaultAlerts,
+} from "../features/proposal-manager/services/bidVaultStore.js";
 
 function isTrialUserSession() {
   const session = getTrialSession();
@@ -452,6 +464,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const [complianceData, setComplianceData] = useState(() => getComplianceData());
   const [assignmentItems, setAssignmentItems] = useState(() => listMyAssignments());
   const [communicationData, setCommunicationData] = useState(() => getCommunicationData());
+  const [pricingData, setPricingData] = useState(() => getPricingData());
+  const [bidVaultData, setBidVaultData] = useState(() => getBidVaultData());
   const [sourceDocAlertTick, setSourceDocAlertTick] = useState(0);
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
   const pmText = (en, ar) => (isArabic ? ar : en);
@@ -693,6 +707,20 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
+    setPricingData(getPricingData());
+    void hydratePricingFromServer().then((next) => setPricingData(next));
+    return subscribePricing(setPricingData);
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    setBidVaultData(getBidVaultData());
+    void hydrateBidVaultFromServer().then((next) => setBidVaultData(next));
+    return subscribeBidVault(setBidVaultData);
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
     const bump = () => setSourceDocAlertTick((n) => n + 1);
     bump();
     window.addEventListener("juno-source-docs-deadlines-changed", bump);
@@ -757,10 +785,12 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const communicationAlerts = isTrialPm
     ? buildCommunicationAlerts(communicationData, t)
     : [];
-  // Trial dashboard: RFP/grant shortlist + source-doc application deadlines + my tasks + communication
+  const pricingAlerts = isTrialPm ? buildPricingAlerts(pricingData, t) : [];
+  const bidVaultAlerts = isTrialPm ? buildBidVaultAlerts(bidVaultData, t) : [];
+  // Trial dashboard alerts
   const alerts = isPM
     ? isTrialPm
-      ? [...shortlistAlerts, ...sourceDocAlerts, ...assignmentAlerts, ...communicationAlerts]
+      ? [...shortlistAlerts, ...sourceDocAlerts, ...assignmentAlerts, ...communicationAlerts, ...pricingAlerts, ...bidVaultAlerts]
       : [...shortlistAlerts, ...staticPmAlerts]
     : [
         { icon: '🚨', text: t('dashboard.alerts.pendingBudgetApprovals'), color: 'text-red-500' },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FiStar, FiMessageCircle } from "react-icons/fi";
+import { FiStar, FiMessageCircle, FiDollarSign, FiPackage } from "react-icons/fi";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { isShortlisted, subscribeShortlist, toggleShortlist, hydrateShortlistFromServer } from "../services/shortlistStore.js";
 
@@ -82,15 +82,35 @@ export default function OpportunityShortlistButton({
           {on ? t("proposalManagerGrants.shortlisted") : t("proposalManagerGrants.shortlist")}
         </button>
         {on ? (
-          <Link
-            to={`/app/communication?shortlistId=${encodeURIComponent(id)}`}
-            onClick={(e) => e.stopPropagation()}
-            title={t("proposalManagerGrants.openKickoffTitle")}
-            className="inline-flex items-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-blue-900 hover:border-blue-400 dark:border-blue-600 dark:bg-blue-950/40 dark:text-blue-100"
-          >
-            <FiMessageCircle className="h-3.5 w-3.5" aria-hidden />
-            {t("proposalManagerGrants.openKickoff")}
-          </Link>
+          <>
+            <Link
+              to={`/app/communication?shortlistId=${encodeURIComponent(id)}`}
+              onClick={(e) => e.stopPropagation()}
+              title={t("proposalManagerGrants.openKickoffTitle")}
+              className="inline-flex items-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-blue-900 hover:border-blue-400 dark:border-blue-600 dark:bg-blue-950/40 dark:text-blue-100"
+            >
+              <FiMessageCircle className="h-3.5 w-3.5" aria-hidden />
+              {t("proposalManagerGrants.openKickoff")}
+            </Link>
+            <Link
+              to={`/app/pricing?shortlistId=${encodeURIComponent(id)}`}
+              onClick={(e) => e.stopPropagation()}
+              title={t("proposalManagerGrants.openPricingTitle")}
+              className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-900 hover:border-emerald-400 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-100"
+            >
+              <FiDollarSign className="h-3.5 w-3.5" aria-hidden />
+              {t("proposalManagerGrants.openPricing")}
+            </Link>
+            <Link
+              to={`/app/bid-vault?shortlistId=${encodeURIComponent(id)}`}
+              onClick={(e) => e.stopPropagation()}
+              title={t("proposalManagerGrants.openBidVaultTitle")}
+              className="inline-flex items-center gap-1 rounded-lg border border-violet-300 bg-violet-50 px-2.5 py-1.5 text-xs font-semibold text-violet-900 hover:border-violet-400 dark:border-violet-600 dark:bg-violet-950/40 dark:text-violet-100"
+            >
+              <FiPackage className="h-3.5 w-3.5" aria-hidden />
+              {t("proposalManagerGrants.openBidVault")}
+            </Link>
+          </>
         ) : null}
       </div>
       {hint ? <span className="max-w-[12rem] text-[10px] font-medium text-rose-600 dark:text-rose-400">{hint}</span> : null}

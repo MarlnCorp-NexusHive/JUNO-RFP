@@ -1,10 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FiAward, FiDownload, FiPlus, FiTrash2, FiUpload } from "react-icons/fi";
+import { FiAward, FiDownload, FiPlus, FiTrash2, FiUpload, FiZap, FiFileText } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { parseScoringText, PRODUCT_AREAS, rollupRoadmap } from "../data/winLossSamples";
 import { getWinLossRecords, upsertWinLossRecord, hydrateWinLossFromBackend } from "../services/winLossStorage";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { getSubmission, updateSubmission, hydrateBidVaultFromServer } from "../services/bidVaultStore.js";
+import {
+  hydrateSourceDocsCatalog,
+  buildSourceDocsAiContext,
+  listTrialSourceDocs,
+} from "../services/sourceDocsCatalog.js";
+import { parseScoringDebriefAi } from "../../../services/api.js";
 
 function emptyRecord() {
   return {
@@ -14,6 +22,8 @@ function emptyRecord() {
     segment: "State/Local",
     outcome: "lost",
     contractValue: null,
+    vaultId: null,
+    sourceDocIds: [],
     debrief: { sourceType: "manual", summary: "", whyWon: [], whyLost: [], evaluatorComments: "" },
     factors: [],
     capabilityGaps: [],
@@ -28,6 +38,8 @@ function scoreDelta(factor) {
 export default function WinLossScoringPage() {
   const { t } = useTranslation("common");
   const { isRTLMode } = useLocalization();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const trial = isTrialUserSession();
   const [records, setRecords] = useState(getWinLossRecords);
   const [selectedId, setSelectedId] = useState(records[0]?.id || null);
   const [filter, setFilter] = useState("all");
@@ -36,20 +48,58 @@ export default function WinLossScoringPage() {
   const [gapDraft, setGapDraft] = useState({ title: "", productArea: "content", severity: "high", description: "" });
   const [showCreate, setShowCreate] = useState(false);
   const [createName, setCreateName] = useState("");
+  const [sourceDocs, setSourceDocs] = useState(() => listTrialSourceDocs());
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   useEffect(() => {
-    if (!isTrialUserSession()) return undefined;
+    if (!trial) return undefined;
     let cancelled = false;
     (async () => {
+      await hydrateBidVaultFromServer().catch(() => {});
+      await hydrateSourceDocsCatalog().catch(() => {});
       const next = await hydrateWinLossFromBackend();
       if (cancelled) return;
+      setSourceDocs(listTrialSourceDocs());
       setRecords(next);
-      setSelectedId(next[0]?.id || null);
+      const vaultId = searchParams.get("vaultId");
+      if (vaultId) {
+        const existing = next.find((r) => r.vaultId === vaultId);
+        if (existing) {
+          setSelectedId(existing.id);
+        } else {
+          const sub = getSubmission(vaultId);
+          if (sub) {
+            const rec = upsertWinLossRecord({
+              ...emptyRecord(),
+              rfpName: sub.title,
+              solicitationNumber: sub.number || "",
+              agency: sub.agency || "",
+              segment: sub.segment || "State/Local",
+              outcome: sub.stage === "won" ? "won" : sub.stage === "lost" ? "lost" : "pending",
+              contractValue: sub.value,
+              vaultId: sub.id,
+              sourceDocIds: sub.sourceDocIds || [],
+            });
+            updateSubmission(sub.id, { scoringId: rec.id });
+            const refreshed = getWinLossRecords();
+            setRecords(refreshed);
+            setSelectedId(rec.id);
+          }
+        }
+        setSearchParams((prev) => {
+          const n = new URLSearchParams(prev);
+          n.delete("vaultId");
+          return n;
+        }, { replace: true });
+      } else {
+        setSelectedId(next[0]?.id || null);
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [trial]);
 
   const selected = records.find((r) => r.id === selectedId) || null;
   const filtered = records.filter((r) => (filter === "all" ? true : r.outcome === filter));
@@ -65,7 +115,14 @@ export default function WinLossScoringPage() {
     if (!selected) return;
     const next = { ...selected, ...updates };
     if (updates.debrief) next.debrief = { ...selected.debrief, ...updates.debrief };
-    upsertWinLossRecord(next);
+    const saved = upsertWinLossRecord(next);
+    if (saved.vaultId) {
+      const vaultPatch = { scoringId: saved.id };
+      if (saved.outcome === "won" || saved.outcome === "lost") {
+        vaultPatch.stage = saved.outcome;
+      }
+      updateSubmission(saved.vaultId, vaultPatch);
+    }
     refresh(selected.id);
   };
 
@@ -78,6 +135,39 @@ export default function WinLossScoringPage() {
     }
     patchSelected({ factors: [...(selected.factors || []), ...factors], ingestMeta: { ingestedAt: new Date().toISOString() } });
     setIngestText("");
+  };
+
+  const runAiParse = async () => {
+    if (!selected || !ingestText.trim()) return;
+    setAiBusy(true);
+    setAiError("");
+    setIngestError("");
+    try {
+      const ctx = buildSourceDocsAiContext();
+      const result = await parseScoringDebriefAi({
+        text: ingestText,
+        pursuit: {
+          rfpName: selected.rfpName,
+          agency: selected.agency,
+          number: selected.solicitationNumber,
+        },
+        sourceDocs: ctx,
+      });
+      patchSelected({
+        outcome: result.outcome || selected.outcome,
+        debrief: { ...selected.debrief, ...result.debrief },
+        factors: [...(selected.factors || []), ...(result.factors || [])],
+        capabilityGaps: [...(selected.capabilityGaps || []), ...(result.capabilityGaps || [])],
+        sourceDocIds: selected.sourceDocIds?.length
+          ? selected.sourceDocIds
+          : (ctx.documents || []).slice(0, 3).map((d) => d.id),
+      });
+      setIngestText("");
+    } catch (err) {
+      setAiError(err?.response?.data?.error || err?.message || "AI parse failed");
+    } finally {
+      setAiBusy(false);
+    }
   };
 
   const addGap = () => {
@@ -136,6 +226,15 @@ export default function WinLossScoringPage() {
               {t("proposalManagerScoring.title")}
             </h1>
             <p className="mt-1 max-w-3xl text-sm text-slate-600 dark:text-slate-400">{t("proposalManagerScoring.subtitle")}</p>
+            {trial && sourceDocs.length > 0 ? (
+              <p className="mt-2 flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400">
+                <FiFileText className="h-3.5 w-3.5" />
+                {t("proposalManagerScoring.sourceDocsContext", {
+                  count: sourceDocs.length,
+                  defaultValue: "{{count}} Source Docs available for AI scoring context",
+                })}
+              </p>
+            ) : null}
           </div>
           <button
             type="button"
@@ -282,14 +381,35 @@ export default function WinLossScoringPage() {
                     placeholder={"Technical Approach | M.1 | 40 | 3.2 | 3.8 | 5"}
                   />
                   {ingestError ? <p className="mt-1 text-xs text-rose-600">{ingestError}</p> : null}
-                  <button
-                    type="button"
-                    onClick={ingestScores}
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white dark:bg-white dark:text-slate-900"
-                  >
-                    <FiUpload className="h-3.5 w-3.5" />
-                    {t("proposalManagerScoring.ingestButton")}
-                  </button>
+                  {aiError ? <p className="mt-1 text-xs text-rose-600">{aiError}</p> : null}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={ingestScores}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white dark:bg-white dark:text-slate-900"
+                    >
+                      <FiUpload className="h-3.5 w-3.5" />
+                      {t("proposalManagerScoring.ingestButton")}
+                    </button>
+                    {trial ? (
+                      <button
+                        type="button"
+                        disabled={aiBusy || !ingestText.trim()}
+                        onClick={runAiParse}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950/40 dark:text-amber-100"
+                      >
+                        <FiZap className="h-3.5 w-3.5" />
+                        {aiBusy
+                          ? t("proposalManagerScoring.aiParsing", { defaultValue: "AI parsing…" })
+                          : t("proposalManagerScoring.aiParse", { defaultValue: "AI parse + Source Docs" })}
+                      </button>
+                    ) : null}
+                    {selected?.vaultId ? (
+                      <Link to="/app/bid-vault" className="inline-flex items-center text-xs font-medium text-violet-700 dark:text-violet-300">
+                        {t("proposalManagerScoring.openVault", { defaultValue: "Open Bid Vault" })}
+                      </Link>
+                    ) : null}
+                  </div>
                   <div className="mt-3 overflow-x-auto">
                     <table className="min-w-full text-sm">
                       <thead>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FiDownload, FiLayout } from "react-icons/fi";
+import { FiDownload, FiLayout, FiZap, FiFileText } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
-import { generateSlideDeck } from "../../../services/api.js";
+import { generateSlideDeck, draftWinSlideAi } from "../../../services/api.js";
 import { COMPETITORS } from "../data/competitiveIntelligenceSamples";
 import { buildWinSlideDeckContent, defaultWinSlideFromPursuit } from "../data/winSlideTemplates";
 import { getWinLossRecords, hydrateWinLossFromBackend } from "../services/winLossStorage";
@@ -14,6 +14,11 @@ import {
 } from "../services/winSlideStorage";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import {
+  hydrateSourceDocsCatalog,
+  buildSourceDocsAiContext,
+  listTrialSourceDocs,
+} from "../services/sourceDocsCatalog.js";
 
 function applyDraftToState(draft, setters) {
   const d = draft || emptyWinSlideDraft();
@@ -46,16 +51,24 @@ export default function WinSlidePage() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
   const [seeded, setSeeded] = useState(trial ? true : !!draft?.pov);
+  const [customCompetitors, setCustomCompetitors] = useState(
+    () => (Array.isArray(draft?.customCompetitors) ? draft.customCompetitors.join(", ") : ""),
+  );
+  const [sourceDocCount, setSourceDocCount] = useState(0);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   useEffect(() => {
     if (!trial) return undefined;
     let cancelled = false;
     (async () => {
+      await hydrateSourceDocsCatalog().catch(() => {});
       await hydrateWinLossFromBackend();
       let nextDraft = await hydrateWinSlideFromBackend();
       if (cancelled) return;
       const nextPursuits = getWinLossRecords();
       setPursuits(nextPursuits);
+      setSourceDocCount(listTrialSourceDocs().length);
       // No scoring pursuits yet → drop orphaned demo drafts so the tab stays blank.
       if (nextPursuits.length === 0) {
         nextDraft = emptyWinSlideDraft();
@@ -70,6 +83,9 @@ export default function WinSlidePage() {
         setWhyUs,
         setWhyThem,
       });
+      if (Array.isArray(nextDraft?.customCompetitors)) {
+        setCustomCompetitors(nextDraft.customCompetitors.join(", "));
+      }
       setSeeded(true);
     })();
     return () => {
@@ -78,7 +94,14 @@ export default function WinSlidePage() {
   }, [trial]);
 
   const pursuit = pursuits.find((p) => p.id === pursuitId) || null;
-  const selectedCompetitors = COMPETITORS.filter((c) => competitorIds.includes(c.id));
+  const selectedCompetitors = trial
+    ? String(customCompetitors || "")
+        .split(/[,;\n]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 4)
+        .map((name, i) => ({ id: `custom_${i}`, shortName: name, name }))
+    : COMPETITORS.filter((c) => competitorIds.includes(c.id));
 
   useEffect(() => {
     // Demo only: auto-fill template once when a pursuit is available.
@@ -111,6 +134,12 @@ export default function WinSlidePage() {
     saveWinSlideDraft({
       pursuitId,
       competitorIds,
+      customCompetitors: trial
+        ? String(customCompetitors || "")
+            .split(/[,;\n]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : undefined,
       outcome,
       pov,
       testing,
@@ -118,6 +147,60 @@ export default function WinSlidePage() {
       whyThem,
       ...patch,
     });
+  };
+
+  const runAiDraft = async () => {
+    if (!pursuit) return;
+    setAiBusy(true);
+    setAiError("");
+    try {
+      const ctx = buildSourceDocsAiContext();
+      const result = await draftWinSlideAi({
+        pursuit: {
+          rfpName: pursuit.rfpName,
+          agency: pursuit.agency,
+          outcome: pursuit.outcome,
+        },
+        scoring: {
+          debrief: pursuit.debrief,
+          factors: pursuit.factors,
+          whyWon: pursuit.debrief?.whyWon,
+          whyLost: pursuit.debrief?.whyLost,
+        },
+        competitors: selectedCompetitors.map((c) => c.shortName || c.name),
+        sourceDocs: ctx,
+        outcome: outcome || pursuit.outcome,
+      });
+      if (result.pov) setPov(result.pov);
+      if (result.testing) setTesting(result.testing);
+      if (result.whyUs?.length) setWhyUs(result.whyUs.join("\n"));
+      if (result.whyThem?.length) setWhyThem(result.whyThem.join("\n"));
+      if (result.competitors?.length && trial) {
+        const joined = result.competitors.join(", ");
+        setCustomCompetitors(joined);
+        persist({
+          pov: result.pov,
+          testing: result.testing,
+          whyUs: (result.whyUs || []).join("\n"),
+          whyThem: (result.whyThem || []).join("\n"),
+          customCompetitors: result.competitors,
+          outcome: result.outcomeHint || outcome,
+        });
+      } else {
+        persist({
+          pov: result.pov,
+          testing: result.testing,
+          whyUs: (result.whyUs || []).join("\n"),
+          whyThem: (result.whyThem || []).join("\n"),
+          outcome: result.outcomeHint || outcome,
+        });
+      }
+      if (result.outcomeHint) setOutcome(result.outcomeHint);
+    } catch (err) {
+      setAiError(err?.response?.data?.error || err?.message || "AI draft failed");
+    } finally {
+      setAiBusy(false);
+    }
   };
 
   const lines = (text) =>
@@ -192,6 +275,19 @@ export default function WinSlidePage() {
             </h1>
           </div>
           <div className="flex flex-wrap gap-2">
+            {trial ? (
+              <button
+                type="button"
+                onClick={runAiDraft}
+                disabled={aiBusy || !pursuit}
+                className="inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950/40 dark:text-amber-100"
+              >
+                <FiZap className="h-4 w-4" />
+                {aiBusy
+                  ? t("proposalManagerWinSlide.aiDrafting", { defaultValue: "Drafting…" })
+                  : t("proposalManagerWinSlide.aiDraft", { defaultValue: "AI draft from Scoring + Source Docs" })}
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={downloadDeck}
@@ -204,6 +300,16 @@ export default function WinSlidePage() {
           </div>
         </header>
         {exportError ? <p className="text-sm text-rose-600">{exportError}</p> : null}
+        {aiError ? <p className="text-sm text-rose-600">{aiError}</p> : null}
+        {trial && sourceDocCount > 0 ? (
+          <p className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400">
+            <FiFileText className="h-3.5 w-3.5" />
+            {t("proposalManagerWinSlide.sourceDocsContext", {
+              count: sourceDocCount,
+              defaultValue: "{{count}} Source Docs feeding AI draft context",
+            })}
+          </p>
+        ) : null}
 
         <section className="grid gap-4 lg:grid-cols-12">
           <div className="lg:col-span-4 space-y-4">
@@ -263,19 +369,38 @@ export default function WinSlidePage() {
                 {t("proposalManagerWinSlide.against")}
               </h2>
               <p className="mt-1 text-[11px] text-slate-400">{t("proposalManagerWinSlide.againstHint")}</p>
-              <ul className="mt-2 max-h-56 space-y-1 overflow-y-auto">
-                {COMPETITORS.map((c) => (
-                  <li key={c.id}>
-                    <label className="flex cursor-pointer items-start gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                      <input type="checkbox" checked={competitorIds.includes(c.id)} onChange={() => toggleCompetitor(c.id)} />
-                      <span>
-                        <span className="font-medium text-slate-800 dark:text-white">{c.shortName}</span>
-                        <span className="block text-[11px] text-slate-500">{c.segment}</span>
-                      </span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
+              {trial ? (
+                <input
+                  value={customCompetitors}
+                  onChange={(e) => {
+                    setCustomCompetitors(e.target.value);
+                    persist({
+                      customCompetitors: e.target.value
+                        .split(/[,;\n]/)
+                        .map((s) => s.trim())
+                        .filter(Boolean),
+                    });
+                  }}
+                  placeholder={t("proposalManagerWinSlide.customCompetitorsPlaceholder", {
+                    defaultValue: "Competitor A, Competitor B",
+                  })}
+                  className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                />
+              ) : (
+                <ul className="mt-2 max-h-56 space-y-1 overflow-y-auto">
+                  {COMPETITORS.map((c) => (
+                    <li key={c.id}>
+                      <label className="flex cursor-pointer items-start gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                        <input type="checkbox" checked={competitorIds.includes(c.id)} onChange={() => toggleCompetitor(c.id)} />
+                        <span>
+                          <span className="font-medium text-slate-800 dark:text-white">{c.shortName}</span>
+                          <span className="block text-[11px] text-slate-500">{c.segment}</span>
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 

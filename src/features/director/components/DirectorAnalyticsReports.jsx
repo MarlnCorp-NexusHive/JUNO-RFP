@@ -12,6 +12,7 @@ import {
 import { directorFeatures } from '../../../components/directorFeatures';
 import DirectorFinancialIntelligence from './ai/DirectorFinancialIntelligence';
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import TrialBidVaultPanel from "../../proposal-manager/components/TrialBidVaultPanel.jsx";
 import { 
   FiDollarSign, 
   FiTarget, 
@@ -487,6 +488,16 @@ export default function DirectorAnalyticsReports() {
 
   // Refs for auto-scroll functionality
   const financialRef = useRef(null);
+
+  if (isTrialBidVault) {
+    return (
+      <div className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? "rtl" : "ltr"}`}>
+        <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
+          <TrialBidVaultPanel isArabic={isArabic} />
+        </main>
+      </div>
+    );
+  }
 
   // Auto-scroll to AI sections
   const scrollToAISection = (sectionRef) => {
@@ -1630,19 +1641,9 @@ export default function DirectorAnalyticsReports() {
         </div>
 
         {/* Content Sections */}
-        {isTrialBidVault && (
-          <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-10 text-center mb-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {pmText(
-                "No bid vault data yet. Submissions, win/loss, and pipeline metrics will appear as you track pursuits.",
-                "لا توجد بيانات لمستودع العطاءات بعد. ستظهر مقاييس التقديم والفوز/الخسارة وخط الأنابيب مع تتبع الفرص.",
-              )}
-            </p>
-          </div>
-        )}
-        {isBidVault && !isTrialBidVault && activeTab === "submissions" && renderBidVaultSubmissions()}
-        {isBidVault && !isTrialBidVault && activeTab === "winLoss" && renderBidVaultWinLoss()}
-        {isBidVault && !isTrialBidVault && activeTab === "pipeline" && renderBidVaultPipeline()}
+        {isBidVault && activeTab === "submissions" && renderBidVaultSubmissions()}
+        {isBidVault && activeTab === "winLoss" && renderBidVaultWinLoss()}
+        {isBidVault && activeTab === "pipeline" && renderBidVaultPipeline()}
         {isContentHub && activeTab === "pastPerformance" && renderContentHubPastPerformance()}
         {isContentHub && activeTab === "boilerplate" && renderContentHubBoilerplate()}
         {isContentHub && activeTab === "library" && renderContentHubLibrary()}

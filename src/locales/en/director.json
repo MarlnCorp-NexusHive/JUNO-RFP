@@ -1293,7 +1293,14 @@
         "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}",
         "communicationUnread": "{{count}} unread proposal messages",
         "communicationUnread_one": "{{count}} unread proposal message",
-        "communicationMention": "Mentioned in {{channel}}: {{preview}}"
+        "communicationMention": "Mentioned in {{channel}}: {{preview}}",
+        "pricingVolumeIncomplete": "Pricing incomplete: {{title}} has no labor lines yet",
+        "pricingTooThin": "Thin margin risk: {{title}} target is near or above bid",
+        "pricingTooFat": "Fat pricing check: {{title}} target is far below bid",
+        "pricingBidBelowCost": "Bid below cost: {{title}} bid is under cost volume total",
+        "bidVaultPastDue": "Bid Vault past due: {{title}}",
+        "bidVaultDueSoon": "Bid Vault due in {{days}}d: {{title}}",
+        "bidVaultNeedsScoring": "Score this outcome in Scoring: {{title}}"
       }
     },
     "trialEmpty": {

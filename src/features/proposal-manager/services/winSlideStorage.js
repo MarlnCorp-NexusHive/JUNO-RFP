@@ -8,6 +8,7 @@ export function emptyWinSlideDraft() {
   return {
     pursuitId: "",
     competitorIds: [],
+    customCompetitors: [],
     outcome: "",
     pov: "",
     testing: "",

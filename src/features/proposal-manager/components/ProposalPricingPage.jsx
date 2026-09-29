@@ -8,6 +8,7 @@ import {
 import { FiTrendingUp, FiPackage, FiUsers, FiFileText, FiZap, FiX } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import TrialPricingPanel from "./TrialPricingPanel.jsx";
 
 const laborRates = [
   { role: "Project Manager", rate: 185, loaded: 220, billable: 185 },
@@ -58,6 +59,16 @@ export default function ProposalPricingPage() {
     { id: "trends", label: t("proposalManagerPricing.tabs.trends") },
   ];
 
+  if (isTrial) {
+    return (
+      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+        <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
+          <TrialPricingPanel issuer={issuer} clearLink={clearLink} />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
@@ -107,18 +118,7 @@ export default function ProposalPricingPage() {
           </div>
         </div>
 
-        {isTrial && (
-          <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-10 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t(
-                "proposalManagerPricing.trialEmpty",
-                "No pricing data yet. Rates, volumes, and trends will appear here as you build proposals.",
-              )}
-            </p>
-          </div>
-        )}
-
-        {activeTab === "labor" && !isTrial && (
+        {activeTab === "labor" && (
           <>
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -145,7 +145,7 @@ export default function ProposalPricingPage() {
           </>
         )}
 
-        {activeTab === "volumes" && !isTrial && (
+        {activeTab === "volumes" && (
           <>
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -173,7 +173,7 @@ export default function ProposalPricingPage() {
           </>
         )}
 
-        {activeTab === "trends" && !isTrial && (
+        {activeTab === "trends" && (
           <>
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -199,7 +199,6 @@ export default function ProposalPricingPage() {
           </>
         )}
 
-        {!isTrial && (
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -228,7 +227,6 @@ export default function ProposalPricingPage() {
             </div>
           </div>
         </motion.section>
-        )}
       </main>
     </div>
   );

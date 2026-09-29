@@ -1291,7 +1291,14 @@
         "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}",
         "communicationUnread": "{{count}} رسائل عروض غير مقروءة",
         "communicationUnread_one": "رسالة عرض غير مقروءة واحدة",
-        "communicationMention": "تمت الإشارة إليك في {{channel}}: {{preview}}"
+        "communicationMention": "تمت الإشارة إليك في {{channel}}: {{preview}}",
+        "pricingVolumeIncomplete": "تسعير غير مكتمل: {{title}} بلا بنود عمالة بعد",
+        "pricingTooThin": "هامش رفيع: {{title}} الهدف قريب من العرض أو أعلى منه",
+        "pricingTooFat": "تحقق من التسعير المرتفع: {{title}} الهدف أقل بكثير من العرض",
+        "pricingBidBelowCost": "العرض أقل من التكلفة: {{title}} سعر العرض تحت إجمالي الحجم",
+        "bidVaultPastDue": "مستودع العطاءات متأخر: {{title}}",
+        "bidVaultDueSoon": "مستودع العطاءات خلال {{days}} يوم: {{title}}",
+        "bidVaultNeedsScoring": "قيّم النتيجة في التسجيل: {{title}}"
       }
     },
     "trialEmpty": {
