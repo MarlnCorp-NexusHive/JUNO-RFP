@@ -1,12 +1,32 @@
 import { store, generateId, activityBus } from "./store.js";
 import { seedQuarterlyItems } from "./seedData.js";
-import { scheduleCollaborationPersist } from "./collaborationPersistence.js";
+import { scheduleCollaborationPersist, persistCollaborationProgressNow } from "./collaborationPersistence.js";
+import { listUsersForTenant } from "../trial/tenantStore.js";
+import { getTenantFeature } from "../trial/featureStore.js";
 
 /** @type {import("openai").OpenAI | null} */
 let openaiClient = null;
 
 export function setCollaborationOpenAI(client) {
   openaiClient = client;
+}
+
+function sanitizeTenantId(tenantId) {
+  return String(tenantId || "")
+    .replace(/[^a-zA-Z0-9_-]/g, "")
+    .slice(0, 64);
+}
+
+function emailKey(email) {
+  return String(email || "")
+    .trim()
+    .toLowerCase();
+}
+
+function emailSlug(email) {
+  return emailKey(email)
+    .replace(/[^a-z0-9]/g, "_")
+    .slice(0, 48);
 }
 
 function userName(userId) {
@@ -80,11 +100,11 @@ export function login(email, password) {
 /**
  * Per-tenant Proposal Manager for trial users — isolated from shared demo jordan@juno.
  * Empty workspace list until the tenant creates their own.
+ * All users under the same company share this single PM identity → company-wide workspaces.
  */
 export function ensureTrialProposalManager({ tenantId, name } = {}) {
-  const safe = String(tenantId || "")
-    .replace(/[^a-zA-Z0-9_-]/g, "")
-    .slice(0, 64);
+  const rawTenantId = String(tenantId || "").trim();
+  const safe = sanitizeTenantId(rawTenantId);
   if (!safe) {
     const e = new Error("Trial tenant required");
     e.statusCode = 400;
@@ -102,21 +122,189 @@ export function ensureTrialProposalManager({ tenantId, name } = {}) {
       name: String(name || "Proposal Manager").trim() || "Proposal Manager",
       role: "proposal_manager",
       tenantId: safe,
+      rawTenantId: rawTenantId || safe,
     };
     store.usersById.set(id, u);
     store.usersByEmail.set(email.toLowerCase(), id);
     scheduleCollaborationPersist();
-  } else if (name && String(name).trim() && u.name !== String(name).trim()) {
-    u.name = String(name).trim();
-    scheduleCollaborationPersist();
+  } else {
+    let dirty = false;
+    if (name && String(name).trim() && u.name !== String(name).trim()) {
+      u.name = String(name).trim();
+      dirty = true;
+    }
+    if (!u.rawTenantId && rawTenantId) {
+      u.rawTenantId = rawTenantId;
+      dirty = true;
+    }
+    if (!u.tenantId) {
+      u.tenantId = safe;
+      dirty = true;
+    }
+    if (dirty) scheduleCollaborationPersist();
   }
   return {
     token: u.id,
-    user: { id: u.id, email: u.email, name: u.name, role: u.role },
+    user: { id: u.id, email: u.email, name: u.name, role: u.role, tenantId: u.tenantId },
   };
 }
 
-/** Recreate trial PM users after disk reload (users are not always persisted). */
+/**
+ * Company-scoped reviewer (auditor) for a trial tenant — one per email.
+ */
+export function ensureTrialAuditor({ tenantId, email, name } = {}) {
+  const rawTenantId = String(tenantId || "").trim();
+  const safe = sanitizeTenantId(rawTenantId);
+  const em = emailKey(email);
+  if (!safe || !em) {
+    const e = new Error("Trial tenant and email required");
+    e.statusCode = 400;
+    throw e;
+  }
+  // Never create a reviewer for the synthetic company PM mailbox
+  if (em.startsWith("trial-pm-") && em.endsWith("@juno.local")) {
+    return null;
+  }
+  const slug = emailSlug(em);
+  const id = `user_aud_trial_${safe}_${slug}`;
+  const localEmail = `trial-aud-${safe}-${slug}@juno.local`;
+  let u = store.usersById.get(id);
+  const displayName = String(name || em.split("@")[0] || "Team member").trim() || "Team member";
+  if (!u) {
+    // Prefer lookup by real email if a prior auditor exists for this tenant
+    const existingId = store.usersByEmail.get(em);
+    if (existingId) {
+      const existing = store.usersById.get(existingId);
+      if (existing?.role === "auditor" && existing.tenantId === safe) {
+        u = existing;
+      } else if (existing?.role === "auditor" && existing.tenantId && existing.tenantId !== safe) {
+        // Same email already used as reviewer in another tenant — keep separate id via localEmail only
+      }
+    }
+  }
+  if (!u) {
+    u = {
+      id,
+      email: em,
+      collabEmail: localEmail,
+      password: `trial_aud_${safe}_${slug}`,
+      name: displayName,
+      role: "auditor",
+      tenantId: safe,
+      rawTenantId: rawTenantId || safe,
+    };
+    store.usersById.set(id, u);
+    // Prefer localEmail for map when cross-tenant collision on real email
+    const mapped = store.usersByEmail.get(em);
+    const mappedUser = mapped ? store.usersById.get(mapped) : null;
+    if (!mapped || (mappedUser?.tenantId === safe)) {
+      store.usersByEmail.set(em, id);
+    }
+    store.usersByEmail.set(localEmail, id);
+    scheduleCollaborationPersist();
+  } else {
+    let dirty = false;
+    if (displayName && u.name !== displayName) {
+      u.name = displayName;
+      dirty = true;
+    }
+    if (!u.tenantId) {
+      u.tenantId = safe;
+      dirty = true;
+    }
+    if (!u.rawTenantId && rawTenantId) {
+      u.rawTenantId = rawTenantId;
+      dirty = true;
+    }
+    if (dirty) scheduleCollaborationPersist();
+  }
+  return { id: u.id, email: u.email, name: u.name, role: u.role, tenantId: u.tenantId };
+}
+
+/**
+ * Sync reviewers from company signup members + Manage Team roster so Team Collab is company-wide.
+ */
+export function syncTrialCompanyAuditors(tenantId) {
+  const rawTenantId = String(tenantId || "").trim();
+  const safe = sanitizeTenantId(rawTenantId);
+  if (!safe) return [];
+
+  const byEmail = new Map();
+
+  try {
+    const members = listUsersForTenant(rawTenantId) || [];
+    for (const m of members) {
+      const em = emailKey(m.email);
+      if (!em) continue;
+      byEmail.set(em, {
+        email: m.email,
+        name: m.name || m.email,
+      });
+    }
+  } catch (err) {
+    console.warn("[collab] listUsersForTenant failed:", err?.message || err);
+  }
+
+  try {
+    const feature = getTenantFeature(rawTenantId, "manageTeam");
+    const teamMembers = Array.isArray(feature?.data?.members) ? feature.data.members : [];
+    for (const m of teamMembers) {
+      const em = emailKey(m.email);
+      if (!em || byEmail.has(em)) continue;
+      byEmail.set(em, {
+        email: m.email,
+        name: m.name || m.email,
+      });
+    }
+  } catch (err) {
+    console.warn("[collab] manageTeam roster read failed:", err?.message || err);
+  }
+
+  // Also try sanitized key if features were stored under sanitized id
+  if (rawTenantId !== safe) {
+    try {
+      const feature = getTenantFeature(safe, "manageTeam");
+      const teamMembers = Array.isArray(feature?.data?.members) ? feature.data.members : [];
+      for (const m of teamMembers) {
+        const em = emailKey(m.email);
+        if (!em || byEmail.has(em)) continue;
+        byEmail.set(em, { email: m.email, name: m.name || m.email });
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const auditors = [];
+  for (const row of byEmail.values()) {
+    const aud = ensureTrialAuditor({
+      tenantId: rawTenantId || safe,
+      email: row.email,
+      name: row.name,
+    });
+    if (aud) auditors.push(aud);
+  }
+  return auditors;
+}
+
+/**
+ * Trial teammate reviewer session — company-scoped auditor for the signed-in trial user email.
+ */
+export function ensureTrialAuditorSession({ tenantId, email, name } = {}) {
+  const aud = ensureTrialAuditor({ tenantId, email, name });
+  if (!aud) {
+    const e = new Error("Could not create trial reviewer session");
+    e.statusCode = 400;
+    throw e;
+  }
+  const u = store.usersById.get(aud.id);
+  return {
+    token: u.id,
+    user: { id: u.id, email: u.email, name: u.name, role: u.role, tenantId: u.tenantId },
+  };
+}
+
+/** Recreate trial PM / auditor users after disk reload. */
 export function hydrateTrialUsersFromWorkspaces() {
   for (const ws of store.workspaces.values()) {
     const id = ws?.createdBy;
@@ -125,11 +313,75 @@ export function hydrateTrialUsersFromWorkspaces() {
     const tenantId = String(id).slice("user_pm_trial_".length);
     ensureTrialProposalManager({ tenantId, name: "Proposal Manager" });
   }
+  // Restore trial auditors referenced by assignments using stored email when possible
+  for (const q of store.questions.values()) {
+    const aid = q?.assignedTo;
+    if (!aid || !String(aid).startsWith("user_aud_trial_")) continue;
+    if (store.usersById.has(aid)) continue;
+    const email = q.assigneeEmail;
+    if (email && !String(email).endsWith("@restored.local")) {
+      // Derive tenant from PM of the workspace
+      const ws = store.workspaces.get(q.workspaceId);
+      const pm = ws ? store.usersById.get(ws.createdBy) : null;
+      const tenantId = pm?.rawTenantId || pm?.tenantId || String(aid).replace(/^user_aud_trial_/, "").split("_")[0];
+      ensureTrialAuditor({
+        tenantId,
+        email,
+        name: String(email).split("@")[0],
+      });
+      continue;
+    }
+    // Fallback: parse user_aud_trial_{safeTenant}_{slug} where safeTenant may contain underscores
+    const rest = String(aid).slice("user_aud_trial_".length);
+    const pmMatch = [...store.usersById.values()].find(
+      (u) =>
+        u.role === "proposal_manager" &&
+        String(u.id || "").startsWith("user_pm_trial_") &&
+        rest.startsWith(String(u.tenantId || "") + "_"),
+    );
+    if (pmMatch?.tenantId) {
+      const slug = rest.slice(String(pmMatch.tenantId).length + 1);
+      ensureTrialAuditor({
+        tenantId: pmMatch.rawTenantId || pmMatch.tenantId,
+        email: `${slug.replace(/_/g, ".")}@restored.local`,
+        name: "Team member",
+      });
+    }
+  }
 }
 
-export function listAuditors() {
+/**
+ * Reviewer list for assign UI.
+ * Trial PM → company-scoped auditors (synced from tenant roster).
+ * Demo → seeded global auditors only.
+ */
+export function listAuditors(requesterId) {
+  const requester = store.usersById.get(requesterId);
+  const isTrialPm = requester && String(requesterId || "").startsWith("user_pm_trial_");
+
+  if (isTrialPm) {
+    const raw = requester.rawTenantId || requester.tenantId;
+    syncTrialCompanyAuditors(raw);
+    const tenantKey = requester.tenantId || sanitizeTenantId(raw);
+    return [...store.usersById.values()]
+      .filter(
+        (u) =>
+          u.role === "auditor" &&
+          u.tenantId === tenantKey &&
+          String(u.id || "").startsWith("user_aud_trial_"),
+      )
+      .map((u) => ({
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        role: u.role,
+        tenantId: u.tenantId || null,
+      }))
+      .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+  }
+
   return [...store.usersById.values()]
-    .filter((u) => u.role === "auditor")
+    .filter((u) => u.role === "auditor" && !u.tenantId)
     .map((u) => ({ id: u.id, email: u.email, name: u.name, role: u.role }));
 }
 
@@ -185,7 +437,7 @@ export function createWorkspace(pmUserId, { title, document, questions }) {
     extra: { title: ws.title },
   });
 
-  scheduleCollaborationPersist();
+  persistCollaborationProgressNow();
   return getWorkspaceDetail(wsId, pmUserId);
 }
 
@@ -282,7 +534,20 @@ export function assignQuestion(pmUserId, { workspaceId, questionId, auditorUserI
     e.statusCode = 400;
     throw e;
   }
+  const pm = store.usersById.get(pmUserId);
+  if (pm && String(pmUserId).startsWith("user_pm_trial_")) {
+    if (!auditor.tenantId || auditor.tenantId !== pm.tenantId) {
+      const e = new Error("Invalid auditor for this company");
+      e.statusCode = 400;
+      throw e;
+    }
+  } else if (auditor.tenantId) {
+    const e = new Error("Invalid auditor");
+    e.statusCode = 400;
+    throw e;
+  }
   q.assignedTo = auditorUserId;
+  q.assigneeEmail = auditor.email || null;
   q.status = "assigned";
   q.updatedAt = new Date().toISOString();
 
@@ -293,7 +558,7 @@ export function assignQuestion(pmUserId, { workspaceId, questionId, auditorUserI
     extra: { auditor: auditor.name, auditor_id: auditorUserId },
   });
 
-  scheduleCollaborationPersist();
+  persistCollaborationProgressNow();
   return { question: summarizeQuestion(q, store.usersById.get(pmUserId)) };
 }
 
@@ -304,7 +569,15 @@ export function getAuditorDashboard(auditorId) {
     e.statusCode = 404;
     throw e;
   }
-  const assigned = [...store.questions.values()].filter((q) => q.assignedTo === auditorId);
+  let assigned = [...store.questions.values()].filter((q) => q.assignedTo === auditorId);
+  // Trial reviewers only see work for their company PM workspaces
+  if (auditor.tenantId) {
+    const pmId = `user_pm_trial_${auditor.tenantId}`;
+    assigned = assigned.filter((q) => {
+      const ws = store.workspaces.get(q.workspaceId);
+      return ws && ws.createdBy === pmId;
+    });
+  }
   return {
     auditor: { id: auditor.id, name: auditor.name, email: auditor.email },
     questions: assigned
@@ -419,7 +692,7 @@ export function submitAnswer(auditorUserId, { workspaceId, questionId, answerTex
     question: q,
   });
 
-  scheduleCollaborationPersist();
+  persistCollaborationProgressNow();
   return { question: summarizeQuestion(q, store.usersById.get(auditorUserId)) };
 }
 
@@ -460,7 +733,7 @@ export function reviewAnswer(pmUserId, { workspaceId, questionId, decision, comm
     extra: { comment: q.pmReviewComment },
   });
 
-  scheduleCollaborationPersist();
+  persistCollaborationProgressNow();
   return { question: summarizeQuestion(q, store.usersById.get(pmUserId)) };
 }
 

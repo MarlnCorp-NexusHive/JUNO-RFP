@@ -29,11 +29,10 @@ import {
 } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useLocalization } from "../../../hooks/useLocalization";
-import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { canUseTrialFeatures } from "../../../services/trialFeatureApi.js";
 import {
   getTeamData,
   subscribeTeam,
-  addTeamMember,
   updateTeamMember,
   addTeamTraining,
   removeTeamTraining,
@@ -42,6 +41,14 @@ import {
   removeTeamAssignment,
   hydrateTeamFromServer,
 } from "../../proposal-manager/services/teamStore.js";
+import {
+  loadCompanyUserRoster,
+  syncTeamMembersFromCompanyRoster,
+  addCompanyTeamPerson,
+  removeCompanyTeamPerson,
+  subscribeUserRoster,
+  upsertManualUserManagementUser,
+} from "../../proposal-manager/services/companyUserRoster.js";
 // Proposal Manager team roles (Team Structure & Hierarchy)
 const PROPOSAL_MANAGER_ROLES = [
   "Capture Manager",
@@ -132,7 +139,8 @@ export default function MarketingHeadTeamManagement() {
   const [languageVersion, setLanguageVersion] = useState(0);
   const { isRTLMode } = useLocalization();
   const isProposalManagerTeam = location.pathname.includes('/app/team');
-  const isTrialPm = isProposalManagerTeam && isTrialUserSession();
+  // Backend company-wide store requires a real trial session token
+  const isTrialPm = isProposalManagerTeam && canUseTrialFeatures();
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("ar");
   const pmText = (en, ar) => (isProposalManagerTeam ? (isArabic ? ar : en) : en);
   const pmTranslate = (text) => {
@@ -174,7 +182,7 @@ export default function MarketingHeadTeamManagement() {
 
   const user = JSON.parse(localStorage.getItem('rbac_current_user') || "null");
   const [members, setMembers] = useState(() => {
-    if (location.pathname.includes("/app/team") && isTrialUserSession()) {
+    if (location.pathname.includes("/app/team") && canUseTrialFeatures()) {
       return getTeamData().members;
     }
     if (location.pathname.includes("/app/team")) return proposalManagerInitialMembers;
@@ -183,16 +191,19 @@ export default function MarketingHeadTeamManagement() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [trainingPerfStatus, setTrainingPerfStatus] = useState("certified");
   const [newTrainingTitle, setNewTrainingTitle] = useState("");
   const [customTrainings, setCustomTrainings] = useState(() =>
-    isTrialUserSession() && location.pathname.includes("/app/team") ? getTeamData().trainings : [],
+    canUseTrialFeatures() && location.pathname.includes("/app/team") ? getTeamData().trainings : [],
   );
   const [assignments, setAssignments] = useState(() =>
-    isTrialUserSession() && location.pathname.includes("/app/team") ? getTeamData().assignments : [],
+    canUseTrialFeatures() && location.pathname.includes("/app/team") ? getTeamData().assignments : [],
   );
+  /** Same count source as User Management "Total Users". */
+  const [rosterCount, setRosterCount] = useState(0);
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
   const [editingAssignmentId, setEditingAssignmentId] = useState(null);
   const [assignmentForm, setAssignmentForm] = useState({
@@ -233,25 +244,35 @@ export default function MarketingHeadTeamManagement() {
     if (!isTrialPm) {
       if (location.pathname.includes("/app/team")) {
         setMembers(proposalManagerInitialMembers);
+        setRosterCount(proposalManagerInitialMembers.length);
       }
       return undefined;
     }
     let cancelled = false;
-    hydrateTeamFromServer()
-      .then((data) => {
+    const applyTeam = (data) => {
+      setMembers(data.members);
+      setCustomTrainings(data.trainings);
+      setAssignments(data.assignments);
+    };
+    (async () => {
+      try {
+        await hydrateTeamFromServer({ notify: false });
+        const synced = await syncTeamMembersFromCompanyRoster({ notify: false });
         if (cancelled) return;
-        setMembers(data.members);
-        setCustomTrainings(data.trainings);
-        setAssignments(data.assignments);
-      })
-      .catch(() => {});
+        applyTeam(synced);
+        const roster = await loadCompanyUserRoster();
+        if (!cancelled) setRosterCount(roster.count);
+      } catch {
+        if (!cancelled) {
+          const data = getTeamData();
+          applyTeam(data);
+        }
+      }
+    })();
     const data = getTeamData();
-    setMembers(data.members);
-    setCustomTrainings(data.trainings);
-    setAssignments(data.assignments);
+    applyTeam(data);
     return () => {
       cancelled = true;
-      return undefined;
     };
   }, [isTrialPm, location.pathname]);
 
@@ -262,6 +283,27 @@ export default function MarketingHeadTeamManagement() {
       setCustomTrainings(next.trainings);
       setAssignments(next.assignments);
     });
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    const refreshRoster = () => {
+      void (async () => {
+        const synced = await syncTeamMembersFromCompanyRoster({ notify: false });
+        setMembers(synced.members);
+        setCustomTrainings(synced.trainings);
+        setAssignments(synced.assignments);
+        const roster = await loadCompanyUserRoster();
+        setRosterCount(roster.count);
+      })();
+    };
+    const unsub = subscribeUserRoster(refreshRoster);
+    const onFocus = () => refreshRoster();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      unsub();
+      window.removeEventListener("focus", onFocus);
+    };
   }, [isTrialPm]);
 
   if (!ready) {
@@ -277,7 +319,13 @@ export default function MarketingHeadTeamManagement() {
   }
 
   const trialMetrics = [
-    { metric: "Team Members", target: Math.max(members.length, 1), achieved: members.length, icon: FiUsers, color: "blue" },
+    {
+      metric: "Team Members",
+      target: Math.max(rosterCount || members.length, 1),
+      achieved: rosterCount || members.length,
+      icon: FiUsers,
+      color: "blue",
+    },
     { metric: "Open Assignments", target: Math.max(assignments.filter((a) => a.status !== "completed").length, 1), achieved: assignments.filter((a) => a.status !== "completed").length, icon: FiClipboard, color: "green" },
     { metric: "Completed", target: Math.max(assignments.length, 1), achieved: assignments.filter((a) => a.status === "completed").length, icon: FiCheckCircle, color: "purple" },
     { metric: "Trainings Logged", target: Math.max(customTrainings.length, 1), achieved: customTrainings.length, icon: FiAward, color: "yellow" },
@@ -362,6 +410,7 @@ export default function MarketingHeadTeamManagement() {
   };
 
   const openAddModal = () => {
+    setEditingMemberId(null);
     setNewMember({
       name: "",
       role: isProposalManagerTeam ? "Proposal Writer" : "Digital Marketer",
@@ -375,23 +424,159 @@ export default function MarketingHeadTeamManagement() {
     setShowAddModal(true);
   };
 
+  const openEditMember = (member) => {
+    if (!member) return;
+    setEditingMemberId(member.id);
+    setNewMember({
+      name: member.name || "",
+      role: member.role || (isProposalManagerTeam ? "Proposal Writer" : "Digital Marketer"),
+      email: member.email || "",
+      phone: member.phone || "",
+      skills: Array.isArray(member.skills) ? member.skills.join(", ") : String(member.skills || ""),
+      projects: Array.isArray(member.projects) ? member.projects.join(", ") : String(member.projects || ""),
+      status: member.status || "Active",
+      permissions: Array.isArray(member.permissions) ? [...member.permissions] : [],
+    });
+    setShowModal(false);
+    setShowAddModal(true);
+  };
+
+  const handleDeleteMember = (member) => {
+    if (!member?.id) return;
+    const label = member.name || member.email || "this member";
+    if (!window.confirm(pmText(`Remove ${label} from the team?`, `إزالة ${label} من الفريق؟`))) return;
+    if (isTrialPm) {
+      void (async () => {
+        const data = await removeCompanyTeamPerson(member);
+        setMembers(data.members);
+        const roster = await loadCompanyUserRoster();
+        setRosterCount(roster.count);
+      })();
+    } else {
+      setMembers((prev) => prev.filter((m) => m.id !== member.id));
+      setRosterCount((n) => Math.max(0, n - 1));
+    }
+    if (selectedMember?.id === member.id) {
+      setSelectedMember(null);
+      setShowModal(false);
+    }
+    if (editingMemberId === member.id) {
+      setEditingMemberId(null);
+      setShowAddModal(false);
+    }
+  };
+
+  const exportRoster = () => {
+    const rows = [
+      ["Name", "Role", "Email", "Phone", "Status", "Skills", "Projects", "Permissions"],
+      ...members.map((m) => [
+        m.name || "",
+        m.role || "",
+        m.email || "",
+        m.phone || "",
+        m.status || "",
+        (m.skills || []).join("; "),
+        (m.projects || []).join("; "),
+        (m.permissions || []).join("; "),
+      ]),
+    ];
+    const csv = rows
+      .map((row) =>
+        row
+          .map((cell) => {
+            const s = String(cell ?? "");
+            if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+            return s;
+          })
+          .join(","),
+      )
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `team-roster-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const handleAddMemberSubmit = (e) => {
     e.preventDefault();
     const name = newMember.name.trim();
     const email = newMember.email.trim();
     if (!name || !email) return;
     if (isTrialPm) {
-      const data = addTeamMember({
-        name,
-        role: newMember.role.trim() || "Proposal Writer",
-        email,
-        phone: newMember.phone.trim() || "",
-        status: newMember.status,
-        skills: newMember.skills,
-        projects: newMember.projects,
-        permissions: [...(newMember.permissions || [])],
-      });
-      setMembers(data.members.map((m) => ({ ...m, avatar: m.avatar || "👤", performance: m.performance ?? 80 })));
+      if (editingMemberId) {
+        const data = updateTeamMember(editingMemberId, {
+          name,
+          role: newMember.role.trim() || "Proposal Writer",
+          email,
+          phone: newMember.phone.trim() || "",
+          status: newMember.status,
+          skills: newMember.skills,
+          projects: newMember.projects,
+          permissions: [...(newMember.permissions || [])],
+        });
+        setMembers(data.members);
+        void (async () => {
+          await upsertManualUserManagementUser({
+            name,
+            email,
+            role: newMember.role.trim() || "Proposal Manager",
+            department: "Proposals",
+          });
+          await syncTeamMembersFromCompanyRoster();
+          const roster = await loadCompanyUserRoster();
+          setRosterCount(roster.count);
+          setMembers(getTeamData().members);
+        })();
+      } else {
+        void (async () => {
+          const result = await addCompanyTeamPerson({
+            name,
+            role: newMember.role.trim() || "Proposal Writer",
+            email,
+            phone: newMember.phone.trim() || "",
+            status: newMember.status,
+            skills: newMember.skills,
+            projects: newMember.projects,
+            permissions: [...(newMember.permissions || [])],
+            avatar: "👤",
+            performance: 80,
+          });
+          if (result?.data) setMembers(result.data.members);
+          const roster = await loadCompanyUserRoster();
+          setRosterCount(roster.count);
+        })();
+      }
+      setEditingMemberId(null);
+      setShowAddModal(false);
+      return;
+    }
+    if (editingMemberId) {
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.id === editingMemberId
+            ? {
+                ...m,
+                name,
+                role: newMember.role.trim() || (isProposalManagerTeam ? "Proposal Writer" : "Team Member"),
+                email,
+                phone: newMember.phone.trim() || "",
+                status: newMember.status,
+                skills: newMember.skills
+                  ? newMember.skills.split(",").map((s) => s.trim()).filter(Boolean)
+                  : [],
+                projects: newMember.projects
+                  ? newMember.projects.split(",").map((p) => p.trim()).filter(Boolean)
+                  : [],
+              }
+            : m,
+        ),
+      );
+      setEditingMemberId(null);
       setShowAddModal(false);
       return;
     }
@@ -516,8 +701,9 @@ export default function MarketingHeadTeamManagement() {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="absolute inset-0" onClick={onClose} />
-        <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-2xl w-full mx-4">
+        <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
           <button
+            type="button"
             onClick={onClose}
             className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl font-bold"
             aria-label="Close"
@@ -526,10 +712,11 @@ export default function MarketingHeadTeamManagement() {
           </button>
           <div className="mb-6">
             <div className="flex items-center gap-4">
-              <span className="text-4xl">{member.avatar}</span>
+              <span className="text-4xl">{member.avatar || "👤"}</span>
               <div>
                 <h2 className="text-xl font-bold">{member.name}</h2>
                 <p className="text-gray-600 dark:text-gray-300">{pmTranslate(member.role)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{member.status || "Active"}</p>
               </div>
             </div>
           </div>
@@ -563,6 +750,36 @@ export default function MarketingHeadTeamManagement() {
                   : <span className="text-sm text-gray-500">—</span>}
               </div>
             </div>
+            {isTrialPm && (member.permissions || []).length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-2">{pmText("Permissions", "الصلاحيات")}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {(member.permissions || []).map((p) => (
+                    <span key={p} className="px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 rounded-full text-xs">
+                      {TRIAL_PERMISSION_OPTIONS.find((o) => o.id === p)?.label || p}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => openEditMember(member)}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              >
+                <FiEdit className="w-4 h-4" />
+                {pmText("Edit", "تعديل")}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteMember(member)}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm"
+              >
+                <FiTrash2 className="w-4 h-4" />
+                {pmText("Remove", "إزالة")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -587,10 +804,20 @@ export default function MarketingHeadTeamManagement() {
         >
           <div className={`flex-1 min-w-0 ${isRTLMode ? 'text-right' : 'text-left'}`}>
             <h1 className="text-2xl font-bold !text-gray-900 dark:!text-white flex items-center gap-2">
-              {isProposalManagerTeam ? pmText('Manage Proposal Team', 'إدارة فريق إعداد العروض') : t('team.title')} <FiUsers className="text-blue-500" />
+              {isProposalManagerTeam ? pmText('Manage Team', 'إدارة الفريق') : t('team.title')} <FiUsers className="text-blue-500" />
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              {isProposalManagerTeam ? pmText('Structure, roles, assignments, and performance for your proposal team.', 'هيكل الفريق والأدوار والتكليفات ومؤشرات الأداء لفريق إعداد العروض.') : t('team.subtitle')}
+              {isTrialPm
+                ? pmText(
+                    "Structure, roles, assignments, and training — saved company-wide for your trial team.",
+                    "الهيكل والأدوار والتكليفات والتدريب — تُحفظ على مستوى الشركة لفريق التجربة.",
+                  )
+                : isProposalManagerTeam
+                  ? pmText(
+                      "Structure, roles, assignments, and performance for your proposal team.",
+                      "هيكل الفريق والأدوار والتكليفات ومؤشرات الأداء لفريق إعداد العروض.",
+                    )
+                  : t("team.subtitle")}
             </p>
           </div>
           
@@ -607,7 +834,10 @@ export default function MarketingHeadTeamManagement() {
               </button>
               
               <button 
-                className={`px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 transition-colors whitespace-nowrap ${isRTLMode ? 'flex-row-reverse' : ''}`}
+                type="button"
+                onClick={exportRoster}
+                disabled={!members.length}
+                className={`px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${isRTLMode ? 'flex-row-reverse' : ''}`}
               >
                 <FiDownload className="w-4 h-4 flex-shrink-0" /> 
                 <span className="hidden sm:inline">{isProposalManagerTeam ? pmText('Export Roster', 'تصدير قائمة الفريق') : t('team.exportReport')}</span>
@@ -768,6 +998,35 @@ export default function MarketingHeadTeamManagement() {
                                   {member.email ? ` · ${member.email}` : ""}
                                 </p>
                               </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMemberClick(member)}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                                  title={pmText("View", "عرض")}
+                                  aria-label={pmText("View member", "عرض العضو")}
+                                >
+                                  <FiEye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => openEditMember(member)}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                  title={pmText("Edit", "تعديل")}
+                                  aria-label={pmText("Edit member", "تعديل العضو")}
+                                >
+                                  <FiEdit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteMember(member)}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                  title={pmText("Remove", "إزالة")}
+                                  aria-label={pmText("Remove member", "إزالة العضو")}
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </div>
                             <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
                               Permissions for this team member:
@@ -837,14 +1096,32 @@ export default function MarketingHeadTeamManagement() {
                             : (index === 0 ? "All" : index === 1 ? "Content, Campaigns" : "Campaigns")}
                         </td>
                         <td className="py-3" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            type="button"
-                            onClick={() => handleMemberClick(member)}
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                          >
-                            <FiEdit className="w-3 h-3" />
-                            {t('team.sections.roleAccess.edit')}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleMemberClick(member)}
+                              className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1"
+                            >
+                              <FiEye className="w-3 h-3" />
+                              {pmText("View", "عرض")}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openEditMember(member)}
+                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                            >
+                              <FiEdit className="w-3 h-3" />
+                              {t('team.sections.roleAccess.edit')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMember(member)}
+                              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1"
+                            >
+                              <FiTrash2 className="w-3 h-3" />
+                              {pmText("Remove", "إزالة")}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1356,13 +1633,28 @@ export default function MarketingHeadTeamManagement() {
         {showModal && <Modal member={selectedMember} onClose={() => setShowModal(false)} />}
         {showAddModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="absolute inset-0" onClick={() => setShowAddModal(false)} />
+            <div
+              className="absolute inset-0"
+              onClick={() => {
+                setShowAddModal(false);
+                setEditingMemberId(null);
+              }}
+            />
             <div className="relative z-10 bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isProposalManagerTeam ? pmText('Add Team Member', 'إضافة عضو فريق') : t('team.addTeamMember')}</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {editingMemberId
+                    ? pmText("Edit Team Member", "تعديل عضو الفريق")
+                    : isProposalManagerTeam
+                      ? pmText("Add Team Member", "إضافة عضو فريق")
+                      : t("team.addTeamMember")}
+                </h2>
                 <button
                   type="button"
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setEditingMemberId(null);
+                  }}
                   className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold"
                   aria-label="Close"
                 >
@@ -1448,9 +1740,9 @@ export default function MarketingHeadTeamManagement() {
                     onChange={(e) => setNewMember((p) => ({ ...p, status: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
-                    <option>{isProposalManagerTeam ? pmText('Active', 'نشط') : 'Active'}</option>
-                    <option>{isProposalManagerTeam ? pmText('On Leave', 'في إجازة') : 'On Leave'}</option>
-                    <option>{isProposalManagerTeam ? pmText('Pending', 'قيد الانتظار') : 'Pending'}</option>
+                    <option value="Active">{isProposalManagerTeam ? pmText('Active', 'نشط') : 'Active'}</option>
+                    <option value="On Leave">{isProposalManagerTeam ? pmText('On Leave', 'في إجازة') : 'On Leave'}</option>
+                    <option value="Pending">{isProposalManagerTeam ? pmText('Pending', 'قيد الانتظار') : 'Pending'}</option>
                   </select>
                 </div>
                 {isTrialPm && (
@@ -1489,7 +1781,10 @@ export default function MarketingHeadTeamManagement() {
                 <div className={`flex gap-3 pt-2 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
                   <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setEditingMemberId(null);
+                    }}
                     className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     {isProposalManagerTeam ? pmText('Cancel', 'إلغاء') : 'Cancel'}
@@ -1498,7 +1793,11 @@ export default function MarketingHeadTeamManagement() {
                     type="submit"
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    {isProposalManagerTeam ? pmText('Add Team Member', 'إضافة عضو فريق') : 'Add Member'}
+                    {editingMemberId
+                      ? pmText("Save Changes", "حفظ التغييرات")
+                      : isProposalManagerTeam
+                        ? pmText("Add Team Member", "إضافة عضو فريق")
+                        : "Add Member"}
                   </button>
                 </div>
               </form>

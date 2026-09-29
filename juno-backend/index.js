@@ -624,6 +624,7 @@ app.listen(PORT, () => {
   console.log("POST /pursuit/ai/suggest-bid-vault");
   console.log("POST /pursuit/ai/parse-scoring");
   console.log("POST /pursuit/ai/draft-win-slide");
+  console.log("POST /pursuit/ai/dashboard-insights");
   console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
   console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines");
   console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)");

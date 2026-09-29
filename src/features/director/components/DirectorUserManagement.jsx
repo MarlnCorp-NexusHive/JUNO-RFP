@@ -34,64 +34,11 @@ import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { loadTrialFeatureData, persistTrialFeatureData, canUseTrialFeatures } from "../../../services/trialFeatureApi.js";
 import { fetchTrialMembers } from "../../../services/api.js";
 import { getTrialSession } from "../../../services/trialAuthSession.js";
-
-function mapSignupMemberToCard(m) {
-  const name = String(m?.name || "").trim() || String(m?.email || "").split("@")[0] || "User";
-  const initials = name
-    .split(/\s+/)
-    .map((s) => s[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-  const created = m?.createdAt || m?.emailVerifiedAt || "";
-  return {
-    id: m.id,
-    source: "signup",
-    name,
-    displayName: name,
-    email: m.email || "",
-    role: m.role || "Proposal Manager",
-    department: m.team || "Proposals",
-    statusKey: "userStatuses.active",
-    avatar: initials || "U",
-    permissions: 3,
-    joinDate: String(created).slice(0, 10) || "—",
-    createdAt: created || null,
-  };
-}
-
-/** Always include the viewer from the trial session if the members API is empty/slow. */
-function sessionUserAsMember() {
-  const session = getTrialSession();
-  const u = session?.user;
-  if (!u?.id && !u?.email) return null;
-  return {
-    id: u.id || `session_${u.email}`,
-    tenantId: session.tenantId || u.tenantId,
-    email: u.email || "",
-    name: u.name || u.email || "You",
-    role: u.role || "Proposal Manager",
-    team: u.team || "Proposals",
-    emailVerified: true,
-    createdAt: u.createdAt || session.savedAt || new Date().toISOString(),
-    emailVerifiedAt: u.emailVerifiedAt || null,
-  };
-}
-
-function mergeSignupMembers(apiMembers) {
-  const list = Array.isArray(apiMembers) ? [...apiMembers] : [];
-  const self = sessionUserAsMember();
-  if (self) {
-    const selfEmail = String(self.email || "").toLowerCase();
-    const exists = list.some(
-      (m) =>
-        String(m.id) === String(self.id) ||
-        (selfEmail && String(m.email || "").toLowerCase() === selfEmail),
-    );
-    if (!exists) list.unshift(self);
-  }
-  return list;
-}
+import { syncTeamMembersFromCompanyRoster } from "../../proposal-manager/services/companyUserRoster.js";
+import {
+  mapSignupMemberToCard,
+  mergeSignupMembers,
+} from "../../proposal-manager/services/companyUserRoster.js";
 
 
 export default function DirectorUserManagement() {
@@ -234,6 +181,8 @@ export default function DirectorUserManagement() {
       newUsers: newCount,
     });
     setUsersReady(true);
+    // Keep Manage Team "Team Members" aligned with Total Users
+    void syncTeamMembersFromCompanyRoster().catch(() => {});
   }, [isTrialPm]);
 
   React.useEffect(() => {
@@ -383,6 +332,7 @@ export default function DirectorUserManagement() {
             : u
         );
         persistUsers(next);
+        void syncTeamMembersFromCompanyRoster().catch(() => {});
         return next;
       });
     } else {
@@ -415,6 +365,7 @@ export default function DirectorUserManagement() {
           },
         ];
         persistUsers(next);
+        void syncTeamMembersFromCompanyRoster().catch(() => {});
         return next;
       });
     }
@@ -428,6 +379,7 @@ export default function DirectorUserManagement() {
     setUsers((prev) => {
       const next = prev.filter((u) => !selectedUsers.includes(u.id));
       persistUsers(next);
+      void syncTeamMembersFromCompanyRoster().catch(() => {});
       return next;
     });
     setSelectedUsers([]);

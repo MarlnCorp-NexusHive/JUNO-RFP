@@ -196,6 +196,7 @@ export async function scanFileForImportantDates(file, onProgress = null) {
     qaItems,
     textLength: trimmed.length,
     truncated: trimmed.length > 400_000,
+    documentText: payload,
   };
 }
 

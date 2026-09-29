@@ -18,6 +18,7 @@ export const FEATURE_KEYS = [
   "shortlist",
   "manageTeam",
   "compliance",
+  "dashboard",
 ];
 
 const EMPTY_BY_KEY = {
@@ -35,10 +36,29 @@ const EMPTY_BY_KEY = {
     settings: { currency: "USD", defaultWrap: 1.2 },
   },
   bidVault: { submissions: [], winLoss: [], pipeline: [] },
-  teamCollab: { workspaces: [] },
+  teamCollab: {
+    tenantId: null,
+    pmUserId: null,
+    workspaces: [],
+    messages: [],
+    logs: [],
+    updatedAt: null,
+  },
   shortlist: { items: [] },
-  manageTeam: { members: [], trainings: [], assignments: [] },
+  manageTeam: { members: [], trainings: [], assignments: [], updatedAt: null },
   compliance: { areas: [], logs: [], risks: [] },
+  dashboard: {
+    docInsights: {},
+    charts: {
+      rollingWinRate: [],
+      sectionM: [],
+      riskCompliance: [],
+      submissionForecast: [],
+      winProbabilityTrend: [],
+    },
+    aiAlerts: [],
+    updatedAt: null,
+  },
 };
 
 function getFeaturesDataPath() {

@@ -162,6 +162,13 @@ export const draftWinSlideAi = async (payload) => {
   return res.data;
 };
 
+export const extractDashboardInsightsFromDocument = async (payload) => {
+  const res = await API.post("/pursuit/ai/dashboard-insights", payload || {}, {
+    timeout: 180_000,
+  });
+  return res.data;
+};
+
 /* ================= COMPANY INTELLIGENCE ================= */
 export const fetchCompanyIntelligenceRemote = async ({ query }) => {
   const res = await API.post("/company-intelligence-remote", { query });

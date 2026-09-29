@@ -39,6 +39,38 @@ export const rfpCollab = {
     );
   },
 
+  /** Trial: refresh company-wide reviewer pool from members + Manage Team */
+  syncTrialAuditors: () => {
+    const trialToken = getTrialSession()?.token;
+    if (!trialToken) {
+      return Promise.reject(new Error("Trial session required"));
+    }
+    return API.post(
+      `${C}/auth/sync-trial-auditors`,
+      {},
+      {
+        timeout: 20_000,
+        headers: { Authorization: `Bearer ${trialToken}` },
+      },
+    );
+  },
+
+  /** Trial: company-scoped reviewer session for the signed-in trial teammate */
+  trialAuditorSession: () => {
+    const trialToken = getTrialSession()?.token;
+    if (!trialToken) {
+      return Promise.reject(new Error("Trial session required"));
+    }
+    return API.post(
+      `${C}/auth/trial-auditor-session`,
+      {},
+      {
+        timeout: 20_000,
+        headers: { Authorization: `Bearer ${trialToken}` },
+      },
+    );
+  },
+
   listAuditors: (token) => API.get(`${C}/auditors`, auth(token)),
   listWorkspaces: (token) => API.get(`${C}/workspaces`, auth(token)),
   createWorkspace: (token, body) => API.post(`${C}/create-workspace`, body, auth(token)),

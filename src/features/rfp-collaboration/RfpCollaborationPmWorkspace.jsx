@@ -16,7 +16,7 @@ import {
   isMainAppProposalManager,
   loadCollabSession,
 } from "./rfpCollabSession.js";
-import { useTrialCollabT } from "./useTrialCollabT.js";
+import { useTrialCollabT, isTrialUserSession } from "./useTrialCollabT.js";
 import { formatDateTime24 } from '../../utils/dateTime';
 
 const STATUS_KEYS = {
@@ -39,9 +39,11 @@ export default function RfpCollaborationPmWorkspace() {
   const { workspaceId } = useParams();
   const t = useTrialCollabT();
   const [session, setSession] = useState(() => loadCollabSession());
+  // Trial always re-ensures PM session — keep spinner until that finishes to avoid stale-token races.
   const [bootstrapping, setBootstrapping] = useState(() => {
-    if (loadCollabSession()?.user?.role === "proposal_manager") return false;
-    return isMainAppProposalManager();
+    if (!isMainAppProposalManager()) return false;
+    if (isTrialUserSession()) return true;
+    return loadCollabSession()?.user?.role !== "proposal_manager";
   });
   const token = session?.token;
 
@@ -117,11 +119,12 @@ export default function RfpCollaborationPmWorkspace() {
   }, []);
 
   useEffect(() => {
+    if (bootstrapping) return;
     loadAll();
-  }, [loadAll]);
+  }, [loadAll, bootstrapping]);
 
   useEffect(() => {
-    if (!token || !workspaceId) return;
+    if (bootstrapping || !token || !workspaceId) return;
     const close = rfpCollab.subscribeLogsStream(workspaceId, token, {
       onEvent: (payload) => {
         if (payload?.type === "connected") return;
@@ -134,7 +137,7 @@ export default function RfpCollaborationPmWorkspace() {
       },
     });
     return close;
-  }, [token, workspaceId]);
+  }, [token, workspaceId, bootstrapping]);
 
   const loadClarifications = useCallback(async () => {
     if (!token || !workspaceId) return;
@@ -495,17 +498,26 @@ export default function RfpCollaborationPmWorkspace() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 space-y-4">
             <h2 className="text-lg font-semibold">{t("rfpCollaboration.assignAuditor")}</h2>
-            <select
-              value={assignAuditorId}
-              onChange={(e) => setAssignAuditorId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm"
-            >
-              {auditors.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name} ({a.email})
-                </option>
-              ))}
-            </select>
+            {auditors.length === 0 ? (
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                {t(
+                  "rfpCollaboration.noAuditorsHint",
+                  "No team members available yet. Add people in Manage Team (or User Management), then refresh.",
+                )}
+              </p>
+            ) : (
+              <select
+                value={assignAuditorId}
+                onChange={(e) => setAssignAuditorId(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+              >
+                {auditors.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name} ({a.email})
+                  </option>
+                ))}
+              </select>
+            )}
             <div className="flex justify-end gap-2">
               <button
                 type="button"
@@ -516,7 +528,7 @@ export default function RfpCollaborationPmWorkspace() {
               </button>
               <button
                 type="button"
-                disabled={busy || !assignAuditorId}
+                disabled={busy || !assignAuditorId || auditors.length === 0}
                 onClick={submitAssign}
                 className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm disabled:opacity-50"
               >

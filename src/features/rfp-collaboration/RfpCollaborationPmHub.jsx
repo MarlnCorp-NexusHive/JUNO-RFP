@@ -15,10 +15,11 @@ export default function RfpCollaborationPmHub() {
   const t = useTrialCollabT();
   const navigate = useNavigate();
   const [session, setSession] = useState(() => loadCollabSession());
+  // Trial always re-ensures — keep spinner up so we never paint with a stale demo/session token.
   const [bootstrapping, setBootstrapping] = useState(() => {
-    const s = loadCollabSession();
-    if (s?.user?.role === "proposal_manager") return false;
-    return isMainAppProposalManager();
+    if (!isMainAppProposalManager()) return false;
+    if (isTrialUserSession()) return true;
+    return loadCollabSession()?.user?.role !== "proposal_manager";
   });
   const [email, setEmail] = useState(() => (isTrialUserSession() ? "" : "jordan@juno"));
   const [password, setPassword] = useState(() => (isTrialUserSession() ? "" : "pm123"));

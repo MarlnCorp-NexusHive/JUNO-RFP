@@ -54,6 +54,15 @@ import {
   hydrateBidVaultFromServer,
   buildBidVaultAlerts,
 } from "../features/proposal-manager/services/bidVaultStore.js";
+import {
+  getDashboardCharts,
+  buildDashboardDerivedMetrics,
+  buildDashboardAiAlerts,
+  hydrateDashboardFromServer,
+  subscribeDashboard,
+  rebuildChartsFromCompanyData,
+} from "../features/proposal-manager/services/dashboardStore.js";
+import { hydrateWinLossFromBackend } from "../features/proposal-manager/services/winLossStorage.js";
 
 function isTrialUserSession() {
   const session = getTrialSession();
@@ -467,6 +476,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const [pricingData, setPricingData] = useState(() => getPricingData());
   const [bidVaultData, setBidVaultData] = useState(() => getBidVaultData());
   const [sourceDocAlertTick, setSourceDocAlertTick] = useState(0);
+  const [dashTick, setDashTick] = useState(0);
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
   const pmText = (en, ar) => (isArabic ? ar : en);
   const pmLabel = (text) => {
@@ -620,13 +630,36 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const hideAiRevenueSection = isTrialPm;
 
   const trialEmptySub = t("dashboard.trialEmpty.noPipelineYet");
+  const trialLiveSub = t("dashboard.trialEmpty.liveFromCompanyData");
+  void dashTick;
+  const trialMetrics = isTrialPm ? buildDashboardDerivedMetrics() : null;
+  const trialChartsLive = isTrialPm ? getDashboardCharts() : null;
+
   const proposalManagerSummaryCards = isTrialPm
-    ? proposalManagerSummaryCardsBase.map((card) => ({
-        ...card,
-        value: card.formatType === "ratio" ? 0 : 0,
-        spark: [],
-        sub: trialEmptySub,
-      }))
+    ? proposalManagerSummaryCardsBase.map((card, idx) => {
+        if (!trialMetrics?.hasData) {
+          return {
+            ...card,
+            value: card.formatType === "ratio" ? 0 : 0,
+            spark: [],
+            sub: trialEmptySub,
+          };
+        }
+        const values = [
+          trialMetrics.activePipeline,
+          trialMetrics.totalPipelineValue,
+          trialMetrics.avgDealSize,
+          trialMetrics.winRate,
+          trialMetrics.bidNoBidRatio,
+          trialMetrics.weightedWinProbability,
+        ];
+        return {
+          ...card,
+          value: values[idx] ?? 0,
+          spark: undefined,
+          sub: trialLiveSub,
+        };
+      })
     : proposalManagerSummaryCardsBase;
   const summaryCards = basePath === "/app" ? proposalManagerSummaryCards : directorSummaryCards;
 
@@ -642,8 +675,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   const proposalManagerKpis = isTrialPm
     ? proposalManagerKpisBase.map((kpi, idx) => {
-        if (idx === 0) return { ...kpi, value: "—", spark: undefined };
-        if (idx === 1) return { ...kpi, value: 0, spark: undefined };
+        if (idx === 0) return { ...kpi, value: trialMetrics?.mttr || "—", spark: undefined };
+        if (idx === 1) return { ...kpi, value: trialMetrics?.rfpsResponded || 0, spark: undefined };
         if (idx === 2) return { ...kpi, value: getComplianceScore(complianceData), spark: undefined };
         if (idx === 3) return { ...kpi, value: getUnaddressedClauseCount(complianceData), spark: undefined };
         if (idx === 4) return { ...kpi, value: farFlagLabel, spark: undefined };
@@ -653,14 +686,39 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     : proposalManagerKpisBase;
   const kpis = basePath === "/app" ? proposalManagerKpis : directorKpis;
 
-  // Chart datasets: demo numbers for demos; empty shells for trial
-  const trialRollingWinRate = isTrialPm ? emptyRollingWinRate : rollingWinRateByProcurement;
+  // Chart datasets: demo numbers for demos; company/AI series for trial
+  const trialRollingWinRate =
+    isTrialPm
+      ? trialChartsLive?.rollingWinRate?.length
+        ? trialChartsLive.rollingWinRate
+        : emptyRollingWinRate
+      : rollingWinRateByProcurement;
   const trialWinRateVsLead = isTrialPm ? emptyWinRateVsLeadTime : winRateVsLeadTimeData;
   const trialProposalQuality = isTrialPm ? emptyProposalQuality : proposalQualityIntelligenceData;
-  const trialSectionM = isTrialPm ? emptySectionM : sectionMScoringData;
-  const trialRiskCompliance = isTrialPm ? emptyRiskCompliance : riskComplianceIntelligenceData;
-  const trialSubmissionForecast = isTrialPm ? emptySubmissionForecast : proposalSubmissionForecast;
-  const trialWinProbabilityTrend = isTrialPm ? emptyWinProbabilityTrend : proposalWinProbabilityTrend;
+  const trialSectionM =
+    isTrialPm
+      ? trialChartsLive?.sectionM?.length
+        ? trialChartsLive.sectionM
+        : emptySectionM
+      : sectionMScoringData;
+  const trialRiskCompliance =
+    isTrialPm
+      ? trialChartsLive?.riskCompliance?.length
+        ? trialChartsLive.riskCompliance
+        : emptyRiskCompliance
+      : riskComplianceIntelligenceData;
+  const trialSubmissionForecast =
+    isTrialPm
+      ? trialChartsLive?.submissionForecast?.length
+        ? trialChartsLive.submissionForecast
+        : emptySubmissionForecast
+      : proposalSubmissionForecast;
+  const trialWinProbabilityTrend =
+    isTrialPm
+      ? trialChartsLive?.winProbabilityTrend?.length
+        ? trialChartsLive.winProbabilityTrend
+        : emptyWinProbabilityTrend
+      : proposalWinProbabilityTrend;
   const trialRevenueFromWins = isTrialPm ? emptyRevenueFromWins : revenueFromWinsData;
 
   useEffect(() => {
@@ -682,8 +740,14 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   useEffect(() => {
     if (!isTrialPm) return undefined;
     setComplianceData(getComplianceData());
-    void hydrateComplianceFromServer().then((next) => setComplianceData(next));
-    return subscribeCompliance(setComplianceData);
+    void hydrateComplianceFromServer().then((next) => {
+      setComplianceData(next);
+      setDashTick((n) => n + 1);
+    });
+    return subscribeCompliance((next) => {
+      setComplianceData(next);
+      setDashTick((n) => n + 1);
+    });
   }, [isTrialPm]);
 
   useEffect(() => {
@@ -708,15 +772,48 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   useEffect(() => {
     if (!isTrialPm) return undefined;
     setPricingData(getPricingData());
-    void hydratePricingFromServer().then((next) => setPricingData(next));
-    return subscribePricing(setPricingData);
+    void hydratePricingFromServer().then((next) => {
+      setPricingData(next);
+      setDashTick((n) => n + 1);
+    });
+    return subscribePricing((next) => {
+      setPricingData(next);
+      setDashTick((n) => n + 1);
+    });
   }, [isTrialPm]);
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
     setBidVaultData(getBidVaultData());
-    void hydrateBidVaultFromServer().then((next) => setBidVaultData(next));
-    return subscribeBidVault(setBidVaultData);
+    void hydrateBidVaultFromServer().then((next) => {
+      setBidVaultData(next);
+      rebuildChartsFromCompanyData();
+      setDashTick((n) => n + 1);
+    });
+    return subscribeBidVault((next) => {
+      setBidVaultData(next);
+      rebuildChartsFromCompanyData();
+      setDashTick((n) => n + 1);
+    });
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        await Promise.all([
+          hydrateDashboardFromServer({ notify: false }),
+          hydrateWinLossFromBackend().catch(() => {}),
+        ]);
+        if (cancelled) return;
+        rebuildChartsFromCompanyData();
+        setDashTick((n) => n + 1);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return subscribeDashboard(() => setDashTick((n) => n + 1));
   }, [isTrialPm]);
 
   useEffect(() => {
@@ -787,10 +884,19 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     : [];
   const pricingAlerts = isTrialPm ? buildPricingAlerts(pricingData, t) : [];
   const bidVaultAlerts = isTrialPm ? buildBidVaultAlerts(bidVaultData, t) : [];
+  const aiDashboardAlerts = isTrialPm ? buildDashboardAiAlerts(t) : [];
   // Trial dashboard alerts
   const alerts = isPM
     ? isTrialPm
-      ? [...shortlistAlerts, ...sourceDocAlerts, ...assignmentAlerts, ...communicationAlerts, ...pricingAlerts, ...bidVaultAlerts]
+      ? [
+          ...aiDashboardAlerts,
+          ...shortlistAlerts,
+          ...sourceDocAlerts,
+          ...assignmentAlerts,
+          ...communicationAlerts,
+          ...pricingAlerts,
+          ...bidVaultAlerts,
+        ]
       : [...shortlistAlerts, ...staticPmAlerts]
     : [
         { icon: '🚨', text: t('dashboard.alerts.pendingBudgetApprovals'), color: 'text-red-500' },
@@ -1582,8 +1688,11 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <>
                 <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">{pmText("Rolling Win Rate by Procurement Type", "معدل الفوز المتحرك حسب نوع الشراء")}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Trailing 12 months — win rate %", "آخر 12 شهراً — نسبة معدل الفوز %")}</p>
-                {isTrialPm && (
+                {isTrialPm && !(trialChartsLive?.rollingWinRate?.length) && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.trialEmpty.chartsFillIn")}</p>
+                )}
+                {isTrialPm && trialChartsLive?.rollingWinRate?.length > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t("dashboard.trialEmpty.chartsUpdatedFromSourceDocs")}</p>
                 )}
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={trialRollingWinRate} margin={{ top: 12, right: 24, left: 0, bottom: 0 }}>

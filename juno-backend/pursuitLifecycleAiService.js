@@ -200,6 +200,145 @@ Ground in scoring factors and source-doc Q&As when provided. Max 5 whyUs and why
   };
 }
 
+/**
+ * Deep-parse an RFP/grant source document into dashboard + vault + compliance insights.
+ * @param {import("openai").OpenAI} openai
+ * @param {{ document?: string, documentName?: string, context?: object }} payload
+ */
+export async function extractDashboardInsights(openai, payload = {}) {
+  const document = asText(payload.document, 120_000);
+  if (!document || document.length < 40) {
+    throw new Error("document text is required");
+  }
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
+    temperature: 0.2,
+    messages: [
+      {
+        role: "system",
+        content: `You are a federal/grant proposal capture analyst. Deeply read the solicitation (or excerpt) and extract structured insights for a company proposal dashboard.
+Return ONLY JSON:
+{
+  "opportunity": {
+    "title":"...",
+    "number":"",
+    "agency":"",
+    "segment":"Federal|State/Local|Commercial|International",
+    "stageHint":"pipeline|capture|proposal|submitted",
+    "valueEstimate": null,
+    "deadline":"YYYY-MM-DD or null",
+    "procurementType":"FAR Part 15 (Best Value)|FAR Part 15 (LPTA)|FAR Part 16 (Task Orders)|Sole Source|Grant|Other",
+    "winProbability": 0
+  },
+  "sectionM":[{"name":"...","weight":0,"score":0}],
+  "risks":[{"name":"...","level":"low|medium|high","score":0,"mitigation":"..."}],
+  "complianceAreas":[{"name":"...","status":"compliant|pending|nonCompliant","score":0}],
+  "quality":{"completeness":0,"clarity":0,"compliance":0,"differentiation":0},
+  "alerts":["short urgent actionable strings"],
+  "summary":"2-3 sentences",
+  "synopsis":"4-8 sentence capture-ready overview: what the document is, issuer, what is sought, value/scope if stated, key deadlines, evaluation themes, and hard constraints",
+  "synopsisBullets":["up to 6 short bullet highlights"]
+}
+Rules:
+- Ground EVERY field in the document; use null/empty when unknown — do not invent agencies or dollar values.
+- valueEstimate is USD number when budget/ceiling/estimated value is stated; else null.
+- sectionM: up to 6 evaluation factors (Section M / evaluation criteria). score is readiness/importance hint 0-100.
+- risks: up to 5 material risks (deadline, page limits, mandatory clauses, OCI, etc.).
+- complianceAreas: up to 6 areas (FAR clauses, certifications, past performance, format).
+- winProbability 0-100 qualitative capture fit if inferable, else 50.
+- alerts: max 4, only if truly time-sensitive or elimination risk.
+- synopsis must be useful as a standalone card brief; synopsisBullets max 6, concrete facts only.`,
+      },
+      {
+        role: "user",
+        content: JSON.stringify({
+          documentName: asText(payload.documentName, 300),
+          context: payload.context || {},
+          document,
+        }),
+      },
+    ],
+  });
+
+  const parsed = parseJsonObject(response.choices?.[0]?.message?.content);
+  const opp = parsed.opportunity || {};
+  const clamp = (n, lo = 0, hi = 100) => {
+    const v = asNum(n, null);
+    if (v == null) return null;
+    return Math.max(lo, Math.min(hi, Math.round(v)));
+  };
+  const listAlerts = Array.isArray(parsed.alerts)
+    ? parsed.alerts.map((a) => asText(a, 240)).filter(Boolean).slice(0, 4)
+    : [];
+
+  return {
+    opportunity: {
+      title: asText(opp.title, 300),
+      number: asText(opp.number, 120),
+      agency: asText(opp.agency, 200),
+      segment: asText(opp.segment || "State/Local", 40),
+      stageHint: asText(opp.stageHint || "pipeline", 40),
+      valueEstimate: asNum(opp.valueEstimate, null),
+      deadline: opp.deadline ? asText(opp.deadline, 20) : null,
+      procurementType: asText(opp.procurementType || "Other", 80),
+      winProbability: clamp(opp.winProbability, 0, 100) ?? 50,
+    },
+    sectionM: Array.isArray(parsed.sectionM)
+      ? parsed.sectionM
+          .map((f) => ({
+            name: asText(f.name, 160),
+            weight: asNum(f.weight, 0) ?? 0,
+            score: clamp(f.score, 0, 100) ?? 0,
+          }))
+          .filter((f) => f.name)
+          .slice(0, 6)
+      : [],
+    risks: Array.isArray(parsed.risks)
+      ? parsed.risks
+          .map((r) => ({
+            name: asText(r.name, 160),
+            level: ["low", "medium", "high"].includes(String(r.level || "").toLowerCase())
+              ? String(r.level).toLowerCase()
+              : "medium",
+            score: clamp(r.score, 0, 100) ?? 50,
+            mitigation: asText(r.mitigation, 300),
+          }))
+          .filter((r) => r.name)
+          .slice(0, 5)
+      : [],
+    complianceAreas: Array.isArray(parsed.complianceAreas)
+      ? parsed.complianceAreas
+          .map((a) => {
+            const statusRaw = String(a.status || "pending").toLowerCase();
+            const status =
+              statusRaw === "compliant" || statusRaw === "noncompliant" || statusRaw === "non-compliant"
+                ? statusRaw.replace("non-compliant", "nonCompliant").replace("noncompliant", "nonCompliant")
+                : "pending";
+            return {
+              name: asText(a.name, 160),
+              status: status === "nonCompliant" ? "nonCompliant" : status === "compliant" ? "compliant" : "pending",
+              score: clamp(a.score, 0, 100) ?? 50,
+            };
+          })
+          .filter((a) => a.name)
+          .slice(0, 6)
+      : [],
+    quality: {
+      completeness: clamp(parsed.quality?.completeness, 0, 100) ?? 0,
+      clarity: clamp(parsed.quality?.clarity, 0, 100) ?? 0,
+      compliance: clamp(parsed.quality?.compliance, 0, 100) ?? 0,
+      differentiation: clamp(parsed.quality?.differentiation, 0, 100) ?? 0,
+    },
+    alerts: listAlerts,
+    summary: asText(parsed.summary, 800),
+    synopsis: asText(parsed.synopsis || parsed.summary, 2500),
+    synopsisBullets: Array.isArray(parsed.synopsisBullets)
+      ? parsed.synopsisBullets.map((b) => asText(b, 240)).filter(Boolean).slice(0, 6)
+      : [],
+  };
+}
+
 export function registerPursuitLifecycleAiRoutes(app, openai) {
   app.post("/pursuit/ai/suggest-bid-vault", async (req, res) => {
     try {
@@ -229,6 +368,17 @@ export function registerPursuitLifecycleAiRoutes(app, openai) {
     } catch (err) {
       console.error("PURSUIT AI WIN SLIDE ERROR:", err.message);
       res.status(500).json({ error: err.message || "Win slide draft failed" });
+    }
+  });
+
+  app.post("/pursuit/ai/dashboard-insights", async (req, res) => {
+    try {
+      const result = await extractDashboardInsights(openai, req.body || {});
+      res.json(result);
+    } catch (err) {
+      console.error("PURSUIT AI DASHBOARD ERROR:", err.message);
+      const status = /required/i.test(err.message) ? 400 : 500;
+      res.status(status).json({ error: err.message || "Dashboard insights failed" });
     }
   });
 }

@@ -59,15 +59,35 @@ export function isMainAppRfpAuditor() {
 }
 
 /**
- * After main JUNO login as RFP Auditor, sync collaboration API session (seeded email/password on user record).
+ * After main JUNO login as RFP Auditor, sync collaboration API session.
+ * Trial: company-scoped reviewer from trial JWT (never seeded aiyana@juno).
+ * Demo: seeded email/password on user record.
  */
 export async function ensureRbacAuditorCollabSession() {
+  const trial = getTrialSession();
+  const rbac = readRbacUser();
+  const isTrial = Boolean(trial?.token || rbac?.isTrialUser);
+
+  if (isTrial) {
+    // Always re-ensure (in-memory users; stale sessionStorage breaks after restart).
+    clearCollabSession();
+    if (!isMainAppRfpAuditor()) return null;
+    if (!trial?.token) {
+      throw new Error("Trial session required — please sign in again");
+    }
+    const { data } = await rfpCollab.trialAuditorSession();
+    if (data.user?.role !== "auditor") {
+      throw new Error("Collaboration auditor account mismatch");
+    }
+    saveCollabSession(data.token, data.user);
+    return loadCollabSession();
+  }
+
   const existing = loadCollabSession();
   if (existing?.token && existing?.user?.role === "auditor") {
     return existing;
   }
   if (!isMainAppRfpAuditor()) return null;
-  const rbac = readRbacUser();
   const email = String(rbac?.collabEmail || "").trim();
   const password = rbac?.collabPassword;
   if (!email || !password) return null;
@@ -110,6 +130,12 @@ export async function ensureProposalManagerCollabSession() {
       throw new Error("Collaboration PM account mismatch");
     }
     saveCollabSession(data.token, data.user);
+    // Keep reviewer pool aligned with company roster (User Management + Manage Team)
+    try {
+      await rfpCollab.syncTrialAuditors();
+    } catch (err) {
+      console.warn("[rfp-collab] sync trial auditors failed:", err?.message || err);
+    }
     return loadCollabSession();
   }
 

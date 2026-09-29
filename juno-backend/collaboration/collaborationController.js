@@ -1,5 +1,6 @@
 import * as svc from "./collaborationService.js";
 import { activityBus } from "./store.js";
+import { hydrateTrialCollabForTenant } from "./collaborationPersistence.js";
 
 export async function login(req, res) {
   try {
@@ -11,11 +12,31 @@ export async function login(req, res) {
   }
 }
 
-/** Trial tenants: isolated collab PM (not shared jordan@juno). Requires trial Bearer. */
+/** Trial tenants: company-wide collab PM + sync reviewers from company roster. */
 export function trialSession(req, res) {
   try {
     const out = svc.ensureTrialProposalManager({
       tenantId: req.tenantId,
+      name: req.trialUser?.name,
+    });
+    hydrateTrialCollabForTenant(req.tenantId, {
+      ensurePm: svc.ensureTrialProposalManager,
+      ensureAuditor: svc.ensureTrialAuditor,
+    });
+    svc.hydrateTrialUsersFromWorkspaces();
+    const auditors = svc.syncTrialCompanyAuditors(req.tenantId);
+    res.json({ ...out, auditors });
+  } catch (e) {
+    svc.handleServiceError(res, e);
+  }
+}
+
+/** Trial teammate: company-scoped reviewer session for the signed-in trial user. */
+export function trialAuditorSession(req, res) {
+  try {
+    const out = svc.ensureTrialAuditorSession({
+      tenantId: req.tenantId,
+      email: req.trialUser?.email,
       name: req.trialUser?.name,
     });
     res.json(out);
@@ -26,7 +47,21 @@ export function trialSession(req, res) {
 
 export function listAuditors(req, res) {
   try {
-    res.json({ auditors: svc.listAuditors() });
+    res.json({ auditors: svc.listAuditors(req.userId) });
+  } catch (e) {
+    svc.handleServiceError(res, e);
+  }
+}
+
+/** Refresh company reviewer pool from tenant members + Manage Team. */
+export function syncTrialAuditors(req, res) {
+  try {
+    const tenantId = req.tenantId;
+    if (!tenantId) {
+      return res.status(400).json({ error: "Trial tenant required", code: "tenant_required" });
+    }
+    const auditors = svc.syncTrialCompanyAuditors(tenantId);
+    res.json({ ok: true, auditors });
   } catch (e) {
     svc.handleServiceError(res, e);
   }

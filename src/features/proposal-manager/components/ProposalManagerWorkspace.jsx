@@ -17,6 +17,7 @@ import {
   hydrateWorkspaceFromBackend,
   hydrateContentHubFromBackend,
   buildQaLibraryContextForRequirement,
+  upsertWorkspaceAnswerInContentHub,
 } from "../services/proposalManagerStorage";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
@@ -297,6 +298,7 @@ export default function ProposalManagerWorkspace() {
   const [newFolderName, setNewFolderName] = useState("");
   const fileInputRef = useRef(null);
   const rfpBackfillDone = useRef(new Set());
+  const qaLibrarySyncTimerRef = useRef(null);
   const [rfpId, setRfpId] = useState(null);
   const [answers, setAnswers] = useState({});
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
@@ -793,6 +795,43 @@ export default function ProposalManagerWorkspace() {
     [refreshDocs],
   );
 
+  const syncAnswerToQaLibrary = useCallback(
+    (questionText, answerText, responseKey, { immediate = false } = {}) => {
+      const q = String(questionText || "").trim();
+      const a = String(answerText || "").trim();
+      if (!rfpId || !q || a.length < 12) return;
+
+      const run = () => {
+        upsertWorkspaceAnswerInContentHub({
+          question: q,
+          answer: a,
+          sourceDocumentId: rfpId,
+          workspaceResponseKey: responseKey || null,
+          tags: ["RFP Response", "Workspace"],
+        });
+      };
+
+      if (immediate) {
+        if (qaLibrarySyncTimerRef.current) {
+          clearTimeout(qaLibrarySyncTimerRef.current);
+          qaLibrarySyncTimerRef.current = null;
+        }
+        run();
+        return;
+      }
+
+      if (qaLibrarySyncTimerRef.current) clearTimeout(qaLibrarySyncTimerRef.current);
+      qaLibrarySyncTimerRef.current = setTimeout(run, 900);
+    },
+    [rfpId],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (qaLibrarySyncTimerRef.current) clearTimeout(qaLibrarySyncTimerRef.current);
+    };
+  }, []);
+
   const handleAnswerChange = useCallback(
     (key, value) => {
       if (!rfpId) return;
@@ -801,8 +840,15 @@ export default function ProposalManagerWorkspace() {
         persistAnswers(rfpId, next);
         return next;
       });
+      const idxMatch = String(key || "").match(/(\d+)$/);
+      const idx = idxMatch ? Number(idxMatch[1]) : NaN;
+      const questionText =
+        Number.isInteger(idx) && idx >= 0 ? questions[idx]?.question : "";
+      if (questionText) {
+        syncAnswerToQaLibrary(questionText, value, key, { immediate: false });
+      }
     },
-    [rfpId, persistAnswers],
+    [rfpId, persistAnswers, questions, syncAnswerToQaLibrary],
   );
 
   const handleInsertAuditorResponse = useCallback(() => {
@@ -821,6 +867,7 @@ export default function ProposalManagerWorkspace() {
     setAnswers((prev) => {
       const next = { ...prev };
       let changed = false;
+      const synced = [];
 
       Object.entries(collabQuestionByIndex).forEach(([idxStr, cq]) => {
         const idx = Number(idxStr);
@@ -836,13 +883,24 @@ export default function ProposalManagerWorkspace() {
 
         next[key] = approvedText;
         changed = true;
+        const qText = questions[idx]?.question;
+        if (qText) synced.push({ qText, approvedText, key });
       });
 
       if (!changed) return prev;
       persistAnswers(rfpId, next);
+      synced.forEach(({ qText, approvedText, key }) => {
+        upsertWorkspaceAnswerInContentHub({
+          question: qText,
+          answer: approvedText,
+          sourceDocumentId: rfpId,
+          workspaceResponseKey: key,
+          tags: ["RFP Response", "Workspace", "Auditor Approved"],
+        });
+      });
       return next;
     });
-  }, [rfpId, collabLinked, collabQuestionByIndex, persistAnswers]);
+  }, [rfpId, collabLinked, collabQuestionByIndex, persistAnswers, questions]);
 
   const handleGenerateAiAnswer = useCallback(async () => {
     if (rfpId == null || selectedQuestionIndex == null || selectedQuestionIndex < 0) return;
@@ -890,6 +948,7 @@ export default function ProposalManagerWorkspace() {
       const libraryContext = buildQaLibraryContextForRequirement(qLine, { limit: 14 });
       const text = await generateAnswer(promptParts.join("\n"), { libraryContext });
       handleAnswerChange(key, text);
+      syncAnswerToQaLibrary(qLine, text, key, { immediate: true });
       setWorkspaceDocumentModel((prev) => ({
         ...prev,
         sections: (prev.sections || []).map((s) =>
@@ -901,7 +960,7 @@ export default function ProposalManagerWorkspace() {
     } finally {
       setAiLoading(false);
     }
-  }, [rfpId, selectedQuestionIndex, questions, answers, issuerBrief, disableIssuerTailoring, handleAnswerChange]);
+  }, [rfpId, selectedQuestionIndex, questions, answers, issuerBrief, disableIssuerTailoring, handleAnswerChange, syncAnswerToQaLibrary]);
 
   const selectedKey =
     selectedQuestionIndex != null && selectedQuestionIndex >= 0
@@ -1959,6 +2018,14 @@ export default function ProposalManagerWorkspace() {
                 ))
               )}
             </select>
+            {auditAuditors.length === 0 ? (
+              <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+                {t(
+                  "rfpCollaboration.noAuditorsHint",
+                  "No team members available yet. Add people in Manage Team (or User Management), then refresh.",
+                )}
+              </p>
+            ) : null}
             <div className="mt-5 flex items-center justify-end gap-2">
               <button
                 type="button"

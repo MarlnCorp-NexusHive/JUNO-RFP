@@ -16,6 +16,8 @@ import {
   isApplicationDeadlineEvent,
   ingestSourceDocQAsToLibrary,
 } from "../services/sourceDocsDeadlineService.js";
+import { ingestSourceDocForDashboard } from "../services/sourceDocsDashboardIngest.js";
+import { extractDashboardInsightsFromDocument } from "../../../services/api.js";
 
 const STORAGE_KEY = "proposal_manager_source_docs";
 const NAME_OVERRIDES_KEY = "proposal_manager_source_docs_names";
@@ -416,6 +418,7 @@ export default function SourceDocsPage() {
   const [copiedId, setCopiedId] = useState("");
   const [editingId, setEditingId] = useState("");
   const [editDraft, setEditDraft] = useState("");
+  const [synopsisDocId, setSynopsisDocId] = useState("");
   const inputRef = useRef(null);
   const boilerplateInputRef = useRef(null);
   const renameInputRef = useRef(null);
@@ -532,6 +535,9 @@ export default function SourceDocsPage() {
         uploadedAt: new Date().toISOString(),
         dataUrl,
         deadlineScanStatus: "scanning",
+        synopsisStatus: "pending",
+        synopsis: "",
+        synopsisBullets: [],
         importantDates: [],
         qaIngestCount: 0,
         ...(options.folder ? { folder: options.folder } : {}),
@@ -545,12 +551,12 @@ export default function SourceDocsPage() {
     for (const { file, doc } of queued) {
       try {
         const isPdf = (file.type || "").includes("pdf") || file.name.toLowerCase().endsWith(".pdf");
-        const { importantDates, qaItems } = await scanFileForImportantDates(
+        const { importantDates, qaItems, documentText } = await scanFileForImportantDates(
           file,
           isPdf ? undefined : null,
         );
         const qaAdded = ingestSourceDocQAsToLibrary(doc.id, qaItems);
-        const patched = {
+        let patched = {
           ...doc,
           importantDates,
           qaIngestCount: qaAdded,
@@ -559,6 +565,75 @@ export default function SourceDocsPage() {
         };
         setDocs((prev) => prev.map((d) => (d.id === doc.id ? { ...d, ...patched } : d)));
         await syncSourceDocDeadlinesForDoc(patched);
+
+        // Deep AI parse: synopsis (all users) + Bid Vault/Compliance/dashboard (trial)
+        if (doc.folder !== "boilerplate" && (documentText || "").trim().length > 40) {
+          setDocs((prev) =>
+            prev.map((d) => (d.id === doc.id ? { ...d, ...patched, synopsisStatus: "scanning" } : d)),
+          );
+          try {
+            let insights = null;
+            if (canUseTrialFeatures()) {
+              const dashResult = await ingestSourceDocForDashboard(patched, documentText);
+              insights = dashResult?.insights || null;
+            } else {
+              insights = await extractDashboardInsightsFromDocument({
+                document: String(documentText).slice(0, 120_000),
+                documentName: patched.shareLabel || patched.name || "",
+                context: {
+                  importantDates: Array.isArray(patched.importantDates)
+                    ? patched.importantDates.slice(0, 12)
+                    : [],
+                },
+              });
+            }
+            if (insights) {
+              const synopsis =
+                String(insights.synopsis || insights.summary || "").trim() ||
+                "";
+              const synopsisBullets = Array.isArray(insights.synopsisBullets)
+                ? insights.synopsisBullets.map((b) => String(b || "").trim()).filter(Boolean).slice(0, 6)
+                : [];
+              patched = {
+                ...patched,
+                dashboardInsights: insights,
+                dashboardIngestAt: new Date().toISOString(),
+                dashboardIngestStatus: "done",
+                synopsis,
+                synopsisBullets,
+                synopsisStatus: synopsis ? "done" : "empty",
+                synopsisAt: new Date().toISOString(),
+              };
+              setDocs((prev) => prev.map((d) => (d.id === doc.id ? { ...d, ...patched } : d)));
+            } else {
+              setDocs((prev) =>
+                prev.map((d) =>
+                  d.id === doc.id
+                    ? { ...d, ...patched, synopsisStatus: "empty" }
+                    : d,
+                ),
+              );
+            }
+          } catch (dashErr) {
+            console.warn("[source-docs] AI synopsis/dashboard ingest failed:", file.name, dashErr);
+            setDocs((prev) =>
+              prev.map((d) =>
+                d.id === doc.id
+                  ? {
+                      ...d,
+                      ...patched,
+                      dashboardIngestStatus: "error",
+                      dashboardIngestError:
+                        dashErr?.response?.data?.error || dashErr?.message || "Dashboard ingest failed",
+                      synopsisStatus: "error",
+                      synopsisError:
+                        dashErr?.response?.data?.error || dashErr?.message || "Synopsis failed",
+                    }
+                  : d,
+              ),
+            );
+          }
+        }
       } catch (err) {
         console.warn("[source-docs] AI scan failed:", file.name, err);
         setDocs((prev) =>
@@ -568,6 +643,7 @@ export default function SourceDocsPage() {
                   ...d,
                   deadlineScanStatus: "error",
                   deadlineScanError: err?.response?.data?.error || err?.message || "Scan failed",
+                  synopsisStatus: "error",
                 }
               : d,
           ),
@@ -712,6 +788,18 @@ export default function SourceDocsPage() {
   const renderDocCard = (doc) => {
     const isEditing = editingId === doc.id;
     const displayName = doc.shareLabel || doc.name;
+    const synopsisText =
+      String(doc.synopsis || doc.dashboardInsights?.synopsis || doc.dashboardInsights?.summary || "").trim();
+    const synopsisBullets = Array.isArray(doc.synopsisBullets)
+      ? doc.synopsisBullets
+      : Array.isArray(doc.dashboardInsights?.synopsisBullets)
+        ? doc.dashboardInsights.synopsisBullets
+        : [];
+    const hasSynopsis = Boolean(synopsisText) || synopsisBullets.length > 0;
+    const synopsisBusy =
+      doc.synopsisStatus === "scanning" ||
+      doc.synopsisStatus === "pending" ||
+      doc.deadlineScanStatus === "scanning";
     return (
     <li
       key={doc.id}
@@ -751,7 +839,14 @@ export default function SourceDocsPage() {
           {doc.deadlineScanStatus === "scanning" && (
             <p className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">
               {t("proposalManagerSourceDocs.scanningDeadlines", {
-                defaultValue: "AI deep-scanning for deadlines and Q&As…",
+                defaultValue: "AI deep-scanning for deadlines, Q&As, and synopsis…",
+              })}
+            </p>
+          )}
+          {doc.synopsisStatus === "scanning" && doc.deadlineScanStatus !== "scanning" && (
+            <p className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+              {t("proposalManagerSourceDocs.generatingSynopsis", {
+                defaultValue: "AI generating document synopsis…",
               })}
             </p>
           )}
@@ -816,10 +911,53 @@ export default function SourceDocsPage() {
           </button>
         </div>
       </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setSynopsisDocId(doc.id)}
+          disabled={!hasSynopsis && !synopsisBusy}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 text-xs font-semibold text-indigo-800 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title={t("proposalManagerSourceDocs.viewSynopsisTitle", {
+            defaultValue: "View AI synopsis",
+          })}
+          aria-label={t("proposalManagerSourceDocs.viewSynopsisAriaLabel", {
+            defaultValue: "View document synopsis",
+          })}
+        >
+          {synopsisBusy
+            ? t("proposalManagerSourceDocs.synopsisBusy", { defaultValue: "Synopsis…" })
+            : t("proposalManagerSourceDocs.viewSynopsis", { defaultValue: "View synopsis" })}
+        </button>
+        {doc.synopsisStatus === "error" && (
+          <span className="text-xs text-rose-600 dark:text-rose-400">
+            {t("proposalManagerSourceDocs.synopsisFailed", {
+              defaultValue: "Synopsis unavailable",
+            })}
+          </span>
+        )}
+      </div>
       <DocPreview doc={doc} />
     </li>
     );
   };
+
+  const synopsisDoc = docs.find((d) => d.id === synopsisDocId) || null;
+  const synopsisModalText = synopsisDoc
+    ? String(
+        synopsisDoc.synopsis ||
+          synopsisDoc.dashboardInsights?.synopsis ||
+          synopsisDoc.dashboardInsights?.summary ||
+          "",
+      ).trim()
+    : "";
+  const synopsisModalBullets = synopsisDoc
+    ? Array.isArray(synopsisDoc.synopsisBullets)
+      ? synopsisDoc.synopsisBullets
+      : Array.isArray(synopsisDoc.dashboardInsights?.synopsisBullets)
+        ? synopsisDoc.dashboardInsights.synopsisBullets
+        : []
+    : [];
+  const synopsisModalOpp = synopsisDoc?.dashboardInsights?.opportunity || null;
 
   return (
     <div className="space-y-6">
@@ -963,6 +1101,129 @@ export default function SourceDocsPage() {
           </ul>
         )}
       </section>
+
+      {synopsisDoc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="source-doc-synopsis-title"
+          onClick={() => setSynopsisDocId("")}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 p-5 max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+                  {t("proposalManagerSourceDocs.synopsisEyebrow", {
+                    defaultValue: "AI synopsis",
+                  })}
+                </p>
+                <h3
+                  id="source-doc-synopsis-title"
+                  className="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                  title={synopsisDoc.shareLabel || synopsisDoc.name}
+                >
+                  {synopsisDoc.shareLabel || synopsisDoc.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSynopsisDocId("")}
+                className="shrink-0 rounded-lg px-2 py-1 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label={t("proposalManagerSourceDocs.closeSynopsis", {
+                  defaultValue: "Close",
+                })}
+              >
+                ✕
+              </button>
+            </div>
+
+            {synopsisDoc.synopsisStatus === "scanning" || synopsisDoc.synopsisStatus === "pending" ? (
+              <p className="text-sm text-indigo-600 dark:text-indigo-300">
+                {t("proposalManagerSourceDocs.generatingSynopsis", {
+                  defaultValue: "AI generating document synopsis…",
+                })}
+              </p>
+            ) : synopsisModalText || synopsisModalBullets.length ? (
+              <div className="space-y-3">
+                {synopsisModalOpp &&
+                  (synopsisModalOpp.agency ||
+                    synopsisModalOpp.number ||
+                    synopsisModalOpp.deadline ||
+                    synopsisModalOpp.valueEstimate != null) && (
+                    <div className="rounded-xl bg-gray-50 dark:bg-gray-800/80 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                      {synopsisModalOpp.agency ? (
+                        <p>
+                          <span className="font-semibold">
+                            {t("proposalManagerSourceDocs.synopsisAgency", {
+                              defaultValue: "Agency",
+                            })}
+                            :
+                          </span>{" "}
+                          {synopsisModalOpp.agency}
+                        </p>
+                      ) : null}
+                      {synopsisModalOpp.number ? (
+                        <p>
+                          <span className="font-semibold">
+                            {t("proposalManagerSourceDocs.synopsisNumber", {
+                              defaultValue: "Solicitation #",
+                            })}
+                            :
+                          </span>{" "}
+                          {synopsisModalOpp.number}
+                        </p>
+                      ) : null}
+                      {synopsisModalOpp.deadline ? (
+                        <p>
+                          <span className="font-semibold">
+                            {t("proposalManagerSourceDocs.synopsisDeadline", {
+                              defaultValue: "Deadline",
+                            })}
+                            :
+                          </span>{" "}
+                          {synopsisModalOpp.deadline}
+                        </p>
+                      ) : null}
+                      {synopsisModalOpp.valueEstimate != null ? (
+                        <p>
+                          <span className="font-semibold">
+                            {t("proposalManagerSourceDocs.synopsisValue", {
+                              defaultValue: "Est. value",
+                            })}
+                            :
+                          </span>{" "}
+                          {Number(synopsisModalOpp.valueEstimate).toLocaleString()}
+                        </p>
+                      ) : null}
+                    </div>
+                  )}
+                {synopsisModalText ? (
+                  <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+                    {synopsisModalText}
+                  </p>
+                ) : null}
+                {synopsisModalBullets.length > 0 ? (
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-gray-800 dark:text-gray-200">
+                    {synopsisModalBullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("proposalManagerSourceDocs.synopsisEmpty", {
+                  defaultValue: "No synopsis is available for this document yet.",
+                })}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

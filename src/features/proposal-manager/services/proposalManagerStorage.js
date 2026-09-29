@@ -150,6 +150,89 @@ export function addContentHubQA({ question, answer, tags = [], sourceDocumentId 
   return id;
 }
 
+/**
+ * Upsert a Workspace RFP response into the Content Hub Q&A library.
+ * Matches by workspaceResponseKey+sourceDocumentId when available, else normalized question.
+ * @returns {string|null} qa id, or null if skipped
+ */
+export function upsertWorkspaceAnswerInContentHub({
+  question,
+  answer,
+  sourceDocumentId = null,
+  workspaceResponseKey = null,
+  tags = ["RFP Response", "Workspace"],
+} = {}) {
+  const qText = String(question || "").trim();
+  const aText = String(answer || "").trim();
+  if (!qText || aText.length < 12) return null;
+
+  const mergedTags = [
+    ...new Set(
+      (Array.isArray(tags) ? tags : [])
+        .map((t) => String(t).trim())
+        .filter(Boolean),
+    ),
+  ].slice(0, 10);
+  const tagList = mergedTags.length ? mergedTags : ["RFP Response", "Workspace"];
+  const normQ = qText.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 240);
+
+  const qas = getContentHubQAs();
+  let idx = -1;
+  if (workspaceResponseKey && sourceDocumentId) {
+    idx = qas.findIndex(
+      (q) =>
+        q.workspaceResponseKey === workspaceResponseKey &&
+        q.sourceDocumentId === sourceDocumentId,
+    );
+  }
+  if (idx < 0) {
+    idx = qas.findIndex((q) => {
+      const qk = String(q.question || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 240);
+      if (qk !== normQ) return false;
+      if (sourceDocumentId && q.sourceDocumentId && q.sourceDocumentId !== sourceDocumentId) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  if (idx >= 0) {
+    const prev = qas[idx];
+    if (String(prev.answer || "").trim() === aText && String(prev.question || "").trim() === qText) {
+      return prev.id;
+    }
+    qas[idx] = {
+      ...prev,
+      question: qText,
+      answer: aText,
+      tags: [...new Set([...(prev.tags || []), ...tagList])].slice(0, 10),
+      sourceDocumentId: sourceDocumentId || prev.sourceDocumentId || null,
+      workspaceResponseKey: workspaceResponseKey || prev.workspaceResponseKey || null,
+      updatedAt: new Date().toISOString(),
+    };
+    saveContentHubQAs(qas);
+    return qas[idx].id;
+  }
+
+  const id = `qa_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  qas.push({
+    id,
+    question: qText,
+    answer: aText,
+    tags: tagList,
+    sourceDocumentId: sourceDocumentId || null,
+    workspaceResponseKey: workspaceResponseKey || null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+  saveContentHubQAs(qas);
+  return id;
+}
+
 export function updateContentHubQA(id, updates) {
   const qas = getContentHubQAs().map((q) => (q.id === id ? { ...q, ...updates } : q));
   saveContentHubQAs(qas);

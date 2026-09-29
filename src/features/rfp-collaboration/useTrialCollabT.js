@@ -23,6 +23,7 @@ const TRIAL_COPY_KEYS = {
   "rfpCollaboration.reviewCommentPlaceholder": "rfpCollaboration.trial.reviewCommentPlaceholder",
   "rfpCollaboration.replyPlaceholder": "rfpCollaboration.trial.replyPlaceholder",
   "rfpCollaboration.assignAuditor": "rfpCollaboration.trial.assignAuditor",
+  "rfpCollaboration.noAuditorsHint": "rfpCollaboration.trial.noAuditorsHint",
   "rfpCollaboration.askToAudit": "rfpCollaboration.trial.askToAudit",
   "rfpCollaboration.auditorPortalTitle": "rfpCollaboration.trial.auditorPortalTitle",
   "rfpCollaboration.auditorPortalSubtitle": "rfpCollaboration.trial.auditorPortalSubtitle",

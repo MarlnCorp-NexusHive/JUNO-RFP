@@ -9,6 +9,10 @@ const router = Router();
 router.post("/auth/login", ctrl.login);
 /** Trial-only: tenant-scoped PM session (blank slate, not shared demo account) */
 router.post("/auth/trial-session", requireTrialAuth, ctrl.trialSession);
+/** Trial-only: company-scoped reviewer session for a trial teammate */
+router.post("/auth/trial-auditor-session", requireTrialAuth, ctrl.trialAuditorSession);
+/** Trial-only: refresh company reviewer pool from members + Manage Team */
+router.post("/auth/sync-trial-auditors", requireTrialAuth, ctrl.syncTrialAuditors);
 
 /** Authenticated */
 router.use(requireAuth);

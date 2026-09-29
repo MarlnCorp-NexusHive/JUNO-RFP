@@ -20,6 +20,7 @@ export const TRIAL_FEATURE_KEYS = [
   "shortlist",
   "manageTeam",
   "compliance",
+  "dashboard",
 ];
 
 export function canUseTrialFeatures() {

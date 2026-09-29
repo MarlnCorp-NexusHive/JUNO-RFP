@@ -1300,14 +1300,17 @@
         "pricingBidBelowCost": "Bid below cost: {{title}} bid is under cost volume total",
         "bidVaultPastDue": "Bid Vault past due: {{title}}",
         "bidVaultDueSoon": "Bid Vault due in {{days}}d: {{title}}",
-        "bidVaultNeedsScoring": "Score this outcome in Scoring: {{title}}"
+        "bidVaultNeedsScoring": "Score this outcome in Scoring: {{title}}",
+        "sourceDocAiAlert": "{{title}}: {{message}}"
       }
     },
     "trialEmpty": {
       "noPipelineYet": "No pipeline data yet",
-      "noAlerts": "No alerts yet. Shortlist grants/RFPs, upload a source doc with a deadline, get assigned a task, or receive a message.",
-      "chartsFillIn": "Charts fill in as you capture and submit opportunities.",
-      "forecastsAppear": "Forecasts appear as you submit and win."
+      "noAlerts": "No alerts yet. Shortlist grants/RFPs, upload a source doc, get assigned a task, or receive a message.",
+      "chartsFillIn": "Charts fill in when you upload Source Docs or capture opportunities in Bid Vault.",
+      "chartsUpdatedFromSourceDocs": "Updated from Source Docs AI and company Bid Vault data.",
+      "forecastsAppear": "Forecasts appear as you submit opportunities and upload Source Docs.",
+      "liveFromCompanyData": "Live from Bid Vault, Scoring & Source Docs"
     },
     "modalContent": {
       "undergraduates": "Full-Time",

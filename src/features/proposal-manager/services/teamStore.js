@@ -14,7 +14,7 @@ export const TEAM_CHANGED_EVENT = "juno-trial-team-changed";
 
 const ASSIGNMENT_DEADLINE_COLOR = "#2563eb";
 
-const EMPTY = { members: [], trainings: [], assignments: [] };
+const EMPTY = { members: [], trainings: [], assignments: [], updatedAt: null };
 
 function storageKey() {
   return scopedStorageKey(BASE_KEY);
@@ -22,6 +22,51 @@ function storageKey() {
 
 function newId(prefix) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function normalizeSkillsOrProjects(value, fallback = []) {
+  if (Array.isArray(value)) return value.map((s) => String(s).trim()).filter(Boolean);
+  if (value == null || value === "") return Array.isArray(fallback) ? [...fallback] : [];
+  return String(value)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function normalizeMember(input = {}) {
+  const performanceRaw = Number(input.performance);
+  return {
+    id: input.id || newId("member"),
+    name: String(input.name || "").trim() || "Team member",
+    role: String(input.role || "").trim() || "Proposal Writer",
+    email: String(input.email || "").trim(),
+    phone: String(input.phone || "").trim(),
+    skills: normalizeSkillsOrProjects(input.skills),
+    projects: normalizeSkillsOrProjects(input.projects),
+    status: String(input.status || "Active"),
+    permissions: Array.isArray(input.permissions) ? [...input.permissions] : [],
+    avatar: String(input.avatar || "👤"),
+    performance: Number.isFinite(performanceRaw)
+      ? Math.max(0, Math.min(100, Math.round(performanceRaw)))
+      : 80,
+  };
+}
+
+function normalizeTraining(input = {}) {
+  return {
+    id: input.id || newId("training"),
+    training: String(input.training || input.name || "").trim() || "Training",
+    status: String(input.status || "certified"),
+  };
+}
+
+function normalizeBlob(data) {
+  return {
+    members: Array.isArray(data?.members) ? data.members.map((m) => normalizeMember(m)) : [],
+    trainings: Array.isArray(data?.trainings) ? data.trainings.map((t) => normalizeTraining(t)) : [],
+    assignments: Array.isArray(data?.assignments) ? data.assignments : [],
+    updatedAt: data?.updatedAt ? String(data.updatedAt) : null,
+  };
 }
 
 function normalizeAssignmentStatus(status) {
@@ -43,24 +88,16 @@ function normalizeProgress(progress) {
 function readRaw() {
   try {
     const raw = localStorage.getItem(storageKey());
-    if (!raw) return { members: [], trainings: [], assignments: [] };
-    const parsed = JSON.parse(raw);
-    return {
-      members: Array.isArray(parsed?.members) ? parsed.members : [],
-      trainings: Array.isArray(parsed?.trainings) ? parsed.trainings : [],
-      assignments: Array.isArray(parsed?.assignments) ? parsed.assignments : [],
-    };
+    if (!raw) return { ...EMPTY, members: [], trainings: [], assignments: [] };
+    return normalizeBlob(JSON.parse(raw));
   } catch {
-    return { members: [], trainings: [], assignments: [] };
+    return { ...EMPTY, members: [], trainings: [], assignments: [] };
   }
 }
 
 function writeRaw(data) {
-  const next = {
-    members: Array.isArray(data?.members) ? data.members : [],
-    trainings: Array.isArray(data?.trainings) ? data.trainings : [],
-    assignments: Array.isArray(data?.assignments) ? data.assignments : [],
-  };
+  const next = normalizeBlob(data);
+  next.updatedAt = new Date().toISOString();
   localStorage.setItem(storageKey(), JSON.stringify(next));
   try {
     window.dispatchEvent(new CustomEvent(TEAM_CHANGED_EVENT, { detail: next }));
@@ -72,12 +109,18 @@ function writeRaw(data) {
 }
 
 async function persistTeamCompanyWide(data) {
-  if (!canUseTrialFeatures()) return;
-  await persistTrialFeatureData("manageTeam", {
-    members: data.members || [],
-    trainings: data.trainings || [],
-    assignments: data.assignments || [],
-  });
+  if (!canUseTrialFeatures()) return null;
+  try {
+    return await persistTrialFeatureData("manageTeam", {
+      members: data.members || [],
+      trainings: data.trainings || [],
+      assignments: data.assignments || [],
+      updatedAt: data.updatedAt || new Date().toISOString(),
+    });
+  } catch (err) {
+    console.warn("[team] company-wide persist failed:", err?.message || err);
+    return null;
+  }
 }
 
 export function assignmentEventId(id) {
@@ -208,27 +251,7 @@ export function setTeamMembers(members) {
 
 export function addTeamMember(input = {}) {
   const data = readRaw();
-  const member = {
-    id: input.id || newId("member"),
-    name: String(input.name || "").trim() || "Team member",
-    role: String(input.role || "").trim() || "Proposal Writer",
-    email: String(input.email || "").trim(),
-    phone: String(input.phone || "").trim(),
-    skills: Array.isArray(input.skills)
-      ? input.skills
-      : String(input.skills || "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-    projects: Array.isArray(input.projects)
-      ? input.projects
-      : String(input.projects || "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-    status: String(input.status || "Active"),
-    permissions: Array.isArray(input.permissions) ? input.permissions : [],
-  };
+  const member = normalizeMember(input);
   data.members = [member, ...data.members];
   return writeRaw(data);
 }
@@ -238,30 +261,14 @@ export function updateTeamMember(id, patch = {}) {
   const idx = data.members.findIndex((m) => m.id === id);
   if (idx < 0) return data;
   const cur = data.members[idx];
-  data.members[idx] = {
+  data.members[idx] = normalizeMember({
     ...cur,
     ...patch,
     id: cur.id,
-    skills:
-      patch.skills != null
-        ? Array.isArray(patch.skills)
-          ? patch.skills
-          : String(patch.skills)
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-        : cur.skills,
-    projects:
-      patch.projects != null
-        ? Array.isArray(patch.projects)
-          ? patch.projects
-          : String(patch.projects)
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-        : cur.projects,
-    permissions: patch.permissions != null ? [...patch.permissions] : cur.permissions,
-  };
+    skills: patch.skills != null ? patch.skills : cur.skills,
+    projects: patch.projects != null ? patch.projects : cur.projects,
+    permissions: patch.permissions != null ? patch.permissions : cur.permissions,
+  });
   return writeRaw(data);
 }
 
@@ -279,11 +286,7 @@ export function setTeamTrainings(trainings) {
 
 export function addTeamTraining(input = {}) {
   const data = readRaw();
-  const training = {
-    id: input.id || newId("training"),
-    training: String(input.training || "").trim() || "Training",
-    status: String(input.status || "certified"),
-  };
+  const training = normalizeTraining(input);
   data.trainings = [training, ...data.trainings];
   return writeRaw(data);
 }
@@ -370,14 +373,10 @@ export async function hydrateTeamFromServer(opts = {}) {
   if (!canUseTrialFeatures()) return getTeamData();
   try {
     const data = await loadTrialFeatureData("manageTeam", EMPTY);
-    const next = {
-      members: Array.isArray(data?.members) ? data.members : [],
-      trainings: Array.isArray(data?.trainings) ? data.trainings : [],
-      assignments: Array.isArray(data?.assignments) ? data.assignments : [],
-    };
+    const next = normalizeBlob(data);
     const nextJson = JSON.stringify(next);
     const prevJson = localStorage.getItem(storageKey());
-    if (prevJson === nextJson) return next;
+    if (prevJson === nextJson) return getTeamData();
     localStorage.setItem(storageKey(), nextJson);
     if (notify) {
       try {
@@ -386,7 +385,7 @@ export async function hydrateTeamFromServer(opts = {}) {
         /* ignore */
       }
     }
-    return next;
+    return getTeamData();
   } catch {
     return getTeamData();
   }
