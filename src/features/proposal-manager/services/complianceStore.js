@@ -1,4 +1,9 @@
 import { scopedStorageKey, isScopedStorageEventKey } from "../../../services/tenantScopedStorage.js";
+import {
+  canUseTrialFeatures,
+  loadTrialFeatureData,
+  persistTrialFeatureData,
+} from "../../../services/trialFeatureApi.js";
 
 const BASE_KEY = "juno_trial_compliance";
 export const COMPLIANCE_CHANGED_EVENT = "juno-trial-compliance-changed";
@@ -41,33 +46,38 @@ function normalizePriority(priority) {
   return normalizeLevel(priority);
 }
 
+function normalizeBlob(data) {
+  return {
+    areas: Array.isArray(data?.areas) ? data.areas : [],
+    logs: Array.isArray(data?.logs) ? data.logs : [],
+    risks: Array.isArray(data?.risks) ? data.risks : [],
+  };
+}
+
 function readRaw() {
   try {
     const raw = localStorage.getItem(storageKey());
     if (!raw) return { ...EMPTY, areas: [], logs: [], risks: [] };
-    const parsed = JSON.parse(raw);
-    return {
-      areas: Array.isArray(parsed?.areas) ? parsed.areas : [],
-      logs: Array.isArray(parsed?.logs) ? parsed.logs : [],
-      risks: Array.isArray(parsed?.risks) ? parsed.risks : [],
-    };
+    return normalizeBlob(JSON.parse(raw));
   } catch {
     return { ...EMPTY, areas: [], logs: [], risks: [] };
   }
 }
 
+async function persistComplianceCompanyWide(data) {
+  if (!canUseTrialFeatures()) return;
+  await persistTrialFeatureData("compliance", normalizeBlob(data));
+}
+
 function writeRaw(data) {
-  const next = {
-    areas: Array.isArray(data?.areas) ? data.areas : [],
-    logs: Array.isArray(data?.logs) ? data.logs : [],
-    risks: Array.isArray(data?.risks) ? data.risks : [],
-  };
+  const next = normalizeBlob(data);
   localStorage.setItem(storageKey(), JSON.stringify(next));
   try {
     window.dispatchEvent(new CustomEvent(COMPLIANCE_CHANGED_EVENT, { detail: next }));
   } catch {
     /* ignore */
   }
+  void persistComplianceCompanyWide(next);
   return next;
 }
 
@@ -182,6 +192,30 @@ export function removeComplianceRisk(id) {
   const data = readRaw();
   data.risks = data.risks.filter((r) => r.id !== id);
   return writeRaw(data);
+}
+
+/** Load company-wide compliance into local cache (trial). */
+export async function hydrateComplianceFromServer(opts = {}) {
+  const notify = opts.notify !== false;
+  if (!canUseTrialFeatures()) return getComplianceData();
+  try {
+    const data = await loadTrialFeatureData("compliance", EMPTY);
+    const next = normalizeBlob(data);
+    const nextJson = JSON.stringify(next);
+    const prevJson = localStorage.getItem(storageKey());
+    if (prevJson === nextJson) return getComplianceData();
+    localStorage.setItem(storageKey(), nextJson);
+    if (notify) {
+      try {
+        window.dispatchEvent(new CustomEvent(COMPLIANCE_CHANGED_EVENT, { detail: next }));
+      } catch {
+        /* ignore */
+      }
+    }
+    return getComplianceData();
+  } catch {
+    return getComplianceData();
+  }
 }
 
 /** Subscribe to compliance changes (same tab + cross-tab storage). Returns unsubscribe. */

@@ -348,6 +348,53 @@ const SORT_OPTIONS = [
   { value: "size", translationKey: "proposalManagerSourceDocs.sort.fileSize" },
 ];
 
+function UploadIcon({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 16V5m0 0l-4 4m4-4l4 4"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 16.5V18a2 2 0 002 2h10a2 2 0 002-2v-1.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function UploadButton({ onClick, label, size = "md", variant = "primary" }) {
+  const isSm = size === "sm";
+  const base =
+    "group relative inline-flex items-center justify-center gap-2.5 font-semibold tracking-wide transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-offset-gray-900 active:scale-[0.98]";
+  const sizing = isSm ? "px-4 py-2 text-sm rounded-xl" : "px-6 py-3 text-sm rounded-2xl";
+  const look =
+    variant === "soft"
+      ? "bg-white/90 dark:bg-gray-900/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-700/60 shadow-sm hover:border-indigo-400 hover:shadow-md hover:bg-white dark:hover:bg-gray-900"
+      : "text-white bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-700 shadow-[0_10px_24px_-8px_rgba(79,70,229,0.65)] hover:shadow-[0_14px_28px_-8px_rgba(79,70,229,0.75)] hover:brightness-110 border border-white/10";
+
+  return (
+    <button type="button" onClick={onClick} className={`${base} ${sizing} ${look}`}>
+      <span
+        className={`inline-flex items-center justify-center rounded-lg ${
+          variant === "soft"
+            ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 w-7 h-7"
+            : "bg-white/15 text-white w-8 h-8"
+        } transition-transform duration-200 group-hover:-translate-y-0.5`}
+      >
+        <UploadIcon className={isSm ? "w-4 h-4" : "w-4.5 h-4.5 w-[18px] h-[18px]"} />
+      </span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
 export default function SourceDocsPage() {
   const { t } = useTranslation();
   const { issuer } = useProposalIssuer();
@@ -370,6 +417,7 @@ export default function SourceDocsPage() {
   const [editingId, setEditingId] = useState("");
   const [editDraft, setEditDraft] = useState("");
   const inputRef = useRef(null);
+  const boilerplateInputRef = useRef(null);
   const renameInputRef = useRef(null);
 
   useEffect(() => {
@@ -446,7 +494,7 @@ export default function SourceDocsPage() {
       reader.readAsDataURL(file);
     });
 
-  const addFiles = async (files) => {
+  const addFiles = async (files, options = {}) => {
     if (!files?.length) return;
     setUploadError("");
     const allowed = ACCEPT.split(",").map((e) => e.trim().toLowerCase());
@@ -486,6 +534,7 @@ export default function SourceDocsPage() {
         deadlineScanStatus: "scanning",
         importantDates: [],
         qaIngestCount: 0,
+        ...(options.folder ? { folder: options.folder } : {}),
       };
       queued.push({ file, doc });
     }
@@ -529,6 +578,11 @@ export default function SourceDocsPage() {
 
   const handleInputChange = (e) => {
     addFiles(e.target.files);
+    e.target.value = "";
+  };
+
+  const handleBoilerplateInputChange = (e) => {
+    addFiles(e.target.files, { folder: BOILERPLATE_FOLDER });
     e.target.value = "";
   };
 
@@ -793,12 +847,19 @@ export default function SourceDocsPage() {
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={`rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
+        className={`relative overflow-hidden rounded-2xl border-2 border-dashed p-10 text-center transition-all duration-300 ${
           dragging
-            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-            : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50"
+            ? "border-indigo-500 bg-indigo-50/90 dark:bg-indigo-950/40 scale-[1.01] shadow-lg shadow-indigo-500/10"
+            : "border-gray-300/90 dark:border-gray-600 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800/80 dark:to-gray-900/40 hover:border-indigo-400/70 dark:hover:border-indigo-500/50"
         }`}
       >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-20"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, rgba(99,102,241,0.12), transparent 40%), radial-gradient(circle at 80% 0%, rgba(139,92,246,0.1), transparent 35%)",
+          }}
+        />
         <input
           ref={inputRef}
           type="file"
@@ -807,32 +868,61 @@ export default function SourceDocsPage() {
           onChange={handleInputChange}
           className="hidden"
         />
-        <p className="text-gray-600 dark:text-gray-400 mb-4">{t("proposalManagerSourceDocs.dragAndDrop")}</p>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-colors"
-        >
-          <span className="text-lg">📤</span>
-          {t("proposalManagerSourceDocs.uploadButton")}
-        </button>
+        <div className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100/80 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 ring-1 ring-indigo-200/60 dark:ring-indigo-700/50">
+          <UploadIcon className="w-7 h-7" />
+        </div>
+        <p className="relative text-gray-600 dark:text-gray-300 mb-5 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+          {t("proposalManagerSourceDocs.dragAndDrop")}
+        </p>
+        <div className="relative">
+          <UploadButton
+            onClick={() => inputRef.current?.click()}
+            label={t("proposalManagerSourceDocs.uploadButton")}
+          />
+        </div>
         {uploadError && (
-          <p className="mt-3 text-sm text-red-600 dark:text-red-400">{uploadError}</p>
+          <p className="relative mt-4 text-sm text-red-600 dark:text-red-400">{uploadError}</p>
         )}
       </div>
 
       <section className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 p-5">
-        <div className="mb-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-            {t("proposalManagerSourceDocs.boilerplateEyebrow")}
-          </p>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {t("proposalManagerSourceDocs.boilerplateTitle")}
-          </h2>
+        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+              {t("proposalManagerSourceDocs.boilerplateEyebrow")}
+            </p>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t("proposalManagerSourceDocs.boilerplateTitle")}
+            </h2>
+          </div>
+          <div>
+            <input
+              ref={boilerplateInputRef}
+              type="file"
+              accept={ACCEPT}
+              multiple
+              onChange={handleBoilerplateInputChange}
+              className="hidden"
+            />
+            <UploadButton
+              onClick={() => boilerplateInputRef.current?.click()}
+              label={t("proposalManagerSourceDocs.uploadButton")}
+              size="sm"
+              variant="soft"
+            />
+          </div>
         </div>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-          {boilerplateDocs.map((doc) => renderDocCard(doc))}
-        </ul>
+        {boilerplateDocs.length === 0 ? (
+          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            {t("proposalManagerSourceDocs.boilerplateEmpty", {
+              defaultValue: "No documents in this section yet. Upload PDF, Word, Excel, or text files.",
+            })}
+          </p>
+        ) : (
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4">
+            {boilerplateDocs.map((doc) => renderDocCard(doc))}
+          </ul>
+        )}
       </section>
 
       <section>

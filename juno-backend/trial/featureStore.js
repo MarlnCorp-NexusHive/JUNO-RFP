@@ -17,6 +17,7 @@ export const FEATURE_KEYS = [
   "teamCollab",
   "shortlist",
   "manageTeam",
+  "compliance",
 ];
 
 const EMPTY_BY_KEY = {
@@ -33,6 +34,7 @@ const EMPTY_BY_KEY = {
   teamCollab: { workspaces: [] },
   shortlist: { items: [] },
   manageTeam: { members: [], trainings: [], assignments: [] },
+  compliance: { areas: [], logs: [], risks: [] },
 };
 
 function getFeaturesDataPath() {

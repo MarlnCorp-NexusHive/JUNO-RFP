@@ -25,6 +25,7 @@ import { buildSourceDocDeadlineAlerts } from "../features/proposal-manager/servi
 import {
   getComplianceData,
   subscribeCompliance,
+  hydrateComplianceFromServer,
   getComplianceScore,
   getUnaddressedClauseCount,
   getFarRiskFlag,
@@ -660,6 +661,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   useEffect(() => {
     if (!isTrialPm) return undefined;
     setComplianceData(getComplianceData());
+    void hydrateComplianceFromServer().then((next) => setComplianceData(next));
     return subscribeCompliance(setComplianceData);
   }, [isTrialPm]);
 

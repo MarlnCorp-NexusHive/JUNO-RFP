@@ -4,7 +4,7 @@
  */
 
 export const BOILERPLATE_FOLDER_ID = "folder_boilerplate_capabilities";
-export const BOILERPLATE_FOLDER_NAME = "Boilerplate — Winning RFP Capabilities";
+export const BOILERPLATE_FOLDER_NAME = "Boilerplate — Winning RFP/Grants Capabilities";
 export const BOILERPLATE_ORG = "Marln Corporation";
 export const BOILERPLATE_PRODUCT = "JUNO RFP";
 
@@ -170,7 +170,7 @@ export const BOILERPLATE_QAS = [
     id: "qa_boilerplate_share",
     question: "What can we send a prospect or lead today?",
     answer:
-      "Share the Source Docs folder “Boilerplate — Winning RFP Capabilities”: (1) Capability Statement, (2) Key Differentiators & Value Proposition, (3) Pursuit Lifecycle Capabilities. Each file has a public URL and an email/share action. The same language is seeded in Workspace and Content Hub for writers.",
+      "Share the Source Docs folder “Boilerplate — Winning RFP/Grants Capabilities”: (1) Capability Statement, (2) Key Differentiators & Value Proposition, (3) Pursuit Lifecycle Capabilities. Each file has a public URL and an email/share action. The same language is seeded in Workspace and Content Hub for writers.",
     tags: ["Boilerplate", "Capabilities"],
   },
 ];

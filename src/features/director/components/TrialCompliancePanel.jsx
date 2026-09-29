@@ -18,6 +18,7 @@ import {
 import {
   getComplianceData,
   subscribeCompliance,
+  hydrateComplianceFromServer,
   addComplianceArea,
   updateComplianceArea,
   removeComplianceArea,
@@ -132,7 +133,9 @@ export default function TrialCompliancePanel({ isArabic = false }) {
 
   useEffect(() => {
     setData(getComplianceData());
-    return subscribeCompliance(setData);
+    const unsub = subscribeCompliance(setData);
+    void hydrateComplianceFromServer().then((next) => setData(next));
+    return unsub;
   }, []);
 
   const label = (en, ar) => (isArabic ? ar : en);
