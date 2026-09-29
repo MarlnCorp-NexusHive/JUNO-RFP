@@ -27,6 +27,7 @@ import { initCalendar, calendarRouter } from "./calendar/index.js";
 import { generateSlideDeckFromContent } from "./slideDeckBuilder.js";
 import { buildWorkDocumentFromContent } from "./workDocumentBuilder.js";
 import { registerTechnicalSolutioningRoutes } from "./technicalSolutioningService.js";
+import { registerCommunicationAiRoutes } from "./communicationAiService.js";
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
 import { registerGrantsGovRoutes } from "./grantsGovService.js";
@@ -86,6 +87,7 @@ app.use("/rfp-collab", collaborationRouter);
 app.use("/calendar", calendarRouter);
 registerRfpAssistantEndpoints(app, openai);
 registerTechnicalSolutioningRoutes(app, openai);
+registerCommunicationAiRoutes(app, openai);
 registerGrantsGovRoutes(app);
 registerAltGrantsRoutes(app);
 
@@ -609,6 +611,9 @@ app.listen(PORT, () => {
   console.log("POST /generate-slide-deck");
   console.log("POST /technical-solution/extract-patterns");
   console.log("POST /technical-solution/generate-design");
+  console.log("POST /communication/ai/draft-kickoff");
+  console.log("POST /communication/ai/summarize");
+  console.log("POST /communication/ai/reply-coach");
   console.log("RFP collaboration API: /rfp-collab/* (see collaboration/)");
   console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines");
   console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)");

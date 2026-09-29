@@ -6,6 +6,7 @@ import MarketingReplySuggestions from './ai/MarketingReplySuggestions';
 import { useTranslation } from 'react-i18next';
 import { FiMail, FiMessageCircle, FiPhone, FiUsers, FiBell, FiCalendar, FiZap, FiFileText, FiSend, FiUser, FiChevronRight, FiSearch, FiDownload, FiPlus, FiAlertCircle, FiStar, FiInbox, FiClock, FiTrendingUp, FiTrendingDown, FiSettings, FiCheck } from 'react-icons/fi';
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import TrialCommunicationHub from "../../proposal-manager/components/TrialCommunicationHub.jsx";
 // Demo data for communication channels
 const communicationChannels = [
   {
@@ -188,30 +189,8 @@ const replySuggestionsRef = useRef(null);
 
   if (isTrialPm) {
     return (
-      <div className={`flex flex-col gap-8 animate-fade-in ${isRTLMode ? "rtl" : "ltr"}`}>
-        <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-gray-200 dark:border-gray-700 ${isRTLMode ? "flex-row-reverse" : ""}`}>
-          <div className={isRTLMode ? "text-right" : "text-left"}>
-            <h1 className={`text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 ${isRTLMode ? "flex-row-reverse" : ""}`}>
-              {pmText("Proposal Communication", "اتصال العروض")}
-              <FiMessageCircle className="text-blue-500" />
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {pmText(
-                "Kickoffs, reviews, and team messaging for proposals and RFPs.",
-                "اجتماعات الانطلاق، المراجعات، ورسائل الفريق للعروض وطلبات تقديم العروض.",
-              )}
-            </p>
-          </div>
-        </div>
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-8 text-center">
-          <FiInbox className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {pmText(
-              "No channels or messages yet. Start a kickoff or review thread as your team collaborates.",
-              "لا توجد قنوات أو رسائل بعد. ابدأ محادثة انطلاق أو مراجعة مع تعاون الفريق.",
-            )}
-          </p>
-        </section>
+      <div className={`animate-fade-in ${isRTLMode ? "rtl" : "ltr"}`}>
+        <TrialCommunicationHub isArabic={isArabic} />
       </div>
     );
   }

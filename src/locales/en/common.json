@@ -607,6 +607,8 @@
     "shortlist": "Shortlist",
     "shortlisted": "Shortlisted",
     "shortlistNeedsDeadline": "Cannot shortlist without a deadline.",
+    "openKickoff": "Open kickoff",
+    "openKickoffTitle": "Open or create a kickoff thread in Communication",
     "showMore": "Show more",
     "showLess": "Show less",
     "shortcutsHint": "Tip: Ctrl/⌘ K focuses search · Esc collapses an open grant",

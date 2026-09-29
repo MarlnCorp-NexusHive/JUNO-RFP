@@ -1288,12 +1288,15 @@
         "complianceAreaNonCompliant": "مجال غير متوافق: {{name}} يتطلب إجراءً",
         "complianceHighRisk": "مخاطر امتثال مرتفعة: {{name}}",
         "assignmentDeadline": "موعد التسليم {{date}}: {{title}}{{daysPart}}",
-        "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}"
+        "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}",
+        "communicationUnread": "{{count}} رسائل عروض غير مقروءة",
+        "communicationUnread_one": "رسالة عرض غير مقروءة واحدة",
+        "communicationMention": "تمت الإشارة إليك في {{channel}}: {{preview}}"
       }
     },
     "trialEmpty": {
       "noPipelineYet": "لا توجد بيانات خط أنابيب بعد",
-      "noAlerts": "لا توجد تنبيهات بعد. أضف مواعيد منح/RFP إلى القائمة المختصرة أو احصل على مهمة مسندة إليك لرؤية التحديثات هنا.",
+      "noAlerts": "لا توجد تنبيهات بعد. أضف مواعيد منح/RFP إلى القائمة المختصرة، أو ارفع مستنداً بموعد نهائي، أو احصل على مهمة، أو استلم رسالة.",
       "chartsFillIn": "تُملأ المخططات مع التقاط الفرص وتقديمها.",
       "forecastsAppear": "تظهر التوقعات مع التقديم والفوز."
     },

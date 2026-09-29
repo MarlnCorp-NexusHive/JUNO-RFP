@@ -1290,12 +1290,15 @@
         "complianceAreaNonCompliant": "Non-compliant area: {{name}} requires action",
         "complianceHighRisk": "High compliance risk: {{name}}",
         "assignmentDeadline": "Assignment due {{date}}: {{title}}{{daysPart}}",
-        "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}"
+        "sourceDocDeadline": "{{event}} {{date}}: {{title}}{{daysPart}}",
+        "communicationUnread": "{{count}} unread proposal messages",
+        "communicationUnread_one": "{{count}} unread proposal message",
+        "communicationMention": "Mentioned in {{channel}}: {{preview}}"
       }
     },
     "trialEmpty": {
       "noPipelineYet": "No pipeline data yet",
-      "noAlerts": "No alerts yet. Shortlist grants/RFPs, upload a source doc with a deadline, or get assigned a task.",
+      "noAlerts": "No alerts yet. Shortlist grants/RFPs, upload a source doc with a deadline, get assigned a task, or receive a message.",
       "chartsFillIn": "Charts fill in as you capture and submit opportunities.",
       "forecastsAppear": "Forecasts appear as you submit and win."
     },

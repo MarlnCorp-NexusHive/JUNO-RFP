@@ -28,7 +28,7 @@ const EMPTY_BY_KEY = {
   scoring: { records: [] },
   winSlide: { draft: null, settings: {} },
   userManagement: { users: [] },
-  communication: { channels: [], messages: [] },
+  communication: { channels: [], messages: [], readState: {} },
   pricing: { laborRates: [], volumes: [], trends: [] },
   bidVault: { submissions: [], winLoss: [], pipeline: [] },
   teamCollab: { workspaces: [] },

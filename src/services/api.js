@@ -96,6 +96,28 @@ export const askWithContext = async (question, document) => {
   return res.data.answer;
 };
 
+/* ================= COMMUNICATION AI ================= */
+export const draftCommunicationKickoff = async (payload) => {
+  const res = await API.post("/communication/ai/draft-kickoff", payload || {}, {
+    timeout: 60_000,
+  });
+  return res.data;
+};
+
+export const summarizeCommunicationThread = async (payload) => {
+  const res = await API.post("/communication/ai/summarize", payload || {}, {
+    timeout: 60_000,
+  });
+  return res.data;
+};
+
+export const coachCommunicationReply = async (payload) => {
+  const res = await API.post("/communication/ai/reply-coach", payload || {}, {
+    timeout: 60_000,
+  });
+  return res.data;
+};
+
 /* ================= COMPANY INTELLIGENCE ================= */
 export const fetchCompanyIntelligenceRemote = async ({ query }) => {
   const res = await API.post("/company-intelligence-remote", { query });

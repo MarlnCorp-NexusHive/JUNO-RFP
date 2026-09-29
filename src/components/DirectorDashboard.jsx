@@ -36,6 +36,12 @@ import {
   listMyAssignments,
   hydrateTeamFromServer,
 } from "../features/proposal-manager/services/teamStore.js";
+import {
+  getCommunicationData,
+  subscribeCommunication,
+  hydrateCommunicationFromServer,
+  buildCommunicationAlerts,
+} from "../features/proposal-manager/services/communicationStore.js";
 
 function isTrialUserSession() {
   const session = getTrialSession();
@@ -445,6 +451,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const [shortlistItems, setShortlistItems] = useState(() => listShortlist());
   const [complianceData, setComplianceData] = useState(() => getComplianceData());
   const [assignmentItems, setAssignmentItems] = useState(() => listMyAssignments());
+  const [communicationData, setCommunicationData] = useState(() => getCommunicationData());
   const [sourceDocAlertTick, setSourceDocAlertTick] = useState(0);
   const isArabic = String(i18n?.resolvedLanguage || i18n?.language || 'en').toLowerCase().startsWith('ar');
   const pmText = (en, ar) => (isArabic ? ar : en);
@@ -679,6 +686,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
+    setCommunicationData(getCommunicationData());
+    void hydrateCommunicationFromServer().then((next) => setCommunicationData(next));
+    return subscribeCommunication(setCommunicationData);
+  }, [isTrialPm]);
+
+  useEffect(() => {
+    if (!isTrialPm) return undefined;
     const bump = () => setSourceDocAlertTick((n) => n + 1);
     bump();
     window.addEventListener("juno-source-docs-deadlines-changed", bump);
@@ -740,10 +754,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           };
         })
     : [];
-  // Trial dashboard: RFP/grant shortlist + source-doc application deadlines + my tasks
+  const communicationAlerts = isTrialPm
+    ? buildCommunicationAlerts(communicationData, t)
+    : [];
+  // Trial dashboard: RFP/grant shortlist + source-doc application deadlines + my tasks + communication
   const alerts = isPM
     ? isTrialPm
-      ? [...shortlistAlerts, ...sourceDocAlerts, ...assignmentAlerts]
+      ? [...shortlistAlerts, ...sourceDocAlerts, ...assignmentAlerts, ...communicationAlerts]
       : [...shortlistAlerts, ...staticPmAlerts]
     : [
         { icon: '🚨', text: t('dashboard.alerts.pendingBudgetApprovals'), color: 'text-red-500' },
