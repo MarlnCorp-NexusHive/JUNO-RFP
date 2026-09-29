@@ -295,14 +295,29 @@ export default function ProposalManagerContentHub() {
   return (
     <div className="min-h-screen bg-[#F6F7FA] dark:bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div>
+        <div
+          data-tour="1"
+          data-tour-title-en="Content Hub"
+          data-tour-title-ar="مركز المحتوى"
+          data-tour-content-en="Browse and maintain reusable answers and boilerplate for faster responses."
+          data-tour-content-ar="تصفح وحافظ على إجابات وقوالب قابلة لإعادة الاستخدام لتسريع الردود."
+          data-tour-position="bottom"
+        >
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {t("proposalManagerContentHub.title")}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">{t("proposalManagerContentHub.description")}</p>
         </div>
 
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4">
+        <section
+          className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-4"
+          data-tour="2"
+          data-tour-title-en="Q&A library"
+          data-tour-title-ar="مكتبة الأسئلة والأجوبة"
+          data-tour-content-en="Answers saved from Workspace upsert into this company library."
+          data-tour-content-ar="الإجابات المحفوظة من مساحة العمل تُدرج في هذه المكتبة المشتركة."
+          data-tour-position="bottom"
+        >
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
             <FiZap className="text-indigo-500 shrink-0" />
             {t("proposalManagerContentHub.aiAssistant.heading")}

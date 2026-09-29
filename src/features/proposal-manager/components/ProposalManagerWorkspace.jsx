@@ -60,6 +60,9 @@ import RichTextAnswerEditor, { toPlainTextFromHtml, toHtmlFromPlain } from "./do
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
 
+/** Set true to show the styled Word export option again in the download modal. */
+const SHOW_STYLED_DOCUMENT_EXPORT = false;
+
 /** Remove characters invalid in Windows / macOS download file names. */
 function sanitizeFileNameSegment(raw, maxLen = 100) {
   return String(raw || "")
@@ -1097,14 +1100,29 @@ export default function ProposalManagerWorkspace() {
   return (
     <div className="min-h-screen bg-[#F6F7FA] dark:bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div>
+        <div
+          data-tour="1"
+          data-tour-title-en="Response workspace"
+          data-tour-title-ar="مساحة الاستجابة"
+          data-tour-content-en="Build and edit RFP responses for the selected document and issuer."
+          data-tour-content-ar="ابنِ وعدّل ردود طلب العرض للمستند والجهة المحددين."
+          data-tour-position="bottom"
+        >
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("proposalManagerWorkspace.title")}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             {t("proposalManagerWorkspace.subtitle")}
           </p>
         </div>
 
-        <section className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-indigo-950/40 dark:via-gray-800 dark:to-blue-950/30 p-5 shadow-sm space-y-3">
+        <section
+          className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-indigo-950/40 dark:via-gray-800 dark:to-blue-950/30 p-5 shadow-sm space-y-3"
+          data-tour="2"
+          data-tour-title-en="Issuer & document context"
+          data-tour-title-ar="سياق الجهة والمستند"
+          data-tour-content-en="Select the issuing company and RFP document so answers and exports stay personalized."
+          data-tour-content-ar="اختر الجهة المصدرة ومستند طلب العرض لتبقى الإجابات والتصدير مخصصة."
+          data-tour-position="bottom"
+        >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-start gap-2 min-w-0">
               <FiZap className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
@@ -1776,6 +1794,12 @@ export default function ProposalManagerWorkspace() {
                                 setShowAuditModal(true);
                               }}
                               disabled={auditAssignBusy || collabLinkStale}
+                              data-tour="3"
+                              data-tour-title-en="Ask team member"
+                              data-tour-title-ar="اطلب من عضو الفريق"
+                              data-tour-content-en="Assign a question to a company teammate via Team Collab for review."
+                              data-tour-content-ar="عيّن سؤالًا لزميل في الشركة عبر تعاون الفريق للمراجعة."
+                              data-tour-position="top"
                               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-violet-500/80 dark:border-violet-500 bg-white dark:bg-gray-800 text-violet-800 dark:text-violet-200 hover:bg-violet-50 dark:hover:bg-violet-950/40 disabled:opacity-50 text-sm font-medium"
                             >
                               <FiUserPlus className="w-4 h-4 shrink-0" />
@@ -1828,7 +1852,11 @@ export default function ProposalManagerWorkspace() {
             </div>
 
             <div className="p-5 sm:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              <div
+                className={`grid grid-cols-1 gap-4 md:gap-5 ${
+                  SHOW_STYLED_DOCUMENT_EXPORT ? "md:grid-cols-2" : "max-w-md mx-auto"
+                }`}
+              >
                 {/* Simple Q&A */}
                 <div className="group flex flex-col rounded-2xl border-2 border-emerald-200/90 dark:border-emerald-800/70 bg-gradient-to-b from-white to-emerald-50/50 dark:from-gray-800/80 dark:to-emerald-950/25 shadow-lg shadow-emerald-900/5 dark:shadow-none ring-1 ring-emerald-500/10 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-900/10">
                   <div className="p-4 pb-0">
@@ -1854,7 +1882,8 @@ export default function ProposalManagerWorkspace() {
                   </div>
                 </div>
 
-                {/* Styled proposal — Marln DXC template on server */}
+                {/* Styled proposal — Marln DXC template on server (kept; toggle SHOW_STYLED_DOCUMENT_EXPORT) */}
+                {SHOW_STYLED_DOCUMENT_EXPORT ? (
                 <div className="group relative flex flex-col rounded-2xl border-2 border-indigo-200/90 dark:border-indigo-800/70 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800/80 dark:to-indigo-950/25 shadow-lg shadow-indigo-900/5 dark:shadow-none ring-1 ring-indigo-500/10 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-900/10">
                   <span className="absolute top-3 end-3 z-10 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 dark:bg-indigo-500/25 dark:text-indigo-100 ring-1 ring-indigo-300/50 dark:ring-indigo-500/30">
                     {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledBadge")}
@@ -1873,7 +1902,11 @@ export default function ProposalManagerWorkspace() {
                       type="button"
                       onClick={() => void handleDownloadStyledWorkspaceDocument()}
                       disabled={
-                        styledDocExporting || workspaceDocExporting || !workspaceDocId || answeredCount === 0
+                        !SHOW_STYLED_DOCUMENT_EXPORT ||
+                        styledDocExporting ||
+                        workspaceDocExporting ||
+                        !workspaceDocId ||
+                        answeredCount === 0
                       }
                       className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white text-sm font-semibold shadow-md shadow-indigo-900/20 transition"
                     >
@@ -1883,6 +1916,7 @@ export default function ProposalManagerWorkspace() {
                     </button>
                   </div>
                 </div>
+                ) : null}
               </div>
 
               <div className="mt-5 flex justify-end">

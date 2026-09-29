@@ -264,7 +264,15 @@ export default function WinSlidePage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6 lg:p-8" dir={dir}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-wrap items-start justify-between gap-3">
+        <header
+          className="flex flex-wrap items-start justify-between gap-3"
+          data-tour="1"
+          data-tour-title-en="Win Slide"
+          data-tour-title-ar="شريحة الفوز"
+          data-tour-content-en="Build a concise post-selection narrative for leadership and capture teams."
+          data-tour-content-ar="ابنِ سردًا موجزًا بعد الاختيار للقيادة وفرق الاستحواذ."
+          data-tour-position="bottom"
+        >
           <div>
             <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
               <FiLayout className="h-5 w-5" />
@@ -274,7 +282,15 @@ export default function WinSlidePage() {
               {t("proposalManagerWinSlide.title")}
             </h1>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div
+            className="flex flex-wrap gap-2"
+            data-tour="2"
+            data-tour-title-en="POV & competitors"
+            data-tour-title-ar="وجهة النظر والمنافسون"
+            data-tour-content-en="Document proof, differentiators, and competitive framing for the win or loss."
+            data-tour-content-ar="وثّق الإثبات والمميزات والإطار التنافسي للفوز أو الخسارة."
+            data-tour-position="left"
+          >
             {trial ? (
               <button
                 type="button"

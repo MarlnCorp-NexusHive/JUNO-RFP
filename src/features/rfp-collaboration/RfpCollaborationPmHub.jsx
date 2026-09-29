@@ -264,14 +264,30 @@ export default function RfpCollaborationPmHub() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div
+        className="flex flex-wrap items-center justify-between gap-3"
+        data-tour="1"
+        data-tour-title-en="Team Collab hub"
+        data-tour-title-ar="مركز تعاون الفريق"
+        data-tour-content-en="Company-wide collaboration workspaces for assigning and reviewing RFP questions."
+        data-tour-content-ar="مساحات تعاون على مستوى الشركة لتعيين ومراجعة أسئلة طلبات العروض."
+        data-tour-position="bottom"
+      >
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("rfpCollaboration.pmHubTitle")}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {session.user.name} · {t("rfpCollaboration.pmHubSubtitle")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2"
+          data-tour="2"
+          data-tour-title-en="New workspace"
+          data-tour-title-ar="مساحة عمل جديدة"
+          data-tour-content-en="Create a workspace from an RFP document or paste requirements, then split questions with AI."
+          data-tour-content-ar="أنشئ مساحة من مستند طلب عرض أو الصق المتطلبات ثم قسّم الأسئلة بالذكاء الاصطناعي."
+          data-tour-position="left"
+        >
           <button
             type="button"
             onClick={() => refresh()}
@@ -297,7 +313,15 @@ export default function RfpCollaborationPmHub() {
         </div>
       ) : null}
 
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+      <div
+        className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden"
+        data-tour="3"
+        data-tour-title-en="Workspaces list"
+        data-tour-title-ar="قائمة المساحات"
+        data-tour-content-en="Open a workspace to assign questions, review submissions, and follow the live activity log."
+        data-tour-content-ar="افتح مساحة لتعيين الأسئلة ومراجعة التقديمات ومتابعة سجل النشاط المباشر."
+        data-tour-position="top"
+      >
         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
           <FiUsers className="w-5 h-5 text-indigo-500" />
           <h2 className="font-semibold text-gray-900 dark:text-white">{t("rfpCollaboration.workspaces")}</h2>

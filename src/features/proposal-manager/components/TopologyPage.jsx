@@ -42,7 +42,15 @@ export default function TopologyPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6 lg:p-8" dir={dir}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="space-y-1">
+        <header
+          className="space-y-1"
+          data-tour="1"
+          data-tour-title-en="Topology overview"
+          data-tour-title-ar="نظرة عامة على الطوبولوجيا"
+          data-tour-content-en="Map how JUNO sits on the customer environment for this pursuit."
+          data-tour-content-ar="اعرض كيف تجلس JUNO على بيئة العميل لهذه المتابعة."
+          data-tour-position="bottom"
+        >
           <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
             <FiMap className="h-5 w-5" aria-hidden />
             <span className="text-xs font-semibold uppercase tracking-wide">
@@ -67,7 +75,15 @@ export default function TopologyPage() {
           )}
         </header>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <section
+          className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          data-tour="2"
+          data-tour-title-en="Environment layers"
+          data-tour-title-ar="طبقات البيئة"
+          data-tour-content-en="Toggle infrastructure layers and legends tied to RFP requirements."
+          data-tour-content-ar="بدّل طبقات البنية والأساطير المرتبطة بمتطلبات طلب العرض."
+          data-tour-position="bottom"
+        >
           <div className="flex flex-wrap items-end justify-between gap-3">
             <label className="block text-sm">
               <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">

@@ -84,15 +84,11 @@ export const TourProvider = ({ children }) => {
       return false;
     }
 
-    // Determine steps (auto-scan if enabled)
-    let steps = [];
-    if (tour.autoScan) {
+    // Prefer authored steps; use DOM [data-tour] only when no authored steps exist.
+    let steps = getTourSteps(role, page) || [];
+    if ((!steps || steps.length === 0) && tour.autoScan) {
       steps = buildAutoSteps(currentLanguage);
     }
-    if (!steps || steps.length === 0) {
-      steps = getTourSteps(role, page);
-    }
-    // Soft fallback so new pages still get a Start Tour experience
     if (!steps || steps.length === 0) {
       steps = [
         {
@@ -190,22 +186,31 @@ export const TourProvider = ({ children }) => {
 
   // Get tour status for smart button behavior
   const getTourStatus = useCallback((role, page) => {
+    const tour = getTourData(role, page);
     if (hasTour(role, page)) {
       return {
         available: true,
         text: t('sidebar.startTour'),
         icon: '⭐',
-        action: 'start'
+        action: 'start',
+        page,
+        title: tour?.title?.[currentLanguage] || tour?.title?.en || '',
+        description: tour?.description?.[currentLanguage] || tour?.description?.en || '',
+        stepCount: (tour?.steps || []).length || (tour?.autoScan ? null : 0),
       };
     } else {
       return {
         available: false,
         text: t('sidebar.tourComingSoon'),
         icon: '🚧',
-        action: 'coming-soon'
+        action: 'coming-soon',
+        page,
+        title: '',
+        description: '',
+        stepCount: 0,
       };
     }
-  }, [t]);
+  }, [t, currentLanguage]);
 
   // Handle tour coming soon
   const handleTourComingSoon = useCallback(() => {

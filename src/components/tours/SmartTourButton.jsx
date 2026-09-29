@@ -96,6 +96,9 @@ const SmartTourButton = ({
 
   const currentPage = getCurrentPage();
   const tourStatus = getTourStatus(role, currentPage);
+  const tooltipText = tourStatus.available
+    ? [tourStatus.text, tourStatus.title, tourStatus.description].filter(Boolean).join(" — ")
+    : tourStatus.text;
 
   // Handle button click
   const handleClick = () => {
@@ -206,12 +209,20 @@ const SmartTourButton = ({
     <div className="relative w-full flex items-center justify-center">
       {/* Enhanced tooltip for collapsed mode */}
       {!expanded && (
-        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-50 shadow-xl whitespace-nowrap">
-          <div className="flex items-center gap-2">
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-50 shadow-xl">
+          <div className="flex items-start gap-2">
             {tourStatus.available && (
-              <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+              <span className="w-2 h-2 mt-1 bg-yellow-400 rounded-full animate-pulse shrink-0"></span>
             )}
-            {isLoading ? t('common.loading') : tourStatus.text}
+            {isLoading ? t('common.loading') : (
+              <div className="max-w-xs">
+                <div className="font-semibold whitespace-nowrap">{tourStatus.text}</div>
+                {tourStatus.title ? <div className="opacity-90 mt-0.5">{tourStatus.title}</div> : null}
+                {tourStatus.description ? (
+                  <div className="opacity-75 mt-1 whitespace-normal leading-snug">{tourStatus.description}</div>
+                ) : null}
+              </div>
+            )}
           </div>
           {/* Tooltip arrow */}
           <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black"></div>
@@ -221,7 +232,7 @@ const SmartTourButton = ({
       <button
         onClick={handleClick}
         className={`${getButtonStyles()} group relative overflow-hidden`}
-        title={tourStatus.text}
+        title={tooltipText}
         disabled={isLoading}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -248,7 +259,14 @@ const SmartTourButton = ({
                 </div>
               </span>
             ) : (
-              tourStatus.text
+              <span className="flex flex-col items-start min-w-0">
+                <span>{tourStatus.text}</span>
+                {tourStatus.title ? (
+                  <span className="text-[11px] font-normal opacity-90 truncate max-w-[9.5rem]">
+                    {tourStatus.title}
+                  </span>
+                ) : null}
+              </span>
             )}
           </span>
         )}

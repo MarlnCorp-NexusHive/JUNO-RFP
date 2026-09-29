@@ -96,14 +96,30 @@ export default function ProposalPricingPage() {
           </motion.div>
         )}
 
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div
+          className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+          data-tour="1"
+          data-tour-title-en="Pricing overview"
+          data-tour-title-ar="نظرة عامة على التسعير"
+          data-tour-content-en="Model labor and cost proposal views for the active pursuit."
+          data-tour-content-ar="نمذج العمالة وتكلفة العرض للمتابعة النشطة."
+          data-tour-position="bottom"
+        >
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("proposalManagerPricing.title")}</h1>
             <p className="text-sm text-gray-600 dark:text-gray-300">
               {t("proposalManagerPricing.subtitle")}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div
+            className="flex flex-wrap gap-2"
+            data-tour="2"
+            data-tour-title-en="Pricing tabs"
+            data-tour-title-ar="تبويبات التسعير"
+            data-tour-content-en="Switch between labor, cost, and related analytics views."
+            data-tour-content-ar="بدّل بين العمالة والتكلفة والتحليلات ذات الصلة."
+            data-tour-position="left"
+          >
             {tabs.map((tab) => (
               <button
                 key={tab.id}

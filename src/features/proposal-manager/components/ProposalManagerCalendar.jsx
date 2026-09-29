@@ -337,7 +337,15 @@ export default function ProposalManagerCalendar() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
       >
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div
+          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+          data-tour="1"
+          data-tour-title-en="Meetings & Calendar"
+          data-tour-title-ar="الاجتماعات والتقويم"
+          data-tour-content-en="See RFP deadlines and pursuit meetings on one company calendar."
+          data-tour-content-ar="اعرض مواعيد طلبات العروض واجتماعات المتابعة في تقويم واحد للشركة."
+          data-tour-position="bottom"
+        >
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
               <FiCalendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />
@@ -352,7 +360,15 @@ export default function ProposalManagerCalendar() {
               </span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div
+            className="flex flex-wrap items-center gap-3"
+            data-tour="2"
+            data-tour-title-en="Add & sync"
+            data-tour-title-ar="إضافة ومزامنة"
+            data-tour-content-en="Add events or pull deadlines extracted from Source Docs uploads."
+            data-tour-content-ar="أضف أحداثًا أو اسحب المواعيد المستخرجة من رفع مستندات المصدر."
+            data-tour-position="left"
+          >
             {nextDeadline && (
               <div className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/40">
                 <div className="text-xs text-red-600 dark:text-red-400 font-medium">

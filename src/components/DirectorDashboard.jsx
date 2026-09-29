@@ -1457,10 +1457,10 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         <div
           className="dashboard-header"
           data-tour="1"
-          data-tour-title-en="Dashboard Header"
-          data-tour-content-en="Your page title and context"
+          data-tour-title-en="Dashboard header"
+          data-tour-content-en="Your JUNO RFP capture desk title and context for this session."
           data-tour-title-ar="رأس اللوحة"
-          data-tour-content-ar="عنوان الصفحة والسياق"
+          data-tour-content-ar="عنوان وسياق مكتب الاستحواذ في JUNO RFP لهذه الجلسة."
           data-tour-position="bottom"
         >
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -1671,10 +1671,10 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         <div
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
           data-tour="4"
-          data-tour-title-en="Recruitment & Finance Charts"
-          data-tour-content-en="Visualize recruitment trends and finance distribution."
-          data-tour-title-ar="مخططات القبول والمالية"
-          data-tour-content-ar="عرض اتجاهات القبول وتوزيع المالية."
+          data-tour-title-en="Win-rate & capture charts"
+          data-tour-content-en="Visualize win-rate trends and capture mix. Charts fill as you upload Source Docs and Bid Vault opportunities."
+          data-tour-title-ar="مخططات معدل الفوز والاستحواذ"
+          data-tour-content-ar="اعرض اتجاهات معدل الفوز ومزيج الاستحواذ. تُملأ المخططات عند رفع مستندات المصدر وفرص خزينة العروض."
           data-tour-position="top"
         >
           {/* Rolling Win Rate by Procurement Type (Proposal Manager) / Recruitment Trend (Director) */}
@@ -1779,10 +1779,10 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         {/* Department Performance Bar Chart */}
         <motion.div
           data-tour="5"
-          data-tour-title-en="Department Performance"
-          data-tour-content-en="Compare department KPIs at a glance."
-          data-tour-title-ar="أداء الأقسام"
-          data-tour-content-ar="قارن مؤشرات الأقسام بسرعة."
+          data-tour-title-en="Department performance"
+          data-tour-content-en="Compare capture and proposal KPIs across teams at a glance."
+          data-tour-title-ar="أداء الفرق"
+          data-tour-content-ar="قارن مؤشرات الاستحواذ والعروض عبر الفرق بسرعة."
           data-tour-position="top"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1806,10 +1806,10 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         <section
           className="mt-8"
           data-tour="6"
-          data-tour-title-en="Academic Insights"
-          data-tour-content-en="Longer-term academic trends and top departments."
+          data-tour-title-en="Portfolio insights"
+          data-tour-content-en="Longer-term pursuit trends and top-performing segments."
           data-tour-title-ar="رؤى المحفظة"
-          data-tour-content-ar="اتجاهات محفظة طويلة الأجل وأفضل الأقسام."
+          data-tour-content-ar="اتجاهات المتابعة طويلة الأجل وأفضل القطاعات أداءً."
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -2116,9 +2116,9 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           className="mt-8"
           data-tour="10"
           data-tour-title-en="AI-Powered Forecasts"
-          data-tour-content-en="Predictive insights: recruitment, retention risk, surplus forecasts."
+          data-tour-content-en="Predictive insights for capture performance, conversion, and pipeline risk."
           data-tour-title-ar="توقعات مدعومة بالذكاء الاصطناعي"
-          data-tour-content-ar="رؤى تنبؤية: القبول، مخاطر الانسحاب، الفائض."
+          data-tour-content-ar="رؤى تنبؤية لأداء الاستحواذ والتحويل ومخاطر خط الأنابيب."
           data-tour-position="bottom"
         >
           <div className="flex items-center gap-2 mb-2">

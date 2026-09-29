@@ -64,8 +64,12 @@ async function confirmTrialEmailOnce(token) {
 
 function ProductHighlight({ label, darkTheme }) {
   return (
-    <div className={`flex items-center gap-2 text-xs ${darkTheme ? "text-white/70" : "text-white/85"}`}>
-      <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-white/25">
+    <div className={`flex items-center gap-2 text-xs ${darkTheme ? "text-stone-300" : "text-stone-600"}`}>
+      <span
+        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
+          darkTheme ? "bg-[#C6A75E]/20 text-[#E8D5A3]" : "bg-[#8B6914]/12 text-[#8B6914]"
+        }`}
+      >
         <svg width="8" height="8" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -321,32 +325,66 @@ function LoginPageContent() {
     setTimeout(() => setDemoReloaded(false), 3000);
   };
 
-  const inputClass = `w-full px-4 py-3 rounded-xl ${darkTheme ? 'bg-slate-700/80 text-white placeholder:text-slate-300/60' : 'bg-white/60 text-[#23232B] placeholder:text-[#23232B]/60'} focus:outline-none focus:ring-2 focus:ring-[#4f3cc9] font-medium shadow text-${textAlign('left')}`;
-  const labelClass = `block text-sm font-medium ${darkTheme ? 'text-white' : 'text-white/80'} mb-1 text-${textAlign('left')}`;
+  const inputClass = `w-full px-4 py-3 rounded-xl border transition-colors ${
+    darkTheme
+      ? "bg-[#1A1714] border-[#3A342C] text-[#F5F0E8] placeholder:text-[#A89F91] focus:border-[#C6A75E] focus:ring-[#C6A75E]/35"
+      : "bg-[#FFFcf7] border-[#E4DCCF] text-[#1C1917] placeholder:text-[#8A8278] focus:border-[#B8953D] focus:ring-[#B8953D]/30"
+  } focus:outline-none focus:ring-2 font-medium shadow-sm text-${textAlign("left")}`;
+  const labelClass = `block text-sm font-medium mb-1 text-${textAlign("left")} ${
+    darkTheme ? "text-[#E8E0D4]" : "text-[#3F3A34]"
+  }`;
+  const mutedCopyClass = darkTheme ? "text-[#B7AEA2]" : "text-[#6F675E]";
+  const linkClass = darkTheme
+    ? "text-[#E8D5A3] hover:text-[#F3E6C4]"
+    : "text-[#8B6914] hover:text-[#6F540F]";
+  const ctaClass = darkTheme
+    ? "w-full py-3 rounded-xl bg-gradient-to-r from-[#C6A75E] to-[#A8883A] text-[#1A1408] font-semibold text-lg shadow-[0_10px_30px_rgba(198,167,94,0.28)] hover:from-[#D4B56C] hover:to-[#B8953D] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+    : "w-full py-3 rounded-xl bg-[#1C1917] text-[#F8F4EC] font-semibold text-lg shadow-[0_10px_28px_rgba(28,25,23,0.22)] hover:bg-[#2A241C] hover:shadow-[0_12px_32px_rgba(28,25,23,0.28)] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed";
 
   return (
-    <RTLWrapper className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#4f3cc9] via-[#6c5dd3] to-[#90caf9] relative">
-      {/* Language Switcher and Theme Toggle - Positioned absolutely in top-right */}
-      <div className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'} z-10 flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''} top-controls`}>
-        {/* Theme Toggle Button */}
+    <RTLWrapper
+      className={`min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-10 ${
+        darkTheme ? "bg-[#0B0A09]" : "bg-[#F3F0EA]"
+      }`}
+    >
+      {/* Ambient stage — gold/espresso, tuned to the JUNO medallion */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        {darkTheme ? (
+          <>
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_30%,rgba(198,167,94,0.16),transparent_55%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_85%_75%,rgba(90,70,35,0.22),transparent_50%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.03),transparent_40%,rgba(0,0,0,0.35))]" />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_20%,rgba(214,190,120,0.28),transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_90%_80%,rgba(120,95,50,0.10),transparent_45%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.55),transparent_35%,rgba(40,30,18,0.04))]" />
+          </>
+        )}
+      </div>
+
+      {/* Language Switcher and Theme Toggle */}
+      <div className={`absolute top-6 ${isRTL ? "left-6" : "right-6"} z-10 flex items-center space-x-2 ${isRTL ? "space-x-reverse" : ""} top-controls`}>
         <button
           onClick={handleThemeToggle}
           className={`
             relative inline-flex items-center justify-center w-12 h-12 
-            bg-white/20 backdrop-blur-sm rounded-full 
-            border border-white/30 shadow-lg
-            hover:bg-white/30 hover:scale-105 
-            transition-all duration-300 ease-in-out
-            group
-            ${isRTL ? 'ml-2' : 'mr-2'}
+            rounded-full border shadow-lg
+            hover:scale-105 transition-all duration-300 ease-in-out group
+            ${isRTL ? "ml-2" : "mr-2"}
+            ${
+              darkTheme
+                ? "bg-[#1A1714]/80 border-[#C6A75E]/25 text-[#E8D5A3] hover:bg-[#241F1A] hover:border-[#C6A75E]/45"
+                : "bg-white/80 border-[#D9D0C2] text-[#5C5348] hover:bg-white hover:border-[#C6A75E]/50"
+            }
           `}
-          title={darkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          aria-label={darkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          title={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
-          {/* Sun Icon */}
           <svg
-            className={`w-5 h-5 text-yellow-400 transition-all duration-300 ${
-              darkTheme ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-0'
+            className={`w-5 h-5 text-[#C6A75E] transition-all duration-300 absolute ${
+              darkTheme ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-90 scale-0"
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -357,49 +395,105 @@ function LoginPageContent() {
               clipRule="evenodd"
             />
           </svg>
-          
-          {/* Moon Icon */}
           <svg
-            className={`w-5 h-5 text-blue-300 transition-all duration-300 absolute ${
-              darkTheme ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
+            className={`w-5 h-5 text-[#5C5348] transition-all duration-300 absolute ${
+              darkTheme ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
           </svg>
-
-          {/* Hover effect ring */}
-          <div className="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-white/40 transition-all duration-300"></div>
+          <div className="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-[#C6A75E]/25 transition-all duration-300" />
         </button>
-        
+
         <LanguageSwitcher />
       </div>
-      
-      <div className={`flex w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-lg border border-white/20 ${flexDirection('row')}`}>
-        {/* Left Side - Logo & Tagline */}
-        <div className={`hidden md:flex flex-col items-center justify-center w-1/2 bg-white/10 p-10 ${isRTL ? 'rounded-r-3xl' : 'rounded-l-3xl'}`}>
-          <img
-            src="/juno-rfp-logo.png"
-            alt="JUNO RFP"
-            className="w-full max-w-56 object-contain drop-shadow-lg"
+
+      <div
+        className={`relative z-[1] flex w-full max-w-4xl rounded-[1.75rem] overflow-hidden border shadow-[0_30px_80px_rgba(20,16,10,0.28)] ${flexDirection("row")} ${
+          darkTheme
+            ? "bg-[#14110F]/95 border-[#3A342C]/80"
+            : "bg-white/90 border-[#E8E0D4] shadow-[0_28px_70px_rgba(40,30,18,0.14)]"
+        }`}
+      >
+        {/* Brand stage — always espresso so the gold/white logo medallion sits naturally */}
+        <div
+          className={`hidden md:flex flex-col items-center justify-center w-[46%] relative overflow-hidden ${
+            isRTL ? "rounded-r-[1.75rem]" : "rounded-l-[1.75rem]"
+          }`}
+          style={{
+            background:
+              "radial-gradient(circle at 50% 42%, #3A2E22 0%, #1A140F 48%, #0B0908 100%)",
+          }}
+        >
+          <div
+            className="pointer-events-none absolute inset-0 opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 45%, rgba(198,167,94,0.22), transparent 58%)",
+            }}
+            aria-hidden="true"
           />
+          <div
+            className="pointer-events-none absolute -inset-8 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, transparent, transparent 11px, rgba(255,255,255,0.35) 12px)",
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="relative flex flex-col items-center px-10 py-12">
+            <div
+              className="relative flex items-center justify-center rounded-full p-3"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(198,167,94,0.18) 0%, rgba(198,167,94,0.05) 45%, transparent 70%)",
+                boxShadow: "0 0 0 1px rgba(198,167,94,0.18), 0 24px 60px rgba(0,0,0,0.45)",
+              }}
+            >
+              <img
+                src="/juno-rfp-logo.png"
+                alt="JUNO RFP"
+                className="w-full max-w-[15.5rem] object-contain"
+              />
+            </div>
+            <p className="mt-8 max-w-[16rem] text-center text-sm leading-relaxed text-[#D8CBAE]/85 tracking-wide">
+              Audit-Ready. Submission-Ready. Win-Ready.
+            </p>
+          </div>
         </div>
-        {/* Right Side - Login Form */}
-        <div className={`flex-1 flex flex-col justify-center items-center p-8 md:p-16 bg-white/20 ${isRTL ? 'rounded-l-3xl' : 'rounded-r-3xl'} form-container`}>
+
+        {/* Form panel */}
+        <div
+          className={`flex-1 flex flex-col justify-center items-center p-8 md:p-14 form-container ${
+            isRTL ? "rounded-l-[1.75rem]" : "rounded-r-[1.75rem]"
+          } ${darkTheme ? "bg-[#171411]" : "bg-[#FFFcf8]"}`}
+        >
           <div className="w-full max-w-sm">
-            <h2 className={`text-2xl font-bold text-center ${darkTheme ? 'text-white' : 'text-[#23232B]'} mb-2`}>
+            {/* Mobile logo */}
+            <div className="md:hidden mb-8 flex justify-center">
+              <div
+                className="rounded-full p-2"
+                style={{
+                  background:
+                    "radial-gradient(circle, #2A2118 0%, #120E0B 70%)",
+                  boxShadow: "0 0 0 1px rgba(198,167,94,0.25), 0 12px 30px rgba(0,0,0,0.25)",
+                }}
+              >
+                <img src="/juno-rfp-logo.png" alt="JUNO RFP" className="w-36 object-contain" />
+              </div>
+            </div>
+
+            <h2 className={`text-2xl font-bold text-center mb-2 ${darkTheme ? "text-[#F7F1E7]" : "text-[#1C1917]"}`}>
               {mode === "signup" ? t("auth.signup.title") : t("auth.login.title")}
             </h2>
             {mode === "signup" && (
-              <p className={`text-center text-sm mb-6 ${darkTheme ? "text-white/70" : "text-white/85"}`}>
-                {t("auth.signup.subtitle")}
-              </p>
+              <p className={`text-center text-sm mb-6 ${mutedCopyClass}`}>{t("auth.signup.subtitle")}</p>
             )}
             {mode === "login" && !info && (
-              <p className={`text-center text-sm mb-6 ${darkTheme ? "text-white/70" : "text-white/85"}`}>
-                {t("auth.login.subtitle")}
-              </p>
+              <p className={`text-center text-sm mb-6 ${mutedCopyClass}`}>{t("auth.login.subtitle")}</p>
             )}
             {mode === "login" && info && <div className="mb-2" />}
 
@@ -419,8 +513,8 @@ function LoginPageContent() {
                     autoFocus
                     disabled={isLoading || confirming}
                   />
-                  <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4f3cc9] input-icon`}>
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#4f3cc9"/></svg>
+                  <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#B8953D] input-icon`}>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg>
                   </span>
                 </div>
               </div>
@@ -438,13 +532,13 @@ function LoginPageContent() {
                     disabled={isLoading || confirming}
                     autoComplete="current-password"
                   />
-                  <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4f3cc9] input-icon`}>
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-7V8a6 6 0 10-12 0v2a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2zm-8-2a4 4 0 118 0v2H6V8zm10 10H4v-6h16v6z" fill="#4f3cc9"/></svg>
+                  <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#B8953D] input-icon`}>
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-7V8a6 6 0 10-12 0v2a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2zm-8-2a4 4 0 118 0v2H6V8zm10 10H4v-6h16v6z" fill="currentColor"/></svg>
                   </span>
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#4f3cc9] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#4f3cc9]/40 dark:hover:bg-white/10`}
+                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#B8953D] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#C6A75E]/40 dark:hover:bg-white/10`}
                     aria-label={showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
                     tabIndex={0}
                   >
@@ -464,7 +558,7 @@ function LoginPageContent() {
               {devConfirmUrl && (
                 <a
                   href={devConfirmUrl}
-                  className="block text-center text-sm font-semibold text-[#4f3cc9] underline"
+                  className={`block text-center text-sm font-semibold underline ${linkClass}`}
                 >
                   {t("auth.signup.openConfirmLink")}
                 </a>
@@ -477,7 +571,7 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={isLoading || confirming}
-                className={`w-full py-3 rounded-xl bg-[#23232B] text-white font-semibold text-lg shadow hover:bg-[#4f3cc9] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed ${flexDirection('row')} login-button`}
+                className={`${ctaClass} ${flexDirection('row')} login-button`}
               >
                 {isLoading ? t('auth.login.loading') : t('auth.login.signInButton')}
                 {!isLoading && (
@@ -489,7 +583,7 @@ function LoginPageContent() {
                     className={isRTL ? 'rotate-180' : ''}
                     data-arrow="true"
                   >
-                    <path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 )}
               </button>
@@ -500,17 +594,14 @@ function LoginPageContent() {
                   setError("");
                   setInfo("");
                 }}
-                className="w-full mt-1 py-2 text-sm font-semibold text-white hover:underline"
+                className={`w-full mt-1 py-2 text-sm font-semibold hover:underline ${darkTheme ? "text-[#F7F1E7]" : "text-[#1C1917]"}`}
               >
                 {t("auth.login.noAccount")} {t("auth.login.signUp")}
               </button>
-              <p className={`text-center text-xs mt-1 ${darkTheme ? "text-white/55" : "text-white/75"}`}>
-                {t("auth.login.trialSignupHint")}
-              </p>
               <button
                 type="button"
                 onClick={handleReloadDemoUsers}
-                className="w-full py-2 text-sm text-[#4f3cc9] hover:underline"
+                className={`w-full py-2 text-sm hover:underline ${linkClass}`}
               >
                 Reload demo credentials
               </button>
@@ -568,7 +659,7 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSignupPassword((v) => !v)}
-                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#4f3cc9] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#4f3cc9]/40 dark:hover:bg-white/10`}
+                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#B8953D] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#C6A75E]/40 dark:hover:bg-white/10`}
                     aria-label={showSignupPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
                   >
                     <EyeIcon off={showSignupPassword} />
@@ -591,7 +682,7 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSignupConfirm((v) => !v)}
-                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#4f3cc9] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#4f3cc9]/40 dark:hover:bg-white/10`}
+                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#B8953D] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#C6A75E]/40 dark:hover:bg-white/10`}
                     aria-label={showSignupConfirm ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
                   >
                     <EyeIcon off={showSignupConfirm} />
@@ -616,7 +707,7 @@ function LoginPageContent() {
               {devConfirmUrl && (
                 <a
                   href={devConfirmUrl}
-                  className="block text-center text-sm font-semibold text-[#4f3cc9] underline"
+                  className={`block text-center text-sm font-semibold underline ${linkClass}`}
                 >
                   {t("auth.signup.openConfirmLink")}
                 </a>
@@ -624,7 +715,7 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-[#23232B] text-white font-semibold text-lg shadow hover:bg-[#4f3cc9] transition-colors disabled:opacity-70"
+                className={`${ctaClass} disabled:opacity-70`}
               >
                 {isLoading ? t("auth.signup.loading") : t("auth.signup.submit")}
               </button>
@@ -635,7 +726,7 @@ function LoginPageContent() {
                   setError("");
                   setInfo("");
                 }}
-                className="w-full py-2 text-sm font-semibold text-white hover:underline"
+                className={`w-full py-2 text-sm font-semibold hover:underline ${darkTheme ? "text-[#F7F1E7]" : "text-[#1C1917]"}`}
               >
                 {t("auth.login.haveAccount")} {t("auth.login.backToSignIn")}
               </button>

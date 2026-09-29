@@ -961,7 +961,14 @@ export default function SourceDocsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div
+        data-tour="1"
+        data-tour-title-en="Source Docs overview"
+        data-tour-title-ar="نظرة عامة على المستندات"
+        data-tour-content-en="Upload and manage Grants/RFP source documents for your company."
+        data-tour-content-ar="ارفع وأدر مستندات المنح/طلبات العروض لشركتك."
+        data-tour-position="bottom"
+      >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("proposalManagerSourceDocs.title")}</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
           {isTrialUserSession()
@@ -982,6 +989,12 @@ export default function SourceDocsPage() {
       )}
 
       <div
+        data-tour="2"
+        data-tour-title-en="Upload zone"
+        data-tour-title-ar="منطقة الرفع"
+        data-tour-content-en="Drag and drop an RFP PDF or Word file. Uploads feed deadlines, dashboard insights, and workspace."
+        data-tour-content-ar="اسحب وأفلت ملف PDF أو Word. يغذي الرفع المواعيد ورؤى اللوحة ومساحة العمل."
+        data-tour-position="bottom"
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -1023,7 +1036,15 @@ export default function SourceDocsPage() {
         )}
       </div>
 
-      <section className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 p-5">
+      <section
+        className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 p-5"
+        data-tour="3"
+        data-tour-title-en="Boilerplate library"
+        data-tour-title-ar="مكتبة القوالب"
+        data-tour-content-en="Share Marln/JUNO capability boilerplate with prospects from this folder."
+        data-tour-content-ar="شارك قوالب قدرات Marln/JUNO مع العملاء المحتملين من هذا المجلد."
+        data-tour-position="top"
+      >
         <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
@@ -1063,7 +1084,14 @@ export default function SourceDocsPage() {
         )}
       </section>
 
-      <section>
+      <section
+        data-tour="4"
+        data-tour-title-en="Uploaded documents"
+        data-tour-title-ar="المستندات المرفوعة"
+        data-tour-content-en="Open, rename, or remove files. Use View synopsis when AI insights are ready."
+        data-tour-content-ar="افتح أو أعد تسمية أو احذف الملفات. استخدم عرض الملخص عندما تكون رؤى الذكاء جاهزة."
+        data-tour-position="top"
+      >
         <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("proposalManagerSourceDocs.uploadedDocumentsTitle")}</h2>
           {libraryDocs.length > 0 && (

@@ -216,7 +216,15 @@ export default function WinLossScoringPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6 lg:p-8" dir={dir}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-wrap items-start justify-between gap-3">
+        <header
+          className="flex flex-wrap items-start justify-between gap-3"
+          data-tour="1"
+          data-tour-title-en="Scoring overview"
+          data-tour-title-ar="نظرة عامة على التسجيل"
+          data-tour-content-en="Capture win/loss outcomes and debrief scores for closed pursuits."
+          data-tour-content-ar="سجّل نتائج الفوز/الخسارة ودرجات الإحاطة للمتابعات المغلقة."
+          data-tour-position="bottom"
+        >
           <div>
             <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
               <FiAward className="h-5 w-5" />
@@ -246,7 +254,15 @@ export default function WinLossScoringPage() {
           </button>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div
+          className="grid gap-6 lg:grid-cols-12"
+          data-tour="2"
+          data-tour-title-en="Samples & gaps"
+          data-tour-title-ar="عينات وفجوات"
+          data-tour-content-en="Review sample debriefs and product capability gaps that should inform the next bid."
+          data-tour-content-ar="راجع عينات الإحاطة وفجوات القدرات التي يجب أن توجه العرض التالي."
+          data-tour-position="top"
+        >
           <section className="lg:col-span-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div className="mb-3 flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">{t("proposalManagerScoring.pursuits")}</h2>

@@ -273,7 +273,15 @@ export default function TechnicalSolutioningPage() {
   return (
     <div className="space-y-8" dir={isRTLMode ? "rtl" : "ltr"}>
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 px-8 py-10 text-white shadow-xl">
+      <div
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 px-8 py-10 text-white shadow-xl"
+        data-tour="1"
+        data-tour-title-en="Technical Solutioning"
+        data-tour-title-ar="الحل التقني"
+        data-tour-content-en="Turn RFP requirements and reference assets into a solution architecture outline."
+        data-tour-content-ar="حوّل متطلبات طلب العرض والأصول المرجعية إلى مخطط هندسة حل."
+        data-tour-position="bottom"
+      >
         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.45),transparent_50%)]" />
         <div className="relative z-10 max-w-3xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
@@ -547,6 +555,12 @@ export default function TechnicalSolutioningPage() {
               type="button"
               onClick={runGenerate}
               disabled={generateLoading}
+              data-tour="2"
+              data-tour-title-en="Inputs & generate"
+              data-tour-title-ar="المدخلات والتوليد"
+              data-tour-content-en="Select references and requirements, then generate or refine the architecture with AI."
+              data-tour-content-ar="اختر المراجع والمتطلبات ثم ولّد أو حسّن الهندسة بالذكاء الاصطناعي."
+              data-tour-position="top"
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 py-3.5 text-white font-semibold shadow-lg hover:from-indigo-700 hover:to-blue-700 disabled:opacity-60"
             >
               <FiZap className={generateLoading ? "animate-pulse" : ""} />
@@ -558,7 +572,17 @@ export default function TechnicalSolutioningPage() {
 
       {/* Step 3 — Blueprint */}
       {activeStep === "blueprint" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-6"
+          data-tour="3"
+          data-tour-title-en="Architecture output"
+          data-tour-title-ar="مخرجات الهندسة"
+          data-tour-content-en="Review diagrams, capability mapping, and exportable solution narrative."
+          data-tour-content-ar="راجع المخططات وتخطيط القدرات والسرد القابل للتصدير."
+          data-tour-position="top"
+        >
           {generateLoading ? (
             <div className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 p-12 text-center">
               <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600 mb-4" />

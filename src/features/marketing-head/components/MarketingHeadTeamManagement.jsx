@@ -822,7 +822,15 @@ export default function MarketingHeadTeamManagement() {
           </div>
           
           {/* Quick Actions */}
-          <div className={`flex-shrink-0 w-full lg:w-auto ${isRTLMode ? 'text-right' : 'text-left'}`}>
+          <div
+            className={`flex-shrink-0 w-full lg:w-auto ${isRTLMode ? 'text-right' : 'text-left'}`}
+            data-tour="2"
+            data-tour-title-en="Add & export"
+            data-tour-title-ar="إضافة وتصدير"
+            data-tour-content-en="Add team members and export the roster. Members sync into Team Collab reviewers."
+            data-tour-content-ar="أضف أعضاء الفريق وصدّر القائمة. يتزامن الأعضاء مع مراجعي تعاون الفريق."
+            data-tour-position="left"
+          >
             <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 lg:flex lg:gap-3 ${isRTLMode ? 'lg:flex-row-reverse' : ''}`}>
               <button 
                 onClick={openAddModal}
@@ -880,7 +888,7 @@ export default function MarketingHeadTeamManagement() {
             {/* Team Structure & Hierarchy */}
             <section
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
-              data-tour="2"
+              data-tour="3"
               data-tour-title-en={isProposalManagerTeam ? "Proposal Team Structure & Hierarchy" : "Team Structure & Hierarchy"}
               data-tour-title-ar={isProposalManagerTeam ? "هيكل فريق العرض والتسلسل الهرمي" : "هيكل الفريق والتسلسل الهرمي"}
               data-tour-content-en={isProposalManagerTeam ? "View proposal roles and reporting lines. AI suggests workload balance." : "View roles and reporting lines with AI workload suggestions."}
