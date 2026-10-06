@@ -34,6 +34,13 @@ import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
 import { registerGrantsGovRoutes } from "./grantsGovService.js";
 import { registerAltGrantsRoutes } from "./altGrantsService.js";
+import { registerUsaSpendingRoutes } from "./usaSpendingService.js";
+import { registerSbirRoutes } from "./sbirService.js";
+import { registerNihReporterRoutes } from "./nihReporterService.js";
+import { registerNsfAwardsRoutes } from "./nsfAwardsService.js";
+import { registerCaGrantsRoutes } from "./caGrantsService.js";
+import { registerFacRoutes } from "./facService.js";
+import { registerAssistanceListingsRoutes } from "./assistanceListingsService.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -94,6 +101,13 @@ registerPricingAiRoutes(app, openai);
 registerPursuitLifecycleAiRoutes(app, openai);
 registerGrantsGovRoutes(app);
 registerAltGrantsRoutes(app);
+registerUsaSpendingRoutes(app);
+registerSbirRoutes(app);
+registerNihReporterRoutes(app);
+registerNsfAwardsRoutes(app);
+registerCaGrantsRoutes(app);
+registerFacRoutes(app);
+registerAssistanceListingsRoutes(app);
 
 /* ================= MULTER ================= */
 const upload = multer({
@@ -629,5 +643,12 @@ app.listen(PORT, () => {
   console.log("Calendar API: /calendar/events, /calendar/team-summary, /calendar/sync-deadlines");
   console.log("Trial tenancy: /trial/auth/* (logical multi-tenant trials)");
   console.log("Grants.gov: POST /grants/search, POST /grants/opportunity");
-  console.log("Alt grants: POST /grants/alt/search (private + local live)\n");
+  console.log("Alt grants: POST /grants/alt/search (private + local live)");
+  console.log("USAspending: POST /grants/usaspending/search");
+  console.log("SBIR: POST /grants/sbir/search");
+  console.log("NIH RePORTER: POST /grants/nih/search");
+  console.log("NSF Awards: POST /grants/nsf/search");
+  console.log("CA Grants: POST /grants/ca/search");
+  console.log("FAC: POST /grants/fac/search");
+  console.log("Assistance Listings: POST /grants/assistance-listings/search\n");
 });

@@ -6,7 +6,7 @@ import {
 } from "./proposalManagerCalendarMockData.js";
 import { getTrialSession } from "../../../services/trialAuthSession.js";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
-import { hydrateShortlistFromServer, listShortlist, shortlistEventId } from "./shortlistStore.js";
+import { hydrateShortlistFromServer, listShortlist, shortlistEventId, SHORTLIST_SOURCE_LABELS } from "./shortlistStore.js";
 import { assignmentEventId, hydrateTeamFromServer, listAssignments } from "./teamStore.js";
 import { listSourceDocDeadlines } from "./sourceDocsDeadlineService.js";
 import { parseDateToISO } from "./calendarDateParse.js";
@@ -37,8 +37,7 @@ export function shortlistItemsToCalendarEvents() {
     .map((item) => {
       const iso = parseDateToISO(item.deadline);
       if (!iso) return null;
-      const sourceLabel =
-        item.source === "sam" ? "SAM" : item.source === "alt" ? "Grant" : "Grant";
+      const sourceLabel = SHORTLIST_SOURCE_LABELS[item.source] || "Grant";
       return {
         id: shortlistEventId(item.id),
         title: `${sourceLabel} deadline: ${item.title}`,
@@ -184,7 +183,7 @@ export async function loadCalendarBundle({ hydrate = true } = {}) {
     ]);
   }
 
-  const shortlistEvents = trial ? shortlistItemsToCalendarEvents() : [];
+  const shortlistEvents = shortlistItemsToCalendarEvents();
   const assignmentEvents = trial ? assignmentItemsToCalendarEvents() : [];
   const sourceDocEvents = trial ? sourceDocItemsToCalendarEvents() : [];
   const overlayEvents = [...shortlistEvents, ...assignmentEvents, ...sourceDocEvents];

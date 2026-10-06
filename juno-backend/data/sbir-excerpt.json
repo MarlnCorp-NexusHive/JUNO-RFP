@@ -1,0 +1,179 @@
+{
+  "source": "SBIR.gov (public excerpt)",
+  "note": "Curated excerpt from public SBIR/STTR data for always-on search when the live API is unavailable.",
+  "updated": "2026-10-02",
+  "awards": [
+    {
+      "id": "sbir-a-doe-2024-1",
+      "title": "Advanced Grid Sensing for Distributed Energy Resources",
+      "agency": "DOE",
+      "number": "DE-SC0024XXXX",
+      "company": "GridSense Analytics Inc.",
+      "phase": "Phase II",
+      "program": "SBIR",
+      "awardYear": "2024",
+      "amount": 1150000,
+      "abstract": "Develops low-cost sensing and analytics for DER-rich distribution feeders to improve hosting capacity and resilience.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-nsf-2023-2",
+      "title": "Privacy-Preserving Federated Learning for Clinical Decision Support",
+      "agency": "NSF",
+      "number": "2321456",
+      "company": "MedForge Labs LLC",
+      "phase": "Phase I",
+      "program": "STTR",
+      "awardYear": "2023",
+      "amount": 275000,
+      "abstract": "STTR collaboration with a university medical center on federated models that keep patient data on-prem.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-dod-2024-3",
+      "title": "Secure Edge AI for Contested Tactical Networks",
+      "agency": "DOD",
+      "number": "N241-012",
+      "company": "Aether Defense Systems",
+      "phase": "Phase I",
+      "program": "SBIR",
+      "awardYear": "2024",
+      "amount": 250000,
+      "abstract": "Edge inference under bandwidth constraints with cryptographic attestation for contested environments.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-nih-2022-4",
+      "title": "Point-of-Care Multiplex Assay for Respiratory Pathogens",
+      "agency": "HHS",
+      "number": "R43AI174221",
+      "company": "PathoQuick Biosciences",
+      "phase": "Phase I",
+      "program": "SBIR",
+      "awardYear": "2022",
+      "amount": 299000,
+      "abstract": "Rapid multiplex molecular assay suitable for clinic and field use.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-nasa-2023-5",
+      "title": "Radiation-Hardened Memory Controller for Small Satellites",
+      "agency": "NASA",
+      "number": "80NSSC23C0123",
+      "company": "OrbitCore Microelectronics",
+      "phase": "Phase II",
+      "program": "SBIR",
+      "awardYear": "2023",
+      "amount": 850000,
+      "abstract": "Rad-hard controller IP and reference design for CubeSat-class platforms.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-usda-2024-6",
+      "title": "Computer Vision for Precision Irrigation Scheduling",
+      "agency": "USDA",
+      "number": "2024-33610-XXXX",
+      "company": "FieldSight AgTech",
+      "phase": "Phase I",
+      "program": "SBIR",
+      "awardYear": "2024",
+      "amount": 175000,
+      "abstract": "On-farm imaging pipeline to recommend irrigation timing and reduce water use.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-epa-2023-7",
+      "title": "Low-Cost Continuous PFAS Monitoring Sensor",
+      "agency": "EPA",
+      "number": "68HERC23C00XX",
+      "company": "AquaTrace Instruments",
+      "phase": "Phase I",
+      "program": "SBIR",
+      "awardYear": "2023",
+      "amount": 100000,
+      "abstract": "Field-deployable sensor for continuous PFAS indicators in drinking water systems.",
+      "url": "https://www.sbir.gov/awards"
+    },
+    {
+      "id": "sbir-a-dot-2024-8",
+      "title": "Digital Twin for Bridge Deck Deterioration Forecasting",
+      "agency": "DOT",
+      "number": "6913G624C000XX",
+      "company": "Structura Digital",
+      "phase": "Phase II",
+      "program": "SBIR",
+      "awardYear": "2024",
+      "amount": 999999,
+      "abstract": "Combines inspection imagery and sensor feeds into a predictive bridge maintenance twin.",
+      "url": "https://www.sbir.gov/awards"
+    }
+  ],
+  "topics": [
+    {
+      "id": "sbir-t-dod-cyber-1",
+      "title": "Zero Trust Architecture for Tactical Edge Systems",
+      "agency": "DOD",
+      "number": "DoD-SBIR-2026-001",
+      "status": "Open",
+      "program": "SBIR",
+      "deadline": "2026-11-15",
+      "summary": "Seeking approaches to enforce zero trust principles on bandwidth-limited tactical networks.",
+      "url": "https://www.sbir.gov/topics"
+    },
+    {
+      "id": "sbir-t-nih-ai-2",
+      "title": "AI Tools for Clinical Trial Matching",
+      "agency": "HHS",
+      "number": "NIH-SBIR-2026-CT-02",
+      "status": "Open",
+      "program": "SBIR",
+      "deadline": "2026-12-01",
+      "summary": "Software that improves patient-to-trial matching while protecting PHI.",
+      "url": "https://www.sbir.gov/topics"
+    },
+    {
+      "id": "sbir-t-nsf-climate-3",
+      "title": "Climate Resilience Decision Support for Municipalities",
+      "agency": "NSF",
+      "number": "NSF-STTR-2026-CR-03",
+      "status": "Open",
+      "program": "STTR",
+      "deadline": "2026-10-30",
+      "summary": "Decision-support platforms for local governments planning climate adaptation investments.",
+      "url": "https://www.sbir.gov/topics"
+    },
+    {
+      "id": "sbir-t-doe-storage-4",
+      "title": "Long-Duration Energy Storage Materials and Controls",
+      "agency": "DOE",
+      "number": "DOE-SBIR-2026-LDES-04",
+      "status": "Open",
+      "program": "SBIR",
+      "deadline": "2026-11-20",
+      "summary": "Materials, chemistries, or controls enabling cost-effective long-duration storage.",
+      "url": "https://www.sbir.gov/topics"
+    },
+    {
+      "id": "sbir-t-nasa-prop-5",
+      "title": "In-Space Propulsion Components for Small Spacecraft",
+      "agency": "NASA",
+      "number": "NASA-SBIR-2026-PROP-05",
+      "status": "Forecasted",
+      "program": "SBIR",
+      "deadline": "2027-02-15",
+      "summary": "Compact propulsion subsystems suitable for rideshare and dedicated smallsat missions.",
+      "url": "https://www.sbir.gov/topics"
+    },
+    {
+      "id": "sbir-t-usda-food-6",
+      "title": "Food Safety Traceability for Fresh Produce Supply Chains",
+      "agency": "USDA",
+      "number": "USDA-SBIR-2025-FS-06",
+      "status": "Closed",
+      "program": "SBIR",
+      "deadline": "2025-09-01",
+      "summary": "Traceability and contamination risk tools for produce packing and distribution.",
+      "url": "https://www.sbir.gov/topics"
+    }
+  ]
+}

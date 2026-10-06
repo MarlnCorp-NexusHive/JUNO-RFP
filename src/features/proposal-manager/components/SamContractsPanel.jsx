@@ -12,10 +12,8 @@ import {
   FiX,
 } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
-import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import {
   SAM_CONTRACT_OPPORTUNITIES,
-  SAM_DATA_SNAPSHOT,
   SAM_QUICK_AGENCIES,
   SAM_REFRESH_INTERVAL_MS,
   SAM_SET_ASIDES,
@@ -76,7 +74,6 @@ function Field({ label, children }) {
 export default function SamContractsPanel() {
   const { t } = useTranslation("common");
   const { isRTLMode } = useLocalization();
-  const isTrial = isTrialUserSession();
 
   const [draftKeyword, setDraftKeyword] = useState("");
   const [keyword, setKeyword] = useState("");
@@ -90,8 +87,8 @@ export default function SamContractsPanel() {
   const [hourTick, setHourTick] = useState(0);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
+  // Same hourly curated desk view for demo and trial.
   useEffect(() => {
-    if (!isTrial) return undefined;
     let intervalId = null;
     const msToNextHour = SAM_REFRESH_INTERVAL_MS - (Date.now() % SAM_REFRESH_INTERVAL_MS);
     const timeoutId = window.setTimeout(() => {
@@ -102,17 +99,9 @@ export default function SamContractsPanel() {
       window.clearTimeout(timeoutId);
       if (intervalId != null) window.clearInterval(intervalId);
     };
-  }, [isTrial]);
+  }, []);
 
-  const samPool = useMemo(() => {
-    if (!isTrial) {
-      return {
-        opportunities: SAM_CONTRACT_OPPORTUNITIES,
-        refreshedLabel: SAM_DATA_SNAPSHOT,
-      };
-    }
-    return buildHourlySamView();
-  }, [isTrial, hourTick]);
+  const samPool = useMemo(() => buildHourlySamView(), [hourTick]);
 
   const toggleExpand = (id) => {
     dismissExpandHint();
@@ -187,15 +176,10 @@ export default function SamContractsPanel() {
             </h2>
           </div>
           <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600">
-            {isTrial
-              ? t("proposalManagerSam.hourlyRefresh", {
-                  source: SAM_SOURCE_LABEL,
-                  time: samPool.refreshedLabel,
-                })
-              : t("proposalManagerSam.curatedFrom", {
-                  source: SAM_SOURCE_LABEL,
-                  date: SAM_DATA_SNAPSHOT,
-                })}
+            {t("proposalManagerSam.hourlyRefresh", {
+              source: SAM_SOURCE_LABEL,
+              time: samPool.refreshedLabel,
+            })}
           </p>
         </div>
       </header>

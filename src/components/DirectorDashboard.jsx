@@ -656,7 +656,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         return {
           ...card,
           value: values[idx] ?? 0,
-          spark: undefined,
+          spark: [],
           sub: trialLiveSub,
         };
       })
@@ -675,13 +675,13 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
 
   const proposalManagerKpis = isTrialPm
     ? proposalManagerKpisBase.map((kpi, idx) => {
-        if (idx === 0) return { ...kpi, value: trialMetrics?.mttr || "—", spark: undefined };
-        if (idx === 1) return { ...kpi, value: trialMetrics?.rfpsResponded || 0, spark: undefined };
-        if (idx === 2) return { ...kpi, value: getComplianceScore(complianceData), spark: undefined };
-        if (idx === 3) return { ...kpi, value: getUnaddressedClauseCount(complianceData), spark: undefined };
-        if (idx === 4) return { ...kpi, value: farFlagLabel, spark: undefined };
-        if (idx === 5) return { ...kpi, value: getPastPerformanceScore(complianceData), spark: undefined };
-        return { ...kpi, spark: undefined };
+        if (idx === 0) return { ...kpi, value: trialMetrics?.mttr || "—", spark: [] };
+        if (idx === 1) return { ...kpi, value: trialMetrics?.rfpsResponded || 0, spark: [] };
+        if (idx === 2) return { ...kpi, value: getComplianceScore(complianceData), spark: [] };
+        if (idx === 3) return { ...kpi, value: getUnaddressedClauseCount(complianceData), spark: [] };
+        if (idx === 4) return { ...kpi, value: farFlagLabel, spark: [] };
+        if (idx === 5) return { ...kpi, value: getPastPerformanceScore(complianceData), spark: [] };
+        return { ...kpi, spark: [] };
       })
     : proposalManagerKpisBase;
   const kpis = basePath === "/app" ? proposalManagerKpis : directorKpis;
@@ -722,20 +722,22 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const trialRevenueFromWins = isTrialPm ? emptyRevenueFromWins : revenueFromWinsData;
 
   useEffect(() => {
-    if (!isTrialPm) return undefined;
+    if (!isPM) return undefined;
     let cancelled = false;
-    hydrateShortlistFromServer()
-      .then((items) => {
-        if (!cancelled) setShortlistItems(items);
-      })
-      .catch(() => {});
     setShortlistItems(listShortlist());
+    if (isTrialPm) {
+      hydrateShortlistFromServer()
+        .then((items) => {
+          if (!cancelled) setShortlistItems(items);
+        })
+        .catch(() => {});
+    }
     const unsub = subscribeShortlist(setShortlistItems);
     return () => {
       cancelled = true;
       unsub();
     };
-  }, [isTrialPm]);
+  }, [isPM, isTrialPm]);
 
   useEffect(() => {
     if (!isTrialPm) return undefined;
@@ -836,7 +838,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
     { text: t('dashboard.alerts.proposalManager.pastPerformanceUpdate'), color: 'text-purple-500' },
     { text: t('dashboard.alerts.proposalManager.pricingReviewRequired'), color: 'text-green-600 dark:text-green-400' },
   ];
-  const shortlistAlerts = isTrialPm
+  const shortlistAlerts = isPM
     ? shortlistItems.map((item) => {
         const days = daysUntilDeadline(item.deadline);
         const daysPart =
@@ -908,10 +910,14 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   // Modal content generator
   const renderModalContent = (card) => {
     if (!card) return null;
+    const spark = Array.isArray(card.spark) ? card.spark : [];
+    const sparkLight = card.sparkColor?.light || "#6366f1";
+    const sparkDark = card.sparkColor?.dark || "#a5b4fc";
+    const label = String(card.label || "");
     // Example extra details for each card type
     let extraDetails = null;
     let insight = null;
-    if (card.label.includes('Employee') || card.label.includes('Team')) {
+    if (label.includes('Employee') || label.includes('Team')) {
       extraDetails = (
         <table className="w-full text-sm mb-2">
           <tbody>
@@ -922,7 +928,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         </table>
       );
       insight = <div className="text-xs text-blue-600 dark:text-blue-300 mb-2">Steady growth in employee population, with a 2.5% increase this month. Contract employee ratio is 8.9%.</div>;
-    } else if (card.label.includes('Team') || card.label.includes('Member')) {
+    } else if (label.includes('Team') || label.includes('Member')) {
       extraDetails = (
         <table className="w-full text-sm mb-2">
           <tbody>
@@ -933,7 +939,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         </table>
       );
       insight = <div className="text-xs text-purple-600 dark:text-purple-300 mb-2">Vacancy rate is low. Recruitment drive ongoing for 12 open positions.</div>;
-    } else if (card.label.includes('Department') || card.label.includes('Division')) {
+    } else if (label.includes('Department') || label.includes('Division')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
           <li>New: Data Analytics Division</li>
@@ -942,7 +948,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         </ul>
       );
       insight = <div className="text-xs text-pink-600 dark:text-pink-300 mb-2">1 new department added this year. Most growth in Technology and Operations fields.</div>;
-    } else if (card.label.includes('Project') || card.label.includes('Position')) {
+    } else if (label.includes('Project') || label.includes('Position')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
           <li>Active Projects: 180</li>
@@ -951,7 +957,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         </ul>
       );
       insight = <div className="text-xs text-yellow-600 dark:text-yellow-300 mb-2">8 new projects launched this year, mostly in AI, Data Science, and Business Intelligence.</div>;
-    } else if (card.label.includes('Vehicles')) {
+    } else if (label.includes('Vehicles')) {
       extraDetails = (
         <table className="w-full text-sm mb-2">
           <tbody>
@@ -962,7 +968,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
         </table>
       );
       insight = <div className="text-xs text-green-600 dark:text-green-300 mb-2">1 vehicle out of service. All routes running on time.</div>;
-    } else if (card.label.includes('Event')) {
+    } else if (label.includes('Event')) {
       extraDetails = (
         <ul className="text-sm mb-2 list-disc ml-5">
           <li>Convocation: 2 days left</li>
@@ -986,44 +992,55 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               : card.value}
         </div>
         <div className="mb-2 text-sm text-gray-400 dark:text-gray-300">{card.sub}</div>
-        {/* Modal sparkline */}
-        <div className="w-full h-20 mb-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={card.spark.map((v, idx) => ({ idx, v }))} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id={`modal-spark-gradient`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={card.sparkColor.light} stopOpacity={0.5} />
-                  <stop offset="100%" stopColor={card.sparkColor.light} stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-              <Area
-                type="monotone"
-                dataKey="v"
-                stroke={card.sparkColor.light}
-                fill={`url(#modal-spark-gradient)`}
-                strokeWidth={3.2}
-                dot={{ r: 4, stroke: card.sparkColor.light, strokeWidth: 2, fill: '#fff' }}
-                className="block dark:hidden"
-              />
-              <Area
-                type="monotone"
-                dataKey="v"
-                stroke={card.sparkColor.dark}
-                fill="none"
-                strokeWidth={3.2}
-                dot={{ r: 4, stroke: card.sparkColor.dark, strokeWidth: 2, fill: '#222' }}
-                className="hidden dark:block"
-                style={{ filter: 'drop-shadow(0 0 4px #fff8)' }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        {/* Modal sparkline — skip when trial/demo clears spark */}
+        {spark.length > 0 && (
+          <div className="w-full h-20 mb-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={spark.map((v, idx) => ({ idx, v }))} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id={`modal-spark-gradient`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={sparkLight} stopOpacity={0.5} />
+                    <stop offset="100%" stopColor={sparkLight} stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                <Area
+                  type="monotone"
+                  dataKey="v"
+                  stroke={sparkLight}
+                  fill={`url(#modal-spark-gradient)`}
+                  strokeWidth={3.2}
+                  dot={{ r: 4, stroke: sparkLight, strokeWidth: 2, fill: '#fff' }}
+                  className="block dark:hidden"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="v"
+                  stroke={sparkDark}
+                  fill="none"
+                  strokeWidth={3.2}
+                  dot={{ r: 4, stroke: sparkDark, strokeWidth: 2, fill: '#222' }}
+                  className="hidden dark:block"
+                  style={{ filter: 'drop-shadow(0 0 4px #fff8)' }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
         {insight}
         {extraDetails}
         <div className="text-sm text-gray-700 dark:text-gray-200">
           <ul className="list-disc ml-5">
             <li>{pmText("Trend", "الاتجاه")}: <span className={card.trendColor}>{card.trend || pmText('Stable', 'مستقر')}</span></li>
-            <li>{pmText("Last 6 periods", "آخر 6 فترات")}: {card.spark.map((v, i) => <span key={i} className="inline-block mx-1">{card.formatType === 'currency' ? `$${Number(v).toLocaleString()}` : v}</span>)}</li>
+            {spark.length > 0 && (
+              <li>
+                {pmText("Last 6 periods", "آخر 6 فترات")}:{" "}
+                {spark.map((v, i) => (
+                  <span key={i} className="inline-block mx-1">
+                    {card.formatType === "currency" ? `$${Number(v).toLocaleString()}` : v}
+                  </span>
+                ))}
+              </li>
+            )}
           </ul>
         </div>
       </div>

@@ -50,9 +50,21 @@ function shortlistEventId(id) {
 
 export { shortlistEventId };
 
+export const SHORTLIST_SOURCE_LABELS = {
+  grants: "Grant",
+  alt: "Grant",
+  sam: "SAM",
+  usaspending: "Award",
+  sbir: "SBIR",
+  nih: "NIH",
+  nsf: "NSF",
+  ca: "CA Grant",
+  fac: "FAC",
+  assistance: "Program",
+};
+
 function sourceLabel(source) {
-  if (source === "sam") return "SAM";
-  return "Grant";
+  return SHORTLIST_SOURCE_LABELS[source] || "Grant";
 }
 
 /** Push or remove a shortlist deadline on the shared tenant calendar. */

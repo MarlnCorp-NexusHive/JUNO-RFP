@@ -6,8 +6,9 @@ import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { isShortlisted, subscribeShortlist, toggleShortlist, hydrateShortlistFromServer } from "../services/shortlistStore.js";
 
 /**
- * Trial-only shortlist toggle. Persists deadline for dashboard Alerts + shared calendar.
- * When shortlisted, offers deep-link into Communication kickoff thread.
+ * Shortlist toggle (demo + trial). Persists deadline for dashboard Alerts;
+ * trial tenants also sync to company-wide storage + shared calendar.
+ * When shortlisted, offers deep-links into Communication / Pricing / Bid Vault.
  */
 export default function OpportunityShortlistButton({
   id,
@@ -20,30 +21,28 @@ export default function OpportunityShortlistButton({
 }) {
   const { t } = useTranslation();
   const trial = isTrialUserSession();
-  const [on, setOn] = useState(() => (trial ? isShortlisted(id) : false));
+  const [on, setOn] = useState(() => isShortlisted(id));
   const [hint, setHint] = useState("");
 
   useEffect(() => {
-    if (!trial) return undefined;
     let cancelled = false;
-    hydrateShortlistFromServer()
-      .then(() => {
-        if (!cancelled) setOn(isShortlisted(id));
-      })
-      .catch(() => {});
     setOn(isShortlisted(id));
+    if (trial) {
+      hydrateShortlistFromServer()
+        .then(() => {
+          if (!cancelled) setOn(isShortlisted(id));
+        })
+        .catch(() => {});
+    }
     return () => {
       cancelled = true;
     };
   }, [trial, id]);
 
   useEffect(() => {
-    if (!trial) return undefined;
     setOn(isShortlisted(id));
     return subscribeShortlist(() => setOn(isShortlisted(id)));
-  }, [trial, id]);
-
-  if (!trial) return null;
+  }, [id]);
 
   const handleClick = (e) => {
     e.preventDefault();

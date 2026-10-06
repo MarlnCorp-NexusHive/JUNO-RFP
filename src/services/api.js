@@ -371,6 +371,42 @@ export const searchAltGrants = async (params = {}) => {
   return res.data;
 };
 
+/** Phase A free US sources */
+export const searchUsaSpending = async (params = {}) => {
+  const res = await API.post("/grants/usaspending/search", params);
+  return res.data;
+};
+
+export const searchSbir = async (params = {}) => {
+  const res = await API.post("/grants/sbir/search", params);
+  return res.data;
+};
+
+export const searchNihReporter = async (params = {}) => {
+  const res = await API.post("/grants/nih/search", params);
+  return res.data;
+};
+
+export const searchNsfAwards = async (params = {}) => {
+  const res = await API.post("/grants/nsf/search", params);
+  return res.data;
+};
+
+export const searchCaGrants = async (params = {}) => {
+  const res = await API.post("/grants/ca/search", params);
+  return res.data;
+};
+
+export const searchFac = async (params = {}) => {
+  const res = await API.post("/grants/fac/search", params);
+  return res.data;
+};
+
+export const searchAssistanceListings = async (params = {}) => {
+  const res = await API.post("/grants/assistance-listings/search", params);
+  return res.data;
+};
+
 /** Trial tenants: change own password (requires Bearer trial token) */
 export const changeTrialPassword = async ({ currentPassword, newPassword }) => {
   const res = await API.post("/trial/auth/change-password", { currentPassword, newPassword });

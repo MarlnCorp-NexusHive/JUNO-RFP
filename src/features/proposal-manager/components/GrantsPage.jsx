@@ -2,23 +2,40 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import { useTranslation } from "react-i18next";
 import {
   FiAlertCircle,
+  FiAward,
+  FiBookOpen,
+  FiBriefcase,
   FiCalendar,
   FiCheck,
   FiChevronDown,
   FiChevronLeft,
   FiChevronRight,
   FiClipboard,
+  FiCpu,
   FiDollarSign,
   FiExternalLink,
+  FiFileText,
+  FiGlobe,
+  FiHome,
+  FiLayers,
+  FiMapPin,
   FiPaperclip,
   FiRefreshCw,
   FiSearch,
+  FiShield,
   FiX,
 } from "react-icons/fi";
 import { useLocalization } from "../../../hooks/useLocalization";
 import { fetchFederalGrantOpportunity, searchFederalGrants } from "../../../services/api.js";
 import SamContractsPanel from "./SamContractsPanel.jsx";
 import AltGrantsPanel from "./AltGrantsPanel.jsx";
+import UsaSpendingPanel from "./UsaSpendingPanel.jsx";
+import SbirPanel from "./SbirPanel.jsx";
+import NihReporterPanel from "./NihReporterPanel.jsx";
+import NsfAwardsPanel from "./NsfAwardsPanel.jsx";
+import CaGrantsPanel from "./CaGrantsPanel.jsx";
+import FacPanel from "./FacPanel.jsx";
+import AssistanceListingsPanel from "./AssistanceListingsPanel.jsx";
 import {
   GrantExpandHintBanner,
   grantExpandChevronHintClass,
@@ -37,6 +54,27 @@ const STATUS_OPTIONS = [
 
 const QUICK_AGENCIES = ["HHS", "NSF", "ED", "USDA", "DOE", "DOD", "EPA", "DOT"];
 const PAGE_SIZE = 25;
+
+const OPEN_OPP_MODES = [
+  { id: "grants", labelKey: "modeGrants", descKey: "descGrants", badge: "live", Icon: FiGlobe },
+  { id: "private", labelKey: "modePrivate", descKey: "descPrivate", badge: "live", Icon: FiHome },
+  { id: "local", labelKey: "modeLocal", descKey: "descLocal", badge: "live", Icon: FiMapPin },
+  { id: "ca", labelKey: "modeCa", descKey: "descCa", badge: "live", Icon: FiFileText },
+  { id: "contracts", labelKey: "modeContracts", descKey: "descContracts", badge: "curated", Icon: FiBriefcase },
+  { id: "sbir", labelKey: "modeSbir", descKey: "descSbir", badge: "live", Icon: FiCpu },
+];
+
+const AWARD_INTEL_MODES = [
+  { id: "usaspending", labelKey: "modeUsaSpending", descKey: "descUsaSpending", badge: "live", Icon: FiDollarSign },
+  { id: "assistance", labelKey: "modeAssistance", descKey: "descAssistance", badge: "curated", Icon: FiLayers },
+  { id: "nih", labelKey: "modeNih", descKey: "descNih", badge: "live", Icon: FiAward },
+  { id: "nsf", labelKey: "modeNsf", descKey: "descNsf", badge: "live", Icon: FiBookOpen },
+  { id: "fac", labelKey: "modeFac", descKey: "descFac", badge: "live", Icon: FiShield },
+];
+
+function sourceCategory(modeId) {
+  return AWARD_INTEL_MODES.some((m) => m.id === modeId) ? "intel" : "open";
+}
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -408,7 +446,23 @@ export default function GrantsPage() {
   const formId = useId();
   const resultsId = useId();
 
-  const [mode, setMode] = useState("grants"); // grants | contracts
+  const [mode, setMode] = useState("grants");
+  const [sourceCategoryTab, setSourceCategoryTab] = useState("open"); // open | intel
+
+  const activeSourceModes = sourceCategoryTab === "intel" ? AWARD_INTEL_MODES : OPEN_OPP_MODES;
+
+  const selectSourceCategory = (nextCategory) => {
+    setSourceCategoryTab(nextCategory);
+    const catalog = nextCategory === "intel" ? AWARD_INTEL_MODES : OPEN_OPP_MODES;
+    if (!catalog.some((m) => m.id === mode)) {
+      setMode(catalog[0].id);
+    }
+  };
+
+  const selectSource = (nextMode) => {
+    setMode(nextMode);
+    setSourceCategoryTab(sourceCategory(nextMode));
+  };
   const [keyword, setKeyword] = useState("");
   const [draftKeyword, setDraftKeyword] = useState("");
   const [oppStatuses, setOppStatuses] = useState("posted|forecasted");
@@ -568,42 +622,162 @@ export default function GrantsPage() {
         {statusMessage}
       </div>
 
-      <div
-        role="tablist"
+      <section
         aria-label={t("proposalManagerGrants.modeTabs")}
-        className="inline-flex rounded-xl border border-slate-200 bg-slate-100/80 p-1 dark:border-slate-700 dark:bg-slate-800/80"
+        className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50 shadow-[0_1px_0_rgba(15,23,42,0.04),0_12px_32px_-16px_rgba(15,23,42,0.35)] dark:border-slate-700/80 dark:from-slate-900 dark:to-slate-950 dark:shadow-[0_1px_0_rgba(255,255,255,0.04),0_20px_40px_-20px_rgba(0,0,0,0.65)]"
         data-tour="1"
         data-tour-title-en="Opportunity sources"
         data-tour-title-ar="مصادر الفرص"
-        data-tour-content-en="Switch between Grants.gov (live federal), Private funding (live foundations), Local & state (live state/local-eligible), and SAM.gov Contracts (curated)."
-        data-tour-content-ar="بدّل بين Grants.gov والمنح الخاصة والمحلية/الولائية وعقود SAM.gov."
+        data-tour-content-en="Choose a category, then pick a US funding source. Cards show whether data is live or curated."
+        data-tour-content-ar="اختر فئة ثم مصدر تمويل أمريكي. البطاقات توضّح إن كانت البيانات مباشرة أو منظّمة."
         data-tour-position="bottom"
       >
-        {[
-          { id: "grants", label: t("proposalManagerGrants.modeGrants") },
-          { id: "private", label: t("proposalManagerGrants.modePrivate") },
-          { id: "local", label: t("proposalManagerGrants.modeLocal") },
-          { id: "contracts", label: t("proposalManagerGrants.modeContracts") },
-        ].map((tab) => {
-          const active = mode === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setMode(tab.id)}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
-                active
-                  ? "bg-white text-indigo-700 shadow-sm dark:bg-slate-900 dark:text-indigo-300"
-                  : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-              }`}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,0.12),_transparent_65%)] dark:bg-[radial-gradient(ellipse_at_top,_rgba(99,102,241,0.18),_transparent_70%)]"
+          aria-hidden
+        />
+
+        <div className="relative space-y-5 p-4 sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-xl space-y-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600 dark:text-indigo-300">
+                {t("proposalManagerGrants.sourcesEyebrow")}
+              </p>
+              <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
+                {t("proposalManagerGrants.sourcesHeading")}
+              </h2>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                {t("proposalManagerGrants.sourcesSubheading")}
+              </p>
+            </div>
+
+            <div
+              role="tablist"
+              aria-label={t("proposalManagerGrants.categorySwitcher")}
+              className="inline-flex w-full rounded-xl border border-slate-200/90 bg-slate-100/90 p-1 shadow-inner dark:border-slate-700 dark:bg-slate-950/70 lg:w-auto"
             >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+              {[
+                {
+                  id: "open",
+                  label: t("proposalManagerGrants.categoryOpen"),
+                  count: OPEN_OPP_MODES.length,
+                },
+                {
+                  id: "intel",
+                  label: t("proposalManagerGrants.categoryIntel"),
+                  count: AWARD_INTEL_MODES.length,
+                },
+              ].map((cat) => {
+                const active = sourceCategoryTab === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => selectSourceCategory(cat.id)}
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 lg:flex-none lg:min-w-[11rem] ${
+                      active
+                        ? "bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white"
+                        : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                        active
+                          ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                          : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                      }`}
+                    >
+                      {cat.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {sourceCategoryTab === "intel"
+              ? t("proposalManagerGrants.categoryIntelHint")
+              : t("proposalManagerGrants.categoryOpenHint")}
+          </p>
+
+          <div
+            role="tablist"
+            aria-label={
+              sourceCategoryTab === "intel"
+                ? t("proposalManagerGrants.modeTabsIntel")
+                : t("proposalManagerGrants.modeTabsOpen")
+            }
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+          >
+            {activeSourceModes.map((tab) => {
+              const active = mode === tab.id;
+              const Icon = tab.Icon;
+              const isLive = tab.badge === "live";
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => selectSource(tab.id)}
+                  className={`group relative flex min-h-[7.25rem] flex-col rounded-2xl border p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
+                    active
+                      ? "border-indigo-500/80 bg-white shadow-[0_10px_30px_-18px_rgba(79,70,229,0.75)] ring-1 ring-indigo-500/30 dark:border-indigo-400/70 dark:bg-slate-900 dark:shadow-[0_16px_40px_-20px_rgba(99,102,241,0.55)] dark:ring-indigo-400/25"
+                      : "border-slate-200/90 bg-white/70 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-slate-700/80 dark:bg-slate-900/50 dark:hover:border-slate-600 dark:hover:bg-slate-900"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span
+                      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+                        active
+                          ? "border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-500/40 dark:bg-indigo-950/50 dark:text-indigo-300"
+                          : "border-slate-200 bg-slate-50 text-slate-600 group-hover:border-slate-300 group-hover:text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                      }`}
+                      aria-hidden
+                    >
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                          isLive
+                            ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-200 dark:ring-emerald-800"
+                            : "bg-amber-50 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-800"
+                        }`}
+                      >
+                        {isLive
+                          ? t("proposalManagerGrants.badgeLive")
+                          : t("proposalManagerGrants.badgeCurated")}
+                      </span>
+                      {active && (
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-white dark:bg-indigo-500">
+                          <FiCheck className="h-3 w-3" aria-hidden />
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="mt-3 space-y-1">
+                    <p
+                      className={`text-sm font-semibold tracking-tight ${
+                        active ? "text-slate-900 dark:text-white" : "text-slate-800 dark:text-slate-100"
+                      }`}
+                    >
+                      {t(`proposalManagerGrants.${tab.labelKey}`)}
+                    </p>
+                    <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                      {t(`proposalManagerGrants.${tab.descKey}`)}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       {mode === "contracts" ? (
         <SamContractsPanel />
@@ -611,6 +785,20 @@ export default function GrantsPage() {
         <AltGrantsPanel variant="private" />
       ) : mode === "local" ? (
         <AltGrantsPanel variant="local" />
+      ) : mode === "ca" ? (
+        <CaGrantsPanel />
+      ) : mode === "sbir" ? (
+        <SbirPanel />
+      ) : mode === "usaspending" ? (
+        <UsaSpendingPanel />
+      ) : mode === "assistance" ? (
+        <AssistanceListingsPanel />
+      ) : mode === "nih" ? (
+        <NihReporterPanel />
+      ) : mode === "nsf" ? (
+        <NsfAwardsPanel />
+      ) : mode === "fac" ? (
+        <FacPanel />
       ) : (
         <>
       <header
