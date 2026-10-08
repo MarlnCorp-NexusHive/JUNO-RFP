@@ -243,18 +243,39 @@ export function registerSbirRoutes(app) {
         page = 0,
         rows = 25,
       } = req.body || {};
+      const kindNorm = kind === "topics" ? "topics" : "awards";
+      // Topics: open solicitations only (never forecasted/closed).
+      let statusNorm = String(status || "").trim();
+      if (kindNorm === "topics") {
+        statusNorm = "Open";
+      }
       const payload = await searchSbir({
-        kind,
+        kind: kindNorm,
         keyword: String(keyword || "").trim(),
         agency: String(agency || "").trim(),
-        status: String(status || "").trim(),
+        status: statusNorm,
         page,
         pageSize: rows,
       });
+      let results = Array.isArray(payload.results) ? payload.results : [];
+      if (kindNorm === "topics") {
+        results = results.filter((row) => {
+          const st = String(row.status || "").toLowerCase();
+          if (/forecast|closed|archiv/.test(st)) return false;
+          const due = row.deadline || row.close_date;
+          if (due) {
+            const ms = Date.parse(due);
+            if (Number.isFinite(ms) && ms < Date.now()) return false;
+          }
+          return true;
+        });
+      }
       return res.json({
-        kind: kind === "topics" ? "topics" : "awards",
+        kind: kindNorm,
         fetchedAt: new Date().toISOString(),
         ...payload,
+        results,
+        hitCount: results.length,
       });
     } catch (err) {
       console.error("[grants/sbir/search]", err);

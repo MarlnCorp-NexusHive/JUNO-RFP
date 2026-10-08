@@ -27,6 +27,10 @@ import {
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
+import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import SortNewestButton from "./SortNewestButton.jsx";
+import { filterOpenListings } from "../services/openListingFilter.js";
+import { sortByNewest } from "../services/listingSort.js";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -85,6 +89,7 @@ export default function SamContractsPanel() {
   const [expandedId, setExpandedId] = useState(null);
   const [copiedId, setCopiedId] = useState("");
   const [hourTick, setHourTick] = useState(0);
+  const [sortNewest, setSortNewest] = useState(false);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   // Same hourly curated desk view for demo and trial.
@@ -108,18 +113,22 @@ export default function SamContractsPanel() {
     setExpandedId((current) => (current === id ? null : id));
   };
 
-  const filtered = useMemo(
-    () =>
-      filterSamOpportunities(samPool.opportunities, {
-        keyword,
-        naics,
-        psc,
-        agency,
-        setAside,
-        noticeType,
-      }),
-    [samPool.opportunities, keyword, naics, psc, agency, setAside, noticeType],
-  );
+  const filtered = useMemo(() => {
+    const matched = filterSamOpportunities(samPool.opportunities, {
+      keyword,
+      naics,
+      psc,
+      agency,
+      setAside,
+      noticeType,
+    });
+    // Active + not past response deadline only.
+    const open = filterOpenListings(matched, {
+      statusKeys: ["status"],
+      deadlineKeys: ["responseDeadline"],
+    });
+    return sortNewest ? sortByNewest(open) : open;
+  }, [samPool.opportunities, keyword, naics, psc, agency, setAside, noticeType, sortNewest]);
 
   const filtersDirty =
     !!draftKeyword.trim() ||
@@ -251,7 +260,8 @@ export default function SamContractsPanel() {
               />
             </label>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <SortNewestButton active={sortNewest} onToggle={() => setSortNewest((v) => !v)} />
               <button
                 type="submit"
                 className="inline-flex min-h-[42px] flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 lg:flex-none"
@@ -409,9 +419,12 @@ export default function SamContractsPanel() {
                         </span>
                       )}
                     </div>
-                    <h3 className="text-sm font-bold leading-snug text-slate-900 dark:text-white">
-                      {opp.title}
-                    </h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <GrantSourceBadge sourceId="contracts" />
+                      <h3 className="text-sm font-bold leading-snug text-slate-900 dark:text-white">
+                        {opp.title}
+                      </h3>
+                    </div>
                     <p className="text-xs text-slate-500">
                       <span className="font-semibold text-slate-700 dark:text-slate-300">{opp.noticeId}</span>
                       {" · "}
@@ -461,6 +474,15 @@ export default function SamContractsPanel() {
                     number={opp.noticeId}
                     agency={opp.agencyCode}
                     deadline={opp.responseDeadline}
+                    opportunity={{
+                      ...opp,
+                      number: opp.noticeId,
+                      agency: opp.agencyCode,
+                      deadline: opp.responseDeadline,
+                      url: opp.samUrl,
+                      amount: opp.awardCeiling,
+                      amountLabel: opp.awardCeilingLabel,
+                    }}
                   />
                 </div>
                 </div>

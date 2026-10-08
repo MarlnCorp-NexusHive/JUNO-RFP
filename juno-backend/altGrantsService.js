@@ -200,7 +200,7 @@ async function searchLocalGrants({ keyword, geography, status, focus, rows, page
     Forecasted: "forecasted",
     Closed: "closed",
   };
-  const oppStatuses = statusMap[status] || "posted|forecasted";
+  const oppStatuses = statusMap[status] || "posted";
   const pageSize = Math.min(Math.max(Number(rows) || 25, 1), 100);
   const pageIndex = Math.max(Number(page) || 0, 0);
 
@@ -271,14 +271,24 @@ async function searchLocalGrants({ keyword, geography, status, focus, rows, page
     };
   });
 
+  const openResults = results.filter((row) => {
+    if (/^forecasted$/i.test(String(row.status || ""))) return false;
+    if (/^closed$/i.test(String(row.status || ""))) return false;
+    if (row.closeDate) {
+      const ms = Date.parse(row.closeDate);
+      if (Number.isFinite(ms) && ms < Date.now()) return false;
+    }
+    return true;
+  });
+
   return {
     source: "Grants.gov",
     sourceDetail: "State & local eligible opportunities (live)",
-    hitCount,
+    hitCount: openResults.length,
     page: pageIndex,
     pageSize,
-    hasMore: (pageIndex + 1) * pageSize < hitCount,
-    results,
+    hasMore: (pageIndex + 1) * pageSize < openResults.length,
+    results: openResults,
   };
 }
 

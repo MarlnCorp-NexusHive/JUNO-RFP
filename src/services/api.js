@@ -407,6 +407,22 @@ export const searchAssistanceListings = async (params = {}) => {
   return res.data;
 };
 
+/** Grant Pursuit Brief — generate once, shared disk cache */
+export const getGrantBrief = async (payload = {}) => {
+  const res = await API.post("/grants/brief/get", payload, { timeout: 180_000 });
+  return res.data;
+};
+
+export const regenerateGrantBrief = async (payload = {}) => {
+  const res = await API.post("/grants/brief/regenerate", payload, { timeout: 180_000 });
+  return res.data;
+};
+
+export const fetchCachedGrantBrief = async (key) => {
+  const res = await API.get("/grants/brief", { params: { key } });
+  return res.data;
+};
+
 /** Trial tenants: change own password (requires Bearer trial token) */
 export const changeTrialPassword = async ({ currentPassword, newPassword }) => {
   const res = await API.post("/trial/auth/change-password", { currentPassword, newPassword });

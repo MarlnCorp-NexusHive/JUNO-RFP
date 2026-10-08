@@ -41,6 +41,7 @@ import { registerNsfAwardsRoutes } from "./nsfAwardsService.js";
 import { registerCaGrantsRoutes } from "./caGrantsService.js";
 import { registerFacRoutes } from "./facService.js";
 import { registerAssistanceListingsRoutes } from "./assistanceListingsService.js";
+import { registerGrantBriefRoutes } from "./grantBriefService.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -108,6 +109,7 @@ registerNsfAwardsRoutes(app);
 registerCaGrantsRoutes(app);
 registerFacRoutes(app);
 registerAssistanceListingsRoutes(app);
+registerGrantBriefRoutes(app, openai);
 
 /* ================= MULTER ================= */
 const upload = multer({
@@ -650,5 +652,6 @@ app.listen(PORT, () => {
   console.log("NSF Awards: POST /grants/nsf/search");
   console.log("CA Grants: POST /grants/ca/search");
   console.log("FAC: POST /grants/fac/search");
-  console.log("Assistance Listings: POST /grants/assistance-listings/search\n");
+  console.log("Assistance Listings: POST /grants/assistance-listings/search");
+  console.log("Grant briefs: GET /grants/brief, POST /grants/brief/get, POST /grants/brief/regenerate\n");
 });

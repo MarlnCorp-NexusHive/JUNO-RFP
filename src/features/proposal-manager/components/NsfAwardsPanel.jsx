@@ -7,6 +7,7 @@ export default function NsfAwardsPanel() {
     <GrantSourceSearchPanel
       ns="proposalManagerNsf"
       shortlistSource="nsf"
+      openOnly={false}
       searchFn={searchNsfAwards}
       buildParams={({ keyword, page }) => ({
         keyword,

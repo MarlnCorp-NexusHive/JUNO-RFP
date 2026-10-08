@@ -7,6 +7,7 @@ export default function UsaSpendingPanel() {
     <GrantSourceSearchPanel
       ns="proposalManagerUsaSpending"
       shortlistSource="usaspending"
+      openOnly={false}
       searchFn={searchUsaSpending}
       initialExtra={{ awardKind: "all" }}
       extraFilters={[

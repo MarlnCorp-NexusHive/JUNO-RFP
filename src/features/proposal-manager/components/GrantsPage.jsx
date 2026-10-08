@@ -42,14 +42,16 @@ import {
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
+import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import MergedGrantsFeed from "./MergedGrantsFeed.jsx";
+import SortNewestButton from "./SortNewestButton.jsx";
+import { filterOpenListings } from "../services/openListingFilter.js";
+import { sortByNewest } from "../services/listingSort.js";
 import { formatDateTime24 } from '../../../utils/dateTime';
 
+/** Open/posted only — forecasted and closed/archived are excluded from the desk. */
 const STATUS_OPTIONS = [
-  { value: "posted|forecasted", labelKey: "openAndForecasted" },
   { value: "posted", labelKey: "posted" },
-  { value: "forecasted", labelKey: "forecasted" },
-  { value: "closed", labelKey: "closed" },
-  { value: "archived", labelKey: "archived" },
 ];
 
 const QUICK_AGENCIES = ["HHS", "NSF", "ED", "USDA", "DOE", "DOD", "EPA", "DOT"];
@@ -72,8 +74,14 @@ const AWARD_INTEL_MODES = [
   { id: "fac", labelKey: "modeFac", descKey: "descFac", badge: "live", Icon: FiShield },
 ];
 
+const ALL_SOURCE_MODES = [...OPEN_OPP_MODES, ...AWARD_INTEL_MODES];
+
 function sourceCategory(modeId) {
   return AWARD_INTEL_MODES.some((m) => m.id === modeId) ? "intel" : "open";
+}
+
+function findSourceMeta(modeId) {
+  return ALL_SOURCE_MODES.find((m) => m.id === modeId) || null;
 }
 
 const inputClass =
@@ -446,26 +454,34 @@ export default function GrantsPage() {
   const formId = useId();
   const resultsId = useId();
 
-  const [mode, setMode] = useState("grants");
+  const [selectedModes, setSelectedModes] = useState(["grants"]);
   const [sourceCategoryTab, setSourceCategoryTab] = useState("open"); // open | intel
 
   const activeSourceModes = sourceCategoryTab === "intel" ? AWARD_INTEL_MODES : OPEN_OPP_MODES;
+  const singleMode = selectedModes.length === 1 ? selectedModes[0] : null;
+  const grantsAlone = singleMode === "grants";
+  const multiSelected = selectedModes.length > 1;
 
   const selectSourceCategory = (nextCategory) => {
     setSourceCategoryTab(nextCategory);
-    const catalog = nextCategory === "intel" ? AWARD_INTEL_MODES : OPEN_OPP_MODES;
-    if (!catalog.some((m) => m.id === mode)) {
-      setMode(catalog[0].id);
-    }
   };
 
-  const selectSource = (nextMode) => {
-    setMode(nextMode);
-    setSourceCategoryTab(sourceCategory(nextMode));
+  const toggleSource = (nextMode) => {
+    setSelectedModes((prev) => {
+      if (prev.includes(nextMode)) {
+        if (prev.length <= 1) return prev;
+        return prev.filter((id) => id !== nextMode);
+      }
+      return [...prev, nextMode];
+    });
+  };
+
+  const removeSelectedSource = (modeId) => {
+    setSelectedModes((prev) => (prev.length <= 1 ? prev : prev.filter((id) => id !== modeId)));
   };
   const [keyword, setKeyword] = useState("");
   const [draftKeyword, setDraftKeyword] = useState("");
-  const [oppStatuses, setOppStatuses] = useState("posted|forecasted");
+  const [oppStatuses, setOppStatuses] = useState("posted");
   const [agencyFilter, setAgencyFilter] = useState("");
   const [startRecord, setStartRecord] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -478,6 +494,7 @@ export default function GrantsPage() {
   const [loadingIds, setLoadingIds] = useState({});
   const [errorById, setErrorById] = useState({});
   const [copiedId, setCopiedId] = useState("");
+  const [sortNewest, setSortNewest] = useState(false);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   const runSearch = useCallback(
@@ -486,6 +503,7 @@ export default function GrantsPage() {
       nextKeyword = keyword,
       nextStatuses = oppStatuses,
       nextAgency = agencyFilter,
+      nextSortNewest = sortNewest,
     } = {}) => {
       setLoading(true);
       setError("");
@@ -497,6 +515,7 @@ export default function GrantsPage() {
           agencies: nextAgency.trim(),
           rows: PAGE_SIZE,
           startRecordNum: nextStart,
+          sortBy: nextSortNewest ? "openDate|desc" : "",
         });
         setPayload(data);
         setStartRecord(nextStart);
@@ -512,15 +531,15 @@ export default function GrantsPage() {
         setLoading(false);
       }
     },
-    [agencyFilter, keyword, oppStatuses, t],
+    [agencyFilter, keyword, oppStatuses, sortNewest, t],
   );
 
   useEffect(() => {
-    if (mode !== "grants") return;
+    if (!grantsAlone) return;
     runSearch({ nextStart: 0 });
     searchInputRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+  }, [grantsAlone]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -578,12 +597,12 @@ export default function GrantsPage() {
   const clearFilters = () => {
     setDraftKeyword("");
     setKeyword("");
-    setOppStatuses("posted|forecasted");
+    setOppStatuses("posted");
     setAgencyFilter("");
     runSearch({
       nextStart: 0,
       nextKeyword: "",
-      nextStatuses: "posted|forecasted",
+      nextStatuses: "posted",
       nextAgency: "",
     });
   };
@@ -599,8 +618,14 @@ export default function GrantsPage() {
     }
   };
 
-  const results = payload?.results || [];
-  const hitCount = payload?.hitCount || 0;
+  const results = useMemo(() => {
+    const open = filterOpenListings(payload?.results || [], {
+      statusKeys: ["oppStatus", "status"],
+      deadlineKeys: ["closeDate", "deadline"],
+    });
+    return sortNewest ? sortByNewest(open) : open;
+  }, [payload?.results, sortNewest]);
+  const hitCount = Number(payload?.hitCount) || results.length;
   const page = Math.floor(startRecord / PAGE_SIZE) + 1;
   const totalPages = Math.max(1, Math.ceil(hitCount / PAGE_SIZE) || 1);
   const rangeStart = hitCount === 0 ? 0 : startRecord + 1;
@@ -608,7 +633,7 @@ export default function GrantsPage() {
   const filtersDirty =
     !!draftKeyword.trim() ||
     !!keyword.trim() ||
-    oppStatuses !== "posted|forecasted" ||
+    oppStatuses !== "posted" ||
     !!agencyFilter.trim();
 
   const statusLabel = useMemo(
@@ -628,8 +653,8 @@ export default function GrantsPage() {
         data-tour="1"
         data-tour-title-en="Opportunity sources"
         data-tour-title-ar="مصادر الفرص"
-        data-tour-content-en="Choose a category, then pick a US funding source. Cards show whether data is live or curated."
-        data-tour-content-ar="اختر فئة ثم مصدر تمويل أمريكي. البطاقات توضّح إن كانت البيانات مباشرة أو منظّمة."
+        data-tour-content-en="Choose a category, then select one or more US funding sources. Multiple selections open a mixed, interleaved results feed."
+        data-tour-content-ar="اختر فئة ثم حدّد مصدر تمويل أمريكي واحداً أو أكثر. الاختيار المتعدد يفتح قائمة نتائج مختلطة ومتداخلة."
         data-tour-position="bottom"
       >
         <div
@@ -699,13 +724,15 @@ export default function GrantsPage() {
           </div>
 
           <p className="text-xs text-slate-500 dark:text-slate-400">
+            {t("proposalManagerGrants.multiSelectHint")}
+            {" · "}
             {sourceCategoryTab === "intel"
               ? t("proposalManagerGrants.categoryIntelHint")
               : t("proposalManagerGrants.categoryOpenHint")}
           </p>
 
           <div
-            role="tablist"
+            role="group"
             aria-label={
               sourceCategoryTab === "intel"
                 ? t("proposalManagerGrants.modeTabsIntel")
@@ -714,16 +741,15 @@ export default function GrantsPage() {
             className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
           >
             {activeSourceModes.map((tab) => {
-              const active = mode === tab.id;
+              const active = selectedModes.includes(tab.id);
               const Icon = tab.Icon;
               const isLive = tab.badge === "live";
               return (
                 <button
                   key={tab.id}
                   type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => selectSource(tab.id)}
+                  aria-pressed={active}
+                  onClick={() => toggleSource(tab.id)}
                   className={`group relative flex min-h-[7.25rem] flex-col rounded-2xl border p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
                     active
                       ? "border-indigo-500/80 bg-white shadow-[0_10px_30px_-18px_rgba(79,70,229,0.75)] ring-1 ring-indigo-500/30 dark:border-indigo-400/70 dark:bg-slate-900 dark:shadow-[0_16px_40px_-20px_rgba(99,102,241,0.55)] dark:ring-indigo-400/25"
@@ -753,11 +779,16 @@ export default function GrantsPage() {
                           ? t("proposalManagerGrants.badgeLive")
                           : t("proposalManagerGrants.badgeCurated")}
                       </span>
-                      {active && (
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-white dark:bg-indigo-500">
-                          <FiCheck className="h-3 w-3" aria-hidden />
-                        </span>
-                      )}
+                      <span
+                        className={`inline-flex h-5 w-5 items-center justify-center rounded-md border ${
+                          active
+                            ? "border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500"
+                            : "border-slate-300 bg-white text-transparent dark:border-slate-600 dark:bg-slate-800"
+                        }`}
+                        aria-hidden
+                      >
+                        <FiCheck className="h-3 w-3" />
+                      </span>
                     </span>
                   </div>
                   <div className="mt-3 space-y-1">
@@ -776,38 +807,64 @@ export default function GrantsPage() {
               );
             })}
           </div>
+
+          {selectedModes.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-4 dark:border-slate-700/80">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                {t("proposalManagerGrants.selectedSources")}
+              </span>
+              {selectedModes.map((id) => {
+                const meta = findSourceMeta(id);
+                if (!meta) return null;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => removeSelectedSource(id)}
+                    title={t("proposalManagerGrants.removeSource")}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-900 hover:border-indigo-300 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-100"
+                  >
+                    {t(`proposalManagerGrants.${meta.labelKey}`)}
+                    {selectedModes.length > 1 ? <FiX className="h-3 w-3 opacity-70" aria-hidden /> : null}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {mode === "contracts" ? (
+      {multiSelected ? (
+        <MergedGrantsFeed selectedModes={selectedModes} />
+      ) : singleMode === "contracts" ? (
         <SamContractsPanel />
-      ) : mode === "private" ? (
+      ) : singleMode === "private" ? (
         <AltGrantsPanel variant="private" />
-      ) : mode === "local" ? (
+      ) : singleMode === "local" ? (
         <AltGrantsPanel variant="local" />
-      ) : mode === "ca" ? (
+      ) : singleMode === "ca" ? (
         <CaGrantsPanel />
-      ) : mode === "sbir" ? (
+      ) : singleMode === "sbir" ? (
         <SbirPanel />
-      ) : mode === "usaspending" ? (
+      ) : singleMode === "usaspending" ? (
         <UsaSpendingPanel />
-      ) : mode === "assistance" ? (
+      ) : singleMode === "assistance" ? (
         <AssistanceListingsPanel />
-      ) : mode === "nih" ? (
+      ) : singleMode === "nih" ? (
         <NihReporterPanel />
-      ) : mode === "nsf" ? (
+      ) : singleMode === "nsf" ? (
         <NsfAwardsPanel />
-      ) : mode === "fac" ? (
+      ) : singleMode === "fac" ? (
         <FacPanel />
-      ) : (
+      ) : singleMode === "grants" ? (
         <>
       <header
         className="space-y-2"
         data-tour="2"
         data-tour-title-en="Live federal grants"
         data-tour-title-ar="المنح الفيدرالية المباشرة"
-        data-tour-content-en="Browse open and forecasted US federal opportunities from Grants.gov. Results refresh from the live API."
-        data-tour-content-ar="تصفح الفرص الفيدرالية المفتوحة والمتوقعة من Grants.gov مباشرة."
+        data-tour-content-en="Browse open (posted) US federal opportunities from Grants.gov. Forecasted and closed listings are excluded."
+        data-tour-content-ar="تصفح الفرص الفيدرالية المفتوحة (المنشورة) من Grants.gov. الفرص المتوقعة والمغلقة مستبعدة."
         data-tour-position="bottom"
       >
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -918,7 +975,15 @@ export default function GrantsPage() {
               />
             </label>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <SortNewestButton
+                active={sortNewest}
+                onToggle={() => {
+                  const next = !sortNewest;
+                  setSortNewest(next);
+                  runSearch({ nextStart: 0, nextSortNewest: next });
+                }}
+              />
               <button
                 type="submit"
                 disabled={loading}
@@ -1100,9 +1165,12 @@ export default function GrantsPage() {
                     <div className="min-w-0 flex-1 space-y-2">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="min-w-0 space-y-1">
-                          <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
-                            {hit.title}
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <GrantSourceBadge sourceId="grants" />
+                            <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
+                              {hit.title}
+                            </p>
+                          </div>
                           <p className="text-xs text-slate-500 dark:text-slate-400">
                             <span className="font-medium text-slate-700 dark:text-slate-200">{hit.number}</span>
                             {" · "}
@@ -1148,6 +1216,12 @@ export default function GrantsPage() {
                       number={hit.number}
                       agency={hit.agency || hit.agencyCode}
                       deadline={hit.closeDate}
+                      opportunity={{
+                        ...hit,
+                        deadline: hit.closeDate,
+                        status: hit.oppStatus,
+                        agency: hit.agency || hit.agencyCode,
+                      }}
                     />
                   </div>
                   </div>
@@ -1209,7 +1283,7 @@ export default function GrantsPage() {
         </div>
       </section>
         </>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -7,6 +7,7 @@ export default function AssistanceListingsPanel() {
     <GrantSourceSearchPanel
       ns="proposalManagerAssistanceListings"
       shortlistSource="assistance"
+      openOnly
       searchFn={searchAssistanceListings}
       initialExtra={{ agency: "", status: "Active" }}
       extraFilters={[
@@ -17,24 +18,13 @@ export default function AssistanceListingsPanel() {
           placeholderKey: "agencyPlaceholder",
           className: "w-full lg:w-40",
         },
-        {
-          key: "status",
-          labelKey: "status",
-          type: "select",
-          className: "w-full lg:w-40",
-          options: [
-            { value: "all", labelKey: "statusAll" },
-            { value: "Active", labelKey: "statusActive" },
-            { value: "Inactive", labelKey: "statusInactive" },
-          ],
-        },
       ]}
       buildParams={({ keyword, page, extra }) => ({
         keyword,
         page,
         rows: 25,
         agency: extra.agency || "",
-        status: extra.status || "Active",
+        status: "Active",
       })}
     />
   );

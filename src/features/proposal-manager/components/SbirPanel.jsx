@@ -41,6 +41,7 @@ export default function SbirPanel() {
         key={kind}
         ns={kind === "topics" ? "proposalManagerSbirTopics" : "proposalManagerSbirAwards"}
         shortlistSource="sbir"
+        openOnly={kind === "topics"}
         searchFn={searchSbir}
         initialExtra={{ agency: "", status: kind === "topics" ? "Open" : "" }}
         extraFilters={[
@@ -51,22 +52,6 @@ export default function SbirPanel() {
             placeholderKey: "agencyPlaceholder",
             className: "w-full lg:w-36",
           },
-          ...(kind === "topics"
-            ? [
-                {
-                  key: "status",
-                  labelKey: "status",
-                  type: "select",
-                  className: "w-full lg:w-40",
-                  options: [
-                    { value: "", labelKey: "statusAll" },
-                    { value: "Open", labelKey: "statusOpen" },
-                    { value: "Forecasted", labelKey: "statusForecasted" },
-                    { value: "Closed", labelKey: "statusClosed" },
-                  ],
-                },
-              ]
-            : []),
         ]}
         buildParams={({ keyword, page, extra }) => ({
           kind,
@@ -74,7 +59,8 @@ export default function SbirPanel() {
           page,
           rows: 25,
           agency: extra.agency || "",
-          status: extra.status || "",
+          // Topics: open solicitations only — never forecasted/closed.
+          status: kind === "topics" ? "Open" : extra.status || "",
         })}
       />
     </div>

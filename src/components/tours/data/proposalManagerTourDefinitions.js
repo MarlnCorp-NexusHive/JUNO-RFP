@@ -37,12 +37,12 @@ export const proposalManagerTourDefinitions = {
     autoScan: true,
     title: { en: "Grants & funding", ar: "المنح والتمويل" },
     description: {
-      en: "Live Grants.gov, private foundations, local/state-eligible opportunities, and SAM.gov contracts.",
-      ar: "Grants.gov المباشر والمنح الخاصة والمحلية/الولائية وعقود SAM.gov.",
+      en: "Multi-select US funding sources — Grants.gov, private, local/state, SAM, and award intel — each stacked with its own search.",
+      ar: "اختيار متعدد لمصادر التمويل الأمريكية — Grants.gov والخاص والمحلي/الولائي وSAM ومعلومات الجوائز — كل منها بلوحة بحث مستقلة.",
     },
     steps: [
-      step(1, '[data-tour="1"]', "Opportunity sources", "مصادر الفرص", "Switch tabs for Grants.gov, Private funding, Local & state, and SAM.gov Contracts.", "بدّل التبويبات بين Grants.gov والتمويل الخاص والمحلي/الولائي وعقود SAM.gov."),
-      step(2, '[data-tour="2"]', "Live federal grants", "المنح الفيدرالية المباشرة", "Browse open and forecasted US federal opportunities from Grants.gov.", "تصفح الفرص الفيدرالية المفتوحة والمتوقعة من Grants.gov."),
+      step(1, '[data-tour="1"]', "Opportunity sources", "مصادر الفرص", "Choose a category, then multi-select one or more US funding sources. Selected sources stack below with their own search.", "اختر فئة ثم حدّد مصدر تمويل أمريكي واحداً أو أكثر. المصادر المحددة تُعرض متتابعة أسفل مع بحث خاص لكل منها."),
+      step(2, '[data-tour="2"]', "Live federal grants", "المنح الفيدرالية المباشرة", "Browse open (posted) US federal opportunities from Grants.gov — forecasted listings are excluded.", "تصفح الفرص الفيدرالية المفتوحة (المنشورة) من Grants.gov — الفرص المتوقعة مستبعدة."),
       step(3, '[data-tour="3"]', "Search & filters", "البحث والمرشحات", "Filter by keyword, agency, and status, then search for the latest matches.", "صفِّ حسب الكلمة والوكالة والحالة ثم ابحث عن أحدث النتائج."),
     ],
   },

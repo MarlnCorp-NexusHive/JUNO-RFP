@@ -7,6 +7,7 @@ export default function FacPanel() {
     <GrantSourceSearchPanel
       ns="proposalManagerFac"
       shortlistSource="fac"
+      openOnly={false}
       searchFn={searchFac}
       buildParams={({ keyword, page }) => ({
         keyword,

@@ -4,11 +4,13 @@ import { useTranslation } from "react-i18next";
 import { FiStar, FiMessageCircle, FiDollarSign, FiPackage } from "react-icons/fi";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { isShortlisted, subscribeShortlist, toggleShortlist, hydrateShortlistFromServer } from "../services/shortlistStore.js";
+import OpenGrantBriefButton from "./OpenGrantBriefButton.jsx";
 
 /**
  * Shortlist toggle (demo + trial). Persists deadline for dashboard Alerts;
  * trial tenants also sync to company-wide storage + shared calendar.
  * When shortlisted, offers deep-links into Communication / Pricing / Bid Vault.
+ * Always offers Open brief (shared Pursuit Brief cache).
  */
 export default function OpportunityShortlistButton({
   id,
@@ -17,6 +19,7 @@ export default function OpportunityShortlistButton({
   number,
   agency,
   deadline,
+  opportunity,
   className = "",
 }) {
   const { t } = useTranslation();
@@ -65,7 +68,16 @@ export default function OpportunityShortlistButton({
 
   return (
     <div className={`inline-flex flex-col items-end gap-0.5 ${className}`}>
-      <div className="inline-flex items-center gap-1.5">
+      <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
+        <OpenGrantBriefButton
+          id={id}
+          source={source}
+          title={title}
+          number={number}
+          agency={agency}
+          deadline={deadline}
+          opportunity={opportunity}
+        />
         <button
           type="button"
           onClick={handleClick}

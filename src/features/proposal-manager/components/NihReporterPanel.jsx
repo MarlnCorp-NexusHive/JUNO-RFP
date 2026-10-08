@@ -7,6 +7,7 @@ export default function NihReporterPanel() {
     <GrantSourceSearchPanel
       ns="proposalManagerNih"
       shortlistSource="nih"
+      openOnly={false}
       searchFn={searchNihReporter}
       initialExtra={{ agency: "" }}
       extraFilters={[

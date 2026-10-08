@@ -46,6 +46,19 @@ function normalizeHit(hit) {
   };
 }
 
+/** Drop listings whose close/due date is already past (stale "open" rows). */
+function isPastCloseDate(closeDate) {
+  if (!closeDate) return false;
+  const raw = String(closeDate).trim();
+  let ms = Date.parse(raw);
+  if (!Number.isFinite(ms)) {
+    const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) ms = new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2]), 23, 59, 59).getTime();
+  }
+  if (!Number.isFinite(ms)) return false;
+  return ms < Date.now();
+}
+
 function pick(...vals) {
   for (const v of vals) {
     if (v == null) continue;
@@ -123,7 +136,7 @@ export function registerGrantsGovRoutes(app) {
     try {
       const {
         keyword = "",
-        oppStatuses = "posted|forecasted",
+        oppStatuses = "posted",
         rows = 25,
         startRecordNum = 0,
         agencies = "",
@@ -135,9 +148,20 @@ export function registerGrantsGovRoutes(app) {
         sortBy = "",
       } = req.body || {};
 
+      // Open opportunities only — never include forecasted by default.
+      let statusFilter = String(oppStatuses || "posted").trim() || "posted";
+      if (/forecasted/i.test(statusFilter) && !/^posted$/i.test(statusFilter)) {
+        statusFilter = statusFilter
+          .split("|")
+          .map((s) => s.trim())
+          .filter((s) => s && !/^forecasted$/i.test(s))
+          .join("|");
+        if (!statusFilter) statusFilter = "posted";
+      }
+
       const payload = {
         keyword: String(keyword || "").trim(),
-        oppStatuses: String(oppStatuses || "posted|forecasted"),
+        oppStatuses: statusFilter,
         rows: Math.min(Math.max(Number(rows) || 25, 1), 100),
         startRecordNum: Math.max(Number(startRecordNum) || 0, 0),
         agencies: String(agencies || ""),
@@ -151,7 +175,13 @@ export function registerGrantsGovRoutes(app) {
 
       const raw = await postGrantsGov("search2", payload);
       const data = raw.data || {};
-      const hits = Array.isArray(data.oppHits) ? data.oppHits.map(normalizeHit).filter(Boolean) : [];
+      const hits = Array.isArray(data.oppHits)
+        ? data.oppHits
+            .map(normalizeHit)
+            .filter(Boolean)
+            .filter((h) => !/^forecasted$/i.test(String(h.oppStatus || "")))
+            .filter((h) => !isPastCloseDate(h.closeDate))
+        : [];
 
       return res.json({
         source: "Grants.gov",

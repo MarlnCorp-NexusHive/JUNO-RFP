@@ -3,6 +3,8 @@ juno-backend/data/collaboration-runtime-state.json
 # Trial tenants / hashed passwords / sessions (provision via create-trial script)
 juno-backend/data/trial-tenants.json
 juno-backend/data/trial-tenants.json.tmp
+# Shared Grant Pursuit Brief AI cache (global disk)
+juno-backend/data/grant-briefs/
 
 # Local styled-export smoke / test outputs
 juno-backend/_*.docx

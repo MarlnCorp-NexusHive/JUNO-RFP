@@ -125,16 +125,30 @@ export function registerCaGrantsRoutes(app) {
   app.post("/grants/ca/search", async (req, res) => {
     try {
       const { keyword = "", status = "", page = 0, rows = 25 } = req.body || {};
+      // Active / open CA grants only — never closed or forecast-style rows.
+      let statusNorm = String(status || "active").trim() || "active";
+      if (/closed|inactive|forecast/i.test(statusNorm)) statusNorm = "active";
       const payload = await searchCaGrants({
         keyword: String(keyword || "").trim(),
-        status: String(status || "").trim(),
+        status: statusNorm,
         page,
         limit: rows,
       });
+      const results = (payload.results || []).filter((row) => {
+        const st = String(row.status || "").toLowerCase();
+        if (/closed|inactive|forecast/.test(st)) return false;
+        if (row.deadline) {
+          const ms = Date.parse(row.deadline);
+          if (Number.isFinite(ms) && ms < Date.now()) return false;
+        }
+        return true;
+      });
       return res.json({
+        ...payload,
+        results,
+        hitCount: results.length,
         fetchedAt: new Date().toISOString(),
         live: true,
-        ...payload,
       });
     } catch (err) {
       console.error("[grants/ca/search]", err);

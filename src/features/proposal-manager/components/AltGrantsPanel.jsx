@@ -21,6 +21,10 @@ import {
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
+import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import SortNewestButton from "./SortNewestButton.jsx";
+import { filterOpenListings } from "../services/openListingFilter.js";
+import { sortByNewest } from "../services/listingSort.js";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -106,12 +110,13 @@ export default function AltGrantsPanel({ variant }) {
   const [keyword, setKeyword] = useState("");
   const [draftGeography, setDraftGeography] = useState("");
   const [geography, setGeography] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(isPrivate ? "" : "Open");
   const [focus, setFocus] = useState("");
   const [sizeBucket, setSizeBucket] = useState("");
   const [sortBy, setSortBy] = useState("relevance");
   const [page, setPage] = useState(0);
   const [expandedId, setExpandedId] = useState(null);
+  const [sortNewest, setSortNewest] = useState(false);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   const [results, setResults] = useState([]);
@@ -166,8 +171,12 @@ export default function AltGrantsPanel({ variant }) {
         sizeBucket: isPrivate ? sizeBucket : "",
         sortBy: isPrivate ? sortBy : "relevance",
       });
-      setResults(Array.isArray(data.results) ? data.results : []);
-      setHitCount(Number(data.hitCount) || (data.results || []).length);
+      const openRows = filterOpenListings(Array.isArray(data.results) ? data.results : [], {
+        statusKeys: ["status"],
+        deadlineKeys: ["closeDate", "deadline"],
+      });
+      setResults(openRows);
+      setHitCount(openRows.length);
       setFilteredCount(data.filteredCount == null ? null : Number(data.filteredCount));
       setPageSize(Number(data.pageSize) || 25);
       setHasMore(Boolean(data.hasMore));
@@ -213,7 +222,7 @@ export default function AltGrantsPanel({ variant }) {
     setKeyword("");
     setDraftGeography("");
     setGeography("");
-    setStatus("");
+    setStatus(isPrivate ? "" : "Open");
     setFocus("");
     setSizeBucket("");
     setSortBy("relevance");
@@ -222,6 +231,10 @@ export default function AltGrantsPanel({ variant }) {
   };
 
   const displayCount = filteredCount != null ? filteredCount : hitCount;
+  const displayResults = useMemo(
+    () => (sortNewest ? sortByNewest(results) : results),
+    [results, sortNewest],
+  );
   const rangeStart = results.length ? page * pageSize + 1 : 0;
   const rangeEnd = page * pageSize + results.length;
 
@@ -347,10 +360,7 @@ export default function AltGrantsPanel({ variant }) {
                   }}
                   className={inputClass}
                 >
-                  <option value="">{t(`${i18nRoot}.allStatuses`)}</option>
                   <option value="Open">{t(`${i18nRoot}.statusOpen`)}</option>
-                  <option value="Forecasted">{t(`${i18nRoot}.statusForecasted`)}</option>
-                  <option value="Closed">{t(`${i18nRoot}.statusClosed`)}</option>
                 </select>
               </label>
             )}
@@ -416,7 +426,8 @@ export default function AltGrantsPanel({ variant }) {
                 </label>
               </>
             )}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <SortNewestButton active={sortNewest} onToggle={() => setSortNewest((v) => !v)} />
               <button
                 type="submit"
                 className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
@@ -463,7 +474,7 @@ export default function AltGrantsPanel({ variant }) {
             ? t(`${i18nRoot}.loading`)
             : filteredCount != null
               ? t(`${i18nRoot}.resultsFiltered`, {
-                  shown: results.length,
+                  shown: displayResults.length,
                   filtered: filteredCount,
                   total: hitCount,
                 })
@@ -510,9 +521,9 @@ export default function AltGrantsPanel({ variant }) {
         </div>
       ) : (
         <div className="space-y-3">
-          <GrantExpandHintBanner show={showHint && results.length > 0} onDismiss={dismissExpandHint} />
+          <GrantExpandHintBanner show={showHint && displayResults.length > 0} onDismiss={dismissExpandHint} />
           <ul className={`space-y-3 ${loading ? "opacity-60" : ""}`}>
-          {results.map((opp, index) => {
+          {displayResults.map((opp, index) => {
             const open = expandedId === opp.id;
             const days = daysUntil(opp.closeDate);
             const highlightExpand = showHint && index === 0 && !open;
@@ -543,7 +554,10 @@ export default function AltGrantsPanel({ variant }) {
                         </span>
                       )}
                     </div>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">{opp.title}</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <GrantSourceBadge sourceId={isPrivate ? "private" : "local"} />
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-white">{opp.title}</h3>
+                    </div>
                     <p className="text-sm text-slate-600 dark:text-slate-300">{opp.funder}</p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                       <span className="inline-flex items-center gap-1">
@@ -577,6 +591,13 @@ export default function AltGrantsPanel({ variant }) {
                     number={opp.id}
                     agency={opp.funder}
                     deadline={opp.closeDate}
+                    opportunity={{
+                      ...opp,
+                      number: opp.id,
+                      agency: opp.funder,
+                      deadline: opp.closeDate,
+                      summary: opp.description,
+                    }}
                   />
                 </div>
                 </div>

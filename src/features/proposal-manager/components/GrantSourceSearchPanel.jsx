@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FiAlertCircle,
@@ -19,6 +19,10 @@ import {
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
+import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import SortNewestButton from "./SortNewestButton.jsx";
+import { filterOpenListings } from "../services/openListingFilter.js";
+import { sortByNewest } from "../services/listingSort.js";
 import { formatDateTime24 } from "../../../utils/dateTime";
 
 const inputClass =
@@ -52,6 +56,8 @@ function urgencyTone(days) {
  * @param {{
  *  ns: string,
  *  shortlistSource: string,
+ *  sourceBadgeId?: string,
+ *  openOnly?: boolean,
  *  searchFn: (params: object) => Promise<object>,
  *  extraFilters?: Array<{ key: string, labelKey: string, type?: 'text'|'select', options?: Array<{value:string,labelKey:string}>, placeholderKey?: string, className?: string }>,
  *  initialExtra?: Record<string, string>,
@@ -61,11 +67,14 @@ function urgencyTone(days) {
 export default function GrantSourceSearchPanel({
   ns,
   shortlistSource,
+  sourceBadgeId,
+  openOnly = true,
   searchFn,
   extraFilters = [],
   initialExtra = {},
   buildParams,
 }) {
+  const badgeSourceId = sourceBadgeId || shortlistSource;
   const { t } = useTranslation("common");
   const { isRTLMode } = useLocalization();
   const formId = useId();
@@ -80,6 +89,7 @@ export default function GrantSourceSearchPanel({
   const [error, setError] = useState("");
   const [payload, setPayload] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+  const [sortNewest, setSortNewest] = useState(false);
 
   const tt = useCallback((key, opts) => t(`${ns}.${key}`, opts), [t, ns]);
 
@@ -117,8 +127,13 @@ export default function GrantSourceSearchPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const results = payload?.results || [];
-  const hitCount = Number(payload?.hitCount) || results.length;
+  const rawResults = payload?.results;
+  const results = useMemo(() => {
+    const list = Array.isArray(rawResults) ? rawResults : [];
+    const base = openOnly ? filterOpenListings(list) : list;
+    return sortNewest ? sortByNewest(base) : base;
+  }, [openOnly, rawResults, sortNewest]);
+  const hitCount = openOnly ? results.length : Number(payload?.hitCount) || results.length;
   const pageSize = Number(payload?.pageSize) || 25;
   const hasMore = Boolean(payload?.hasMore);
   const rangeStart = hitCount === 0 ? 0 : page * pageSize + 1;
@@ -233,7 +248,8 @@ export default function GrantSourceSearchPanel({
               </label>
             ))}
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <SortNewestButton active={sortNewest} onToggle={() => setSortNewest((v) => !v)} />
               <button
                 type="submit"
                 disabled={loading}
@@ -363,9 +379,12 @@ export default function GrantSourceSearchPanel({
                       <div className="min-w-0 flex-1 space-y-2">
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <div className="min-w-0 space-y-1">
-                            <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
-                              {hit.title}
-                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <GrantSourceBadge sourceId={badgeSourceId} />
+                              <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
+                                {hit.title}
+                              </p>
+                            </div>
                             <p className="text-xs text-slate-500">
                               {hit.number ? (
                                 <span className="font-medium text-slate-700 dark:text-slate-200">{hit.number}</span>
@@ -412,6 +431,7 @@ export default function GrantSourceSearchPanel({
                           number={hit.number}
                           agency={hit.agency}
                           deadline={hit.deadline}
+                          opportunity={hit}
                         />
                       </div>
                     )}
