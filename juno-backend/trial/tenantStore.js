@@ -428,13 +428,13 @@ export function getTenantStatus(tenant) {
 
 /** Shared walkthrough / demo trial — no expiry; re-seeded on every boot (incl. live). */
 export const WALKTHROUGH_DEFAULTS = {
-  email: "maharshi@marln.ai",
+  email: "maharshi@marlncorp.ai",
   password: "Walkthrough2026!",
   companyName: "JUNO Walkthrough",
   contactName: "Maharshi Nath",
 };
 
-const LEGACY_WALKTHROUGH_EMAILS = ["walkthrough@junorfp.com"];
+const LEGACY_WALKTHROUGH_EMAILS = ["walkthrough@junorfp.com", "maharshi@marln.ai"];
 
 export function getWalkthroughCredentials() {
   return {
