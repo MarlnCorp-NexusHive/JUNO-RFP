@@ -264,8 +264,8 @@ export default function TrialCommunicationHub({ isArabic = false }) {
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {label(
-              "Kickoffs, reviews, and team messaging — shared across your company trial.",
-              "اجتماعات الانطلاق والمراجعات ورسائل الفريق — مشتركة عبر تجربة شركتك.",
+              "Kickoffs, reviews, and team messaging — shared across your company.",
+              "اجتماعات الانطلاق والمراجعات ورسائل الفريق — مشتركة عبر شركتك.",
             )}
           </p>
         </div>

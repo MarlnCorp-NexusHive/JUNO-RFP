@@ -319,8 +319,8 @@ export default function TrialPricingPanel({ issuer, clearLink }) {
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {label(
-              "Company rate card and cost volumes — shared across your trial tenant.",
-              "بطاقة أسعار الشركة وأحجام التكلفة — مشتركة عبر مستأجر التجربة.",
+              "Company rate card and cost volumes — shared across your company.",
+              "بطاقة أسعار الشركة وأحجام التكلفة — مشتركة عبر شركتك.",
             )}
           </p>
         </div>

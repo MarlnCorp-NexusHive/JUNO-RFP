@@ -540,6 +540,19 @@
       "exportStyledPreparing": "جارٍ دمج القالب…",
       "exportDownloadSimple": "تنزيل بهذا الشكل",
       "exportPreparing": "جارٍ التحضير…"
+    },
+    "grantPursuitPlan": {
+      "title": "خطة متابعة المنحة",
+      "subtitle": "المعالم والمخرجات وفحوصات الامتثال وعناصر التتبع للمنحة التي بدأت متابعتها.",
+      "emptyHint": "ابدأ متابعة من موجز متابعة المنحة في صفحة الحوافز لإنشاء خطة هنا.",
+      "selectLabel": "متابعة المنحة النشطة",
+      "activeBadge": "قيد المتابعة",
+      "docTypeGrants": "حوافز",
+      "milestones": "المعالم",
+      "deliverables": "المخرجات",
+      "complianceChecks": "فحوصات الامتثال",
+      "trackables": "عناصر التتبع",
+      "sectionEmpty": "لا يوجد عناصر في هذا القسم بعد."
     }
   },
   "proposalManagerGrants": {

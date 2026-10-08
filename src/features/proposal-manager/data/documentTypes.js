@@ -9,6 +9,7 @@ export const RFP_DOCUMENT_TYPES = [
   { id: "section_m", label: "Section M", description: "Evaluation factors and criteria" },
   { id: "pricing", label: "Pricing / Cost volume", description: "Price or cost requirements" },
   { id: "past_performance", label: "Past Performance", description: "Past performance requirements" },
+  { id: "grants", label: "Grants", description: "Grant opportunity, NOFO, or funder guidelines" },
   { id: "other", label: "Other / General", description: "Other RFP-related document" },
 ];
 
@@ -23,6 +24,7 @@ export const DOCUMENT_TYPE_TO_TAGS = {
   section_m: ["Section M", "Evaluation", "Criteria"],
   pricing: ["Pricing", "Cost"],
   past_performance: ["Past Performance", "PP"],
+  grants: ["Grants", "NOFO", "Funding"],
   other: ["General"],
 };
 

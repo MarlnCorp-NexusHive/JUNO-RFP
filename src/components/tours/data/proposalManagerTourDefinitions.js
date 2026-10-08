@@ -96,7 +96,7 @@ export const proposalManagerTourDefinitions = {
       ar: "قائمة الشركة والأدوار والتعيينات والتصدير لفريق العروض.",
     },
     steps: [
-      step(1, '[data-tour="1"]', "Manage Team", "إدارة الفريق", "Structure, roles, and performance for your proposal team—shared across the company trial.", "الهيكل والأدوار والأداء لفريق العروض—مشترك عبر تجربة الشركة."),
+      step(1, '[data-tour="1"]', "Manage Team", "إدارة الفريق", "Structure, roles, and performance for your proposal team—shared across your company.", "الهيكل والأدوار والأداء لفريق العروض—مشترك عبر شركتك."),
       step(2, '[data-tour="2"]', "Add & export", "إضافة وتصدير", "Add team members and export the roster. Members sync into Team Collab reviewers.", "أضف أعضاء الفريق وصدّر القائمة. يتزامن الأعضاء مع مراجعي تعاون الفريق."),
       step(3, '[data-tour="3"]', "Team structure", "هيكل الفريق", "Review roles, hierarchy, and assignments for the people who will answer RFP questions.", "راجع الأدوار والتسلسل والتعيينات للأشخاص الذين سيجيبون على أسئلة طلبات العروض."),
     ],
@@ -268,7 +268,7 @@ export const proposalManagerTourDefinitions = {
       ar: "مستخدمو الشركة والأدوار وإجماليات أعضاء التجربة.",
     },
     steps: [
-      step(1, '[data-tour="1"]', "User Management", "إدارة المستخدمين", "See who belongs to your company trial and their roles.", "اعرض من ينتمي لتجربة شركتك وأدوارهم."),
+      step(1, '[data-tour="1"]', "User Management", "إدارة المستخدمين", "See who belongs to your company and their roles.", "اعرض من ينتمي لشركتك وأدوارهم."),
       step(2, '[data-tour="2"]', "Totals & roster", "الإجماليات والقائمة", "Total users stay in sync with Manage Team membership for the tenant.", "يبقى إجمالي المستخدمين متزامنًا مع عضوية إدارة الفريق للمستأجر."),
     ],
   },

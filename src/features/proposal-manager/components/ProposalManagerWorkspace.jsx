@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useTrialCollabT } from "../../rfp-collaboration/useTrialCollabT.js";
+import GrantPursuitPlanPanel from "./GrantPursuitPlanPanel.jsx";
 import {
   getFolders,
   saveFolders,
@@ -210,6 +211,7 @@ async function messageFromApiError(error) {
 export default function ProposalManagerWorkspace() {
   const t = useTrialCollabT();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isTrial = isTrialUserSession();
   const { issuer, linkFromIntelligence, clearLink, disableIssuerTailoring, setDisableIssuerTailoring, effectiveIssuerName } =
     useProposalIssuer();
@@ -218,6 +220,9 @@ export default function ProposalManagerWorkspace() {
   const [companyPickerOpen, setCompanyPickerOpen] = useState(false);
   const [companyLoading, setCompanyLoading] = useState(false);
   const [companyError, setCompanyError] = useState("");
+  const [grantPursuitKey, setGrantPursuitKey] = useState(() =>
+    String(searchParams.get("grantPursuit") || "").trim(),
+  );
   useEffect(() => {
     if (issuer?.narrative) setIssuerBrief(issuer.narrative);
   }, [issuer?.linkedAt, issuer?.narrative]);
@@ -293,7 +298,35 @@ export default function ProposalManagerWorkspace() {
   }, []);
 
   const [selectedFolderId, setSelectedFolderId] = useState(null);
-  const [documentTypeId, setDocumentTypeId] = useState("solicitation");
+  const [documentTypeId, setDocumentTypeId] = useState(() =>
+    searchParams.get("grantPursuit") ? "grants" : "solicitation",
+  );
+  useEffect(() => {
+    const key = String(searchParams.get("grantPursuit") || "").trim();
+    if (key) {
+      setGrantPursuitKey(key);
+      setDocumentTypeId("grants");
+    }
+  }, [searchParams]);
+
+  const handleSelectGrantPursuit = useCallback(
+    (key) => {
+      const next = String(key || "").trim();
+      setGrantPursuitKey(next);
+      if (next) {
+        setDocumentTypeId("grants");
+        setSearchParams(
+          (prev) => {
+            const p = new URLSearchParams(prev);
+            p.set("grantPursuit", next);
+            return p;
+          },
+          { replace: true },
+        );
+      }
+    },
+    [setSearchParams],
+  );
   const [uploading, setUploading] = useState(false);
   const [scanProgress, setScanProgress] = useState(null);
   const [scanningId, setScanningId] = useState(null);
@@ -1113,6 +1146,11 @@ export default function ProposalManagerWorkspace() {
             {t("proposalManagerWorkspace.subtitle")}
           </p>
         </div>
+
+        <GrantPursuitPlanPanel
+          selectedKey={grantPursuitKey}
+          onSelectKey={handleSelectGrantPursuit}
+        />
 
         <section
           className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-indigo-950/40 dark:via-gray-800 dark:to-blue-950/30 p-5 shadow-sm space-y-3"

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   FiAlertCircle,
@@ -53,6 +54,7 @@ export default function GrantPursuitBriefModal({
   readOnly = false,
 }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const titleId = useId();
   const opportunityRef = useRef(opportunity);
   opportunityRef.current = opportunity;
@@ -130,6 +132,10 @@ export default function GrantPursuitBriefModal({
     const state = startPursuitFromBrief(brief);
     setPursuit(state);
     setActionMsg(t("proposalManagerGrants.briefPursuitStarted"));
+    onClose?.();
+    if (state?.briefKey) {
+      navigate(`/app/workspace?grantPursuit=${encodeURIComponent(state.briefKey)}`);
+    }
   };
 
   const handleToggleCheck = (itemId) => {

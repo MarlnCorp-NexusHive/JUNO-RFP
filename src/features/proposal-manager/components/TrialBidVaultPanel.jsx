@@ -204,8 +204,8 @@ export default function TrialBidVaultPanel({ isArabic = false }) {
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {label(
-              "Company pursuits grounded in Source Docs and shortlist — shared across your trial.",
-              "فرص الشركة المبنية على مستندات المصدر والقائمة المختصرة — مشتركة عبر التجربة.",
+              "Company pursuits grounded in Source Docs and shortlist — shared across your company.",
+              "فرص الشركة المبنية على مستندات المصدر والقائمة المختصرة — مشتركة عبر شركتك.",
             )}
           </p>
         </div>

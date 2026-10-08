@@ -540,6 +540,19 @@
       "exportStyledPreparing": "Merging template…",
       "exportDownloadSimple": "Download this format",
       "exportPreparing": "Preparing…"
+    },
+    "grantPursuitPlan": {
+      "title": "Grant Pursuit Plan",
+      "subtitle": "Milestones, deliverables, compliance checks, and trackables for the grant you started pursuing.",
+      "emptyHint": "Start a pursuit from a Grant Pursuit Brief on the Grants page to seed a plan here.",
+      "selectLabel": "Active grant pursuit",
+      "activeBadge": "In pursuit",
+      "docTypeGrants": "Grants",
+      "milestones": "Milestones",
+      "deliverables": "Deliverables",
+      "complianceChecks": "Compliance Checks",
+      "trackables": "Trackables",
+      "sectionEmpty": "Nothing in this section yet."
     }
   },
   "proposalManagerGrants": {
