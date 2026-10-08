@@ -246,12 +246,12 @@ function LoginPageContent() {
         return;
       }
 
-      // 2) Trial tenants (backend)
+      // 2) Trial tenants (backend) — long timeout: Render free tier can cold-start slowly.
       try {
         const { data } = await API.post(
           "/trial/auth/login",
           { email: ident, password: passIn },
-          { timeout: 8_000 },
+          { timeout: 90_000 },
         );
         setTrialSession(data);
         localStorage.setItem("rbac_current_user", JSON.stringify(trialUserToRbacUser(data)));
@@ -270,7 +270,16 @@ function LoginPageContent() {
           setError(msg || t("auth.login.emailNotVerified"));
           return;
         }
-        setError(t('auth.login.invalidCredentials'));
+        const timedOut =
+          trialErr?.code === "ECONNABORTED" ||
+          /timeout/i.test(String(trialErr?.message || ""));
+        const networkFail = !trialErr?.response && !timedOut;
+        if (timedOut || networkFail) {
+          clearTrialSession();
+          setError(t("auth.login.serverWaking"));
+          return;
+        }
+        setError(msg || t('auth.login.invalidCredentials'));
       }
     } catch (err) {
       setError(t('auth.login.invalidCredentials'));
