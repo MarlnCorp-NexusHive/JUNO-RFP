@@ -28,7 +28,11 @@ function readAll() {
 }
 
 function writeAll(map) {
-  localStorage.setItem(storageKey(), JSON.stringify(map));
+  try {
+    localStorage.setItem(storageKey(), JSON.stringify(map));
+  } catch (err) {
+    console.warn("[grant-pursuit] localStorage write failed:", err?.message || err);
+  }
   try {
     window.dispatchEvent(new CustomEvent(PURSUIT_CHANGED_EVENT, { detail: { map } }));
   } catch {

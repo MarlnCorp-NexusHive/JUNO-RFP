@@ -127,15 +127,31 @@ export default function GrantPursuitBriefModal({
 
   if (!open || typeof document === "undefined") return null;
 
-  const handleStartPursuit = () => {
-    if (!brief || readOnly) return;
-    const state = startPursuitFromBrief(brief);
-    setPursuit(state);
-    setActionMsg(t("proposalManagerGrants.briefPursuitStarted"));
+  const goToWorkspacePursuit = (briefKey) => {
+    const key = String(briefKey || "").trim();
+    if (!key) return;
+    // Navigate first so closing the portal cannot cancel the transition.
+    navigate(`/app/workspace?grantPursuit=${encodeURIComponent(key)}`);
     onClose?.();
-    if (state?.briefKey) {
-      navigate(`/app/workspace?grantPursuit=${encodeURIComponent(state.briefKey)}`);
+  };
+
+  const handleStartPursuit = () => {
+    if (!brief?.key || readOnly) return;
+    let state = null;
+    try {
+      state = startPursuitFromBrief(brief);
+      setPursuit(state);
+      setActionMsg(t("proposalManagerGrants.briefPursuitStarted"));
+    } catch (err) {
+      console.warn("[grant-pursuit] start failed:", err?.message || err);
+      setActionMsg(t("proposalManagerGrants.briefPursuitStartFailed"));
     }
+    goToWorkspacePursuit(state?.briefKey || brief.key);
+  };
+
+  const handleContinuePursuit = () => {
+    if (!brief?.key || readOnly) return;
+    goToWorkspacePursuit(brief.key);
   };
 
   const handleToggleCheck = (itemId) => {
@@ -426,13 +442,22 @@ export default function GrantPursuitBriefModal({
                 <FiExternalLink aria-hidden />
               </a>
             ) : null}
-            {!readOnly && brief && !pursuit?.startedAt ? (
+            {!readOnly && brief?.key && !pursuit?.startedAt ? (
               <button
                 type="button"
                 onClick={handleStartPursuit}
                 className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
               >
                 {t("proposalManagerGrants.briefStartPursuit")}
+              </button>
+            ) : null}
+            {!readOnly && brief?.key && pursuit?.startedAt ? (
+              <button
+                type="button"
+                onClick={handleContinuePursuit}
+                className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
+              >
+                {t("proposalManagerGrants.briefContinuePursuit")}
               </button>
             ) : null}
             {!readOnly && brief ? (
