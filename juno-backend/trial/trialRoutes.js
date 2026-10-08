@@ -197,7 +197,11 @@ router.post("/login", (req, res) => {
     }
 
     // Fallback: start business-day trial clock on first login if confirm didn't (legacy rows).
-    const tenantFresh = ensureTrialClockStarted(user.tenantId) || tenant;
+    // Permanent walkthrough tenants never start a countdown.
+    const tenantFresh =
+      tenant?.permanent || tenant?.neverExpires
+        ? tenant
+        : ensureTrialClockStarted(user.tenantId) || tenant;
 
     const { token, expiresAt } = createSession(user, tenantFresh);
     const usage = getUsageSnapshot(tenantFresh);

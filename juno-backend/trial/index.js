@@ -4,7 +4,13 @@ import { attachTrialContext, meterTrialAi } from "./authMiddleware.js";
 import trialRoutes from "./trialRoutes.js";
 import featureRoutes from "./featureRoutes.js";
 import { getFeaturesStoragePath } from "./featureStore.js";
-import { getTrialDataPath, loadTrialDb, migrateTrialDurationsOnBoot } from "./tenantStore.js";
+import {
+  ensurePermanentWalkthroughAccount,
+  getTrialDataPath,
+  getWalkthroughCredentials,
+  loadTrialDb,
+  migrateTrialDurationsOnBoot,
+} from "./tenantStore.js";
 
 /** AI / generative routes that should count against trial quotas when a trial token is present. */
 const METERED_PATH_PREFIXES = [
@@ -123,6 +129,16 @@ export function registerTrialSystem(app) {
     migrateTrialDurationsOnBoot();
   } catch (err) {
     console.warn("[trial] duration migration skipped:", err.message);
+  }
+
+  try {
+    const walkthrough = ensurePermanentWalkthroughAccount();
+    const creds = getWalkthroughCredentials();
+    console.log(
+      `[trial] permanent walkthrough ready (${walkthrough.created ? "created" : "updated"}): ${creds.email} · tenant ${walkthrough.tenantId}`,
+    );
+  } catch (err) {
+    console.warn("[trial] permanent walkthrough seed failed:", err.message);
   }
 
   app.use(attachTrialContext);

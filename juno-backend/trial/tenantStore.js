@@ -67,8 +67,13 @@ export function trialEndsAtAfterBusinessDays(start, businessDays) {
  * Start the trial window once. No-op if trialEndsAt is already set.
  * @returns {boolean} true if the clock was started now
  */
+export function isPermanentTenant(tenant) {
+  return Boolean(tenant?.permanent || tenant?.neverExpires);
+}
+
 export function startTrialClockIfNeeded(tenant, { now = new Date() } = {}) {
   if (!tenant) return false;
+  if (isPermanentTenant(tenant)) return false;
   if (tenant.trialEndsAt) return false;
   const days =
     Number(tenant.trialDays) > 0 ? Number(tenant.trialDays) : DEFAULT_TRIAL_DAYS;
@@ -95,6 +100,7 @@ export function capTrialWindowsToDefaultDays(db, { days = DEFAULT_TRIAL_DAYS } =
   let updated = 0;
   for (const tenant of db.tenants || []) {
     if (!tenant) continue;
+    if (isPermanentTenant(tenant)) continue;
     const prevDays = tenant.trialDays;
     const prevEnds = tenant.trialEndsAt;
     tenant.trialDays = days;
@@ -392,7 +398,8 @@ export function publicTenant(tenant) {
     name: tenant.name,
     status: tenant.status,
     trialStartsAt: tenant.trialStartsAt,
-    trialEndsAt: tenant.trialEndsAt,
+    trialEndsAt: isPermanentTenant(tenant) ? null : tenant.trialEndsAt,
+    permanent: isPermanentTenant(tenant),
     aiDailyLimit: tenant.aiDailyLimit,
     aiMonthlyLimit: tenant.aiMonthlyLimit,
     brandLogo: resolveTenantBrandLogo(tenant),
@@ -411,11 +418,121 @@ export function getTenantStatus(tenant) {
   if (tenant.status === "revoked" || tenant.status === "disabled") {
     return { ok: false, code: "tenant_disabled", message: "This trial has been disabled" };
   }
+  if (isPermanentTenant(tenant)) return { ok: true };
   const ends = Date.parse(tenant.trialEndsAt || "");
   if (Number.isFinite(ends) && Date.now() > ends) {
     return { ok: false, code: "trial_expired", message: "This trial has expired" };
   }
   return { ok: true };
+}
+
+/** Shared walkthrough / demo trial — no expiry; re-seeded on every boot (incl. live). */
+export const WALKTHROUGH_DEFAULTS = {
+  email: "walkthrough@junorfp.com",
+  password: "Walkthrough2026!",
+  companyName: "JUNO Walkthrough",
+  contactName: "Walkthrough PM",
+};
+
+export function getWalkthroughCredentials() {
+  return {
+    email: String(process.env.WALKTHROUGH_EMAIL || WALKTHROUGH_DEFAULTS.email)
+      .trim()
+      .toLowerCase(),
+    password: String(process.env.WALKTHROUGH_PASSWORD || WALKTHROUGH_DEFAULTS.password),
+    companyName: String(process.env.WALKTHROUGH_COMPANY || WALKTHROUGH_DEFAULTS.companyName).trim(),
+    contactName: String(process.env.WALKTHROUGH_NAME || WALKTHROUGH_DEFAULTS.contactName).trim(),
+  };
+}
+
+/**
+ * Ensure a permanent walkthrough trial exists with a known password.
+ * Safe to call on every boot — updates flags/password so live always has a usable login.
+ */
+export function ensurePermanentWalkthroughAccount() {
+  const creds = getWalkthroughCredentials();
+  const db = loadTrialDb();
+  const nowIso = new Date().toISOString();
+  let user = (db.users || []).find((u) => String(u.email).toLowerCase() === creds.email);
+  let tenant = user ? (db.tenants || []).find((t) => t.id === user.tenantId) : null;
+  let created = false;
+
+  if (!tenant) {
+    const existingByName = findTenantByCompanyName(creds.companyName, db);
+    if (existingByName && isPermanentTenant(existingByName)) {
+      tenant = existingByName;
+    }
+  }
+
+  if (!tenant) {
+    const displayName = canonicalCompanyDisplayName(creds.companyName);
+    tenant = {
+      id: slugifyTenantId(displayName),
+      name: displayName,
+      status: "active",
+      permanent: true,
+      neverExpires: true,
+      trialDays: null,
+      trialStartsAt: nowIso,
+      trialEndsAt: null,
+      aiDailyLimit: null,
+      aiMonthlyLimit: null,
+      brandLogo: "marln",
+      createdAt: nowIso,
+      walkthrough: true,
+    };
+    db.tenants.push(tenant);
+    created = true;
+  } else {
+    tenant.status = "active";
+    tenant.permanent = true;
+    tenant.neverExpires = true;
+    tenant.trialEndsAt = null;
+    tenant.trialDays = null;
+    tenant.walkthrough = true;
+    if (!tenant.brandLogo) tenant.brandLogo = "marln";
+    if (!tenant.trialStartsAt) tenant.trialStartsAt = nowIso;
+  }
+
+  const { salt, hash } = hashPassword(creds.password);
+  if (!user) {
+    user = {
+      id: `u_${crypto.randomBytes(6).toString("hex")}`,
+      tenantId: tenant.id,
+      email: creds.email,
+      name: creds.contactName,
+      passwordSalt: salt,
+      passwordHash: hash,
+      role: "Proposal Manager",
+      team: "Proposal Team",
+      emailVerified: true,
+      createdAt: nowIso,
+      walkthrough: true,
+    };
+    db.users.push(user);
+    created = true;
+  } else {
+    user.tenantId = tenant.id;
+    user.name = creds.contactName || user.name;
+    user.passwordSalt = salt;
+    user.passwordHash = hash;
+    user.emailVerified = true;
+    user.walkthrough = true;
+    if (!user.role) user.role = "Proposal Manager";
+    if (!user.team) user.team = "Proposal Team";
+  }
+
+  if (!db.usage) db.usage = {};
+  if (!db.usage[tenant.id]) db.usage[tenant.id] = {};
+
+  saveTrialDb(db);
+  return {
+    created,
+    email: creds.email,
+    tenantId: tenant.id,
+    tenantName: tenant.name,
+    permanent: true,
+  };
 }
 
 /**
@@ -677,10 +794,13 @@ export function reissueEmailConfirmation({ email, password }) {
   };
 }
 
+const PERMANENT_SESSION_TTL_HOURS = 24 * 365 * 10; // ~10 years
+
 export function createSession(user, tenant, ttlHours = 24 * 14) {
   const db = loadTrialDb();
   const token = crypto.randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + ttlHours * 60 * 60 * 1000).toISOString();
+  const hours = isPermanentTenant(tenant) ? PERMANENT_SESSION_TTL_HOURS : ttlHours;
+  const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
   db.sessions = (db.sessions || []).filter((s) => Date.parse(s.expiresAt) > Date.now());
   db.sessions.push({
     token,
@@ -712,9 +832,17 @@ export function resolveSession(token) {
   const user = db.users.find((u) => u.id === session.userId);
   const tenant = db.tenants.find((t) => t.id === session.tenantId);
   if (!user || !tenant) return null;
-  if (startTrialClockIfNeeded(tenant)) {
-    saveTrialDb(db);
+  let dirty = false;
+  if (startTrialClockIfNeeded(tenant)) dirty = true;
+  // Keep permanent walkthrough sessions from aging out during long demos.
+  if (isPermanentTenant(tenant)) {
+    const remainingMs = Date.parse(session.expiresAt) - Date.now();
+    if (!Number.isFinite(remainingMs) || remainingMs < 365 * 24 * 60 * 60 * 1000) {
+      session.expiresAt = new Date(Date.now() + PERMANENT_SESSION_TTL_HOURS * 60 * 60 * 1000).toISOString();
+      dirty = true;
+    }
   }
+  if (dirty) saveTrialDb(db);
   const status = getTenantStatus(tenant);
   if (!status.ok) return { invalid: true, ...status };
   return { session, user, tenant };
