@@ -552,7 +552,9 @@
       "deliverables": "المخرجات",
       "complianceChecks": "فحوصات الامتثال",
       "trackables": "عناصر التتبع",
-      "sectionEmpty": "لا يوجد عناصر في هذا القسم بعد."
+      "sectionEmpty": "لا يوجد عناصر في هذا القسم بعد.",
+      "cancelPursuit": "إلغاء المتابعة",
+      "cancelConfirm": "هل تريد إلغاء متابعة هذه المنحة؟ ستُزال من مساحة العمل. يمكنك بدؤها مجدداً من الموجز."
     }
   },
   "proposalManagerGrants": {

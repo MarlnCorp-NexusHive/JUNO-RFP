@@ -313,17 +313,19 @@ export default function ProposalManagerWorkspace() {
     (key) => {
       const next = String(key || "").trim();
       setGrantPursuitKey(next);
-      if (next) {
-        setDocumentTypeId("grants");
-        setSearchParams(
-          (prev) => {
-            const p = new URLSearchParams(prev);
+      setSearchParams(
+        (prev) => {
+          const p = new URLSearchParams(prev);
+          if (next) {
             p.set("grantPursuit", next);
-            return p;
-          },
-          { replace: true },
-        );
-      }
+          } else {
+            p.delete("grantPursuit");
+          }
+          return p;
+        },
+        { replace: true },
+      );
+      if (next) setDocumentTypeId("grants");
     },
     [setSearchParams],
   );

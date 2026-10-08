@@ -158,6 +158,16 @@ export function listGrantPursuits() {
     .sort((a, b) => String(b.startedAt || "").localeCompare(String(a.startedAt || "")));
 }
 
+/** Cancel / remove a started pursuit from Workspace. */
+export function cancelGrantPursuit(briefKey) {
+  if (!briefKey) return false;
+  const all = readAll();
+  if (!all[briefKey]) return false;
+  delete all[briefKey];
+  writeAll(all);
+  return true;
+}
+
 export function upsertPursuitState(briefKey, patch = {}) {
   if (!briefKey) return null;
   const all = readAll();

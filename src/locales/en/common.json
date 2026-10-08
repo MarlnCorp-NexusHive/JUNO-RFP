@@ -552,7 +552,9 @@
       "deliverables": "Deliverables",
       "complianceChecks": "Compliance Checks",
       "trackables": "Trackables",
-      "sectionEmpty": "Nothing in this section yet."
+      "sectionEmpty": "Nothing in this section yet.",
+      "cancelPursuit": "Cancel pursuit",
+      "cancelConfirm": "Cancel this grant pursuit? It will be removed from Workspace. You can start it again from the brief."
     }
   },
   "proposalManagerGrants": {
