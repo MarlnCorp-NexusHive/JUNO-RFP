@@ -12,24 +12,39 @@ export const PURSUIT_CHANGED_EVENT = "juno-grant-pursuit-changed";
 
 export const PLAN_CATEGORIES = ["milestones", "deliverables", "complianceChecks", "trackables"];
 
+/** In-memory mirror so pursuits survive localStorage quota / private-mode failures. */
+const memoryByTenant = new Map();
+
 function storageKey() {
   return scopedStorageKey(BASE_KEY);
 }
 
+function memoryBucket() {
+  const key = storageKey();
+  if (!memoryByTenant.has(key)) memoryByTenant.set(key, {});
+  return memoryByTenant.get(key);
+}
+
 function readAll() {
+  const mem = memoryBucket();
+  let disk = {};
   try {
     const raw = localStorage.getItem(storageKey());
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : {};
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") disk = parsed;
+    }
   } catch {
-    return {};
+    /* ignore */
   }
+  return { ...disk, ...mem };
 }
 
 function writeAll(map) {
+  const key = storageKey();
+  memoryByTenant.set(key, { ...map });
   try {
-    localStorage.setItem(storageKey(), JSON.stringify(map));
+    localStorage.setItem(key, JSON.stringify(map));
   } catch (err) {
     console.warn("[grant-pursuit] localStorage write failed:", err?.message || err);
   }
@@ -38,6 +53,11 @@ function writeAll(map) {
   } catch {
     /* ignore */
   }
+}
+
+function planItemCount(plan) {
+  if (!plan || typeof plan !== "object") return 0;
+  return PLAN_CATEGORIES.reduce((n, k) => n + (Array.isArray(plan[k]) ? plan[k].length : 0), 0);
 }
 
 function asText(value, max = 400) {
@@ -137,12 +157,118 @@ export function buildPlanFromBrief(brief) {
     }),
   );
 
-  return {
-    milestones,
-    deliverables,
-    complianceChecks,
-    trackables,
+  return ensureMinimumPlan(
+    {
+      milestones,
+      deliverables,
+      complianceChecks,
+      trackables,
+    },
+    brief,
+  );
+}
+
+/** Ensure thin / sparse briefs still produce a visible Workspace plan. */
+export function ensureMinimumPlan(plan, brief) {
+  const next = {
+    milestones: Array.isArray(plan?.milestones) ? [...plan.milestones] : [],
+    deliverables: Array.isArray(plan?.deliverables) ? [...plan.deliverables] : [],
+    complianceChecks: Array.isArray(plan?.complianceChecks) ? [...plan.complianceChecks] : [],
+    trackables: Array.isArray(plan?.trackables) ? [...plan.trackables] : [],
   };
+
+  const title = asText(brief?.title || brief?.snapshot?.title, 200) || "This grant";
+  const deadline = asText(brief?.snapshot?.deadline, 80);
+  const agency = asText(brief?.snapshot?.agency, 160);
+  const packageType = asText(brief?.howToApply?.packageType, 200);
+  const portal = asText(brief?.howToApply?.portal || brief?.snapshot?.url, 300);
+
+  if (!next.milestones.length) {
+    if (deadline) {
+      next.milestones.push(
+        planItem({
+          id: "fallback-deadline",
+          label: "Application deadline",
+          detail: agency ? `Verify with ${agency}` : "Confirm on the official portal",
+          dueDate: deadline,
+          category: "milestones",
+        }),
+      );
+    }
+    next.milestones.push(
+      planItem({
+        id: "fallback-kickoff",
+        label: `Kick off pursuit: ${title}`,
+        detail: "Confirm eligibility, assign owners, and gather required documents",
+        category: "milestones",
+      }),
+      planItem({
+        id: "fallback-submit",
+        label: "Submit application package",
+        detail: portal ? `Submit via ${portal}` : "Submit through the official application portal",
+        category: "milestones",
+      }),
+    );
+  }
+
+  if (!next.deliverables.length) {
+    next.deliverables.push(
+      planItem({
+        id: "fallback-package",
+        label: packageType || "Application package / required forms",
+        detail: "Download and complete forms from the official opportunity page",
+        category: "deliverables",
+      }),
+      planItem({
+        id: "fallback-narrative",
+        label: "Narrative / project description",
+        detail: "Draft and review proposal narrative before submission",
+        category: "deliverables",
+      }),
+    );
+  }
+
+  if (!next.complianceChecks.length) {
+    const summary = asText(brief?.eligibility?.summary, 500);
+    next.complianceChecks.push(
+      planItem({
+        id: "fallback-eligibility",
+        label: "Confirm applicant eligibility",
+        detail: summary || "Verify eligibility criteria on the official posting",
+        category: "complianceChecks",
+      }),
+      planItem({
+        id: "fallback-requirements",
+        label: "Review submission requirements",
+        detail: "Check page limits, attachments, certifications, and cost share",
+        category: "complianceChecks",
+      }),
+    );
+  }
+
+  if (!next.trackables.length) {
+    next.trackables.push(
+      planItem({
+        id: "fallback-track-brief",
+        label: "Review pursuit brief with team",
+        category: "trackables",
+      }),
+      planItem({
+        id: "fallback-track-forms",
+        label: "Collect and complete required forms",
+        category: "trackables",
+      }),
+      planItem({
+        id: "fallback-track-submit",
+        label: "Submit before deadline",
+        detail: deadline || "",
+        dueDate: deadline || null,
+        category: "trackables",
+      }),
+    );
+  }
+
+  return next;
 }
 
 export function getPursuitState(briefKey) {
@@ -152,6 +278,20 @@ export function getPursuitState(briefKey) {
 
 export function getGrantPursuit(key) {
   return getPursuitState(key);
+}
+
+/** Fill empty plans from older thin briefs (safe to call outside render). */
+export function healGrantPursuitPlan(briefKey) {
+  const state = getPursuitState(briefKey);
+  if (!state?.startedAt) return state;
+  if (planItemCount(state.plan) > 0) return state;
+  return upsertPursuitState(briefKey, {
+    plan: ensureMinimumPlan(state.plan, {
+      title: state.title,
+      source: state.source,
+      snapshot: {},
+    }),
+  });
 }
 
 /** Started pursuits newest-first. */
@@ -196,8 +336,9 @@ export function upsertPursuitState(briefKey, patch = {}) {
 export function startPursuitFromBrief(brief) {
   if (!brief?.key) return null;
   const existing = getPursuitState(brief.key);
-  const plan = existing?.plan?.milestones?.length || existing?.plan?.trackables?.length
-    ? existing.plan
+  const reusePlan = existing?.plan && planItemCount(existing.plan) > 0;
+  const plan = reusePlan
+    ? ensureMinimumPlan(existing.plan, brief)
     : buildPlanFromBrief(brief);
   const checklist = (brief.checklistTemplate || []).map((item) => ({
     id: item.id,
@@ -217,11 +358,13 @@ export function startPursuitFromBrief(brief) {
     source: brief.source || existing?.source || "",
     opportunityId: brief.opportunityId || existing?.opportunityId || "",
     documentTypeId: "grants",
-    checklist: mergedChecklist.length ? mergedChecklist : (plan.trackables || []).map((t) => ({
-      id: t.id,
-      label: t.label,
-      done: !!t.done,
-    })),
+    checklist: mergedChecklist.length
+      ? mergedChecklist
+      : (plan.trackables || []).map((t) => ({
+          id: t.id,
+          label: t.label,
+          done: !!t.done,
+        })),
     plan,
   });
 }

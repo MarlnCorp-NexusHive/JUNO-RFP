@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FiCalendar,
@@ -15,6 +15,7 @@ import {
 import {
   cancelGrantPursuit,
   getGrantPursuit,
+  healGrantPursuitPlan,
   listGrantPursuits,
   subscribePursuit,
   togglePlanItem,
@@ -101,16 +102,32 @@ export default function GrantPursuitPlanPanel({
   const { t } = useTranslation("common");
   const tt = (key, opts) => t(`proposalManagerWorkspace.grantPursuitPlan.${key}`, opts);
 
+  const panelRef = useRef(null);
   const [pursuits, setPursuits] = useState(() => listGrantPursuits());
   const [activeKey, setActiveKey] = useState(selectedKey || "");
 
-  useEffect(() => {
+  const refreshPursuits = () => {
+    const list = listGrantPursuits();
+    list.forEach((p) => healGrantPursuitPlan(p.briefKey));
+    if (selectedKey) healGrantPursuitPlan(selectedKey);
     setPursuits(listGrantPursuits());
+    return list;
+  };
+
+  useEffect(() => {
+    refreshPursuits();
     return subscribePursuit(() => setPursuits(listGrantPursuits()));
   }, []);
 
   useEffect(() => {
-    if (selectedKey) setActiveKey(selectedKey);
+    if (selectedKey) {
+      setActiveKey(selectedKey);
+      refreshPursuits();
+      // Bring plan into view after Start pursuit navigation.
+      requestAnimationFrame(() => {
+        panelRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+      });
+    }
   }, [selectedKey]);
 
   useEffect(() => {
@@ -120,10 +137,10 @@ export default function GrantPursuitPlanPanel({
     }
   }, [activeKey, pursuits, onSelectKey]);
 
-  const active = useMemo(
-    () => (activeKey ? getGrantPursuit(activeKey) : null) || pursuits.find((p) => p.briefKey === activeKey) || null,
-    [activeKey, pursuits],
-  );
+  const active = useMemo(() => {
+    if (!activeKey) return null;
+    return getGrantPursuit(activeKey) || pursuits.find((p) => p.briefKey === activeKey) || null;
+  }, [activeKey, pursuits]);
 
   const plan = active?.plan || {
     milestones: [],
@@ -158,9 +175,12 @@ export default function GrantPursuitPlanPanel({
     }
   };
 
-  if (!pursuits.length) {
+  if (!pursuits.length && !active) {
     return (
-      <div className="rounded-xl border border-dashed border-indigo-300/70 bg-indigo-50/40 p-4 dark:border-indigo-800 dark:bg-indigo-950/20">
+      <div
+        ref={panelRef}
+        className="rounded-xl border border-dashed border-indigo-300/70 bg-indigo-50/40 p-4 dark:border-indigo-800 dark:bg-indigo-950/20"
+      >
         <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white">
           <FiTarget className="h-5 w-5 text-indigo-600" aria-hidden />
           {tt("title")}
@@ -170,8 +190,15 @@ export default function GrantPursuitPlanPanel({
     );
   }
 
+  const selectable = pursuits.length
+    ? pursuits
+    : active
+      ? [active]
+      : [];
+
   return (
     <div
+      ref={panelRef}
       className="min-w-0 overflow-hidden rounded-xl border border-indigo-200/80 bg-white p-4 shadow-sm dark:border-indigo-900/50 dark:bg-gray-800 md:p-5"
       data-tour="grant-pursuit-plan"
     >
@@ -206,7 +233,7 @@ export default function GrantPursuitPlanPanel({
           ) : null}
         </div>
         <ul className="max-h-48 min-w-0 space-y-1 overflow-y-auto overflow-x-hidden rounded-lg border border-gray-200 bg-gray-50/80 p-1 dark:border-gray-600 dark:bg-gray-900/40">
-          {pursuits.map((p) => {
+          {selectable.map((p) => {
             const selected = p.briefKey === activeKey;
             const label = truncateLabel(p.title || p.briefKey);
             const source = p.source ? truncateLabel(p.source, 28) : "";

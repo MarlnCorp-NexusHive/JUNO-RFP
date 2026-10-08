@@ -151,6 +151,12 @@ export default function GrantPursuitBriefModal({
 
   const handleContinuePursuit = () => {
     if (!brief?.key || readOnly) return;
+    // Re-seed / heal empty plans from older thin briefs, then open Workspace.
+    try {
+      startPursuitFromBrief(brief);
+    } catch {
+      /* navigate anyway */
+    }
     goToWorkspacePursuit(brief.key);
   };
 
