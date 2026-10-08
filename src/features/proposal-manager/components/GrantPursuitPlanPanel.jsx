@@ -5,6 +5,8 @@ import {
   FiCheckCircle,
   FiCheckSquare,
   FiClipboard,
+  FiDownload,
+  FiExternalLink,
   FiFileText,
   FiFlag,
   FiShield,
@@ -35,7 +37,7 @@ function truncateLabel(text, max = 72) {
   return `${s.slice(0, max - 1)}…`;
 }
 
-function PlanSection({ title, Icon, items, onToggle, emptyLabel }) {
+function PlanSection({ title, Icon, items, onToggle, emptyLabel, downloadLabel, openLabel }) {
   return (
     <section className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900/60">
       <h3 className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
@@ -49,43 +51,65 @@ function PlanSection({ title, Icon, items, onToggle, emptyLabel }) {
         <p className="text-xs text-slate-500 dark:text-slate-400">{emptyLabel}</p>
       ) : (
         <ul className="space-y-1.5">
-          {items.map((item) => (
-            <li key={item.id} className="min-w-0">
-              <button
-                type="button"
-                onClick={() => onToggle(item.id)}
-                className={`flex w-full min-w-0 items-start gap-2 rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-slate-50 dark:hover:bg-slate-800/80 ${
-                  item.done ? "opacity-70" : ""
-                }`}
-              >
-                {item.done ? (
-                  <FiCheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
-                ) : (
-                  <FiSquare className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden />
-                )}
-                <span className="min-w-0 flex-1 overflow-hidden">
-                  <span
-                    className={`block break-words font-medium text-slate-900 dark:text-white ${
-                      item.done ? "line-through decoration-slate-400" : ""
+          {items.map((item) => {
+            const href = item.downloadUrl || item.portalUrl;
+            return (
+              <li key={item.id} className="min-w-0">
+                <div className="flex min-w-0 items-start gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onToggle(item.id)}
+                    className={`flex min-w-0 flex-1 items-start gap-2 rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-slate-50 dark:hover:bg-slate-800/80 ${
+                      item.done ? "opacity-70" : ""
                     }`}
                   >
-                    {item.label}
-                  </span>
-                  {item.dueDate ? (
-                    <span className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
-                      <FiCalendar className="h-3 w-3 shrink-0" aria-hidden />
-                      {item.dueDate}
+                    {item.done ? (
+                      <FiCheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+                    ) : (
+                      <FiSquare className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+                    )}
+                    <span className="min-w-0 flex-1 overflow-hidden">
+                      <span
+                        className={`block break-words font-medium text-slate-900 dark:text-white ${
+                          item.done ? "line-through decoration-slate-400" : ""
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                      {item.dueDate ? (
+                        <span className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+                          <FiCalendar className="h-3 w-3 shrink-0" aria-hidden />
+                          {item.dueDate}
+                        </span>
+                      ) : null}
+                      {item.detail ? (
+                        <span className="mt-0.5 block break-words text-xs text-slate-500 dark:text-slate-400">
+                          {item.detail}
+                        </span>
+                      ) : null}
                     </span>
+                  </button>
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={item.downloadUrl ? downloadLabel : openLabel}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-1 me-1 inline-flex shrink-0 items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-[10px] font-semibold text-sky-800 hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-100"
+                    >
+                      {item.downloadUrl ? (
+                        <FiDownload className="h-3 w-3" aria-hidden />
+                      ) : (
+                        <FiExternalLink className="h-3 w-3" aria-hidden />
+                      )}
+                      {item.downloadUrl ? downloadLabel : openLabel}
+                    </a>
                   ) : null}
-                  {item.detail ? (
-                    <span className="mt-0.5 block break-words text-xs text-slate-500 dark:text-slate-400">
-                      {item.detail}
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            </li>
-          ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
@@ -210,12 +234,20 @@ export default function GrantPursuitPlanPanel({
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-300">{tt("subtitle")}</p>
         </div>
-        {active?.startedAt ? (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-800">
-            <FiCheckCircle className="h-3.5 w-3.5" aria-hidden />
-            {tt("activeBadge")}
-          </span>
-        ) : null}
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {Array.isArray(active?.forms) && active.forms.length > 0 ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-900 ring-1 ring-sky-200 dark:bg-sky-950/40 dark:text-sky-100 dark:ring-sky-800">
+              <FiDownload className="h-3.5 w-3.5" aria-hidden />
+              {tt("formsBadge", { count: active.forms.length })}
+            </span>
+          ) : null}
+          {active?.startedAt ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-800">
+              <FiCheckCircle className="h-3.5 w-3.5" aria-hidden />
+              {tt("activeBadge")}
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <div className="mb-4 min-w-0 space-y-2">
@@ -309,6 +341,8 @@ export default function GrantPursuitPlanPanel({
                 Icon={Icon}
                 items={Array.isArray(plan[key]) ? plan[key] : []}
                 emptyLabel={tt("sectionEmpty")}
+                downloadLabel={tt("downloadForm")}
+                openLabel={tt("openForm")}
                 onToggle={(itemId) => handleToggle(key, itemId)}
               />
             ))}

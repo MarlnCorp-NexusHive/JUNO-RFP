@@ -554,7 +554,10 @@
       "trackables": "عناصر التتبع",
       "sectionEmpty": "لا يوجد عناصر في هذا القسم بعد.",
       "cancelPursuit": "إلغاء المتابعة",
-      "cancelConfirm": "هل تريد إلغاء متابعة هذه المنحة؟ ستُزال من مساحة العمل. يمكنك بدؤها مجدداً من الموجز."
+      "cancelConfirm": "هل تريد إلغاء متابعة هذه المنحة؟ ستُزال من مساحة العمل. يمكنك بدؤها مجدداً من الموجز.",
+      "downloadForm": "تنزيل",
+      "openForm": "فتح",
+      "formsBadge": "{{count}} نماذج"
     }
   },
   "proposalManagerGrants": {
@@ -602,7 +605,7 @@
     "description": "الملخص / الوصف",
     "assistanceListings": "قوائم المساعدة (ALN)",
     "attachments": "المرفقات",
-    "attachmentsHint": "تُعرض المرفقات كما نُشرت على Grants.gov. حمّل حزمة الإعلان الكاملة من صفحة الفرصة.",
+    "attachmentsHint": "انقر اسم الملف لتنزيله من Grants.gov. بعض حزم الطلب تفتح فقط في مساحة عمل Grants.gov بعد تسجيل الدخول.",
     "searchFilters": "مرشحات البحث",
     "clearKeyword": "مسح الكلمة المفتاحية",
     "clearFilters": "مسح المرشحات",
@@ -660,6 +663,13 @@
     "briefContinuePursuit": "فتح في مساحة العمل",
     "briefPursuitStarted": "تم حفظ قائمة المتابعة لجلسة فريقك.",
     "briefPursuitStartFailed": "تعذّر حفظ المتابعة محلياً — جارٍ فتح مساحة العمل على أي حال.",
+    "briefFormsAvailable": "{{count}} نماذج متاحة",
+    "briefFormsPortalOnly": "{{count}} روابط نماذج",
+    "briefFormsNone": "لا توجد نماذج مدرجة",
+    "briefFormsTitle": "نماذج الطلب والمرفقات",
+    "briefFormsDownload": "تنزيل",
+    "briefFormsOpenPortal": "فتح",
+    "briefFormsHint": "الملفات من الجهة المانحة (مثل Grants.gov). بعض الحزم تفتح فقط في مساحة العمل الرسمية بعد تسجيل الدخول.",
     "briefAddToCalendar": "إضافة المواعيد للتقويم",
     "briefCalendarSynced": "أُضيف {{count}} موعد/مواعيد للتقويم",
     "briefCalendarNone": "لا توجد مواعيد قابلة للمزامنة",

@@ -434,12 +434,28 @@ function GrantDetailBody({ detail, t, copied, onCopy }) {
                   <p className="font-medium text-slate-800 dark:text-slate-100">
                     {folder.folderType || folder.folderName}
                   </p>
-                  {(folder.synopsisAttachments || []).map((att) => (
-                    <p key={att.id || att.fileName} className="text-xs text-slate-500">
-                      {att.fileName}
-                      {att.fileDescription ? ` — ${att.fileDescription}` : ""}
-                    </p>
-                  ))}
+                  {(folder.synopsisAttachments || []).map((att) => {
+                    const href = att.id
+                      ? `https://www.grants.gov/grantsws/rest/opportunity/att/download/${encodeURIComponent(att.id)}`
+                      : "";
+                    return href ? (
+                      <a
+                        key={att.id || att.fileName}
+                        href={href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 block text-xs font-medium text-sky-700 underline-offset-2 hover:underline dark:text-sky-300"
+                      >
+                        {att.fileName || t("proposalManagerGrants.briefFormsDownload")}
+                        {att.fileDescription ? ` — ${att.fileDescription}` : ""}
+                      </a>
+                    ) : (
+                      <p key={att.id || att.fileName} className="text-xs text-slate-500">
+                        {att.fileName}
+                        {att.fileDescription ? ` — ${att.fileDescription}` : ""}
+                      </p>
+                    );
+                  })}
                 </li>
               ))}
             </ul>

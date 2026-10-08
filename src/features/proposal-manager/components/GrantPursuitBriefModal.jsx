@@ -6,13 +6,19 @@ import {
   FiAlertCircle,
   FiCalendar,
   FiCheckSquare,
+  FiDownload,
   FiExternalLink,
   FiLoader,
+  FiPaperclip,
   FiRefreshCw,
   FiSquare,
   FiX,
 } from "react-icons/fi";
-import { getGrantBrief, regenerateGrantBrief } from "../../../services/api.js";
+import {
+  fetchFederalGrantOpportunity,
+  getGrantBrief,
+  regenerateGrantBrief,
+} from "../../../services/api.js";
 import {
   getPursuitState,
   startPursuitFromBrief,
@@ -20,6 +26,11 @@ import {
   syncBriefDatesToCalendar,
   togglePursuitCheckItem,
 } from "../services/grantPursuitStore.js";
+import {
+  extractFormsFromOpportunityDetail,
+  isGrantsGovSource,
+  mergeFormsOntoBrief,
+} from "../services/grantFormDownloads.js";
 
 function confidenceTone(level) {
   if (level === "high") return "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200";
@@ -71,6 +82,37 @@ export default function GrantPursuitBriefModal({
     setPursuit(key ? getPursuitState(key) : null);
   }, []);
 
+  const loadFormsForOpportunity = useCallback(async () => {
+    const snap = opportunityRef.current || {};
+    // Prefer forms already on the listing snapshot (if detail was fetched earlier).
+    let forms = extractFormsFromOpportunityDetail({
+      opportunity: snap,
+      grantsGovUrl: snap.url || snap.grantsGovUrl,
+      opportunityId,
+    });
+    if ((!forms.length || !forms.some((f) => f.url)) && isGrantsGovSource(source) && opportunityId) {
+      try {
+        const detail = await fetchFederalGrantOpportunity(opportunityId);
+        forms = extractFormsFromOpportunityDetail(detail);
+      } catch {
+        /* keep whatever we have */
+      }
+    }
+    // Non–Grants.gov: still offer official URL when present.
+    if (!forms.length && snap.url) {
+      forms = [
+        {
+          id: "official",
+          name: "Official opportunity page",
+          detail: "Open the funder page for forms and instructions",
+          portalUrl: String(snap.url).trim(),
+          kind: "portal",
+        },
+      ];
+    }
+    return forms;
+  }, [source, opportunityId]);
+
   const loadBrief = useCallback(
     async ({ refresh = false } = {}) => {
       if (!source || !opportunityId) return;
@@ -80,23 +122,27 @@ export default function GrantPursuitBriefModal({
       setActionMsg("");
       try {
         const fn = refresh ? regenerateGrantBrief : getGrantBrief;
-        const data = await fn({
-          source,
-          opportunityId,
-          opportunity: {
-            ...snap,
-            id: opportunityId,
-            title: snap.title,
-            number: snap.number,
-            agency: snap.agency,
-            deadline: snap.deadline,
-          },
-          forceRefresh: refresh,
-        });
-        setBrief(data.brief || null);
+        const [data, forms] = await Promise.all([
+          fn({
+            source,
+            opportunityId,
+            opportunity: {
+              ...snap,
+              id: opportunityId,
+              title: snap.title,
+              number: snap.number,
+              agency: snap.agency,
+              deadline: snap.deadline,
+            },
+            forceRefresh: refresh,
+          }),
+          loadFormsForOpportunity(),
+        ]);
+        const nextBrief = mergeFormsOntoBrief(data.brief || null, forms);
+        setBrief(nextBrief);
         setCached(Boolean(data.cached));
         setStale(Boolean(data.stale));
-        refreshPursuit(data.brief?.key);
+        refreshPursuit(nextBrief?.key);
       } catch (err) {
         setError(err?.response?.data?.error || err?.message || t("proposalManagerGrants.briefFailed"));
         setBrief(null);
@@ -104,7 +150,7 @@ export default function GrantPursuitBriefModal({
         setLoading(false);
       }
     },
-    [source, opportunityId, refreshPursuit, t],
+    [source, opportunityId, refreshPursuit, t, loadFormsForOpportunity],
   );
 
   useEffect(() => {
@@ -252,6 +298,19 @@ export default function GrantPursuitBriefModal({
                 <span className={`rounded-full px-2.5 py-0.5 font-semibold ${confidenceTone(brief.confidence)}`}>
                   {t(`proposalManagerGrants.briefConfidence.${brief.confidence || "medium"}`)}
                 </span>
+                {Array.isArray(brief.forms) && brief.forms.length > 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2.5 py-0.5 font-semibold text-sky-900 dark:bg-sky-950/50 dark:text-sky-100">
+                    <FiPaperclip className="h-3 w-3" aria-hidden />
+                    {brief.forms.some((f) => f.url)
+                      ? t("proposalManagerGrants.briefFormsAvailable", { count: brief.forms.length })
+                      : t("proposalManagerGrants.briefFormsPortalOnly", { count: brief.forms.length })}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    <FiPaperclip className="h-3 w-3" aria-hidden />
+                    {t("proposalManagerGrants.briefFormsNone")}
+                  </span>
+                )}
                 {cached ? (
                   <span className="rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                     {t("proposalManagerGrants.briefCached")}
@@ -273,6 +332,48 @@ export default function GrantPursuitBriefModal({
                   </span>
                 ) : null}
               </div>
+
+              {Array.isArray(brief.forms) && brief.forms.length > 0 ? (
+                <Section title={t("proposalManagerGrants.briefFormsTitle")}>
+                  <ul className="space-y-2">
+                    {brief.forms.map((form) => {
+                      const href = form.url || form.portalUrl;
+                      if (!href) return null;
+                      return (
+                        <li key={form.id || form.name} className="flex min-w-0 flex-wrap items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-slate-900 dark:text-white">{form.name}</p>
+                            {form.detail ? (
+                              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{form.detail}</p>
+                            ) : null}
+                          </div>
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-sky-300 bg-sky-50 px-2.5 py-1.5 text-[11px] font-semibold text-sky-900 hover:bg-sky-100 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-100"
+                          >
+                            {form.url ? (
+                              <>
+                                <FiDownload className="h-3.5 w-3.5" aria-hidden />
+                                {t("proposalManagerGrants.briefFormsDownload")}
+                              </>
+                            ) : (
+                              <>
+                                <FiExternalLink className="h-3.5 w-3.5" aria-hidden />
+                                {t("proposalManagerGrants.briefFormsOpenPortal")}
+                              </>
+                            )}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                    {t("proposalManagerGrants.briefFormsHint")}
+                  </p>
+                </Section>
+              ) : null}
 
               <Section title={t("proposalManagerGrants.eligibility")}>
                 {brief.eligibility?.summary ? <p className="leading-relaxed">{brief.eligibility.summary}</p> : null}

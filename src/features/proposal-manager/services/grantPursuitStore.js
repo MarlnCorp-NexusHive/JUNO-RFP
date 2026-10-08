@@ -66,7 +66,16 @@ function asText(value, max = 400) {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
-function planItem({ id, label, detail = "", dueDate = null, category, done = false }) {
+function planItem({
+  id,
+  label,
+  detail = "",
+  dueDate = null,
+  category,
+  done = false,
+  downloadUrl = null,
+  portalUrl = null,
+}) {
   return {
     id: String(id || `${category}-${Math.random().toString(36).slice(2, 8)}`),
     label: asText(label, 240) || "Item",
@@ -74,7 +83,42 @@ function planItem({ id, label, detail = "", dueDate = null, category, done = fal
     dueDate: dueDate ? asText(dueDate, 80) : null,
     category,
     done: !!done,
+    downloadUrl: downloadUrl ? asText(downloadUrl, 500) : null,
+    portalUrl: portalUrl ? asText(portalUrl, 500) : null,
   };
+}
+
+function formsToDeliverables(forms) {
+  return (Array.isArray(forms) ? forms : [])
+    .map((f, i) =>
+      planItem({
+        id: f.id || `form-${i + 1}`,
+        label: f.name || `Form ${i + 1}`,
+        detail: f.detail || (f.kind === "package" ? "Application package" : "Provided form / attachment"),
+        category: "deliverables",
+        downloadUrl: f.url || null,
+        portalUrl: f.portalUrl || null,
+      }),
+    )
+    .filter((d) => d.downloadUrl || d.portalUrl || d.label);
+}
+
+function mergeFormDeliverables(plan, forms) {
+  const next = {
+    milestones: Array.isArray(plan?.milestones) ? [...plan.milestones] : [],
+    deliverables: Array.isArray(plan?.deliverables) ? [...plan.deliverables] : [],
+    complianceChecks: Array.isArray(plan?.complianceChecks) ? [...plan.complianceChecks] : [],
+    trackables: Array.isArray(plan?.trackables) ? [...plan.trackables] : [],
+  };
+  const formDeliverables = formsToDeliverables(forms);
+  formDeliverables.forEach((item) => {
+    if (next.deliverables.some((d) => d.id === item.id || (d.downloadUrl && d.downloadUrl === item.downloadUrl))) {
+      return;
+    }
+    // Prefer downloadable forms at the top of deliverables.
+    next.deliverables.unshift(item);
+  });
+  return next;
 }
 
 /** Build Workspace plan buckets from a Grant Pursuit Brief. */
@@ -105,15 +149,18 @@ export function buildPlanFromBrief(brief) {
     );
   });
 
-  const deliverables = (Array.isArray(brief?.documents) ? brief.documents : []).map((doc, i) =>
+  let deliverables = (Array.isArray(brief?.documents) ? brief.documents : []).map((doc, i) =>
     planItem({
       id: doc.id || `doc-${i + 1}`,
       label: doc.name || `Document ${i + 1}`,
       detail: [doc.required === false ? "Optional" : "Required", doc.notes].filter(Boolean).join(" · "),
       dueDate: null,
       category: "deliverables",
+      downloadUrl: doc.url || doc.downloadUrl || null,
+      portalUrl: doc.portalUrl || null,
     }),
   );
+  deliverables = mergeFormDeliverables({ deliverables }, brief?.forms).deliverables;
 
   const complianceChecks = [];
   const watchOuts = Array.isArray(brief?.eligibility?.watchOuts) ? brief.eligibility.watchOuts : [];
@@ -337,9 +384,17 @@ export function startPursuitFromBrief(brief) {
   if (!brief?.key) return null;
   const existing = getPursuitState(brief.key);
   const reusePlan = existing?.plan && planItemCount(existing.plan) > 0;
-  const plan = reusePlan
+  let plan = reusePlan
     ? ensureMinimumPlan(existing.plan, brief)
     : buildPlanFromBrief(brief);
+  const forms = Array.isArray(brief?.forms) && brief.forms.length
+    ? brief.forms
+    : Array.isArray(existing?.forms)
+      ? existing.forms
+      : [];
+  if (forms.length) {
+    plan = mergeFormDeliverables(plan, forms);
+  }
   const checklist = (brief.checklistTemplate || []).map((item) => ({
     id: item.id,
     label: item.label,
@@ -358,6 +413,7 @@ export function startPursuitFromBrief(brief) {
     source: brief.source || existing?.source || "",
     opportunityId: brief.opportunityId || existing?.opportunityId || "",
     documentTypeId: "grants",
+    forms,
     checklist: mergedChecklist.length
       ? mergedChecklist
       : (plan.trackables || []).map((t) => ({

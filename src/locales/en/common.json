@@ -554,7 +554,10 @@
       "trackables": "Trackables",
       "sectionEmpty": "Nothing in this section yet.",
       "cancelPursuit": "Cancel pursuit",
-      "cancelConfirm": "Cancel this grant pursuit? It will be removed from Workspace. You can start it again from the brief."
+      "cancelConfirm": "Cancel this grant pursuit? It will be removed from Workspace. You can start it again from the brief.",
+      "downloadForm": "Download",
+      "openForm": "Open",
+      "formsBadge": "{{count}} forms"
     }
   },
   "proposalManagerGrants": {
@@ -602,7 +605,7 @@
     "description": "Synopsis / description",
     "assistanceListings": "Assistance listings (ALN)",
     "attachments": "Attachments",
-    "attachmentsHint": "Attachment files are listed as published on Grants.gov. Download the full NOFO package from the Grants.gov opportunity page.",
+    "attachmentsHint": "Click a file name to download it from Grants.gov. Some application packages only open in Grants.gov Workspace after you sign in.",
     "searchFilters": "Search filters",
     "clearKeyword": "Clear keyword",
     "clearFilters": "Clear filters",
@@ -660,6 +663,13 @@
     "briefContinuePursuit": "Open in Workspace",
     "briefPursuitStarted": "Pursuit checklist saved for your team session.",
     "briefPursuitStartFailed": "Could not save pursuit locally — opening Workspace anyway.",
+    "briefFormsAvailable": "{{count}} forms available",
+    "briefFormsPortalOnly": "{{count}} form links",
+    "briefFormsNone": "No forms listed",
+    "briefFormsTitle": "Application forms & attachments",
+    "briefFormsDownload": "Download",
+    "briefFormsOpenPortal": "Open",
+    "briefFormsHint": "Files come from the funder (e.g. Grants.gov). Some packages only open in the official Workspace after you sign in.",
     "briefAddToCalendar": "Add dates to calendar",
     "briefCalendarSynced": "Added {{count}} date(s) to calendar",
     "briefCalendarNone": "No parseable dates to sync",
