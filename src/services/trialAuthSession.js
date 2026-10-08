@@ -29,6 +29,7 @@ export function setTrialSession(payload) {
     tenantId: payload.tenant?.id || payload.tenantId,
     tenantName: payload.tenant?.name || payload.tenantName || "",
     trialEndsAt: payload.tenant?.trialEndsAt || payload.trialEndsAt || "",
+    brandLogo: payload.tenant?.brandLogo || payload.brandLogo || "marln",
     user: payload.user || null,
     usage: payload.usage || null,
     savedAt: new Date().toISOString(),
@@ -67,6 +68,7 @@ export function trialUserToRbacUser(loginPayload) {
     tenantId: tenant.id,
     tenantName: tenant.name,
     trialEndsAt: tenant.trialEndsAt,
+    brandLogo: tenant.brandLogo || "marln",
     isTrialUser: true,
   };
 }

@@ -5,37 +5,9 @@ import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useLocalization } from "../../../hooks/useLocalization";
 import TourOverlay from "../../../components/tours/TourOverlay";
 import { TourProvider } from "../../../components/tours/TourContext";
-import { useTour } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 import { getTrialSession } from "../../../services/trialAuthSession.js";
-import { getProposalManagerTourPage } from "../../../components/tours/data/proposalManagerTourPages.js";
-
-function AutoStartTour({ role }) {
-  const location = useLocation();
-  const { startTour, getTourStatus, isActive } = useTour();
-  const user = parseLocalStorageJson("rbac_current_user");
-
-  const getCurrentPage = (pathname) => getProposalManagerTourPage(pathname) || "dashboard";
-
-  React.useEffect(() => {
-    const page = getCurrentPage(location.pathname);
-    const userKey = (user?.id || user?.email || user?.username || user?.displayName || 'guest') + '';
-    const seenKey = `tour_seen_${userKey}_${role}_${page}`;
-    const status = getTourStatus(role, page);
-    if (!isActive && status.available && !localStorage.getItem(seenKey)) {
-      const timer = setTimeout(() => {
-        const started = startTour(role, page);
-        if (started) {
-          try { localStorage.setItem(seenKey, 'true'); } catch {}
-        }
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname, role, isActive]);
-
-  return null;
-}
 
 function isTrialUser() {
   const session = getTrialSession();
@@ -65,10 +37,27 @@ function sidebarFeatures() {
 
 function sidebarBrandLogo() {
   if (!isTrialUser()) return null;
-  return {
-    src: "/wbec-pacific-logo.png",
-    alt: "WBEC Pacific",
-  };
+  const session = getTrialSession();
+  const user = parseLocalStorageJson("rbac_current_user");
+  const brand = String(
+    session?.brandLogo ||
+      session?.tenant?.brandLogo ||
+      user?.brandLogo ||
+      "",
+  )
+    .trim()
+    .toLowerCase();
+  const tenantBlob = `${session?.tenantId || user?.tenantId || ""} ${session?.tenantName || user?.tenantName || ""}`.toLowerCase();
+  const useWbec =
+    brand === "wbec" ||
+    brand === "wbec-pacific" ||
+    /wbec|wbenc/.test(tenantBlob);
+
+  // Default trial branding is MARLN; WBEC only for WBEC-flagged tenants.
+  if (useWbec) {
+    return { src: "/wbec-pacific-logo.png", alt: "WBEC Pacific" };
+  }
+  return null; // Sidebar falls back to /marlncorplogo.png
 }
 
 export default function ProposalManagerLayout() {
@@ -112,7 +101,6 @@ export default function ProposalManagerLayout() {
             ? (isRTLMode ? 'mr-56' : 'ml-56') 
             : (isRTLMode ? 'mr-12' : 'ml-12')
         }`}>
-          <AutoStartTour role="proposal-manager" />
           <Outlet />
         </main>
 

@@ -309,6 +309,7 @@ export function createTrialTenant({
       trialEndsAt: ends.toISOString(),
       aiDailyLimit: aiDailyLimit == null ? null : Number(aiDailyLimit),
       aiMonthlyLimit: aiMonthlyLimit == null ? null : Number(aiMonthlyLimit),
+      brandLogo: "marln",
       createdAt: now.toISOString(),
     };
     db.tenants.push(tenant);
@@ -374,6 +375,16 @@ export function listUsersForTenant(tenantId) {
     .sort((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
 }
 
+function resolveTenantBrandLogo(tenant) {
+  const explicit = String(tenant?.brandLogo || "").trim().toLowerCase();
+  if (explicit === "wbec" || explicit === "wbec-pacific") return "wbec-pacific";
+  if (explicit === "marln") return "marln";
+  const name = String(tenant?.name || "").toLowerCase();
+  const id = String(tenant?.id || "").toLowerCase();
+  if (/wbec|wbenc/.test(name) || /wbec|wbenc/.test(id)) return "wbec-pacific";
+  return "marln";
+}
+
 export function publicTenant(tenant) {
   if (!tenant) return null;
   return {
@@ -384,6 +395,7 @@ export function publicTenant(tenant) {
     trialEndsAt: tenant.trialEndsAt,
     aiDailyLimit: tenant.aiDailyLimit,
     aiMonthlyLimit: tenant.aiMonthlyLimit,
+    brandLogo: resolveTenantBrandLogo(tenant),
   };
 }
 
@@ -513,6 +525,7 @@ export function registerTrialSignup({
       trialEndsAt: null,
       aiDailyLimit: aiDailyLimit == null ? null : Number(aiDailyLimit),
       aiMonthlyLimit: aiMonthlyLimit == null ? null : Number(aiMonthlyLimit),
+      brandLogo: "marln",
       createdAt: now.toISOString(),
     };
     db.tenants.push(tenant);
