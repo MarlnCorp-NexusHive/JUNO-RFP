@@ -428,11 +428,13 @@ export function getTenantStatus(tenant) {
 
 /** Shared walkthrough / demo trial — no expiry; re-seeded on every boot (incl. live). */
 export const WALKTHROUGH_DEFAULTS = {
-  email: "walkthrough@junorfp.com",
+  email: "maharshi@marln.ai",
   password: "Walkthrough2026!",
   companyName: "JUNO Walkthrough",
-  contactName: "Walkthrough PM",
+  contactName: "Maharshi Nath",
 };
+
+const LEGACY_WALKTHROUGH_EMAILS = ["walkthrough@junorfp.com"];
 
 export function getWalkthroughCredentials() {
   return {
@@ -454,6 +456,12 @@ export function ensurePermanentWalkthroughAccount() {
   const db = loadTrialDb();
   const nowIso = new Date().toISOString();
   let user = (db.users || []).find((u) => String(u.email).toLowerCase() === creds.email);
+  if (!user) {
+    user = (db.users || []).find((u) => {
+      const email = String(u.email || "").toLowerCase();
+      return u.walkthrough || LEGACY_WALKTHROUGH_EMAILS.includes(email);
+    });
+  }
   let tenant = user ? (db.tenants || []).find((t) => t.id === user.tenantId) : null;
   let created = false;
 
@@ -513,6 +521,7 @@ export function ensurePermanentWalkthroughAccount() {
     created = true;
   } else {
     user.tenantId = tenant.id;
+    user.email = creds.email;
     user.name = creds.contactName || user.name;
     user.passwordSalt = salt;
     user.passwordHash = hash;
