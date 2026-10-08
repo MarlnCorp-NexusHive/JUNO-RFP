@@ -28,9 +28,12 @@ import {
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import RetrievalConfidenceBadge from "./RetrievalConfidenceBadge.jsx";
+import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
-import { sortByNewest } from "../services/listingSort.js";
+import { sortListings } from "../services/listingSort.js";
+import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -90,6 +93,9 @@ export default function SamContractsPanel() {
   const [copiedId, setCopiedId] = useState("");
   const [hourTick, setHourTick] = useState(0);
   const [sortNewest, setSortNewest] = useState(false);
+  const [orgProfile, setOrgProfile] = useState(getOrgMatchProfile);
+
+  useEffect(() => subscribeOrgMatchProfile(setOrgProfile), []);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   // Same hourly curated desk view for demo and trial.
@@ -127,8 +133,8 @@ export default function SamContractsPanel() {
       statusKeys: ["status"],
       deadlineKeys: ["responseDeadline"],
     });
-    return sortNewest ? sortByNewest(open) : open;
-  }, [samPool.opportunities, keyword, naics, psc, agency, setAside, noticeType, sortNewest]);
+    return sortListings(open, { newestFirst: sortNewest, profile: orgProfile });
+  }, [samPool.opportunities, keyword, naics, psc, agency, setAside, noticeType, sortNewest, orgProfile]);
 
   const filtersDirty =
     !!draftKeyword.trim() ||
@@ -421,6 +427,8 @@ export default function SamContractsPanel() {
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <GrantSourceBadge sourceId="contracts" />
+                      <OrgMatchBadge listing={opp} />
+                      <RetrievalConfidenceBadge listing={opp} />
                       <h3 className="text-sm font-bold leading-snug text-slate-900 dark:text-white">
                         {opp.title}
                       </h3>

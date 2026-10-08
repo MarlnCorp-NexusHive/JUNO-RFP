@@ -18,6 +18,7 @@ export const TRIAL_FEATURE_KEYS = [
   "bidVault",
   "teamCollab",
   "shortlist",
+  "applicantFit",
   "manageTeam",
   "compliance",
   "dashboard",

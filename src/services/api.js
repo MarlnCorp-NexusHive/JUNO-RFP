@@ -423,8 +423,26 @@ export const fetchCachedGrantBrief = async (key) => {
   return res.data;
 };
 
+/* ================= US PHILANTHROPIC GRANTMAKERS ================= */
+export const fetchUsPhilanthropicDirectory = async ({ q } = {}) => {
+  const res = await API.get("/grants/philanthropic/directory", {
+    params: q ? { q } : {},
+    timeout: 20_000,
+  });
+  return res.data;
+};
+
+export const fetchUsPhilanthropicOpportunities = async ({ funderId, forceRefresh = false } = {}) => {
+  const res = await API.post(
+    "/grants/philanthropic/opportunities",
+    { funderId, forceRefresh },
+    { timeout: 90_000 },
+  );
+  return res.data;
+};
+
 /** Trial tenants: change own password (requires Bearer trial token) */
-export const changeTrialPassword = async ({ currentPassword, newPassword }) => {
+export const changeTrialPassword = async ({ currentPassword, newPassword } = {}) => {
   const res = await API.post("/trial/auth/change-password", { currentPassword, newPassword });
   return res.data;
 };

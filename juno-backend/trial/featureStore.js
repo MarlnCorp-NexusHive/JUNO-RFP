@@ -16,6 +16,7 @@ export const FEATURE_KEYS = [
   "bidVault",
   "teamCollab",
   "shortlist",
+  "applicantFit",
   "manageTeam",
   "compliance",
   "dashboard",
@@ -45,6 +46,7 @@ const EMPTY_BY_KEY = {
     updatedAt: null,
   },
   shortlist: { items: [] },
+  applicantFit: { profile: null },
   manageTeam: { members: [], trainings: [], assignments: [], updatedAt: null },
   compliance: { areas: [], logs: [], risks: [] },
   dashboard: {

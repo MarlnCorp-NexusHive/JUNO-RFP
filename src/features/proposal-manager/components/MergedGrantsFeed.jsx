@@ -28,6 +28,8 @@ import {
   filterSamOpportunities,
 } from "../data/samContractOpportunities.js";
 import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import RetrievalConfidenceBadge from "./RetrievalConfidenceBadge.jsx";
+import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 import {
   GrantExpandHintBanner,
@@ -35,7 +37,8 @@ import {
   useGrantExpandCoach,
 } from "./GrantExpandCoach.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
-import { sortByNewest } from "../services/listingSort.js";
+import { sortListings } from "../services/listingSort.js";
+import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { formatDateTime24 } from "../../../utils/dateTime";
 
@@ -279,6 +282,9 @@ export default function MergedGrantsFeed({ selectedModes = [] }) {
   const [fetchedAt, setFetchedAt] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [sortNewest, setSortNewest] = useState(false);
+  const [orgProfile, setOrgProfile] = useState(getOrgMatchProfile);
+
+  useEffect(() => subscribeOrgMatchProfile(setOrgProfile), []);
 
   const modesKey = selectedModes.join("|");
 
@@ -325,8 +331,8 @@ export default function MergedGrantsFeed({ selectedModes = [] }) {
   );
 
   const displayResults = useMemo(
-    () => (sortNewest ? sortByNewest(results) : results),
-    [results, sortNewest],
+    () => sortListings(results, { newestFirst: sortNewest, profile: orgProfile }),
+    [results, sortNewest, orgProfile],
   );
 
   useEffect(() => {
@@ -494,6 +500,8 @@ export default function MergedGrantsFeed({ selectedModes = [] }) {
                           <div className="min-w-0 space-y-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <GrantSourceBadge sourceId={hit.sourceId} />
+                              <OrgMatchBadge listing={hit} />
+                              <RetrievalConfidenceBadge listing={hit} />
                               <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
                                 {hit.title}
                               </p>

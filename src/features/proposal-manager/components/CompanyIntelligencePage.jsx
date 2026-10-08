@@ -8,6 +8,8 @@ import { SAMPLE_COMPANIES } from "../data/companyIntelligenceSamples";
 import { FiSearch, FiTrendingUp, FiDollarSign, FiUsers, FiGlobe, FiRefreshCw, FiAlertCircle, FiZap } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import FinancialTrendsChart from "./FinancialTrendsChart";
+import OrgMatchProfilePanel from "./OrgMatchProfilePanel";
+import UsPhilanthropicGrantmakersPanel from "./UsPhilanthropicGrantmakersPanel";
 import { scopedStorageKey } from "../../../services/tenantScopedStorage.js";
 
 const STORAGE_KEY = "juno_proposal_manager_company_intelligence_saved";
@@ -329,6 +331,10 @@ export default function CompanyIntelligencePage() {
             </div>
           )}
         </header>
+
+        <OrgMatchProfilePanel />
+
+        <UsPhilanthropicGrantmakersPanel />
 
         <div
           className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 md:p-6"

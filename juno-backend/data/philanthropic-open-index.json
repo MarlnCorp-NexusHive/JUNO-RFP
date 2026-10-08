@@ -1,0 +1,530 @@
+{
+  "updatedAt": "2026-10-08T17:59:20.954Z",
+  "funders": {
+    "F001": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:47:19.516Z",
+      "blocked": false,
+      "extractionMode": "crawl-heuristic"
+    },
+    "F002": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:44:12.122Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F003": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:44:15.102Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F004": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:44:19.516Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F005": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:49:09.114Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F006": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:44:22.171Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F009": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:44:37.037Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F010": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:01.105Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F011": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:49:21.670Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F012": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:03.550Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F013": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:05.835Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F015": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:08.405Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F016": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:07.997Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F018": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:14.011Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F020": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:18.424Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F021": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:46:21.979Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F024": {
+      "openGrantCount": 4,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:47:11.968Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F026": {
+      "openGrantCount": 11,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:47:33.198Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F031": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:47:01.368Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F033": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:42:41.395Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F041": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:50:16.326Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F043": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:47:29.695Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F046": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:42:18.198Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F058": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:47:00.997Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F081": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:50:25.275Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F099": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:45:28.533Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F100": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:45:35.617Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F087": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:53:41.805Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F082": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:55:02.849Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F036": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:55:18.980Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F030": {
+      "openGrantCount": 2,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:55:35.167Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F040": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:55:47.485Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F055": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:55:58.804Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F057": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:09.185Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F054": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:16.988Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F053": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:29.478Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F007": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:32.281Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F097": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:43.167Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F047": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:45.510Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F039": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:51.609Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F037": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:55.642Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F050": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:56:59.774Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F014": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:03.486Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F088": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:06.156Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F083": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:10.698Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F056": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:14.188Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F048": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:18.578Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F042": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:21.803Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F096": {
+      "openGrantCount": 4,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:36.286Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F093": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:50.870Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F098": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:55.642Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F092": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:55.799Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F094": {
+      "openGrantCount": 6,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:57:59.763Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F095": {
+      "openGrantCount": 6,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:00.196Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F089": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:00.298Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F032": {
+      "openGrantCount": 2,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:00.404Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F027": {
+      "openGrantCount": 8,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:14.971Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F091": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:33.674Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F084": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:33.983Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F086": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:34.540Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F052": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:38.265Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F045": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:39.298Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F044": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:39.419Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F008": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:40.145Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F029": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:41.181Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F049": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:41.236Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F028": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:41.401Z",
+      "blocked": true,
+      "extractionMode": "blocked"
+    },
+    "F059": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:42.432Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F019": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:42.893Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F060": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:45.140Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F025": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:45.661Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F038": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:45.764Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F051": {
+      "openGrantCount": 0,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:46.802Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F090": {
+      "openGrantCount": 1,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:58:47.362Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    },
+    "F017": {
+      "openGrantCount": 6,
+      "checked": true,
+      "fetchedAt": "2026-10-08T17:59:20.952Z",
+      "blocked": false,
+      "extractionMode": "crawl-ai"
+    }
+  }
+}

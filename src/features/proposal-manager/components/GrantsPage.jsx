@@ -43,10 +43,13 @@ import {
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import RetrievalConfidenceBadge from "./RetrievalConfidenceBadge.jsx";
+import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import MergedGrantsFeed from "./MergedGrantsFeed.jsx";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
-import { sortByNewest } from "../services/listingSort.js";
+import { sortListings } from "../services/listingSort.js";
+import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 import { formatDateTime24 } from '../../../utils/dateTime';
 
 /** Open/posted only — forecasted and closed/archived are excluded from the desk. */
@@ -495,7 +498,10 @@ export default function GrantsPage() {
   const [errorById, setErrorById] = useState({});
   const [copiedId, setCopiedId] = useState("");
   const [sortNewest, setSortNewest] = useState(false);
+  const [orgProfile, setOrgProfile] = useState(getOrgMatchProfile);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
+
+  useEffect(() => subscribeOrgMatchProfile(setOrgProfile), []);
 
   const runSearch = useCallback(
     async ({
@@ -623,8 +629,8 @@ export default function GrantsPage() {
       statusKeys: ["oppStatus", "status"],
       deadlineKeys: ["closeDate", "deadline"],
     });
-    return sortNewest ? sortByNewest(open) : open;
-  }, [payload?.results, sortNewest]);
+    return sortListings(open, { newestFirst: sortNewest, profile: orgProfile });
+  }, [payload?.results, sortNewest, orgProfile]);
   const hitCount = Number(payload?.hitCount) || results.length;
   const page = Math.floor(startRecord / PAGE_SIZE) + 1;
   const totalPages = Math.max(1, Math.ceil(hitCount / PAGE_SIZE) || 1);
@@ -1167,6 +1173,8 @@ export default function GrantsPage() {
                         <div className="min-w-0 space-y-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <GrantSourceBadge sourceId="grants" />
+                            <OrgMatchBadge listing={hit} />
+                            <RetrievalConfidenceBadge listing={hit} />
                             <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
                               {hit.title}
                             </p>

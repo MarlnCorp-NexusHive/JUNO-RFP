@@ -20,9 +20,12 @@ import {
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import RetrievalConfidenceBadge from "./RetrievalConfidenceBadge.jsx";
+import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
-import { sortByNewest } from "../services/listingSort.js";
+import { sortListings } from "../services/listingSort.js";
+import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 import { formatDateTime24 } from "../../../utils/dateTime";
 
 const inputClass =
@@ -90,6 +93,9 @@ export default function GrantSourceSearchPanel({
   const [payload, setPayload] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [sortNewest, setSortNewest] = useState(false);
+  const [orgProfile, setOrgProfile] = useState(getOrgMatchProfile);
+
+  useEffect(() => subscribeOrgMatchProfile(setOrgProfile), []);
 
   const tt = useCallback((key, opts) => t(`${ns}.${key}`, opts), [t, ns]);
 
@@ -131,8 +137,8 @@ export default function GrantSourceSearchPanel({
   const results = useMemo(() => {
     const list = Array.isArray(rawResults) ? rawResults : [];
     const base = openOnly ? filterOpenListings(list) : list;
-    return sortNewest ? sortByNewest(base) : base;
-  }, [openOnly, rawResults, sortNewest]);
+    return sortListings(base, { newestFirst: sortNewest, profile: orgProfile });
+  }, [openOnly, rawResults, sortNewest, orgProfile]);
   const hitCount = openOnly ? results.length : Number(payload?.hitCount) || results.length;
   const pageSize = Number(payload?.pageSize) || 25;
   const hasMore = Boolean(payload?.hasMore);
@@ -381,6 +387,8 @@ export default function GrantSourceSearchPanel({
                           <div className="min-w-0 space-y-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <GrantSourceBadge sourceId={badgeSourceId} />
+                              <OrgMatchBadge listing={hit} />
+                              <RetrievalConfidenceBadge listing={hit} />
                               <p className="text-sm font-semibold leading-snug text-slate-900 dark:text-white">
                                 {hit.title}
                               </p>

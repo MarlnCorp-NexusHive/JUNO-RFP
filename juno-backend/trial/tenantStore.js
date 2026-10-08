@@ -270,8 +270,8 @@ export function createTrialTenant({
   password,
   contactName,
   trialDays = DEFAULT_TRIAL_DAYS,
-  aiDailyLimit = 80,
-  aiMonthlyLimit = 800,
+  aiDailyLimit = null,
+  aiMonthlyLimit = null,
 }) {
   const db = loadTrialDb();
   const emailNorm = String(email || "").trim().toLowerCase();
@@ -307,8 +307,8 @@ export function createTrialTenant({
       trialDays: days,
       trialStartsAt: now.toISOString(),
       trialEndsAt: ends.toISOString(),
-      aiDailyLimit: Number(aiDailyLimit) || 80,
-      aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
+      aiDailyLimit: aiDailyLimit == null ? null : Number(aiDailyLimit),
+      aiMonthlyLimit: aiMonthlyLimit == null ? null : Number(aiMonthlyLimit),
       createdAt: now.toISOString(),
     };
     db.tenants.push(tenant);
@@ -416,8 +416,8 @@ export function registerTrialSignup({
   password,
   contactName,
   trialDays = DEFAULT_TRIAL_DAYS,
-  aiDailyLimit = 80,
-  aiMonthlyLimit = 800,
+  aiDailyLimit = null,
+  aiMonthlyLimit = null,
 }) {
   const db = loadTrialDb();
   const emailNorm = String(email || "").trim().toLowerCase();
@@ -511,8 +511,8 @@ export function registerTrialSignup({
       trialDays: days,
       trialStartsAt: null,
       trialEndsAt: null,
-      aiDailyLimit: Number(aiDailyLimit) || 80,
-      aiMonthlyLimit: Number(aiMonthlyLimit) || 800,
+      aiDailyLimit: aiDailyLimit == null ? null : Number(aiDailyLimit),
+      aiMonthlyLimit: aiMonthlyLimit == null ? null : Number(aiMonthlyLimit),
       createdAt: now.toISOString(),
     };
     db.tenants.push(tenant);
@@ -720,24 +720,21 @@ export function getUsageSnapshot(tenant) {
   const bucket = db.usage[tenant.id] || {};
   const day = Number(bucket[dayKey()] || 0);
   const month = Number(bucket[monthKey()] || 0);
+  // Trials are unmetered — keep counters for observability only.
   return {
     day,
     month,
-    aiDailyLimit: tenant.aiDailyLimit,
-    aiMonthlyLimit: tenant.aiMonthlyLimit,
-    dayRemaining: Math.max(0, (tenant.aiDailyLimit || 0) - day),
-    monthRemaining: Math.max(0, (tenant.aiMonthlyLimit || 0) - month),
+    aiDailyLimit: null,
+    aiMonthlyLimit: null,
+    dayRemaining: null,
+    monthRemaining: null,
+    unlimited: true,
   };
 }
 
+/** Trials have no AI call caps (usage is still recorded for observability). */
 export function assertAiQuota(tenant) {
   const snap = getUsageSnapshot(tenant);
-  if (snap.day >= (tenant.aiDailyLimit || 0)) {
-    return { ok: false, code: "ai_daily_limit", message: "Daily AI limit reached for this trial", usage: snap };
-  }
-  if (snap.month >= (tenant.aiMonthlyLimit || 0)) {
-    return { ok: false, code: "ai_monthly_limit", message: "Monthly AI limit reached for this trial", usage: snap };
-  }
   return { ok: true, usage: snap };
 }
 

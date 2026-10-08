@@ -22,9 +22,12 @@ import {
 } from "./GrantExpandCoach.jsx";
 import OpportunityShortlistButton from "./OpportunityShortlistButton.jsx";
 import GrantSourceBadge from "./GrantSourceBadge.jsx";
+import RetrievalConfidenceBadge from "./RetrievalConfidenceBadge.jsx";
+import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
-import { sortByNewest } from "../services/listingSort.js";
+import { sortListings } from "../services/listingSort.js";
+import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -117,6 +120,9 @@ export default function AltGrantsPanel({ variant }) {
   const [page, setPage] = useState(0);
   const [expandedId, setExpandedId] = useState(null);
   const [sortNewest, setSortNewest] = useState(false);
+  const [orgProfile, setOrgProfile] = useState(getOrgMatchProfile);
+
+  useEffect(() => subscribeOrgMatchProfile(setOrgProfile), []);
   const { showHint, dismiss: dismissExpandHint } = useGrantExpandCoach();
 
   const [results, setResults] = useState([]);
@@ -232,8 +238,8 @@ export default function AltGrantsPanel({ variant }) {
 
   const displayCount = filteredCount != null ? filteredCount : hitCount;
   const displayResults = useMemo(
-    () => (sortNewest ? sortByNewest(results) : results),
-    [results, sortNewest],
+    () => sortListings(results, { newestFirst: sortNewest, profile: orgProfile }),
+    [results, sortNewest, orgProfile],
   );
   const rangeStart = results.length ? page * pageSize + 1 : 0;
   const rangeEnd = page * pageSize + results.length;
@@ -556,6 +562,8 @@ export default function AltGrantsPanel({ variant }) {
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <GrantSourceBadge sourceId={isPrivate ? "private" : "local"} />
+                      <OrgMatchBadge listing={opp} />
+                      <RetrievalConfidenceBadge listing={opp} />
                       <h3 className="text-base font-semibold text-slate-900 dark:text-white">{opp.title}</h3>
                     </div>
                     <p className="text-sm text-slate-600 dark:text-slate-300">{opp.funder}</p>

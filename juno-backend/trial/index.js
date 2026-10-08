@@ -22,6 +22,8 @@ const METERED_PATH_PREFIXES = [
   "/extract-qas",
   "/extract-structured-data",
   "/technical-solution/",
+  "/grants/philanthropic/opportunities",
+  "/grants/brief/",
 ];
 
 function isMeteredPath(url = "") {

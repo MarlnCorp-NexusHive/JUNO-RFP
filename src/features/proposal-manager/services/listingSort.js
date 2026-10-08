@@ -1,7 +1,11 @@
 /**
- * Sort opportunity rows by recency (newest first).
- * Prefers posting/open dates; falls back to close/deadline only when no open date exists.
+ * Sort opportunity rows by org match, retrieval confidence, and recency.
+ * Unlikely org fits and thin listings are demoted (not hidden).
  */
+
+import { assessListingConfidence, confidenceRank, withRetrievalConfidence } from "./listingConfidence.js";
+import { assessOrgMatch, matchRank, withOrgMatch } from "./grantMatch.js";
+import { getOrgMatchProfile } from "./orgMatchProfileStore.js";
 
 function parseListingDate(value) {
   if (value == null || value === "") return null;
@@ -39,5 +43,37 @@ export function listingRecencyMs(row) {
 
 export function sortByNewest(rows) {
   if (!Array.isArray(rows)) return [];
-  return [...rows].sort((a, b) => listingRecencyMs(b) - listingRecencyMs(a));
+  return sortListings(rows, { newestFirst: true });
+}
+
+/**
+ * Default Grants desk ordering:
+ * 1) Org match (strong → possible → unknown → unlikely)
+ * 2) Retrieval confidence (high → medium → low)
+ * 3) Optional newest-first within band
+ */
+export function sortListings(rows, { newestFirst = false, profile = getOrgMatchProfile() } = {}) {
+  if (!Array.isArray(rows)) return [];
+  const enriched = withOrgMatch(withRetrievalConfidence(rows), profile);
+  return [...enriched].sort((a, b) => {
+    const ma = a._orgMatch || assessOrgMatch(a, profile);
+    const mb = b._orgMatch || assessOrgMatch(b, profile);
+    const matchDiff = matchRank(ma.level) - matchRank(mb.level);
+    if (matchDiff !== 0) return matchDiff;
+
+    const ca = a._retrievalConfidence || assessListingConfidence(a);
+    const cb = b._retrievalConfidence || assessListingConfidence(b);
+    const rankDiff = confidenceRank(ca.level) - confidenceRank(cb.level);
+    if (rankDiff !== 0) return rankDiff;
+    if (newestFirst) {
+      const recencyDiff = listingRecencyMs(b) - listingRecencyMs(a);
+      if (recencyDiff !== 0) return recencyDiff;
+    }
+    return (cb.score || 0) - (ca.score || 0);
+  });
+}
+
+/** Always deprioritize thin/low confidence; preserve relative order otherwise when newestFirst is false. */
+export function deprioritizeThinListings(rows) {
+  return sortListings(rows, { newestFirst: false });
 }
