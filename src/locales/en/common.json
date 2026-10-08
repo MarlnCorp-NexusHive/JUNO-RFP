@@ -690,8 +690,8 @@
     },
     "retrievalConfidenceHint": "How complete this retrieved listing looks (title, summary, dates, amount, link). Thin or incomplete rows are ranked lower.",
     "orgMatch": {
-      "hint": "Applicant Fit vs your Company Intelligence profile (entity type, years, finance, registrations).",
-      "setProfileHint": "Set Applicant Fit under Company Intelligence to score eligibility.",
+      "hint": "Applicant Profile vs your Company Intelligence settings (entity type, years, finance, registrations).",
+      "setProfileHint": "Set Applicant Profile under Company Intelligence to score eligibility.",
       "levels": {
         "strong": "Strong fit",
         "possible": "Possible fit",
@@ -699,7 +699,7 @@
         "unknown": "Fit unknown"
       },
       "reasons": {
-        "profile_incomplete": "Complete Applicant Fit in Company Intelligence",
+        "profile_incomplete": "Complete Applicant Profile in Company Intelligence",
         "entity_pass": "Applicant type matches your org",
         "entity_fail": "Applicant type does not match your org",
         "entity_unknown": "Applicant type not stated clearly",
@@ -715,6 +715,7 @@
         "finance_pass": "Award size within your capacity",
         "finance_stretch": "Award size is a stretch vs capacity",
         "finance_fail": "Award size far above your capacity",
+        "finance_below_min": "Award size below your minimum",
         "finance_unknown": "Award size known; capacity not set",
         "keywords_pass": "Mission keywords appear in listing",
         "keywords_miss": "Mission keywords not found in listing",
@@ -1323,7 +1324,7 @@
   "proposalManagerCompanyIntelligence": {
     "title": "Company Intelligence",
     "orgMatch": {
-      "title": "Applicant Fit",
+      "title": "Applicant Profile",
       "subtitle": "Who you are when applying. Grants uses this to score Strong / Possible / Unlikely fit (entity type, years in operation, finance, SAM/UEI). Issuer lookup below stays separate.",
       "statusReady": "Saved · matching active",
       "statusIncomplete": "Select entity type, then Save",
@@ -1355,6 +1356,8 @@
       "revenue1m10m": "$1M – $10M",
       "revenue10m50m": "$10M – $50M",
       "revenue50mPlus": "$50M+",
+      "minAwardCapacity": "Minimum award ($)",
+      "minAwardPlaceholder": "e.g. 25000",
       "maxAwardCapacity": "Max award you can manage ($)",
       "maxAwardPlaceholder": "e.g. 500000",
       "naics": "NAICS codes",
@@ -1370,7 +1373,7 @@
       "certDbeSbe": "DBE / SBE",
       "missionKeywords": "Mission / focus keywords",
       "missionPlaceholder": "workforce, digital equity, health data…",
-      "save": "Save Applicant Fit",
+      "save": "Save Applicant Profile",
       "clear": "Clear",
       "saved": "Saved — Grants ranking will update",
       "lastSaved": "Last saved {{time}}"

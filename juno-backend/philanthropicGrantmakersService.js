@@ -808,6 +808,132 @@ export async function getOpenOpportunitiesForFunder(openai, { funderId, forceRef
   return { ...payload, cached: false };
 }
 
+function isListedOpenOpportunity(status) {
+  const s = String(status || "open").toLowerCase();
+  if (/closed|ended|archived|expired|inactive|not yet|award(ed)? only/.test(s)) return false;
+  return true;
+}
+
+/** Private Grants desk: grants/RFPs only — drop scholarships and non-award programs. */
+function isNonGrantOpportunity(title, summary = "", eligibility = "") {
+  const blob = `${title} ${summary} ${eligibility}`.toLowerCase();
+  if (/\bscholarships?\b/.test(blob)) return true;
+  if (/\bbursar(y|ies)\b/.test(blob)) return true;
+  if (/\btuition\b/.test(blob)) return true;
+  if (/\b(student|college)\s+(financial\s+)?aid\b/.test(blob)) return true;
+  if (/\bstudent stem enrichment\b/.test(blob)) return true;
+  if (/\bstem enrichment program\b/.test(blob) && /\bstudent\b/.test(blob)) return true;
+  if (/\bskill[- ]building sessions?\b/.test(blob)) return true;
+  if (/\bworkshop series\b/.test(blob) && !/\bgrant\b/.test(blob)) return true;
+  if (/\binternship program\b/.test(blob) && !/\bgrant\b/.test(blob)) return true;
+  return false;
+}
+
+/**
+ * Flatten cached open opportunities into Grants-page private-feed rows.
+ * Used by /grants/alt/search (variant=private) so desk listings stay in sync
+ * with US Philanthropic Grantmakers open counts.
+ */
+export function listOpenPhilanthropicGrantsForPrivateFeed({
+  keyword = "",
+  geography = "",
+  focus = "",
+} = {}) {
+  const needle = String(keyword || "").trim().toLowerCase();
+  const geo = String(geography || "").trim().toLowerCase();
+  const focusNeedle = String(focus || "").trim().toLowerCase();
+  const dir = loadUsGrantmakersDirectory();
+  const byId = new Map(
+    (dir.grantmakers || []).map((g) => [String(g.id || "").toUpperCase(), g]),
+  );
+  const rows = [];
+
+  try {
+    const cacheRoot = ensureCacheDir();
+    for (const name of fs.readdirSync(cacheRoot)) {
+      if (!name.endsWith(".json")) continue;
+      let parsed;
+      try {
+        parsed = JSON.parse(fs.readFileSync(path.join(cacheRoot, name), "utf8"));
+      } catch {
+        continue;
+      }
+      if (!parsed || isRegistryFallbackOnly(parsed)) continue;
+      const ops = Array.isArray(parsed.opportunities) ? parsed.opportunities : [];
+      if (!ops.length) continue;
+      const funderId = String(parsed.funderId || name.replace(/\.json$/i, "")).toUpperCase();
+      const funder = byId.get(funderId) || {};
+      const funderName = parsed.grantmaker || funder.name || funderId;
+      const fundingFocus = parsed.fundingFocus || funder.fundingFocus || "";
+      const fundingGeography =
+        parsed.fundingGeography || funder.fundingGeography || "United States";
+      const focusAreas = String(fundingFocus)
+        .split(/[;,/|]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      for (const [i, op] of ops.entries()) {
+        if (!op?.title || !isListedOpenOpportunity(op.status)) continue;
+        const title = String(op.title).trim();
+        if (isNonGrantOpportunity(title, op.summary, op.eligibility)) continue;
+        const blob = `${title} ${funderName} ${fundingFocus} ${fundingGeography} ${op.eligibility || ""} ${op.summary || ""}`.toLowerCase();
+        if (needle && needle !== "foundation" && !blob.includes(needle)) continue;
+        if (geo && !blob.includes(geo) && !/united states|usa|u\.s|national|canada/.test(fundingGeography.toLowerCase())) {
+          // Keep national US funders when geography filter is a US state name/code
+          if (!/\bunited states\b|\busa\b|\bu\.s/.test(fundingGeography.toLowerCase())) continue;
+        }
+        if (focusNeedle && !blob.includes(focusNeedle) && !focusAreas.some((f) => f.toLowerCase().includes(focusNeedle))) {
+          continue;
+        }
+        rows.push({
+          id: String(op.id || `phil-${funderId}-${i + 1}`),
+          sourceType: "private",
+          source: "US Philanthropic Grantmakers",
+          title,
+          funder: funderName,
+          program: "Open opportunity (retrieved from funder policy/opportunities page)",
+          geography: fundingGeography,
+          focusAreas: focusAreas.length ? focusAreas : ["Philanthropy"],
+          applicantTypes: op.eligibility
+            ? [String(op.eligibility).trim()]
+            : ["See funder guidelines"],
+          status: String(op.status || "Open").trim() || "Open",
+          postedDate: parsed.fetchedAt || null,
+          closeDate: op.deadline || null,
+          awardMin: null,
+          awardMax: null,
+          awardLabel: op.amountLabel || "See funder listing",
+          assets: null,
+          revenue: null,
+          description:
+            op.summary ||
+            `${title} — open opportunity listed by ${funderName}. Confirm deadlines and eligibility on the funder site.`,
+          eligibility: op.eligibility || funder.applicationAccess || "",
+          url: op.url || parsed.opportunitySourceUrl || funder.opportunitySourceUrl || null,
+          keywords: [funderName, funderId, title, fundingFocus].filter(Boolean),
+          retrievalConfidence: op.confidence || "medium",
+          liveMeta: {
+            funderId,
+            philanthropic: true,
+            retrieved: true,
+            extractionMode: parsed.extractionMode || null,
+          },
+        });
+      }
+    }
+  } catch {
+    /* no cache yet */
+  }
+
+  // Funders with more opens first, then title.
+  rows.sort((a, b) => {
+    const fa = String(a.funder || "").localeCompare(String(b.funder || ""));
+    if (fa !== 0) return fa;
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  });
+  return rows;
+}
+
 /**
  * Map funderId -> { openGrantCount, checked, fetchedAt } from durable index.
  * Falls back to rebuilding from ops-cache files once if the index file is missing.

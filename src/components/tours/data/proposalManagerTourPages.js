@@ -1,5 +1,5 @@
 /**
- * Map Proposal Manager routes → tour page keys (shared by Start Tour button + auto-start).
+ * Map Proposal Manager routes → tour page keys (used by the Start Tour button).
  */
 export function getProposalManagerTourPage(pathname = "") {
   const segments = String(pathname).split("/").filter(Boolean);

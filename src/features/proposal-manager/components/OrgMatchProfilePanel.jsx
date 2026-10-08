@@ -242,8 +242,8 @@ export default function OrgMatchProfilePanel() {
     <section
       className="rounded-xl border border-indigo-200/80 bg-white p-4 shadow-sm dark:border-indigo-900/50 dark:bg-gray-800 md:p-6"
       data-tour="org-match"
-      data-tour-title-en="Applicant Fit"
-      data-tour-title-ar="ملاءمة المتقدم"
+      data-tour-title-en="Applicant Profile"
+      data-tour-title-ar="ملف المتقدم"
       data-tour-content-en="Tell Grants who you are as an applicant so opportunities can be scored for eligibility and capacity."
       data-tour-content-ar="عرّف المنح بمن أنتم كمتقدم حتى تُقيَّم الفرص حسب الأهلية والقدرة."
       data-tour-position="bottom"
@@ -344,6 +344,20 @@ export default function OrgMatchProfilePanel() {
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block space-y-1">
+            <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">{tt("minAwardCapacity")}</span>
+            <input
+              type="number"
+              min={0}
+              step={1000}
+              value={form.minAwardCapacity ?? ""}
+              onChange={(e) =>
+                setField("minAwardCapacity", e.target.value === "" ? null : Number(e.target.value))
+              }
+              className={fieldClass}
+              placeholder={tt("minAwardPlaceholder")}
+            />
           </label>
           <label className="block space-y-1">
             <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">{tt("maxAwardCapacity")}</span>

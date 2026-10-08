@@ -21,7 +21,7 @@ function tone(level) {
 }
 
 /**
- * Applicant Fit badge driven by Company Intelligence → Applicant Fit profile.
+ * Applicant Profile badge driven by Company Intelligence → Applicant Profile.
  */
 export default function OrgMatchBadge({ listing, match, className = "" }) {
   const { t } = useTranslation("common");

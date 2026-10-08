@@ -1,7 +1,10 @@
 /**
  * Live private-foundation (ProPublica) + state/local-eligible (Grants.gov) grant feeds.
+ * Private variant also surfaces cached open US philanthropic grantmaker opportunities first.
  * No API keys required.
  */
+
+import { listOpenPhilanthropicGrantsForPrivateFeed } from "./philanthropicGrantmakersService.js";
 
 const GRANTS_GOV_BASE = "https://api.grants.gov/v1/api";
 const PROPUBLICA_BASE = "https://projects.propublica.org/nonprofits/api/v2";
@@ -441,20 +444,39 @@ async function searchPrivateFunders({
 
   const totalFiltered = needsEnrichPool ? filtered.length : Number(search.total_results) || filtered.length;
   const start = needsEnrichPool ? pageIndex * pageSize : 0;
-  const results = needsEnrichPool ? filtered.slice(start, start + pageSize) : filtered;
+  const registryResults = needsEnrichPool ? filtered.slice(start, start + pageSize) : filtered;
   const enrichedPool = needsEnrichPool ? filtered.length : null;
 
+  // Prefer retrieved open grants from US Philanthropic Grantmakers (same cache as CI panel).
+  // Page 0 leads with every matching open opportunity; later pages stay registry-only.
+  const openPhilanthropic = listOpenPhilanthropicGrantsForPrivateFeed({
+    keyword: String(keyword || "").trim(),
+    geography: String(geography || "").trim(),
+    focus: String(focus || "").trim(),
+  });
+  const openCountAll = openPhilanthropic.length;
+  const results =
+    pageIndex === 0 ? [...openPhilanthropic, ...registryResults] : registryResults;
+  const hasMore = needsEnrichPool
+    ? start + pageSize < totalFiltered
+    : (pageIndex + 1) * pageSize < (Number(search.total_results) || 0);
+
   return {
-    source: "ProPublica Nonprofit Explorer",
-    sourceDetail: "US private foundations & philanthropic orgs (live IRS registry)",
-    hitCount: Number(search.total_results) || totalFiltered,
-    filteredCount: needsEnrichPool ? totalFiltered : null,
+    source:
+      openCountAll > 0
+        ? "US Philanthropic open grants + ProPublica Nonprofit Explorer"
+        : "ProPublica Nonprofit Explorer",
+    sourceDetail:
+      openCountAll > 0
+        ? `${openCountAll} retrieved open opportunities from US philanthropic grantmakers, then live IRS registry orgs`
+        : "US private foundations & philanthropic orgs (live IRS registry)",
+    hitCount: openCountAll + (Number(search.total_results) || totalFiltered),
+    filteredCount: needsEnrichPool ? openCountAll + totalFiltered : openCountAll || null,
     enrichedPoolSize: enrichedPool,
+    openPhilanthropicCount: openCountAll,
     page: pageIndex,
-    pageSize,
-    hasMore: needsEnrichPool
-      ? start + pageSize < totalFiltered
-      : (pageIndex + 1) * pageSize < (Number(search.total_results) || 0),
+    pageSize: pageIndex === 0 ? Math.max(pageSize, results.length) : pageSize,
+    hasMore,
     sizeBucket: bucket || null,
     sortBy: sort,
     results,

@@ -111,6 +111,21 @@ function listingAwardCeiling(listing) {
   return null;
 }
 
+function listingAwardFloor(listing) {
+  const candidates = [
+    listing?.awardFloor,
+    listing?.awardMin,
+    listing?.awardFloorLabel,
+    listing?.raw?.awardFloor,
+    listing?.raw?.awardMin,
+  ];
+  for (const c of candidates) {
+    const n = parseMoney(c);
+    if (n != null && n > 0) return n;
+  }
+  return null;
+}
+
 function extractMinYears(text) {
   if (!text) return null;
   const patterns = [
@@ -283,29 +298,52 @@ export function assessOrgMatch(listing, profile = getOrgMatchProfile()) {
     }
   }
 
-  // --- Finance / award capacity ---
+  // --- Finance / award capacity (min + max) ---
   const ceiling = listingAwardCeiling(listing);
-  if (ceiling != null) {
-    const capacity =
+  const floor = listingAwardFloor(listing);
+  const awardSize = ceiling ?? floor;
+  if (awardSize != null) {
+    const minCapacity =
+      profile.minAwardCapacity != null && Number.isFinite(profile.minAwardCapacity)
+        ? profile.minAwardCapacity
+        : null;
+    const maxCapacity =
       profile.maxAwardCapacity != null
         ? profile.maxAwardCapacity
         : revenueBandCeiling(profile.revenueBand);
-    if (capacity == null) {
-      gates.push({ id: "finance", status: "unknown", detail: String(ceiling) });
-      softUnknown += 1;
-      reasons.push("finance_unknown");
-    } else if (ceiling <= capacity * 1.25) {
+
+    // Listing max (or only known amount) below org minimum → too small to pursue.
+    const compareForMin = ceiling ?? floor;
+    if (minCapacity != null && compareForMin != null && compareForMin < minCapacity) {
+      gates.push({ id: "finance", status: "fail", detail: String(compareForMin) });
+      hardFail = true;
+      reasons.push("finance_below_min");
+    } else if (maxCapacity == null) {
+      if (minCapacity == null) {
+        gates.push({ id: "finance", status: "unknown", detail: String(awardSize) });
+        softUnknown += 1;
+        reasons.push("finance_unknown");
+      } else {
+        gates.push({ id: "finance", status: "pass", detail: String(awardSize) });
+        softPass += 1;
+        reasons.push("finance_pass");
+      }
+    } else if (ceiling != null && ceiling <= maxCapacity * 1.25) {
       gates.push({ id: "finance", status: "pass", detail: String(ceiling) });
       softPass += 1;
       reasons.push("finance_pass");
-    } else if (ceiling <= capacity * 3) {
+    } else if (ceiling != null && ceiling <= maxCapacity * 3) {
       gates.push({ id: "finance", status: "unknown", detail: String(ceiling) });
       softUnknown += 1;
       reasons.push("finance_stretch");
-    } else {
+    } else if (ceiling != null) {
       gates.push({ id: "finance", status: "fail", detail: String(ceiling) });
       hardFail = true;
       reasons.push("finance_fail");
+    } else if (floor != null && minCapacity != null && floor >= minCapacity) {
+      gates.push({ id: "finance", status: "pass", detail: String(floor) });
+      softPass += 1;
+      reasons.push("finance_pass");
     }
   }
 

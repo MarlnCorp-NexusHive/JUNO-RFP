@@ -1,5 +1,5 @@
 /**
- * Applicant Fit profile used by Grant Match (eligibility / capacity checks).
+ * Applicant Profile used by Grant Match (eligibility / capacity checks).
  * Lives under Company Intelligence; tenant-scoped when trial is active.
  * Always dual-writes an unscoped fallback so the form stays filled after refresh.
  */
@@ -25,6 +25,7 @@ export const TRIAL_FEATURE_KEY = "applicantFit";
  *  hasSam: boolean,
  *  hasUei: boolean,
  *  revenueBand: ''|'under_100k'|'100k_1m'|'1m_10m'|'10m_50m'|'50m_plus',
+ *  minAwardCapacity: number|null,
  *  maxAwardCapacity: number|null,
  *  costShareOk: boolean,
  *  naics: string,
@@ -42,6 +43,7 @@ export const EMPTY_ORG_MATCH_PROFILE = {
   hasSam: false,
   hasUei: false,
   revenueBand: "",
+  minAwardCapacity: null,
   maxAwardCapacity: null,
   costShareOk: false,
   naics: "",
@@ -185,6 +187,10 @@ export function normalizeProfile(raw) {
       : Number(raw.yearsInOperation);
   const founded =
     raw.foundedYear == null || raw.foundedYear === "" ? null : Number(raw.foundedYear);
+  const minAward =
+    raw.minAwardCapacity == null || raw.minAwardCapacity === ""
+      ? null
+      : Number(raw.minAwardCapacity);
   const maxAward =
     raw.maxAwardCapacity == null || raw.maxAwardCapacity === ""
       ? null
@@ -200,6 +206,7 @@ export function normalizeProfile(raw) {
     revenueBand: REVENUE_BAND_OPTIONS.some((o) => o.id === raw.revenueBand)
       ? raw.revenueBand
       : "",
+    minAwardCapacity: Number.isFinite(minAward) && minAward >= 0 ? minAward : null,
     maxAwardCapacity: Number.isFinite(maxAward) && maxAward >= 0 ? maxAward : null,
     costShareOk: !!raw.costShareOk,
     naics: String(raw.naics || "").trim(),
@@ -252,7 +259,7 @@ function removeLocal() {
 }
 
 /**
- * Replace-save the full Applicant Fit form (does not merge stale fields).
+ * Replace-save the full Applicant Profile form (does not merge stale fields).
  * @returns {{ ok: true, profile: OrgMatchProfile } | { ok: false, error: string, profile: OrgMatchProfile }}
  */
 export function saveOrgMatchProfile(patch = {}) {
@@ -315,7 +322,7 @@ export function subscribeOrgMatchProfile(onChange) {
   };
 }
 
-/** Load company-wide Applicant Fit into local cache (trial). */
+/** Load company-wide Applicant Profile into local cache (trial). */
 export async function hydrateOrgMatchProfileFromServer() {
   if (!canUseTrialFeatures()) return getOrgMatchProfile();
   try {
