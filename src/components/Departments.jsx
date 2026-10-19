@@ -108,7 +108,7 @@ const departments = [
   }
 ];
 
-const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
+const COLORS = ["#1A5336", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
 export default function Departments() {
   const [selectedDepartment, setSelectedDepartment] = useState("All");
@@ -167,7 +167,7 @@ export default function Departments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="passRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="passRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -184,7 +184,7 @@ export default function Departments() {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="name" />
                 <PolarRadiusAxis />
-                <Radar name="Metrics" dataKey="GPA" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+                <Radar name="Metrics" dataKey="GPA" stroke="#1A5336" fill="#1A5336" fillOpacity={0.6} />
                 <Radar name="Metrics" dataKey="Satisfaction" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
               </RadarChart>
             </ResponsiveContainer>
@@ -241,7 +241,7 @@ export default function Departments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="facultyStrength" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="facultyStrength" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="researchOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -261,7 +261,7 @@ export default function Departments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="budgetAllocated" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="budgetAllocated" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="budgetSpent" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -305,7 +305,7 @@ export default function Departments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="publications" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="publications" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="patentsFiled" fill="#22c55e" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="collaborations" fill="#f59e42" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -350,7 +350,7 @@ export default function Departments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="placementRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="placementRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="higherStudiesRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -416,7 +416,7 @@ export default function Departments() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>

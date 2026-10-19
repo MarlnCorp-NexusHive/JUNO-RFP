@@ -14,7 +14,7 @@ const meetingTypes = [
   { type: "Research/Innovation", icon: "📚" },
 ];
 const demoMeetings = [
-  { title: "Quarterly Vision Planning", type: "Strategic Review", date: "2026-10-10", time: "10:00", host: "Director", category: "Strategic", color: "#6366f1" },
+  { title: "Quarterly Vision Planning", type: "Strategic Review", date: "2026-10-10", time: "10:00", host: "Director", category: "Strategic", color: "#1A5336" },
   { title: "Financial Council", type: "Financial Meetings", date: "2026-10-12", time: "14:00", host: "CFO Finance", category: "Finance", color: "#22c55e" },
   { title: "Budget Planning", type: "Financial Meetings", date: "2026-10-15", time: "11:00", host: "Finance Admin", category: "Finance", color: "#f59e42" },
   { title: "HR Policy Review", type: "HR/Admin Meetings", date: "2026-10-18", time: "16:00", host: "HR Head", category: "HR", color: "#a21caf" },
@@ -50,7 +50,7 @@ export default function MeetingsCalendar() {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>
@@ -70,7 +70,7 @@ export default function MeetingsCalendar() {
             ))}
           </div>
           <div className="flex gap-2 mb-2">
-            <span className="w-3 h-3 rounded-full inline-block" style={{ background: "#6366f1" }} /> <span className="text-xs">Strategic</span>
+            <span className="w-3 h-3 rounded-full inline-block" style={{ background: "#1A5336" }} /> <span className="text-xs">Strategic</span>
             <span className="w-3 h-3 rounded-full inline-block" style={{ background: "#22c55e" }} /> <span className="text-xs">Academic</span>
             <span className="w-3 h-3 rounded-full inline-block" style={{ background: "#f59e42" }} /> <span className="text-xs">Finance</span>
             <span className="w-3 h-3 rounded-full inline-block" style={{ background: "#a21caf" }} /> <span className="text-xs">HR</span>

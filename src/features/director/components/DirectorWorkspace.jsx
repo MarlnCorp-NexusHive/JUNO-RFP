@@ -79,7 +79,7 @@ export default function DirectorWorkspace() {
   // Show loading state if i18n is not ready
   if (!ready) {
     return (
-      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+      <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
         <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
           <div className="text-center">
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">Loading...</h1>
@@ -90,7 +90,7 @@ export default function DirectorWorkspace() {
   }
 
   return (
-    <div className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? 'rtl' : 'ltr'}`}>
+    <div className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}>
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
       <header
           className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 ${isRTLMode ? 'flex-row-reverse' : ''}`}

@@ -157,7 +157,7 @@ const complianceMetrics = {
   ],
 };
 
-const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
+const COLORS = ["#1A5336", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
 export default function AnalyticsReports() {
   const [selectedDepartment, setSelectedDepartment] = useState("All");
@@ -180,7 +180,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="conversion" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="conversion" fill="#1A5336" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -199,7 +199,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="program" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="enrolled" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="enrolled" fill="#1A5336" radius={[4, 4, 0, 0]} />
             <Line type="monotone" dataKey="capacity" stroke="#ef4444" strokeWidth={2} />
           </ComposedChart>
         </ResponsiveContainer>
@@ -295,7 +295,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="month" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Area type="monotone" dataKey="applications" fill="#6366f1" stroke="#6366f1" />
+            <Area type="monotone" dataKey="applications" fill="#1A5336" stroke="#1A5336" />
             <Area type="monotone" dataKey="qualifiedLeads" fill="#22c55e" stroke="#22c55e" />
           </AreaChart>
         </ResponsiveContainer>
@@ -344,7 +344,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="department" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="contractRevenue" stackId="a" fill="#6366f1" />
+            <Bar dataKey="contractRevenue" stackId="a" fill="#1A5336" />
             <Bar dataKey="grants" stackId="a" fill="#22c55e" />
           </BarChart>
         </ResponsiveContainer>
@@ -364,7 +364,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="category" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="perBid" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="perBid" fill="#1A5336" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -457,7 +457,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="month" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Area type="monotone" dataKey="operational" fill="#6366f1" stroke="#6366f1" />
+            <Area type="monotone" dataKey="operational" fill="#1A5336" stroke="#1A5336" />
             <Area type="monotone" dataKey="capital" fill="#22c55e" stroke="#22c55e" />
           </AreaChart>
         </ResponsiveContainer>
@@ -506,7 +506,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="course" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="passRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="passRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
             <Line type="monotone" dataKey="avgGPA" stroke="#22c55e" strokeWidth={2} />
           </ComposedChart>
         </ResponsiveContainer>
@@ -526,7 +526,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="faculty" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="rating" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="rating" fill="#1A5336" radius={[4, 4, 0, 0]} />
             <Line type="monotone" dataKey="publications" stroke="#22c55e" strokeWidth={2} />
           </ComposedChart>
         </ResponsiveContainer>
@@ -580,7 +580,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="year" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="publications" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="publications" fill="#1A5336" radius={[4, 4, 0, 0]} />
             <Bar dataKey="citations" fill="#22c55e" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -607,7 +607,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="semester" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Area type="monotone" dataKey="avgGPA" fill="#6366f1" stroke="#6366f1" />
+            <Area type="monotone" dataKey="avgGPA" fill="#1A5336" stroke="#1A5336" />
             <Area type="monotone" dataKey="passRate" fill="#22c55e" stroke="#22c55e" />
           </AreaChart>
         </ResponsiveContainer>
@@ -656,7 +656,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="event" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="participants" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="participants" fill="#1A5336" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -675,7 +675,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="facility" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="rating" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="rating" fill="#1A5336" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -728,7 +728,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="club" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="members" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="members" fill="#1A5336" radius={[4, 4, 0, 0]} />
             <Bar dataKey="activities" fill="#22c55e" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -755,7 +755,7 @@ export default function AnalyticsReports() {
             <PolarGrid />
             <PolarAngleAxis dataKey="category" tick={{ fontSize: 10 }} />
             <PolarRadiusAxis tick={{ fontSize: 10 }} />
-            <Radar name="Satisfaction" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+            <Radar name="Satisfaction" dataKey="score" stroke="#1A5336" fill="#1A5336" fillOpacity={0.6} />
           </RadarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -803,7 +803,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="program" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="placement" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="placement" fill="#1A5336" radius={[4, 4, 0, 0]} />
             <Line type="monotone" dataKey="avgSalary" stroke="#22c55e" strokeWidth={2} />
           </ComposedChart>
         </ResponsiveContainer>
@@ -823,7 +823,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="company" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="satisfaction" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="satisfaction" fill="#1A5336" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -916,7 +916,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="year" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Line type="monotone" dataKey="avgSalary" stroke="#6366f1" strokeWidth={2} />
+            <Line type="monotone" dataKey="avgSalary" stroke="#1A5336" strokeWidth={2} />
             <Line type="monotone" dataKey="maxSalary" stroke="#22c55e" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
@@ -965,7 +965,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="standard" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Bar dataKey="score" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="score" fill="#1A5336" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -1040,7 +1040,7 @@ export default function AnalyticsReports() {
             <XAxis dataKey="month" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Line type="monotone" dataKey="compliance" stroke="#6366f1" strokeWidth={2} />
+            <Line type="monotone" dataKey="compliance" stroke="#1A5336" strokeWidth={2} />
             <Line type="monotone" dataKey="audits" stroke="#22c55e" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
@@ -1067,7 +1067,7 @@ export default function AnalyticsReports() {
             <PolarGrid />
             <PolarAngleAxis dataKey="category" tick={{ fontSize: 10 }} />
             <PolarRadiusAxis tick={{ fontSize: 10 }} />
-            <Radar name="Risk Level" dataKey="risk" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+            <Radar name="Risk Level" dataKey="risk" stroke="#1A5336" fill="#1A5336" fillOpacity={0.6} />
           </RadarChart>
         </ResponsiveContainer>
       </motion.div>
@@ -1101,7 +1101,7 @@ export default function AnalyticsReports() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>

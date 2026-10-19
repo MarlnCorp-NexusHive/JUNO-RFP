@@ -298,7 +298,7 @@ const complianceMetrics = {
   ],
 };
 
-const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
+const COLORS = ["#1A5336", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
 // Proposal Manager – Bid Vault (RFP submissions, win/loss, pipeline)
 // Separate demo series for Last 6 months vs Last year so the time switch visibly updates charts.
@@ -491,7 +491,7 @@ export default function DirectorAnalyticsReports() {
 
   if (isTrialBidVault) {
     return (
-      <div className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? "rtl" : "ltr"}`}>
+      <div className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? "rtl" : "ltr"}`}>
         <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
           <TrialBidVaultPanel isArabic={isArabic} />
         </main>
@@ -518,7 +518,7 @@ export default function DirectorAnalyticsReports() {
   };
 
   if (!ready) {
-    return <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 items-center justify-center">
+    return <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] items-center justify-center">
       <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
     </div>;
   }
@@ -539,7 +539,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="conversion" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="conversion" fill="#1A5336" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -558,7 +558,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="team" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="onboarded" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="onboarded" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Line type="monotone" dataKey="capacity" stroke="#ef4444" strokeWidth={2} />
             </ComposedChart>
           </ResponsiveContainer>
@@ -626,7 +626,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="onboarded" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="onboarded" stroke="#1A5336" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -676,7 +676,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="department" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="revenue" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="revenue" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="grants" fill="#22c55e" radius={[4, 4, 0, 0]} />
               <Bar dataKey="other" fill="#f59e42" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -697,7 +697,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="category" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="cost" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="cost" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="perEmployee" fill="#22c55e" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -717,7 +717,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="Revenue" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="Revenue" stroke="#1A5336" strokeWidth={2} />
               <Line type="monotone" dataKey="Expenses" stroke="#ef4444" strokeWidth={2} />
               <Line type="monotone" dataKey="Profit" stroke="#22c55e" strokeWidth={2} />
             </LineChart>
@@ -768,7 +768,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="department" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="allocated" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="allocated" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="used" fill="#f59e42" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -787,7 +787,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="year" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="revenue" stroke="#1A5336" strokeWidth={2} />
               <Line type="monotone" dataKey="cost" stroke="#ef4444" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
@@ -812,7 +812,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="project" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="completionRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="completionRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="avgScore" fill="#22c55e" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -831,7 +831,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="team" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="rating" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="rating" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="projects" fill="#22c55e" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -898,7 +898,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="completionRate" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="completionRate" stroke="#1A5336" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -940,7 +940,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="event" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="participants" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="participants" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="satisfaction" fill="#22c55e" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -959,7 +959,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="facility" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="rating" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="rating" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="complaints" fill="#ef4444" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -978,7 +978,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="year" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="FullTime" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="FullTime" stroke="#1A5336" strokeWidth={2} />
               <Line type="monotone" dataKey="PartTime" stroke="#22c55e" strokeWidth={2} />
               <Line type="monotone" dataKey="Contract" stroke="#f59e42" strokeWidth={2} />
             </LineChart>
@@ -1000,7 +1000,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="rate" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="rate" stroke="#1A5336" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1060,7 +1060,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="team" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="successRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="successRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="avgRevenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -1079,7 +1079,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="client" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="satisfaction" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="satisfaction" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="returnRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -1098,7 +1098,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="dept" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="KPI" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="KPI" fill="#1A5336" radius={[4, 4, 0, 0]} />
               <Bar dataKey="Budget" fill="#22c55e" radius={[4, 4, 0, 0]} />
               <Bar dataKey="Revenue" fill="#f59e42" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -1138,7 +1138,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="year" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="avgRevenue" stroke="#6366f1" strokeWidth={2} />
+              <Line type="monotone" dataKey="avgRevenue" stroke="#1A5336" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1180,7 +1180,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="standard" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="score" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="score" fill="#1A5336" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1238,7 +1238,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="department" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="review" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="review" fill="#1A5336" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1294,7 +1294,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="stage" tick={{ fontSize: 9 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip labelFormatter={(label) => bidLabel(label)} />
-              <Bar dataKey="conversion" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="conversion" fill="#1A5336" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1306,7 +1306,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="month" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip labelFormatter={(label) => bidLabel(label)} />
-              <Line type="monotone" dataKey="submitted" stroke="#6366f1" strokeWidth={2} name={pmText("Submitted", "المقدّم")} />
+              <Line type="monotone" dataKey="submitted" stroke="#1A5336" strokeWidth={2} name={pmText("Submitted", "المقدّم")} />
               <Line type="monotone" dataKey="won" stroke="#22c55e" strokeWidth={2} name={pmText("Won", "فوز")} />
             </LineChart>
           </ResponsiveContainer>
@@ -1352,7 +1352,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="stage" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip labelFormatter={(label) => bidLabel(label)} />
-              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} name={pmText("Value ($M)", "القيمة (مليون $)")} />
+              <Bar dataKey="value" fill="#1A5336" radius={[4, 4, 0, 0]} name={pmText("Value ($M)", "القيمة (مليون $)")} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1370,7 +1370,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="stage" tick={{ fontSize: 10 }} tickFormatter={bidLabel} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip labelFormatter={(label) => bidLabel(label)} />
-              <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} name={pmText("Value", "القيمة")} />
+              <Bar dataKey="value" fill="#1A5336" radius={[4, 4, 0, 0]} name={pmText("Value", "القيمة")} />
               <Bar dataKey="count" fill="#22c55e" radius={[4, 4, 0, 0]} name={pmText("Count", "العدد")} />
             </BarChart>
           </ResponsiveContainer>
@@ -1403,7 +1403,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="category" tick={{ fontSize: 9 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="projects" fill="#6366f1" radius={[4, 4, 0, 0]} name="Projects" />
+              <Bar dataKey="projects" fill="#1A5336" radius={[4, 4, 0, 0]} name="Projects" />
               <Bar dataKey="reuseRate" fill="#22c55e" radius={[4, 4, 0, 0]} name="Reuse %" />
             </BarChart>
           </ResponsiveContainer>
@@ -1416,7 +1416,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="reuseCount" stroke="#6366f1" strokeWidth={2} name="Reuses" />
+              <Line type="monotone" dataKey="reuseCount" stroke="#1A5336" strokeWidth={2} name="Reuses" />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1428,7 +1428,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="type" tick={{ fontSize: 9 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} name="Total" />
+              <Bar dataKey="count" fill="#1A5336" radius={[4, 4, 0, 0]} name="Total" />
               <Bar dataKey="updated" fill="#22c55e" radius={[4, 4, 0, 0]} name="Updated (6M)" />
             </BarChart>
           </ResponsiveContainer>
@@ -1447,7 +1447,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="section" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="uses" fill="#6366f1" radius={[4, 4, 0, 0]} name="Uses (6M)" />
+              <Bar dataKey="uses" fill="#1A5336" radius={[4, 4, 0, 0]} name="Uses (6M)" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1459,7 +1459,7 @@ export default function DirectorAnalyticsReports() {
               <XAxis dataKey="type" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Count" />
+              <Bar dataKey="count" fill="#3d7a52" radius={[4, 4, 0, 0]} name="Count" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -1499,7 +1499,7 @@ export default function DirectorAnalyticsReports() {
   );
 
   return (
-    <div className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? 'rtl' : 'ltr'}`}>
+    <div className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}>
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {/* Header Section */}
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 ${isRTLMode ? 'flex-row-reverse' : ''}`} data-tour="1">

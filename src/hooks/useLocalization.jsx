@@ -1,8 +1,11 @@
-import { useContext, createContext, useState, useEffect } from 'react';
+import { useContext, createContext, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { isRTL, getTextDirection, forceRTLScrollbar, cleanupRTLStyling, debugRTLState } from '../utils/rtl';
 import {
   ARABIC_LANGUAGE_ENABLED,
+  isArabicUiEnabled,
+  getSupportedLanguages,
   saveLanguagePreference,
   getLanguagePreference,
 } from '../utils/languageUtils';
@@ -12,22 +15,59 @@ const normalizeLanguageCode = (lng) => String(lng || 'en').toLowerCase().split('
 
 export const LocalizationProvider = ({ children }) => {
   const { i18n } = useTranslation();
+  const location = useLocation();
+  const arabicEnabled = isArabicUiEnabled(location.pathname);
+
   const initialLanguage = normalizeLanguageCode(
-    ARABIC_LANGUAGE_ENABLED
-      ? (i18n?.resolvedLanguage || i18n?.language || getLanguagePreference())
+    arabicEnabled
+      ? (i18n?.resolvedLanguage || i18n?.language || getLanguagePreference(location.pathname))
       : 'en',
   );
 
   const [currentLanguage, setCurrentLanguage] = useState(initialLanguage);
   const [isRTLMode, setIsRTLMode] = useState(isRTL(initialLanguage));
 
+  const changeLanguage = useCallback(async (languageCode) => {
+    let normalized = normalizeLanguageCode(languageCode);
+    if (!isArabicUiEnabled(window.location?.pathname) && normalized === 'ar') {
+      normalized = 'en';
+    }
+    try {
+      await i18n.changeLanguage(normalized);
+      setCurrentLanguage(normalized);
+      
+      const newRTLMode = isRTL(normalized);
+      setIsRTLMode(newRTLMode);
+      saveLanguagePreference(normalized, window.location?.pathname);
+      
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = normalized;
+        document.documentElement.dir = getTextDirection(normalized);
+        
+        cleanupRTLStyling();
+        
+        if (newRTLMode) {
+          document.body.classList.add('rtl-layout');
+          forceRTLScrollbar();
+        } else {
+          document.body.classList.add('ltr-layout');
+        }
+        
+        debugRTLState();
+      }
+    } catch (error) {
+      console.error('Failed to change language:', error);
+    }
+  }, [i18n]);
+
+  // Apply / revoke Arabic when route or login session context changes.
   useEffect(() => {
-    // Force English while Arabic is disabled (clears a prior AR preference in the UI).
-    if (!ARABIC_LANGUAGE_ENABLED) {
+    const allowed = isArabicUiEnabled(location.pathname);
+    if (!allowed) {
       if (normalizeLanguageCode(i18n?.language) !== 'en') {
         void changeLanguage('en');
       } else {
-        saveLanguagePreference('en');
+        saveLanguagePreference('en', location.pathname);
         if (typeof document !== 'undefined') {
           document.documentElement.lang = 'en';
           document.documentElement.dir = 'ltr';
@@ -38,17 +78,16 @@ export const LocalizationProvider = ({ children }) => {
       return;
     }
 
-    const savedLang = normalizeLanguageCode(getLanguagePreference());
-    if (savedLang && savedLang !== i18n?.resolvedLanguage) {
+    const savedLang = normalizeLanguageCode(getLanguagePreference(location.pathname));
+    if (savedLang && savedLang !== normalizeLanguageCode(i18n?.resolvedLanguage || i18n?.language)) {
       void changeLanguage(savedLang);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount / flag change
-  }, []);
+  }, [location.pathname, changeLanguage, i18n]);
 
   useEffect(() => {
     const onLanguageChanged = (lng) => {
       const normalized = normalizeLanguageCode(lng);
-      if (!ARABIC_LANGUAGE_ENABLED && normalized === 'ar') {
+      if (!isArabicUiEnabled(window.location?.pathname) && normalized === 'ar') {
         void changeLanguage('en');
         return;
       }
@@ -59,54 +98,25 @@ export const LocalizationProvider = ({ children }) => {
     return () => {
       if (i18n?.off) i18n.off('languageChanged', onLanguageChanged);
     };
-  }, [i18n]);
+  }, [i18n, changeLanguage]);
 
-  async function changeLanguage(languageCode) {
-    let normalized = normalizeLanguageCode(languageCode);
-    if (!ARABIC_LANGUAGE_ENABLED && normalized === 'ar') {
-      normalized = 'en';
-    }
-    try {
-      await i18n.changeLanguage(normalized);
-      setCurrentLanguage(normalized);
-      
-      const newRTLMode = isRTL(normalized);
-      setIsRTLMode(newRTLMode);
-      saveLanguagePreference(normalized);
-      
-      console.log('Language changed to:', normalized, 'RTL mode:', newRTLMode);
-      
-      // Update document attributes safely
-      if (typeof document !== 'undefined') {
-        document.documentElement.lang = normalized;
-        document.documentElement.dir = getTextDirection(normalized);
-        
-        // First, clean up any existing RTL/LTR classes to ensure clean state
-        console.log('Cleaning up existing RTL/LTR classes...');
-        cleanupRTLStyling();
-        
-        // Use specific class names to avoid conflicts
-        if (newRTLMode) {
-          document.body.classList.add('rtl-layout');
-          // Only apply RTL scrollbar when needed
-          forceRTLScrollbar();
-          console.log('RTL layout and scrollbar applied');
-        } else {
-          document.body.classList.add('ltr-layout');
-          console.log('LTR layout applied - all RTL styling cleaned up');
-        }
-        
-        // Debug: Check final state
-        console.log('Final RTL state after language change:');
-        debugRTLState();
+  // Re-evaluate after login/logout writes rbac_current_user.
+  useEffect(() => {
+    const onStorage = (event) => {
+      if (event.key && event.key !== 'rbac_current_user' && event.key !== 'preferred-language') {
+        return;
       }
-    } catch (error) {
-      console.error('Failed to change language:', error);
-    }
-  }
+      const allowed = isArabicUiEnabled(window.location?.pathname);
+      if (!allowed && normalizeLanguageCode(i18n?.language) === 'ar') {
+        void changeLanguage('en');
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [changeLanguage, i18n]);
 
   const toggleLanguage = () => {
-    if (!ARABIC_LANGUAGE_ENABLED) return;
+    if (!isArabicUiEnabled(window.location?.pathname)) return;
     const current = normalizeLanguageCode(currentLanguage);
     const newLanguage = current === 'ar' ? 'en' : 'ar';
     void changeLanguage(newLanguage);
@@ -118,7 +128,9 @@ export const LocalizationProvider = ({ children }) => {
     changeLanguage,
     toggleLanguage,
     textDirection: getTextDirection(currentLanguage),
-    arabicEnabled: ARABIC_LANGUAGE_ENABLED,
+    arabicEnabled,
+    featureArabicEnabled: ARABIC_LANGUAGE_ENABLED,
+    supportedLanguages: getSupportedLanguages(location.pathname),
   };
 
   return (

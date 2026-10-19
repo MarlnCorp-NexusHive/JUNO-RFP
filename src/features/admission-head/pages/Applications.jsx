@@ -46,7 +46,7 @@ function StatusDonutChart({ data, t }) {
     '#ef4444', // red
     '#3b82f6', // blue
     '#a21caf', // purple
-    '#6366f1', // indigo
+    '#1A5336', // indigo
     '#10b981', // emerald
   ];
   return (
@@ -474,7 +474,7 @@ export default function Applications() {
                         <span className="relative flex items-center">
                           <svg width="28" height="28">
                             <circle cx="14" cy="14" r="12" fill="#f3f4f6" />
-                            <circle cx="14" cy="14" r="12" fill="none" stroke="#6366f1" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
+                            <circle cx="14" cy="14" r="12" fill="none" stroke="#1A5336" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
                           </svg>
                           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-blue-700 dark:text-blue-300">{app.ai.likelihood}%</span>
                         </span>
@@ -513,7 +513,7 @@ export default function Applications() {
                 <div className="flex items-center gap-2">
                   <svg width="28" height="28">
                     <circle cx="14" cy="14" r="12" fill="#f3f4f6" />
-                    <circle cx="14" cy="14" r="12" fill="none" stroke="#6366f1" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
+                    <circle cx="14" cy="14" r="12" fill="none" stroke="#1A5336" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
                   </svg>
                   <span className="text-xs font-bold text-blue-700 dark:text-blue-300">{app.ai.likelihood}% {t('applications.ai.likelihood')}</span>
                   {app.ai.topPercentile && <span className="ml-1 bg-green-200 text-green-800 text-xs px-2 py-0.5 rounded-full animate-pulse">{t('applications.ai.topPercentile')}</span>}

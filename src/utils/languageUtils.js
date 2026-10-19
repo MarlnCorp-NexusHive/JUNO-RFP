@@ -1,10 +1,11 @@
 import { isRTL } from './rtl.js';
 
 /**
- * Flip to `true` to re-enable Arabic UI + language switchers.
- * Arabic locale files and i18n resources stay loaded either way — do not delete them.
+ * Master switch for Proposal Manager demo Arabic support.
+ * When true: Arabic is available on login + for Proposal Manager sessions.
+ * Other RBAC roles still stay English-only. Locale files remain loaded either way.
  */
-export const ARABIC_LANGUAGE_ENABLED = false;
+export const ARABIC_LANGUAGE_ENABLED = true;
 
 /** Full catalog (kept for when Arabic is re-enabled). */
 export const ALL_SUPPORTED_LANGUAGES = [
@@ -12,10 +13,59 @@ export const ALL_SUPPORTED_LANGUAGES = [
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
 ];
 
-/** Languages offered in the UI right now. */
-export const SUPPORTED_LANGUAGES = ARABIC_LANGUAGE_ENABLED
-  ? ALL_SUPPORTED_LANGUAGES
-  : ALL_SUPPORTED_LANGUAGES.filter((lang) => lang.code === 'en');
+function readCurrentUser() {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    const raw = localStorage.getItem('rbac_current_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function isProposalManagerUser(user = readCurrentUser()) {
+  if (!user || typeof user !== 'object') return false;
+  const username = String(user.username || '').toLowerCase();
+  const role = String(user.role || '').toLowerCase();
+  const team = String(user.team || '').toLowerCase();
+  return (
+    username === 'proposal_manager' ||
+    role === 'proposal manager' ||
+    team === 'proposal team' ||
+    Boolean(user.isTrialUser)
+  );
+}
+
+/**
+ * Arabic UI is allowed on the shared login page and for Proposal Manager
+ * (demo + trial) sessions — including /app and related chrome.
+ */
+export function isArabicUiEnabled(pathname) {
+  if (!ARABIC_LANGUAGE_ENABLED) return false;
+
+  const path =
+    pathname != null
+      ? String(pathname)
+      : typeof window !== 'undefined'
+        ? String(window.location?.pathname || '')
+        : '';
+
+  if (path === '/' || path.startsWith('/login')) return true;
+  if (path.startsWith('/app')) return true;
+  if (path.startsWith('/corporate-info') && isProposalManagerUser()) return true;
+
+  return isProposalManagerUser();
+}
+
+/** Languages offered in the UI for the current context. */
+export function getSupportedLanguages(pathname) {
+  return isArabicUiEnabled(pathname)
+    ? ALL_SUPPORTED_LANGUAGES
+    : ALL_SUPPORTED_LANGUAGES.filter((lang) => lang.code === 'en');
+}
+
+/** @deprecated Prefer getSupportedLanguages() — kept for older imports. */
+export const SUPPORTED_LANGUAGES = ALL_SUPPORTED_LANGUAGES;
 
 export const getLanguageByCode = (code) => {
   return ALL_SUPPORTED_LANGUAGES.find(lang => lang.code === code) || ALL_SUPPORTED_LANGUAGES[0];
@@ -26,9 +76,10 @@ export const getLanguageName = (code, currentLanguage = 'en') => {
   return currentLanguage === 'ar' ? language.nativeName : language.name;
 };
 
-export const saveLanguagePreference = (languageCode) => {
+export const saveLanguagePreference = (languageCode, pathname) => {
   try {
-    const code = !ARABIC_LANGUAGE_ENABLED && languageCode === 'ar' ? 'en' : languageCode;
+    const allowAr = isArabicUiEnabled(pathname);
+    const code = !allowAr && languageCode === 'ar' ? 'en' : languageCode;
     localStorage.setItem('preferred-language', code);
     document.documentElement.lang = code;
     document.documentElement.dir = isRTL(code) ? 'rtl' : 'ltr';
@@ -37,10 +88,10 @@ export const saveLanguagePreference = (languageCode) => {
   }
 };
 
-export const getLanguagePreference = () => {
+export const getLanguagePreference = (pathname) => {
   try {
     const saved = localStorage.getItem('preferred-language') || 'en';
-    if (!ARABIC_LANGUAGE_ENABLED && String(saved).toLowerCase().startsWith('ar')) {
+    if (!isArabicUiEnabled(pathname) && String(saved).toLowerCase().startsWith('ar')) {
       return 'en';
     }
     return saved;
@@ -50,10 +101,10 @@ export const getLanguagePreference = () => {
   }
 };
 
-export const detectUserLanguage = () => {
-  if (!ARABIC_LANGUAGE_ENABLED) return 'en';
+export const detectUserLanguage = (pathname) => {
+  if (!isArabicUiEnabled(pathname)) return 'en';
 
-  const saved = getLanguagePreference();
+  const saved = getLanguagePreference(pathname);
   if (saved) return saved;
   
   try {
@@ -65,8 +116,8 @@ export const detectUserLanguage = () => {
   }
 };
 
-export const isLanguageSupported = (languageCode) => {
-  return SUPPORTED_LANGUAGES.some(lang => lang.code === languageCode);
+export const isLanguageSupported = (languageCode, pathname) => {
+  return getSupportedLanguages(pathname).some(lang => lang.code === languageCode);
 };
 
 export const getDefaultLanguage = () => {

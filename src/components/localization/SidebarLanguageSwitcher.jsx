@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../../hooks/useLocalization';
 import { useTranslation } from 'react-i18next';
-import { ARABIC_LANGUAGE_ENABLED } from '../../utils/languageUtils';
 
 const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
-  const { currentLanguage, toggleLanguage } = useLocalization();
+  const { currentLanguage, toggleLanguage, arabicEnabled } = useLocalization();
   const { t } = useTranslation('common');
   const isEnglish = String(currentLanguage || 'en').toLowerCase().startsWith('en');
   const [isHovered, setIsHovered] = useState(false);
@@ -15,27 +14,28 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
 
   // Glow animation every 6 seconds
   useEffect(() => {
-    if (!ARABIC_LANGUAGE_ENABLED) return undefined;
+    if (!arabicEnabled) return undefined;
     const interval = setInterval(() => {
       setGlowAnimation(true);
       setTimeout(() => setGlowAnimation(false), 1500);
     }, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [arabicEnabled]);
 
-  // Arabic temporarily disabled — hide EN/AR toggle (locales kept for later).
-  if (!ARABIC_LANGUAGE_ENABLED) {
+  // Proposal Manager demo/trial (+ login) only — other roles stay English.
+  if (!arabicEnabled) {
     return null;
   }
+
+  const textClass = darkTheme ? 'text-emerald-50' : 'text-slate-800';
+  const hoverClass = darkTheme ? 'hover:bg-[#122018]' : 'hover:bg-[#F2F7F4]';
 
   return (
     <button
       onClick={toggleLanguage}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full text-white group relative overflow-hidden ${
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full ${textClass} group relative overflow-hidden ${
         expanded ? 'justify-start' : 'justify-center'
-      } ${
-        darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/30'
-      } ${glowAnimation ? 'shadow-lg shadow-green-400/10 ring-1 ring-green-400/5' : ''}`}
+      } ${hoverClass} ${glowAnimation ? 'shadow-lg shadow-green-400/10 ring-1 ring-green-400/5' : ''}`}
       style={{ background: "transparent" }}
       title={switchLabel}
       onMouseEnter={() => setIsHovered(true)}
@@ -65,7 +65,9 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
           
           {/* Main language text */}
           <span className={`font-bold text-lg relative z-10 transition-all duration-300 ${
-            isHovered ? 'text-green-200' : 'text-white'
+            isHovered
+              ? (darkTheme ? 'text-green-200' : 'text-[#1A5336]')
+              : (darkTheme ? 'text-emerald-50' : 'text-slate-800')
           }`}>
             {isEnglish ? 'EN' : 'AR'}
           </span>
@@ -77,7 +79,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
       
       {/* Text container for expanded mode */}
       {expanded && (
-        <span className={`text-white whitespace-nowrap transition-transform duration-200 ${
+        <span className={`whitespace-nowrap transition-transform duration-200 ${
           isHovered ? 'translate-x-1' : ''
         }`}>
           {switchLabel}

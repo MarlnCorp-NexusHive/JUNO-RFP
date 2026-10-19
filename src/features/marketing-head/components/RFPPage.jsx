@@ -159,7 +159,7 @@ function SortableSectionItem({ section, questions, isEditable, onEditSection, on
               {statusLabel}
             </span>
             {section.assignedDepartmentId && sectionStatus !== 'completed' && (
-              <button type="button" onClick={() => onSetSectionStatus(section.id, sectionStatus === 'not_sent' ? 'sent_for_response' : sectionStatus === 'sent_for_response' ? 'in_progress' : sectionStatus === 'in_progress' ? 'under_review' : 'completed')} className="px-2 py-1.5 text-xs font-medium rounded-lg bg-[#4f3cc9] text-white hover:bg-[#4330a8]">
+              <button type="button" onClick={() => onSetSectionStatus(section.id, sectionStatus === 'not_sent' ? 'sent_for_response' : sectionStatus === 'sent_for_response' ? 'in_progress' : sectionStatus === 'in_progress' ? 'under_review' : 'completed')} className="px-2 py-1.5 text-xs font-medium rounded-lg bg-[#1A5336] text-white hover:bg-[#4330a8]">
                 {sectionStatus === 'not_sent' ? t('rfp.sendForResponse') : sectionStatus === 'sent_for_response' ? t('rfp.inProgress') : sectionStatus === 'in_progress' ? t('rfp.sendForReview') : t('rfp.markReviewed')}
               </button>
             )}
@@ -393,12 +393,12 @@ export default function RFPPage() {
   const deleteRepositoryEntry = (id) => setContentRepository((prev) => prev.filter((e) => e.id !== id));
 
   return (
-    <div className={`min-h-full bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRtl ? 'rtl' : 'ltr'}`} dir={dir}>
+    <div className={`min-h-full bg-[#F8F9F8] dark:bg-[#0B1410] ${isRtl ? 'rtl' : 'ltr'}`} dir={dir}>
       <header className="mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <FiFileText className="w-8 h-8 text-[#4f3cc9]" />
+              <FiFileText className="w-8 h-8 text-[#1A5336]" />
               {t('rfp.title')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">{rfp.basicInfo?.projectName || t('rfp.subtitle')}</p>
@@ -423,7 +423,7 @@ export default function RFPPage() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl font-medium transition-colors ${activeTab === tab.id ? 'bg-[#4f3cc9] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              className={`px-4 py-2 rounded-xl font-medium transition-colors ${activeTab === tab.id ? 'bg-[#1A5336] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             >
               {t(`rfp.${tab.labelKey}`)}
             </button>
@@ -441,58 +441,58 @@ export default function RFPPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.projectName')} <span className="text-red-500">*</span></label>
-                <input type="text" value={rfp.basicInfo?.projectName ?? ''} onChange={(e) => setBasicInfo('projectName', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" required />
+                <input type="text" value={rfp.basicInfo?.projectName ?? ''} onChange={(e) => setBasicInfo('projectName', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.department')}</label>
-                <input type="text" value={rfp.basicInfo?.department ?? ''} onChange={(e) => setBasicInfo('department', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="text" value={rfp.basicInfo?.department ?? ''} onChange={(e) => setBasicInfo('department', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.objective')} <span className="text-red-500">*</span></label>
-              <textarea value={rfp.basicInfo?.objective ?? ''} onChange={(e) => setBasicInfo('objective', e.target.value)} rows={4} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" required />
+              <textarea value={rfp.basicInfo?.objective ?? ''} onChange={(e) => setBasicInfo('objective', e.target.value)} rows={4} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" required />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.budgetRange')}</label>
-                <input type="text" value={rfp.basicInfo?.budgetRange ?? ''} onChange={(e) => setBasicInfo('budgetRange', e.target.value)} disabled={!isEditable} placeholder="e.g. $50,000 - $75,000" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="text" value={rfp.basicInfo?.budgetRange ?? ''} onChange={(e) => setBasicInfo('budgetRange', e.target.value)} disabled={!isEditable} placeholder="e.g. $50,000 - $75,000" className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.submissionDeadline')}</label>
-                <input type="date" value={rfp.basicInfo?.submissionDeadline ?? ''} onChange={(e) => setBasicInfo('submissionDeadline', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="date" value={rfp.basicInfo?.submissionDeadline ?? ''} onChange={(e) => setBasicInfo('submissionDeadline', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.timelineStart')}</label>
-                <input type="date" value={rfp.basicInfo?.timelineStart ?? ''} onChange={(e) => setBasicInfo('timelineStart', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="date" value={rfp.basicInfo?.timelineStart ?? ''} onChange={(e) => setBasicInfo('timelineStart', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.timelineEnd')}</label>
-                <input type="date" value={rfp.basicInfo?.timelineEnd ?? ''} onChange={(e) => setBasicInfo('timelineEnd', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="date" value={rfp.basicInfo?.timelineEnd ?? ''} onChange={(e) => setBasicInfo('timelineEnd', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.vendorRequirements')}</label>
-              <textarea value={rfp.basicInfo?.vendorRequirements ?? ''} onChange={(e) => setBasicInfo('vendorRequirements', e.target.value)} rows={3} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+              <textarea value={rfp.basicInfo?.vendorRequirements ?? ''} onChange={(e) => setBasicInfo('vendorRequirements', e.target.value)} rows={3} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.evaluationCriteria')}</label>
-              <textarea value={rfp.basicInfo?.evaluationCriteria ?? ''} onChange={(e) => setBasicInfo('evaluationCriteria', e.target.value)} rows={3} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+              <textarea value={rfp.basicInfo?.evaluationCriteria ?? ''} onChange={(e) => setBasicInfo('evaluationCriteria', e.target.value)} rows={3} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.contactPerson')}</label>
-                <input type="text" value={rfp.basicInfo?.contactPerson ?? ''} onChange={(e) => setBasicInfo('contactPerson', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="text" value={rfp.basicInfo?.contactPerson ?? ''} onChange={(e) => setBasicInfo('contactPerson', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.contactEmail')}</label>
-                <input type="email" value={rfp.basicInfo?.contactEmail ?? ''} onChange={(e) => setBasicInfo('contactEmail', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+                <input type="email" value={rfp.basicInfo?.contactEmail ?? ''} onChange={(e) => setBasicInfo('contactEmail', e.target.value)} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.additionalNotes')}</label>
-              <textarea value={rfp.basicInfo?.additionalNotes ?? ''} onChange={(e) => setBasicInfo('additionalNotes', e.target.value)} rows={3} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4f3cc9] disabled:opacity-70" />
+              <textarea value={rfp.basicInfo?.additionalNotes ?? ''} onChange={(e) => setBasicInfo('additionalNotes', e.target.value)} rows={3} disabled={!isEditable} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#1A5336] disabled:opacity-70" />
             </div>
           </form>
         </div>
@@ -504,7 +504,7 @@ export default function RFPPage() {
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('rfp.sectionsAndQuestions')}</h2>
             {isEditable && (
-              <button type="button" onClick={() => setSectionModal({ mode: 'add' })} className="inline-flex items-center gap-2 px-4 py-2 bg-[#4f3cc9] text-white rounded-xl hover:bg-[#4330a8]">
+              <button type="button" onClick={() => setSectionModal({ mode: 'add' })} className="inline-flex items-center gap-2 px-4 py-2 bg-[#1A5336] text-white rounded-xl hover:bg-[#4330a8]">
                 <FiPlus className="w-5 h-5" /> {t('rfp.addSection')}
               </button>
             )}
@@ -563,7 +563,7 @@ export default function RFPPage() {
             {isEditable && (
               <>
                 <input ref={fileInputRef} type="file" multiple accept=".pdf,.xlsx,.xls,.doc,.docx,.txt,image/*" className="hidden" onChange={onFileUpload} />
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="inline-flex items-center gap-2 px-4 py-2 bg-[#4f3cc9] text-white rounded-xl hover:bg-[#4330a8]">
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="inline-flex items-center gap-2 px-4 py-2 bg-[#1A5336] text-white rounded-xl hover:bg-[#4330a8]">
                   <FiUpload className="w-5 h-5" /> {t('rfp.uploadAttachments')}
                 </button>
               </>
@@ -627,7 +627,7 @@ export default function RFPPage() {
       {activeTab === 'preview' && (
         <div className="space-y-4">
           <div className={`flex ${isRtl ? 'flex-row-reverse' : ''} gap-3 flex-wrap`}>
-            <button type="button" onClick={() => handleDownload()} className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#4f3cc9] text-white font-semibold rounded-xl hover:bg-[#4330a8]">
+            <button type="button" onClick={() => handleDownload()} className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1A5336] text-white font-semibold rounded-xl hover:bg-[#4330a8]">
               <FiDownload className="w-5 h-5" /> {t('rfp.download')}
             </button>
             <button type="button" onClick={() => handleDownloadExcel()} className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700">
@@ -636,22 +636,22 @@ export default function RFPPage() {
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div ref={printRef} className="p-8 md:p-12 text-gray-900 dark:text-gray-100 space-y-8">
-              <div className="border-b-2 border-[#4f3cc9] pb-4">
+              <div className="border-b-2 border-[#1A5336] pb-4">
                 <h1 className="text-2xl font-bold">REQUEST FOR PROPOSAL</h1>
                 <p className="text-lg text-gray-600 dark:text-gray-400 mt-1">{rfp.basicInfo?.projectName || '—'}</p>
                 <p className="text-sm text-gray-500 mt-1">{t('rfp.status')}: {t(`rfp.${rfp.status}`)}</p>
               </div>
               <section>
-                <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">1. Project / Initiative</h2>
+                <h2 className="text-lg font-semibold text-[#1A5336] mb-2">1. Project / Initiative</h2>
                 <p className="text-gray-700 dark:text-gray-300">{rfp.basicInfo?.projectName || '—'}</p>
                 {rfp.basicInfo?.department && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Department: {rfp.basicInfo.department}</p>}
               </section>
               <section>
-                <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">2. Objective & Scope</h2>
+                <h2 className="text-lg font-semibold text-[#1A5336] mb-2">2. Objective & Scope</h2>
                 <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">{rfp.basicInfo?.objective || '—'}</p>
               </section>
               <section>
-                <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">3. Budget & Timeline</h2>
+                <h2 className="text-lg font-semibold text-[#1A5336] mb-2">3. Budget & Timeline</h2>
                 <p><span className="font-medium">Budget range:</span> {rfp.basicInfo?.budgetRange || '—'}</p>
                 <p className="mt-1"><span className="font-medium">Start date:</span> {rfp.basicInfo?.timelineStart || '—'}</p>
                 <p><span className="font-medium">End date:</span> {rfp.basicInfo?.timelineEnd || '—'}</p>
@@ -659,7 +659,7 @@ export default function RFPPage() {
               </section>
               {[...rfp.sections].sort((a, b) => a.order - b.order).map((sec, idx) => (
                 <section key={sec.id}>
-                  <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">{idx + 4}. {sec.title}</h2>
+                  <h2 className="text-lg font-semibold text-[#1A5336] mb-2">{idx + 4}. {sec.title}</h2>
                   <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                     {rfp.questions.filter((q) => q.sectionId === sec.id).sort((a, b) => a.order - b.order).map((q) => (
                       <li key={q.id}>{q.text} {q.required && '*'}</li>
@@ -668,18 +668,18 @@ export default function RFPPage() {
                 </section>
               ))}
               <section>
-                <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">Vendor Requirements & Evaluation</h2>
+                <h2 className="text-lg font-semibold text-[#1A5336] mb-2">Vendor Requirements & Evaluation</h2>
                 <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">{rfp.basicInfo?.vendorRequirements || '—'}</p>
                 <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300 mt-2">{rfp.basicInfo?.evaluationCriteria || '—'}</p>
               </section>
               {rfp.basicInfo?.additionalNotes && (
                 <section>
-                  <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">Additional Notes</h2>
+                  <h2 className="text-lg font-semibold text-[#1A5336] mb-2">Additional Notes</h2>
                   <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">{rfp.basicInfo.additionalNotes}</p>
                 </section>
               )}
               <section className="pt-4 border-t border-gray-200 dark:border-gray-600">
-                <h2 className="text-lg font-semibold text-[#4f3cc9] mb-2">Contact</h2>
+                <h2 className="text-lg font-semibold text-[#1A5336] mb-2">Contact</h2>
                 <p><span className="font-medium">Name:</span> {rfp.basicInfo?.contactPerson || '—'}</p>
                 <p><span className="font-medium">Email:</span> {rfp.basicInfo?.contactEmail || '—'}</p>
               </section>
@@ -825,7 +825,7 @@ function ContentRepositoryEditor({ entries, onAdd, onUpdate, onDelete, t }) {
         <input type="text" value={questionText} onChange={(e) => setQuestionText(e.target.value)} placeholder={t('rfp.questionPlaceholder')} className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
         <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} rows={2} placeholder={t('rfp.answerPlaceholder')} className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
         <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder={t('rfp.categoryOptional')} className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
-        <button type="submit" className="px-4 py-2 rounded-xl bg-[#4f3cc9] text-white hover:bg-[#4330a8] font-medium">{t('rfp.addEntry')}</button>
+        <button type="submit" className="px-4 py-2 rounded-xl bg-[#1A5336] text-white hover:bg-[#4330a8] font-medium">{t('rfp.addEntry')}</button>
       </form>
       <div>
         <h3 className="font-medium text-gray-900 dark:text-white mb-3">Saved entries</h3>
@@ -871,7 +871,7 @@ function SectionModal({ mode, section, onSave, onClose, t }) {
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('rfp.sectionTitle')} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white mb-4" autoFocus />
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
-          <button type="button" onClick={() => onSave(title)} className="px-4 py-2 rounded-xl bg-[#4f3cc9] text-white hover:bg-[#4330a8]">Save</button>
+          <button type="button" onClick={() => onSave(title)} className="px-4 py-2 rounded-xl bg-[#1A5336] text-white hover:bg-[#4330a8]">Save</button>
         </div>
       </div>
     </div>
@@ -903,7 +903,7 @@ function QuestionModal({ mode, question, sectionId, onSave, onClose, t }) {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <input type="checkbox" id="q-required" checked={required} onChange={(e) => setRequired(e.target.checked)} className="rounded border-gray-300 text-[#4f3cc9]" />
+            <input type="checkbox" id="q-required" checked={required} onChange={(e) => setRequired(e.target.checked)} className="rounded border-gray-300 text-[#1A5336]" />
             <label htmlFor="q-required" className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('rfp.required')}</label>
           </div>
           <div>
@@ -919,7 +919,7 @@ function QuestionModal({ mode, question, sectionId, onSave, onClose, t }) {
         </div>
         <div className="flex justify-end gap-2 mt-6">
           <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
-          <button type="button" onClick={() => onSave({ text, answerType, required, weight: weight.trim(), choices: choicesText.split('\n').map((s) => s.trim()).filter(Boolean) })} className="px-4 py-2 rounded-xl bg-[#4f3cc9] text-white hover:bg-[#4330a8]">Save</button>
+          <button type="button" onClick={() => onSave({ text, answerType, required, weight: weight.trim(), choices: choicesText.split('\n').map((s) => s.trim()).filter(Boolean) })} className="px-4 py-2 rounded-xl bg-[#1A5336] text-white hover:bg-[#4330a8]">Save</button>
         </div>
       </div>
     </div>
@@ -947,7 +947,7 @@ function InviteVendorForm({ onInvite, t }) {
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('rfp.vendorEmail')}</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('rfp.vendorEmail')} className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
       </div>
-      <button type="submit" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#4f3cc9] text-white rounded-xl hover:bg-[#4330a8]">
+      <button type="submit" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1A5336] text-white rounded-xl hover:bg-[#4330a8]">
         <FiUserPlus className="w-5 h-5" /> {t('rfp.inviteVendor')}
       </button>
     </form>
@@ -968,7 +968,7 @@ function VendorResponseModal({ vendor, questions, sections, initialAnswers, cont
         return (
           <div>
             <textarea value={value} onChange={(e) => setValue(e.target.value)} onFocus={applyFromRepository} rows={3} className={inputClass} />
-            {repoMatch && <button type="button" onClick={applyFromRepository} className="mt-1 text-xs text-[#4f3cc9] hover:underline">{t('rfp.insertFromRepository')}</button>}
+            {repoMatch && <button type="button" onClick={applyFromRepository} className="mt-1 text-xs text-[#1A5336] hover:underline">{t('rfp.insertFromRepository')}</button>}
           </div>
         );
       case 'yesNo':
@@ -1002,7 +1002,7 @@ function VendorResponseModal({ vendor, questions, sections, initialAnswers, cont
         return (
           <div>
             <input type="text" value={value} onChange={(e) => setValue(e.target.value)} onFocus={applyFromRepository} className={inputClass} />
-            {repoMatch && <button type="button" onClick={applyFromRepository} className="mt-1 text-xs text-[#4f3cc9] hover:underline">{t('rfp.insertFromRepository')}</button>}
+            {repoMatch && <button type="button" onClick={applyFromRepository} className="mt-1 text-xs text-[#1A5336] hover:underline">{t('rfp.insertFromRepository')}</button>}
           </div>
         );
     }
@@ -1020,7 +1020,7 @@ function VendorResponseModal({ vendor, questions, sections, initialAnswers, cont
             if (secQuestions.length === 0) return null;
             return (
               <div key={sec.id}>
-                <h4 className="font-medium text-[#4f3cc9] mb-3">{sec.title}</h4>
+                <h4 className="font-medium text-[#1A5336] mb-3">{sec.title}</h4>
                 <ul className="space-y-3">
                   {secQuestions.map((q) => (
                     <li key={q.id}>
@@ -1035,7 +1035,7 @@ function VendorResponseModal({ vendor, questions, sections, initialAnswers, cont
         </div>
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
-          <button type="button" onClick={() => onSave(answers)} className="px-4 py-2 rounded-xl bg-[#4f3cc9] text-white hover:bg-[#4330a8]">Save Response</button>
+          <button type="button" onClick={() => onSave(answers)} className="px-4 py-2 rounded-xl bg-[#1A5336] text-white hover:bg-[#4330a8]">Save Response</button>
         </div>
       </div>
     </div>

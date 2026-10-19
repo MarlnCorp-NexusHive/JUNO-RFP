@@ -15,14 +15,15 @@ const ThemeToggleButton = ({ expanded, darkTheme, onToggle, isRTLMode = false })
     return () => clearInterval(interval);
   }, []);
 
+  const textClass = darkTheme ? 'text-emerald-50' : 'text-slate-800';
+  const hoverClass = darkTheme ? 'hover:bg-[#122018]' : 'hover:bg-[#F2F7F4]';
+
   return (
     <button
       onClick={onToggle}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full text-white group relative overflow-hidden ${
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full ${textClass} group relative overflow-hidden ${
         expanded ? (isRTLMode ? 'justify-end' : 'justify-start') : 'justify-center'
-      } ${
-        darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/30'
-      } ${glowAnimation ? (darkTheme ? 'shadow-lg shadow-orange-400/15 ring-1 ring-orange-400/10' : 'shadow-lg shadow-blue-400/15 ring-1 ring-blue-400/10') : ''}`}
+      } ${hoverClass} ${glowAnimation ? (darkTheme ? 'shadow-lg shadow-orange-400/15 ring-1 ring-orange-400/10' : 'shadow-lg shadow-emerald-400/15 ring-1 ring-emerald-400/10') : ''}`}
       style={{ background: "transparent" }}
       title={darkTheme ? t('sidebar.switchToLightMode') : t('sidebar.switchToDarkMode')}
       onMouseEnter={() => setIsHovered(true)}
@@ -54,13 +55,13 @@ const ThemeToggleButton = ({ expanded, darkTheme, onToggle, isRTLMode = false })
           <div className="relative z-10">
             {darkTheme ? (
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className={`w-5 h-5 transition-all duration-300 ${
-                isHovered ? 'text-orange-200' : 'text-white'
+                isHovered ? 'text-orange-200' : 'text-emerald-100'
               }`}>
                 <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/>
               </svg>
             ) : (
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className={`w-5 h-5 transition-all duration-300 ${
-                isHovered ? 'text-yellow-200' : 'text-white'
+                isHovered ? 'text-[#1A5336]' : 'text-slate-700'
               }`}>
                 <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z" fill="currentColor"/>
               </svg>
@@ -74,7 +75,7 @@ const ThemeToggleButton = ({ expanded, darkTheme, onToggle, isRTLMode = false })
       
       {/* Text container for expanded mode */}
       {expanded && (
-        <span className={`text-white whitespace-nowrap transition-transform duration-200 flex-1 ${
+        <span className={`whitespace-nowrap transition-transform duration-200 flex-1 ${
           isHovered ? (isRTLMode ? 'translate-x-1' : 'translate-x-1') : ''
         } ${isRTLMode ? 'text-right order-1' : 'text-left'}`}>
           {darkTheme ? t('sidebar.darkMode') : t('sidebar.lightMode')}

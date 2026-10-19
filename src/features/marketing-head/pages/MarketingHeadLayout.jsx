@@ -28,7 +28,7 @@ export default function MarketingHeadLayout() {
   
   return (
     <TourProvider>
-      <div className="flex h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+      <div className="flex h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
         <Sidebar 
           features={useMemo(() => getSidebarFeatures(user?.username), [user?.username])} 
           userLabel={userLabel} 

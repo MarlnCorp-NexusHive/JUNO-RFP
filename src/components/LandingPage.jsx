@@ -26,30 +26,30 @@ export default function LandingPage() {
       {/* Cookie Consent Popup */}
       {showCookieConsent && (
         <div className="fixed left-0 right-0 bottom-0 w-full z-50">
-          <div className="mx-auto w-[85%] bg-gradient-to-r from-[#d1c4e9] to-[#90caf9] rounded-2xl shadow-xl border border-[#e0e0e0] px-6 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-4 mb-4">
+          <div className="mx-auto w-[85%] bg-gradient-to-r from-[#e4ede7] to-[#c5d9cb] rounded-2xl shadow-xl border border-[#e0e0e0] px-6 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-4 mb-4">
             <div className="flex-1 min-w-0">
-              <div className="font-bold text-base text-[#3B2175] mb-0.5">Help us improve your experience</div>
+              <div className="font-bold text-base text-[#1A5336] mb-0.5">Help us improve your experience</div>
               <div className="text-xs text-[#23232B] max-w-2xl leading-snug">
                 We use cookies and similar technologies to deliver, maintain, and improve our services, and for security purposes. We also use these technologies to understand how users interact with our services (including the effectiveness of our ad campaigns). Learn more in our{' '}
-                <Link to="/cookie-policy" className="underline text-[#3B2175] hover:text-[#6C4A7C]">Cookie Policy</Link>.
+                <Link to="/cookie-policy" className="underline text-[#1A5336] hover:text-[#164430]">Cookie Policy</Link>.
               </div>
             </div>
             <div className="flex gap-3 items-center justify-center mt-2 md:mt-0 flex-shrink-0">
               <button
                 onClick={() => setShowCookieConsent(false)}
-                className="px-5 py-2 rounded-full bg-white text-[#7C3AED] font-semibold shadow-md border border-[#e0e0e0] hover:bg-[#f3e8ff] transition-all text-sm"
+                className="px-5 py-2 rounded-full bg-white text-[#1A5336] font-semibold shadow-md border border-[#e0e0e0] hover:bg-[#E4EDE7] transition-all text-sm"
               >
                 Reject non-essential
               </button>
               <button
                 onClick={handleAcceptCookies}
-                className="px-5 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#7C6CFA] text-white font-semibold shadow-md border-0 hover:opacity-90 transition-all text-sm"
+                className="px-5 py-2 rounded-full bg-gradient-to-r from-[#1A5336] to-[#3d7a52] text-white font-semibold shadow-md border-0 hover:opacity-90 transition-all text-sm"
               >
                 Accept all
               </button>
             </div>
           </div>
-          <div className="w-full text-center text-xs text-[#3B2175] opacity-80 pb-2">
+          <div className="w-full text-center text-xs text-[#1A5336] opacity-80 pb-2">
             By messaging MARLN, you agree to our <a href="#" className="underline">Terms</a> and have read our <a href="#" className="underline">Privacy Policy</a>.
           </div>
         </div>
@@ -82,8 +82,8 @@ export default function LandingPage() {
               className="h-12 w-12 object-contain"
             />
             <div>
-              <div className="text-2xl font-bold text-[#3B2175] leading-none">MARLN</div>
-              <div className="text-xs tracking-wide text-[#3B2175] font-medium">KEEP LEARNING, KEEP BUZZING</div>
+              <div className="text-2xl font-bold text-[#1A5336] leading-none">MARLN</div>
+              <div className="text-xs tracking-wide text-[#1A5336] font-medium">KEEP LEARNING, KEEP BUZZING</div>
             </div>
           </div>
           {/* Navigation */}
@@ -122,7 +122,7 @@ export default function LandingPage() {
       </section>
 
       {/* Product Video Section - styled as per screenshot */}
-      <section className="relative w-full bg-[#F6F7FA] py-24 overflow-x-clip">
+      <section className="relative w-full bg-[#F8F9F8] py-24 overflow-x-clip">
         {/* Testimonial bubble */}
         <div className="absolute right-10 top-0 z-10 flex items-center gap-2">
           <div className="relative">
@@ -159,7 +159,7 @@ export default function LandingPage() {
       </section>
 
       {/* App Grid Section */}
-      <section className="relative w-full bg-[#F6F7FA] pb-24 pt-0 overflow-x-clip min-h-[600px] flex flex-col items-center">
+      <section className="relative w-full bg-[#F8F9F8] pb-24 pt-0 overflow-x-clip min-h-[600px] flex flex-col items-center">
         {/* Large, soft white curve in the background */}
         <div className="absolute top-0 left-0 w-full" style={{height: '340px', zIndex: 0}}>
           <svg viewBox="0 0 1440 340" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -224,7 +224,7 @@ export default function LandingPage() {
       <section className="w-full flex flex-col md:flex-row items-center justify-center py-16 px-4 bg-white">
         {/* Video Block */}
         <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0 md:mr-8">
-          <div className="border-2 border-[#B388FF] rounded-lg overflow-hidden shadow-sm w-full max-w-lg">
+          <div className="border-2 border-[#9fbfa9] rounded-lg overflow-hidden shadow-sm w-full max-w-lg">
             <video
               controls
               poster={marlnLogo}
@@ -256,7 +256,7 @@ export default function LandingPage() {
       <section className="w-full flex flex-col md:flex-row items-center justify-center py-16 px-4 bg-white">
         {/* Image Block */}
         <div className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0 md:mr-8">
-          <div className="border-2 border-[#B388FF] rounded-lg overflow-hidden shadow-sm w-full max-w-lg">
+          <div className="border-2 border-[#9fbfa9] rounded-lg overflow-hidden shadow-sm w-full max-w-lg">
             <img
               src="https://lms-frontend-resources.s3.ap-south-1.amazonaws.com/NexusHiveCRM/Image-2.png"
               alt="Collaborative Learning"
@@ -412,7 +412,7 @@ function CustomVideoPlayer() {
         ref={videoRef}
         src="https://lms-frontend-resources.s3.ap-south-1.amazonaws.com/NexusHiveCRM/NexusHive-LandingPage-AI-Video.mp4"
         poster={nexushiveLogo}
-        className="w-full h-[500px] object-contain rounded-xl bg-[#F6F7FA]"
+        className="w-full h-[500px] object-contain rounded-xl bg-[#F8F9F8]"
         style={{outline: 'none'}}
         onClick={handlePlayPause}
       />
@@ -420,7 +420,7 @@ function CustomVideoPlayer() {
       <div className="w-full flex items-center gap-3 mt-2 px-2">
         <button
           onClick={handlePlayPause}
-          className="focus:outline-none text-[#6C4A7C] hover:text-[#3B2175] text-xl"
+          className="focus:outline-none text-[#164430] hover:text-[#1A5336] text-xl"
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
@@ -435,14 +435,14 @@ function CustomVideoPlayer() {
         >
           <div className="absolute top-1/2 left-0 w-full h-1 bg-[#E3E3E3] rounded-full -translate-y-1/2" />
           <div
-            className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-[#6C4A7C] to-[#3B2175] rounded-full -translate-y-1/2 transition-all"
+            className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-[#1A5336] to-[#0d281c] rounded-full -translate-y-1/2 transition-all"
             style={{ width: duration ? `${(progress / duration) * 100}%` : '0%' }}
           />
           <div
             className="absolute top-1/2"
             style={{ left: duration ? `calc(${(progress / duration) * 100}% - 7px)` : '-7px', transform: 'translateY(-50%)' }}
           >
-            <div className="w-3 h-3 bg-[#3B2175] rounded-full shadow-md border-2 border-white group-hover:scale-110 transition-transform" />
+            <div className="w-3 h-3 bg-[#1A5336] rounded-full shadow-md border-2 border-white group-hover:scale-110 transition-transform" />
           </div>
         </div>
         <span className="text-xs text-gray-500 min-w-[48px] text-right">

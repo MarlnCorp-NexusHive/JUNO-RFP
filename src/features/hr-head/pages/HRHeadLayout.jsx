@@ -19,7 +19,7 @@ const HRHeadLayout = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <Sidebar features={features} userLabel="HR Head" />
       <main className="flex-1 overflow-y-auto p-8">
         <Outlet />

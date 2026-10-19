@@ -293,7 +293,7 @@ export default function ProposalManagerContentHub() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F7FA] dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-[#F8F9F8] dark:bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         <div
           data-tour="1"

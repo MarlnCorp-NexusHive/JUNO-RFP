@@ -11,7 +11,7 @@ export default function AdmissionHeadLayout() {
   
   return (
     <TourProvider>
-      <div className="flex h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+      <div className="flex h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
         <Sidebar features={admissionHeadFeatures} userLabel={user?.displayName || t('roles.admissionHead')} />
         <main className="flex-1 overflow-y-auto">
           <div className="p-6 md:p-8 lg:p-10 flex flex-col gap-6">

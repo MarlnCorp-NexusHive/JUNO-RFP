@@ -34,7 +34,7 @@ export default function CorporateInfo() {
   // Show loading state while translations are loading
   if (!ready) {
     return (
-      <div className="min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300">Loading...</p>
@@ -91,7 +91,7 @@ export default function CorporateInfo() {
   const tabs = ['overview', 'features'];
 
   return (
-    <div key={`${i18n.language}-${languageVersion}`} className={`min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? 'rtl' : 'ltr'}`} dir={isRTLMode ? 'rtl' : 'ltr'}>
+    <div key={`${i18n.language}-${languageVersion}`} className={`min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`} dir={isRTLMode ? 'rtl' : 'ltr'}>
       {/* Header with Hero Section */}
       <div className="relative bg-white dark:bg-gray-800 shadow-lg overflow-hidden">
         {/* Hero Background */}

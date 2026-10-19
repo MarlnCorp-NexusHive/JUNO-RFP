@@ -51,6 +51,15 @@ import { filterOpenListings } from "../services/openListingFilter.js";
 import { sortListings } from "../services/listingSort.js";
 import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 import { formatDateTime24 } from '../../../utils/dateTime';
+import {
+  GRANARY_BTN_PRIMARY,
+  GRANARY_BTN_SECONDARY,
+  GRANARY_CARD,
+  GRANARY_CARD_ACTIVE,
+  GRANARY_CARD_SOFT,
+  GRANARY_INPUT,
+  GRANARY_PANEL,
+} from "../../../styles/granarySurfaces.js";
 
 /** Open/posted only — forecasted and closed/archived are excluded from the desk. */
 const STATUS_OPTIONS = [
@@ -87,8 +96,7 @@ function findSourceMeta(modeId) {
   return ALL_SOURCE_MODES.find((m) => m.id === modeId) || null;
 }
 
-const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
+const inputClass = GRANARY_INPUT;
 
 function daysUntil(closeDate) {
   if (!closeDate) return null;
@@ -194,7 +202,7 @@ function formatAlnPreview(list, moreFn) {
 function DetailField({ label, children }) {
   if (children == null || children === "" || (Array.isArray(children) && !children.length)) return null;
   return (
-    <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-800/50">
+    <div className={`min-w-0 ${GRANARY_CARD_SOFT} p-3`}>
       <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {label}
       </dt>
@@ -211,7 +219,7 @@ function ExpandableText({ text, label, moreLabel, lessLabel }) {
   if (!clean) return null;
   const long = clean.length > 700;
   return (
-    <section aria-label={label} className="rounded-xl border border-slate-100 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
+    <section aria-label={label} className={`${GRANARY_CARD} p-4`}>
       <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</h3>
       <p
         className={`mt-2 text-sm leading-relaxed text-slate-800 dark:text-slate-100 whitespace-pre-wrap break-words ${
@@ -316,7 +324,7 @@ function GrantDetailBody({ detail, t, copied, onCopy }) {
           {moneyCards.map((card) => (
             <div
               key={card.label}
-              className="rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-700 dark:from-slate-800 dark:to-slate-900"
+              className={`${GRANARY_CARD_SOFT} p-3`}
             >
               <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{card.label}</p>
               <p className="mt-1.5 flex items-center gap-1 text-sm font-bold text-slate-900 dark:text-white">
@@ -772,18 +780,18 @@ export default function GrantsPage() {
                   type="button"
                   aria-pressed={active}
                   onClick={() => toggleSource(tab.id)}
-                  className={`group relative flex min-h-[7.25rem] flex-col rounded-2xl border p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
+                  className={`group relative flex min-h-[7.25rem] flex-col p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A5336] ${
                     active
-                      ? "border-indigo-500/80 bg-white shadow-[0_10px_30px_-18px_rgba(79,70,229,0.75)] ring-1 ring-indigo-500/30 dark:border-indigo-400/70 dark:bg-slate-900 dark:shadow-[0_16px_40px_-20px_rgba(99,102,241,0.55)] dark:ring-indigo-400/25"
-                      : "border-slate-200/90 bg-white/70 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-slate-700/80 dark:bg-slate-900/50 dark:hover:border-slate-600 dark:hover:bg-slate-900"
+                      ? GRANARY_CARD_ACTIVE
+                      : `${GRANARY_CARD} hover:border-[#1A5336]/30 hover:bg-[#F2F7F4] dark:hover:border-[#5eb094]/35 dark:hover:bg-[#1a2e24]`
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span
-                      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+                      className={`inline-flex h-10 w-10 items-center justify-center rounded-[10px] border transition ${
                         active
-                          ? "border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-500/40 dark:bg-indigo-950/50 dark:text-indigo-300"
-                          : "border-slate-200 bg-slate-50 text-slate-600 group-hover:border-slate-300 group-hover:text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                          ? "border-[#1A5336]/25 bg-[#E4EDE7] text-[#1A5336] dark:border-[#5eb094]/40 dark:bg-[#1a2e24] dark:text-[#9fbfa9]"
+                          : "border-[#E5E7EB] bg-[#F8F9F8] text-slate-600 group-hover:border-[#1A5336]/25 group-hover:text-[#1A5336] dark:border-[#24352c] dark:bg-[#0B1410] dark:text-slate-300"
                       }`}
                       aria-hidden
                     >
@@ -914,7 +922,7 @@ export default function GrantsPage() {
 
       <section
         aria-labelledby={`${formId}-legend`}
-        className="sticky top-0 z-20 -mx-1 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
+        className={`sticky top-0 z-20 -mx-1 ${GRANARY_PANEL}`}
         data-tour="3"
         data-tour-title-en="Search & filters"
         data-tour-title-ar="البحث والمرشحات"
@@ -1009,7 +1017,7 @@ export default function GrantsPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex min-h-[42px] flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 lg:flex-none"
+                className={`${GRANARY_BTN_PRIMARY} flex-1 lg:flex-none`}
               >
                 {loading ? <FiRefreshCw aria-hidden className="animate-spin" /> : <FiSearch aria-hidden />}
                 {loading ? t("proposalManagerGrants.searching") : t("proposalManagerGrants.search")}
@@ -1018,7 +1026,7 @@ export default function GrantsPage() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="inline-flex min-h-[42px] items-center justify-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className={GRANARY_BTN_SECONDARY}
                 >
                   {t("proposalManagerGrants.clearFilters")}
                 </button>
@@ -1161,10 +1169,8 @@ export default function GrantsPage() {
               return (
                 <li
                   key={hit.id}
-                  className={`overflow-hidden rounded-xl border transition ${
-                    open
-                      ? "border-indigo-400 bg-white shadow-sm dark:border-indigo-500 dark:bg-slate-900"
-                      : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+                  className={`overflow-hidden transition ${
+                    open ? GRANARY_CARD_ACTIVE : GRANARY_CARD
                   }`}
                 >
                   <div className="flex items-stretch">

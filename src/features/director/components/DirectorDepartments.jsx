@@ -108,7 +108,7 @@ const departments = [
   }
 ];
 
-const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
+const COLORS = ["#1A5336", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
 export default function DirectorDepartments() {
   const { t, ready } = useTranslation('director');
@@ -119,7 +119,7 @@ export default function DirectorDepartments() {
   const user = JSON.parse(localStorage.getItem('rbac_current_user'));
 
   if (!ready) {
-    return <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 items-center justify-center">
+    return <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] items-center justify-center">
       <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
     </div>;
   }
@@ -170,7 +170,7 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" interval={0} angle={-10} dy={20} />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="completionRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="completionRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -187,7 +187,7 @@ export default function DirectorDepartments() {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="name" />
                 <PolarRadiusAxis />
-                <Radar name="Metrics" dataKey="GPA" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+                <Radar name="Metrics" dataKey="GPA" stroke="#1A5336" fill="#1A5336" fillOpacity={0.6} />
                 <Radar name="Metrics" dataKey="Satisfaction" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
               </RadarChart>
             </ResponsiveContainer>
@@ -244,7 +244,7 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="teamSize" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="teamSize" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="projectOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -264,7 +264,7 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="budgetAllocated" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="budgetAllocated" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="budgetSpent" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -308,7 +308,7 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="publications" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="publications" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="patentsFiled" fill="#22c55e" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="collaborations" fill="#f59e42" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -353,7 +353,7 @@ export default function DirectorDepartments() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="clientSuccessRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="clientSuccessRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="careerAdvancementRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -424,7 +424,7 @@ export default function DirectorDepartments() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-4 overflow-x-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" data-tour="1" data-tour-title-en="Departments Overview" data-tour-title-ar="نظرة عامة على الأقسام" data-tour-content-en="Filter departments and switch between overview and list views." data-tour-content-ar="قم بتصفية الأقسام والتبديل بين عرض النظرة العامة والقائمة." data-tour-position="bottom">
@@ -520,7 +520,7 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" interval={0} angle={-10} dy={20} />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="completionRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="completionRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -537,7 +537,7 @@ export default function DirectorDepartments() {
                         <PolarGrid />
                         <PolarAngleAxis dataKey="name" />
                         <PolarRadiusAxis />
-                        <Radar name="Metrics" dataKey="Performance" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+                        <Radar name="Metrics" dataKey="Performance" stroke="#1A5336" fill="#1A5336" fillOpacity={0.6} />
                         <Radar name="Metrics" dataKey="Satisfaction" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -602,7 +602,7 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="teamSize" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="teamSize" fill="#1A5336" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="projectOutput" fill="#22c55e" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -630,7 +630,7 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="budgetAllocated" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="budgetAllocated" fill="#1A5336" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="budgetSpent" fill="#22c55e" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -682,7 +682,7 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="publications" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="publications" fill="#1A5336" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="patentsFiled" fill="#22c55e" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="collaborations" fill="#f59e42" radius={[4, 4, 0, 0]} />
                       </BarChart>
@@ -735,7 +735,7 @@ export default function DirectorDepartments() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="clientSuccessRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="clientSuccessRate" fill="#1A5336" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="careerAdvancementRate" fill="#22c55e" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>

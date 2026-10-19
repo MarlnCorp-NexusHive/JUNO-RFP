@@ -129,7 +129,7 @@ function ExportSimpleFormatThumbnail({ className = "" }) {
 function ExportStyledFormatThumbnail({ className = "" }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-indigo-200/80 dark:border-indigo-800/60 bg-gradient-to-br from-slate-50 via-indigo-50/50 to-violet-50/40 dark:from-gray-900 dark:via-indigo-950/40 dark:to-gray-900 shadow-inner ${className}`}
+      className={`relative overflow-hidden rounded-[10px] border border-[#E5E7EB] bg-[#F8F9F8] dark:border-[#24352c] dark:bg-[#0F1A14] shadow-none ${className}`}
       aria-hidden
     >
       <div className="flex h-14 bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 px-2.5 py-2 items-center gap-2">
@@ -1133,7 +1133,7 @@ export default function ProposalManagerWorkspace() {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#F6F7FA] dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-[#F8F9F8] dark:bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div
           data-tour="1"
@@ -1155,7 +1155,7 @@ export default function ProposalManagerWorkspace() {
         />
 
         <section
-          className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-indigo-950/40 dark:via-gray-800 dark:to-blue-950/30 p-5 shadow-sm space-y-3"
+          className="rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] p-5 shadow-none space-y-3"
           data-tour="2"
           data-tour-title-en="Issuer & document context"
           data-tour-title-ar="سياق الجهة والمستند"
@@ -1898,7 +1898,7 @@ export default function ProposalManagerWorkspace() {
                 }`}
               >
                 {/* Simple Q&A */}
-                <div className="group flex flex-col rounded-2xl border-2 border-emerald-200/90 dark:border-emerald-800/70 bg-gradient-to-b from-white to-emerald-50/50 dark:from-gray-800/80 dark:to-emerald-950/25 shadow-lg shadow-emerald-900/5 dark:shadow-none ring-1 ring-emerald-500/10 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-900/10">
+                <div className="group flex flex-col rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] shadow-none transition-colors duration-200 hover:border-[#1A5336]/35 dark:hover:border-[#5eb094]/40">
                   <div className="p-4 pb-0">
                     <ExportSimpleFormatThumbnail className="h-[7.5rem] w-full" />
                   </div>
@@ -1913,7 +1913,7 @@ export default function ProposalManagerWorkspace() {
                       type="button"
                       onClick={() => void handleDownloadWorkspaceDocument()}
                       disabled={workspaceDocExporting || styledDocExporting || !workspaceDocId}
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-sm font-semibold shadow-md shadow-emerald-900/20 transition"
+                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#1A5336] hover:bg-[#164430] disabled:opacity-50 text-white text-sm font-semibold shadow-none transition dark:bg-[#5eb094] dark:text-[#0B1410] dark:hover:bg-[#6bc4a3]"
                     >
                       {workspaceDocExporting
                         ? t("proposalManagerWorkspace.rfpWorkspace.exportPreparing")
@@ -1924,7 +1924,7 @@ export default function ProposalManagerWorkspace() {
 
                 {/* Styled proposal — Marln DXC template on server (kept; toggle SHOW_STYLED_DOCUMENT_EXPORT) */}
                 {SHOW_STYLED_DOCUMENT_EXPORT ? (
-                <div className="group relative flex flex-col rounded-2xl border-2 border-indigo-200/90 dark:border-indigo-800/70 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800/80 dark:to-indigo-950/25 shadow-lg shadow-indigo-900/5 dark:shadow-none ring-1 ring-indigo-500/10 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-900/10">
+                <div className="group relative flex flex-col rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] shadow-none transition-colors duration-200 hover:border-[#1A5336]/35 dark:hover:border-[#5eb094]/40">
                   <span className="absolute top-3 end-3 z-10 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 dark:bg-indigo-500/25 dark:text-indigo-100 ring-1 ring-indigo-300/50 dark:ring-indigo-500/30">
                     {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledBadge")}
                   </span>
@@ -1948,7 +1948,7 @@ export default function ProposalManagerWorkspace() {
                         !workspaceDocId ||
                         answeredCount === 0
                       }
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 text-white text-sm font-semibold shadow-md shadow-indigo-900/20 transition"
+                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#1A5336] hover:bg-[#164430] disabled:opacity-50 text-white text-sm font-semibold shadow-none transition dark:bg-[#5eb094] dark:text-[#0B1410] dark:hover:bg-[#6bc4a3]"
                     >
                       {styledDocExporting
                         ? t("proposalManagerWorkspace.rfpWorkspace.exportStyledPreparing")

@@ -20,7 +20,7 @@ export default function ProcurementManagerDashboard() {
   })();
   const welcomeMessage = t(user?.username || "procurement_manager");
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <Sidebar features={features} userLabel={user?.displayName || "Procurement Manager"} />
       <main className="flex-1 p-10 flex flex-col gap-8">
         <h1 className="text-3xl font-bold text-primary mb-2">

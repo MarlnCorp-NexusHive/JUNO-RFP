@@ -12,7 +12,6 @@ import {
   setTrialSession,
   trialUserToRbacUser,
 } from "../services/trialAuthSession.js";
-import { LocalizationProvider } from "../hooks/useLocalization.jsx";
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
 import RTLWrapper from "./localization/RTLWrapper";
@@ -754,11 +753,6 @@ function LoginPageContent() {
   );
 }
 
-// Main export with LocalizationProvider wrapper
 export default function LoginPage() {
-  return (
-    <LocalizationProvider>
-      <LoginPageContent />
-    </LocalizationProvider>
-  );
+  return <LoginPageContent />;
 } 

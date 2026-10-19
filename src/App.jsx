@@ -147,9 +147,9 @@ function LegacyDashboardRedirect() {
 
 export default function App() {
   return (
-    <LocalizationProvider>
-      {/* <Router basename="/marln-erp-frontend"> */}
+      // Router wraps LocalizationProvider so Arabic gating can follow /login vs /app.
       <Router basename="/">
+    <LocalizationProvider>
         <Routes>
         {/* <Route path="/" element={<LandingPage />} /> */}
         <Route path="/" element={<LoginPage />} />
@@ -303,8 +303,8 @@ export default function App() {
         {/* University-specific routes removed for corporate ERP */}
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
-      </Router>
     </LocalizationProvider>
+      </Router>
   );
 }
 

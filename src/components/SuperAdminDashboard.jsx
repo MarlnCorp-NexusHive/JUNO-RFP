@@ -18,7 +18,7 @@ export default function SuperAdminDashboard() {
   const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const welcomeMessage = t(user?.username || 'superadmin');
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA]">
+    <div className="flex min-h-screen bg-[#F8F9F8]">
       <Sidebar features={features} />
       {/* Main Content */}
       <main className="flex-1 p-10 flex flex-col gap-8">

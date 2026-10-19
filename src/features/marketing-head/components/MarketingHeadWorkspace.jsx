@@ -42,7 +42,7 @@ export default function MarketingHeadWorkspace() {
   // Show loading state while translations are loading
   if (!ready) {
     return (
-      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+      <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
         <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
           <div className="text-center">
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">Loading...</h1>
@@ -55,7 +55,7 @@ export default function MarketingHeadWorkspace() {
   return (
     <div 
       key={`${i18n.language}-${languageVersion}`}
-      className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? 'rtl' : 'ltr'}`}
+      className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}
       data-tour="1"
       data-tour-title-en="Workspace Overview"
       data-tour-title-ar="نظرة عامة على مساحة العمل"

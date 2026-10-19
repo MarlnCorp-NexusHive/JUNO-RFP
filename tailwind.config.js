@@ -17,6 +17,17 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: [
+          '"Public Sans"',
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          "sans-serif",
+        ],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -51,11 +62,62 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Remap indigo → Granary forest green so existing indigo-* classes inherit the new brand.
+        indigo: {
+          50: "#f2f7f4",
+          100: "#e4ede7",
+          200: "#c5d9cb",
+          300: "#9fbfa9",
+          400: "#6b9a78",
+          500: "#3d7a52",
+          600: "#1a5336",
+          700: "#164430",
+          800: "#123628",
+          900: "#0d281c",
+          950: "#071912",
+        },
+        violet: {
+          50: "#f2f7f4",
+          100: "#e4ede7",
+          200: "#c5d9cb",
+          300: "#9fbfa9",
+          400: "#6b9a78",
+          500: "#3d7a52",
+          600: "#1a5336",
+          700: "#164430",
+          800: "#123628",
+          900: "#0d281c",
+          950: "#071912",
+        },
+        purple: {
+          50: "#f2f7f4",
+          100: "#e4ede7",
+          200: "#c5d9cb",
+          300: "#9fbfa9",
+          400: "#6b9a78",
+          500: "#3d7a52",
+          600: "#1a5336",
+          700: "#164430",
+          800: "#123628",
+          900: "#0d281c",
+          950: "#071912",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      // Granary: prefer hairline borders over heavy elevation
+      boxShadow: {
+        sm: "0 1px 0 rgba(16, 24, 20, 0.04)",
+        DEFAULT: "0 1px 2px rgba(16, 24, 20, 0.05)",
+        md: "0 1px 2px rgba(16, 24, 20, 0.05)",
+        lg: "0 4px 14px rgba(16, 24, 20, 0.06)",
+        xl: "0 8px 22px rgba(16, 24, 20, 0.07)",
+        "2xl": "0 12px 28px rgba(16, 24, 20, 0.08)",
+        inner: "inset 0 1px 0 rgba(16, 24, 20, 0.04)",
+        none: "none",
       },
       keyframes: {
         "accordion-down": {
@@ -72,10 +134,10 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       backgroundImage: {
-        'app-gradient': 'linear-gradient(to bottom right, #ede7f6, #e3f0ff)',
-        'app-gradient-dark': 'linear-gradient(to bottom right, #181824, #23232b)',
+        "app-gradient": "linear-gradient(to bottom right, #f2f7f4, #eef2ef)",
+        "app-gradient-dark": "linear-gradient(to bottom right, #0b1410, #122018)",
       },
     },
   },
   plugins: [require("@tailwindcss/forms")],
-} 
+};

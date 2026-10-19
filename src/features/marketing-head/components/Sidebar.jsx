@@ -44,9 +44,25 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
     setDarkTheme((prev) => !prev);
   };
 
+  const shellClass = darkTheme
+    ? "bg-[#0B1410] text-emerald-50 border-r border-[#1a2e24]"
+    : "bg-white text-slate-800 border-r border-[#E5E7EB]";
+  const labelClass = darkTheme ? "text-emerald-50" : "text-slate-800";
+  const navActiveClass = darkTheme
+    ? "bg-[#1a2e24] text-emerald-200"
+    : "bg-[#E4EDE7] text-[#1A5336]";
+  const navHoverClass = darkTheme
+    ? "hover:bg-[#122018]"
+    : "hover:bg-[#F2F7F4]";
+  const footerBorder = darkTheme ? "border-[#1a2e24]" : "border-[#E5E7EB]";
+  const footerHover = darkTheme ? "hover:bg-[#122018]" : "hover:bg-[#F2F7F4]";
+  const collapseBtn = darkTheme
+    ? "bg-[#122018] hover:bg-[#1a2e24] text-emerald-100 border border-[#1a2e24]"
+    : "bg-[#F2F7F4] hover:bg-[#E4EDE7] text-[#1A5336] border border-[#E5E7EB]";
+
   return (
     <aside
-      className={`${darkTheme ? 'bg-gray-900' : 'bg-gradient-to-b from-[#4f3cc9] to-[#6c5dd3]'} text-white flex flex-col shadow-lg h-screen transition-all duration-300 ${expanded ? 'w-56' : 'w-12'}`}
+      className={`${shellClass} flex flex-col h-screen transition-all duration-300 ${expanded ? 'w-56' : 'w-12'}`}
       style={{ zIndex: 20 }}
     >
       {/* Fixed Logo at Top */}
@@ -61,7 +77,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
             className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'}`}
           />
           {expanded && (
-            <span className="ml-3 text-2xl font-bold tracking-wide text-white">{userLabel || t('roles.marketingHead')}</span>
+            <span className={`ml-3 text-2xl font-bold tracking-wide ${labelClass}`}>{userLabel || t('roles.marketingHead')}</span>
           )}
         </button>
       </div>
@@ -75,18 +91,17 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
               <button
                 key={f.label}
                 onClick={() => navigate(f.route)}
-                className={`group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-lg font-medium text-left relative
-                  ${isActive ? (darkTheme ? 'bg-gray-700 shadow-lg' : 'bg-white/20 shadow-lg') : ''}
+                className={`group flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 text-lg font-medium text-left relative
+                  ${isActive ? navActiveClass : `${labelClass} ${navHoverClass}`}
                   ${expanded ? 'justify-start' : 'justify-center'}
-                  ${!isActive ? (darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/10') : ''}
                 `}
                 title={!expanded ? t(f.label, { defaultValue: f.label }) : undefined}
               >
-                <span className="text-2xl">{f.icon}</span>
-                {expanded && <span className="whitespace-nowrap text-white">{t(f.label, { defaultValue: f.label })}</span>}
+                <span className={`text-2xl ${isActive ? (darkTheme ? 'text-emerald-300' : 'text-[#1A5336]') : ''}`}>{f.icon}</span>
+                {expanded && <span className="whitespace-nowrap">{t(f.label, { defaultValue: f.label })}</span>}
                 {/* Tooltip for collapsed */}
                 {!expanded && (
-                  <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg">
+                  <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-slate-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg">
                     {t(f.label, { defaultValue: f.label })}
                   </span>
                 )}
@@ -97,9 +112,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
       </nav>
 
       {/* Fixed Buttons at Bottom */}
-      <div className={`flex flex-col items-center gap-2 p-4 border-t ${
-        darkTheme ? 'border-gray-700' : 'border-white/20'
-      }`}>
+      <div className={`flex flex-col items-center gap-2 p-4 border-t ${footerBorder}`}>
         {/* Language Switcher */}
         <SidebarLanguageSwitcher expanded={expanded} darkTheme={darkTheme} />
         
@@ -118,10 +131,8 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
         
         <button
           onClick={handleLogout}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full text-white ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full ${labelClass} ${footerHover} ${
             expanded ? 'justify-start' : 'justify-center'
-          } ${
-            darkTheme ? 'hover:bg-gray-700' : 'hover:bg-white/30'
           }`}
           style={{ background: "transparent" }}
           title={t('sidebar.logout')}
@@ -131,20 +142,20 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
               <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
             </svg>
           </span>
-          {expanded && <span className="text-white whitespace-nowrap">{t('sidebar.logout')}</span>}
+          {expanded && <span className="whitespace-nowrap">{t('sidebar.logout')}</span>}
         </button>
         <button
           onClick={() => setExpanded((e) => !e)}
-          className="bg-[#23232B] hover:bg-neutral-800 text-white rounded-full p-2 transition-colors"
+          className={`${collapseBtn} rounded-full p-2 transition-colors`}
           title={expanded ? t('sidebar.collapseSidebar') : t('sidebar.expandSidebar')}
         >
           {expanded ? (
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-              <path d={isRTLMode ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d={isRTLMode ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           ) : (
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-              <path d={isRTLMode ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d={isRTLMode ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </button>
@@ -165,4 +176,4 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
       `}</style>
     </aside>
   );
-} 
+}

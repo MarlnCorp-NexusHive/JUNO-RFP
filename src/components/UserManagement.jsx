@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import { directorFeatures } from './directorFeatures';
 
 const roles = [
-  { name: "CFO", count: 5, permissions: ["Financial Oversight", "Department Management", "Budget Approval"], color: "#6366f1", description: "Senior financial leadership role responsible for finance and budget oversight" },
+  { name: "CFO", count: 5, permissions: ["Financial Oversight", "Department Management", "Budget Approval"], color: "#1A5336", description: "Senior financial leadership role responsible for finance and budget oversight" },
   { name: "Capture Lead", count: 12, permissions: ["Division Operations", "Team Management", "Pursuit Planning"], color: "#22c55e", description: "Division lead managing capture and proposal operations" },
   { name: "Proposal Writer", count: 45, permissions: ["Volume Management", "Proposal Review", "Research Oversight"], color: "#f59e42", description: "Senior writer responsible for proposal content and compliance" },
   { name: "Admin Staff", count: 20, permissions: ["Administrative Tasks", "Document Management", "Student Support"], color: "#a21caf", description: "Support staff handling administrative and operational tasks" },
@@ -68,7 +68,7 @@ export default function UserManagement() {
   });
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>

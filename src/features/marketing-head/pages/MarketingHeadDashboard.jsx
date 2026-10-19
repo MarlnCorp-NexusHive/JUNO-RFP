@@ -42,7 +42,7 @@ const getCampaignPerformance = (t) => [
   { name: t('charts.other'), value: 5 },
 ];
 
-const COLORS = ["#6366f1", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
+const COLORS = ["#1A5336", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 
 // Procurement-specific demo data
 const getProcurementSpendTrend = (t) => [
@@ -62,13 +62,13 @@ const getProcurementSpendByCategory = (t) => [
 ];
 const getProcurementPOStatus = (t) => [
   { name: t('procurement.pending'), count: 12, fill: '#94a3b8' },
-  { name: t('procurement.approved'), count: 28, fill: '#6366f1' },
+  { name: t('procurement.approved'), count: 28, fill: '#1A5336' },
   { name: t('procurement.inProgress'), count: 19, fill: '#f59e0b' },
   { name: t('procurement.delivered'), count: 41, fill: '#22c55e' },
 ];
 const getProcurementSavingsData = (t) => [
   { name: t('procurement.budget'), value: 320, fill: '#e2e8f0' },
-  { name: t('procurement.spend'), value: 300, fill: '#6366f1' },
+  { name: t('procurement.spend'), value: 300, fill: '#1A5336' },
   { name: t('procurement.savings'), value: 20, fill: '#22c55e' },
 ];
 const getSupplierMatrixData = (t) => [
@@ -417,7 +417,7 @@ export default function MarketingHeadDashboard() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey={t('procurement.spend')} stroke="#6366f1" strokeWidth={2} />
+                    <Line type="monotone" dataKey={t('procurement.spend')} stroke="#1A5336" strokeWidth={2} />
                     <Line type="monotone" dataKey="budget" stroke="#94a3b8" strokeDasharray="5 5" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -459,7 +459,7 @@ export default function MarketingHeadDashboard() {
                     <XAxis type="number" />
                     <YAxis type="category" dataKey="name" width={70} />
                     <Tooltip />
-                    <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]}>
+                    <Bar dataKey="count" fill="#1A5336" radius={[0, 4, 4, 0]}>
                       {getProcurementPOStatus(t).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
@@ -567,7 +567,7 @@ export default function MarketingHeadDashboard() {
                     <XAxis type="number" />
                     <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} />
                     <Tooltip />
-                    <Bar dataKey="spend" fill="#6366f1" radius={[0, 4, 4, 0]} name={t('procurement.totalSpend')} />
+                    <Bar dataKey="spend" fill="#1A5336" radius={[0, 4, 4, 0]} name={t('procurement.totalSpend')} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -602,7 +602,7 @@ export default function MarketingHeadDashboard() {
                     <Tooltip />
                     <Legend />
                     <Bar dataKey="budget" fill="#94a3b8" radius={[4, 4, 0, 0]} name={t('procurement.budget')} />
-                    <Bar dataKey="actual" fill="#6366f1" radius={[4, 4, 0, 0]} name={t('procurement.actual')} />
+                    <Bar dataKey="actual" fill="#1A5336" radius={[4, 4, 0, 0]} name={t('procurement.actual')} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -634,7 +634,7 @@ export default function MarketingHeadDashboard() {
                   <YAxis type="number" dataKey="onTime" name={t('procurement.onTimeDelivery')} domain={[70, 100]} />
                   <ZAxis type="number" dataKey="spend" range={[100, 600]} name={t('procurement.totalSpend')} />
                   <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => [name === t('procurement.totalSpend') ? `$${value}K` : value, name]} />
-                  <Scatter name={t('procurement.vendor')} data={getVendorQuadrantData()} fill="#6366f1" />
+                  <Scatter name={t('procurement.vendor')} data={getVendorQuadrantData()} fill="#1A5336" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
@@ -690,7 +690,7 @@ export default function MarketingHeadDashboard() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey={t('charts.leads')} stroke="#6366f1" />
+                <Line type="monotone" dataKey={t('charts.leads')} stroke="#1A5336" />
                 <Line type="monotone" dataKey={t('charts.conversions')} stroke="#22c55e" />
               </LineChart>
             </ResponsiveContainer>

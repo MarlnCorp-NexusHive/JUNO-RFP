@@ -60,7 +60,7 @@ export default function DirectorRiskManagement() {
   // Show loading state if i18n is not ready
   if (!ready) {
     return (
-      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 items-center justify-center">
+      <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] items-center justify-center">
         <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
       </div>
     );
@@ -202,7 +202,7 @@ export default function DirectorRiskManagement() {
   };
 
   return (
-    <div className={`flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 ${isRTLMode ? 'rtl' : 'ltr'}`}>
+    <div className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}>
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {/* Header Section */}
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>

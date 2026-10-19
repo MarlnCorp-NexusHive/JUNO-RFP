@@ -382,7 +382,7 @@ export default function TrialBidVaultPanel({ isArabic = false }) {
                   <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
                   <YAxis allowDecimals={false} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} name={label("Count", "العدد")} />
+                  <Bar dataKey="count" fill="#1A5336" radius={[4, 4, 0, 0]} name={label("Count", "العدد")} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -487,7 +487,7 @@ export default function TrialBidVaultPanel({ isArabic = false }) {
                 <YAxis allowDecimals={false} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="count" fill="#8b5cf6" name={label("Count", "العدد")} />
+                <Bar dataKey="count" fill="#3d7a52" name={label("Count", "العدد")} />
                 <Bar dataKey="value" fill="#f59e0b" name={label("Value ($M)", "القيمة (مليون $)")} />
               </BarChart>
             </ResponsiveContainer>

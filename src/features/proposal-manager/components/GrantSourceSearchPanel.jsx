@@ -27,9 +27,18 @@ import { filterOpenListings } from "../services/openListingFilter.js";
 import { sortListings } from "../services/listingSort.js";
 import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 import { formatDateTime24 } from "../../../utils/dateTime";
+import {
+  GRANARY_BTN_PRIMARY,
+  GRANARY_BTN_SECONDARY,
+  GRANARY_CARD,
+  GRANARY_CARD_ACTIVE,
+  GRANARY_CARD_SOFT,
+  GRANARY_INPUT,
+  GRANARY_PANEL,
+} from "../../../styles/granarySurfaces.js";
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
+  GRANARY_INPUT;
 
 function daysUntil(value) {
   if (!value) return null;
@@ -185,7 +194,7 @@ export default function GrantSourceSearchPanel({
 
       <section
         aria-labelledby={`${formId}-legend`}
-        className="sticky top-0 z-20 -mx-1 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
+        className={`sticky top-0 z-20 -mx-1 ${GRANARY_PANEL}`}
       >
         <h3 id={`${formId}-legend`} className="sr-only">
           {tt("search")}
@@ -259,7 +268,7 @@ export default function GrantSourceSearchPanel({
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex min-h-[42px] flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-60 lg:flex-none"
+                className={`${GRANARY_BTN_PRIMARY} flex-1 lg:flex-none`}
               >
                 {loading ? <FiRefreshCw className="animate-spin" aria-hidden /> : <FiSearch aria-hidden />}
                 {loading ? tt("loading") : tt("search")}
@@ -268,7 +277,7 @@ export default function GrantSourceSearchPanel({
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="inline-flex min-h-[42px] items-center justify-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className={GRANARY_BTN_SECONDARY}
                 >
                   {tt("clearFilters")}
                 </button>
@@ -358,10 +367,8 @@ export default function GrantSourceSearchPanel({
               return (
                 <li
                   key={hit.id}
-                  className={`overflow-hidden rounded-xl border transition ${
-                    open
-                      ? "border-indigo-400 bg-white shadow-sm dark:border-indigo-500 dark:bg-slate-900"
-                      : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+                  className={`overflow-hidden transition ${
+                    open ? GRANARY_CARD_ACTIVE : GRANARY_CARD
                   }`}
                 >
                   <div className="flex items-stretch">
@@ -453,7 +460,7 @@ export default function GrantSourceSearchPanel({
                         </p>
                       )}
                       {hit.eligibility && (
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/50">
+                        <div className={`${GRANARY_CARD_SOFT} p-3 text-sm`}>
                           <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                             {tt("eligibility")}
                           </p>
@@ -461,7 +468,7 @@ export default function GrantSourceSearchPanel({
                         </div>
                       )}
                       {Array.isArray(hit.applicantTypes) && hit.applicantTypes.length > 0 && (
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/50">
+                        <div className={`${GRANARY_CARD_SOFT} p-3 text-sm`}>
                           <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                             {tt("applicantTypes")}
                           </p>

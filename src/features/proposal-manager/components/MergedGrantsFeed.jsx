@@ -41,6 +41,13 @@ import { sortListings } from "../services/listingSort.js";
 import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { formatDateTime24 } from "../../../utils/dateTime";
+import {
+  GRANARY_BTN_SECONDARY,
+  GRANARY_CARD,
+  GRANARY_CARD_ACTIVE,
+  GRANARY_INPUT,
+  GRANARY_PANEL,
+} from "../../../styles/granarySurfaces.js";
 
 /** Sources that are open pursuits (not historical award intel). */
 const OPEN_PURSUIT_SOURCES = new Set([
@@ -55,8 +62,7 @@ const OPEN_PURSUIT_SOURCES = new Set([
 
 const PER_SOURCE = 12;
 
-const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
+const inputClass = GRANARY_INPUT;
 
 function daysUntil(value) {
   if (!value) return null;
@@ -371,7 +377,7 @@ export default function MergedGrantsFeed({ selectedModes = [] }) {
 
       <section
         aria-labelledby={`${formId}-legend`}
-        className="sticky top-0 z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
+        className={`sticky top-0 z-20 ${GRANARY_PANEL}`}
       >
         <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="min-w-0 flex-1 space-y-1.5">
@@ -471,10 +477,8 @@ export default function MergedGrantsFeed({ selectedModes = [] }) {
               return (
                 <li
                   key={hit.key}
-                  className={`overflow-hidden rounded-xl border transition ${
-                    open
-                      ? "border-indigo-400 bg-white shadow-sm dark:border-indigo-500 dark:bg-slate-900"
-                      : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+                  className={`overflow-hidden transition ${
+                    open ? GRANARY_CARD_ACTIVE : GRANARY_CARD
                   }`}
                 >
                   <div className="flex items-stretch">

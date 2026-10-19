@@ -6,7 +6,7 @@ const TYPE_COLORS = {
   deadline: "#dc2626",
   milestone: "#ea580c",
   meeting: "#2563eb",
-  assignment: "#7c3aed",
+  assignment: "#1A5336",
   submission: "#16a34a",
   review: "#0891b2",
   task: "#6366f1",

@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import { useLocalization } from '../../hooks/useLocalization.jsx';
 import { useTranslation } from 'react-i18next';
-import { ARABIC_LANGUAGE_ENABLED, SUPPORTED_LANGUAGES } from '../../utils/languageUtils';
 import { FiGlobe, FiChevronDown } from 'react-icons/fi';
 
 const LanguageSwitcher = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { currentLanguage, changeLanguage, isRTLMode } = useLocalization();
+  const { currentLanguage, changeLanguage, isRTLMode, arabicEnabled, supportedLanguages } = useLocalization();
   const { t } = useTranslation('common');
 
-  // Arabic temporarily disabled — hide switcher entirely (locales kept for later).
-  if (!ARABIC_LANGUAGE_ENABLED || SUPPORTED_LANGUAGES.length < 2) {
+  // Shown on login + Proposal Manager demo/trial sessions only.
+  if (!arabicEnabled || !supportedLanguages || supportedLanguages.length < 2) {
     return null;
   }
   
-  const currentLang = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLanguage);
+  const currentLang = supportedLanguages.find(lang => lang.code === currentLanguage) || supportedLanguages[0];
 
   const handleLanguageChange = (languageCode) => {
     changeLanguage(languageCode);
@@ -35,7 +34,7 @@ const LanguageSwitcher = () => {
 
       {isOpen && (
         <div className={`absolute top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 dropdown-menu ${isRTLMode ? 'left-0' : 'right-0'}`}>
-          {SUPPORTED_LANGUAGES.map((language) => (
+          {supportedLanguages.map((language) => (
             <button
               key={language.code}
               onClick={() => handleLanguageChange(language.code)}

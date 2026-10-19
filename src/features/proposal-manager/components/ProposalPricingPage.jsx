@@ -61,7 +61,7 @@ export default function ProposalPricingPage() {
 
   if (isTrial) {
     return (
-      <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+      <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
         <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
           <TrialPricingPanel issuer={issuer} clearLink={clearLink} />
         </main>
@@ -70,7 +70,7 @@ export default function ProposalPricingPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {issuer && (
           <motion.div
@@ -152,7 +152,7 @@ export default function ProposalPricingPage() {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="rate" fill="#6366f1" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.blendedPerHour")} />
+                  <Bar dataKey="rate" fill="#1A5336" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.blendedPerHour")} />
                   <Bar dataKey="loaded" fill="#22c55e" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.loadedPerHour")} />
                   <Bar dataKey="billable" fill="#f59e0b" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.billablePerHour")} />
                 </BarChart>
@@ -179,10 +179,10 @@ export default function ProposalPricingPage() {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="labor" fill="#6366f1" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.labor")} />
+                  <Bar dataKey="labor" fill="#1A5336" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.labor")} />
                   <Bar dataKey="subcontractors" fill="#22c55e" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.subcontractors")} />
                   <Bar dataKey="odc" fill="#f59e0b" radius={[4, 4, 0, 0]} name="ODC" />
-                  <Bar dataKey="total" fill="#8b5cf6" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.total")} />
+                  <Bar dataKey="total" fill="#3d7a52" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.total")} />
                 </BarChart>
               </ResponsiveContainer>
             </motion.section>
@@ -207,7 +207,7 @@ export default function ProposalPricingPage() {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="winPrice" stroke="#6366f1" strokeWidth={2} name={t("proposalManagerPricing.series.winPrice")} />
+                  <Line type="monotone" dataKey="winPrice" stroke="#1A5336" strokeWidth={2} name={t("proposalManagerPricing.series.winPrice")} />
                   <Line type="monotone" dataKey="targetCost" stroke="#22c55e" strokeWidth={2} name={t("proposalManagerPricing.series.targetCost")} />
                 </LineChart>
               </ResponsiveContainer>

@@ -14,7 +14,7 @@ export default function ParentDashboard() {
   const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const welcomeMessage = t(user?.username || 'parent');
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA]">
+    <div className="flex min-h-screen bg-[#F8F9F8]">
       <Sidebar features={features} userLabel={user?.displayName || user?.role || "Parent"} />
       <main className="flex-1 p-10 flex flex-col gap-8">
         <h1 className="text-3xl font-bold text-primary mb-2">Welcome, {user?.displayName || user?.role || "Parent"}!</h1>

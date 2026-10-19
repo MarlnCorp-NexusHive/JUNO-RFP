@@ -382,7 +382,7 @@ export default function ApprovalCenter() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F6F7FA] dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>

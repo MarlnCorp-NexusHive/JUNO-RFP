@@ -13,7 +13,7 @@ export default function RBACShell({ children }) {
   return (
     <div className="flex h-screen bg-[#f8f9fb]">
       {/* Sidebar */}
-      <aside className="w-20 bg-[#4f3cc9] flex flex-col items-center py-6 shadow-lg">
+      <aside className="w-20 bg-[#1A5336] flex flex-col items-center py-6 shadow-lg">
         <div className="mb-8">
           <span className="text-white text-3xl font-bold">U</span>
         </div>
@@ -21,7 +21,7 @@ export default function RBACShell({ children }) {
           {sidebarItems.map((item, idx) => (
             <button
               key={item.label}
-              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-[#6c5dd3] transition-colors text-white text-xl"
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-[#164430] transition-colors text-white text-xl"
               title={item.label}
             >
               {/* Replace with icon component */}
@@ -34,10 +34,10 @@ export default function RBACShell({ children }) {
       <div className="flex-1 flex flex-col">
         {/* Topbar */}
         <header className="h-16 bg-white flex items-center justify-between px-8 shadow-sm">
-          <div className="text-xl font-semibold text-[#4f3cc9] tracking-wide">JUNO RFP RBAC Demo</div>
+          <div className="text-xl font-semibold text-[#1A5336] tracking-wide">JUNO RFP RBAC Demo</div>
           <div className="flex items-center gap-4">
             <Button variant="outline">Login</Button>
-            <div className="w-10 h-10 rounded-full bg-[#e0e7ff] flex items-center justify-center text-[#4f3cc9] font-bold">A</div>
+            <div className="w-10 h-10 rounded-full bg-[#e0e7ff] flex items-center justify-center text-[#1A5336] font-bold">A</div>
           </div>
         </header>
         {/* Content Area */}

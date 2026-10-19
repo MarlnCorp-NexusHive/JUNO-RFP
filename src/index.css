@@ -349,47 +349,56 @@ html[lang="ar"] {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Granary surfaces — JUNO keeps product name; colors only */
+    --background: 120 11% 97%;
+    --foreground: 160 28% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 160 28% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 160 28% 12%;
+    --primary: 151 52% 21%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 140 18% 94%;
+    --secondary-foreground: 151 52% 21%;
+    --muted: 140 12% 94%;
+    --muted-foreground: 160 8% 40%;
+    --accent: 140 22% 92%;
+    --accent-foreground: 151 52% 21%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --border: 140 8% 90%;
+    --input: 140 8% 90%;
+    --ring: 151 52% 21%;
+    --radius: 0.625rem; /* ~10px Granary cards */
+    --granary-mint: #5eb094;
+    --granary-forest: #1a5336;
+    --granary-card-border: #e5e7eb;
+    --granary-card-bg: #ffffff;
+    --granary-canvas: #f8f9f8;
   }
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 150 22% 6%;
+    --foreground: 140 18% 94%;
+    --card: 150 16% 9%;
+    --card-foreground: 140 18% 94%;
+    --popover: 150 16% 9%;
+    --popover-foreground: 140 18% 94%;
+    --primary: 155 35% 55%;
+    --primary-foreground: 150 30% 8%;
+    --secondary: 150 14% 14%;
+    --secondary-foreground: 140 18% 94%;
+    --muted: 150 12% 14%;
+    --muted-foreground: 140 10% 65%;
+    --accent: 150 14% 16%;
+    --accent-foreground: 140 18% 94%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 150 14% 16%;
+    --input: 150 14% 16%;
+    --ring: 155 35% 55%;
+    --granary-card-border: #24352c;
+    --granary-card-bg: #122018;
+    --granary-canvas: #0b1410;
   }
 }
 
@@ -398,13 +407,68 @@ html[lang="ar"] {
     @apply border-[hsl(var(--border))];
   }
   body {
-    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))] font-sans antialiased;
   }
+}
+
+/* Granary card language — border-defined surfaces, soft corners */
+@layer components {
+  .juno-card {
+    border-radius: 10px;
+    border: 1px solid var(--granary-card-border);
+    background: var(--granary-card-bg);
+    box-shadow: none;
+  }
+  .juno-card-soft {
+    border-radius: 10px;
+    border: 1px solid var(--granary-card-border);
+    background: var(--granary-canvas);
+    box-shadow: none;
+  }
+}
+
+/* Soften common slate/gray card shells toward Granary (cascade) */
+.rounded-xl.border.bg-white,
+.rounded-2xl.border.bg-white,
+.rounded-lg.border.bg-white {
+  border-radius: 10px;
+  border-color: var(--granary-card-border);
+  box-shadow: none;
+}
+body.dark .rounded-xl.border.bg-white,
+body.dark .rounded-2xl.border.bg-white,
+body.dark .rounded-lg.border.bg-white,
+body.dark .dark\:bg-slate-900.rounded-xl,
+body.dark .dark\:bg-gray-800.rounded-xl {
+  border-color: var(--granary-card-border);
+  background-color: var(--granary-card-bg);
+  box-shadow: none;
+}
+
+/* Dark mode primary CTAs → mint fill + dark text (artifact Sign in) */
+body.dark .bg-indigo-600 {
+  background-color: var(--granary-mint) !important;
+  color: #0b1410 !important;
+}
+body.dark .bg-indigo-600:hover,
+body.dark .hover\:bg-indigo-500:hover {
+  background-color: #6bc4a3 !important;
+}
+body.dark .bg-indigo-500 {
+  background-color: var(--granary-mint) !important;
+  color: #0b1410 !important;
+}
+body.dark .from-indigo-600,
+body.dark .to-blue-600,
+body.dark .to-violet-600 {
+  --tw-gradient-from: #5eb094 var(--tw-gradient-from-position);
+  --tw-gradient-to: #3d7a52 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
 /* Dark Mode Component Styles */
 body.dark .bg-gradient-to-br {
-  background: linear-gradient(to bottom right, #1e293b, #334155, #475569);
+  background: linear-gradient(to bottom right, #0b1410, #122018, #1a2e24);
 }
 
 /* Dark mode for login form container */

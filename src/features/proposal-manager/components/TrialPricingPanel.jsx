@@ -451,7 +451,7 @@ export default function TrialPricingPanel({ issuer, clearLink }) {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="rate" fill="#6366f1" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.blendedPerHour")} />
+                  <Bar dataKey="rate" fill="#1A5336" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.blendedPerHour")} />
                   <Bar dataKey="loaded" fill="#22c55e" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.loadedPerHour")} />
                   <Bar dataKey="billable" fill="#f59e0b" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.billablePerHour")} />
                 </BarChart>
@@ -644,10 +644,10 @@ export default function TrialPricingPanel({ issuer, clearLink }) {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="labor" fill="#6366f1" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.labor")} />
+                  <Bar dataKey="labor" fill="#1A5336" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.labor")} />
                   <Bar dataKey="subcontractors" fill="#22c55e" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.subcontractors")} />
                   <Bar dataKey="odc" fill="#f59e0b" radius={[4, 4, 0, 0]} name="ODC" />
-                  <Bar dataKey="total" fill="#8b5cf6" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.total")} />
+                  <Bar dataKey="total" fill="#3d7a52" radius={[4, 4, 0, 0]} name={t("proposalManagerPricing.series.total")} />
                 </BarChart>
               </ResponsiveContainer>
             </motion.section>
@@ -743,7 +743,7 @@ export default function TrialPricingPanel({ issuer, clearLink }) {
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="bidPrice" stroke="#6366f1" strokeWidth={2} name={label("Bid ($K)", "عرض ($ألف)")} connectNulls />
+                <Line type="monotone" dataKey="bidPrice" stroke="#1A5336" strokeWidth={2} name={label("Bid ($K)", "عرض ($ألف)")} connectNulls />
                 <Line type="monotone" dataKey="targetCost" stroke="#22c55e" strokeWidth={2} name={label("Target / cost ($K)", "هدف / تكلفة ($ألف)")} connectNulls />
               </LineChart>
             </ResponsiveContainer>

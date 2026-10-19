@@ -97,8 +97,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    // Keep Arabic resources loaded; force English while Arabic UI is disabled
-    // (see ARABIC_LANGUAGE_ENABLED in languageUtils.js).
+    // Arabic resources stay loaded. UI gating is in languageUtils.isArabicUiEnabled
+    // (login + Proposal Manager demo/trial only).
     lng: 'en',
     fallbackLng: 'en',
     supportedLngs: ['en', 'ar'],

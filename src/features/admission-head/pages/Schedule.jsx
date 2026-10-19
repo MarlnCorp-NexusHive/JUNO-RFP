@@ -147,7 +147,7 @@ function AnalyticsWidgets({ appointments, staff }) {
               {(() => {
                 let acc = 0;
                 const total = statusCounts.reduce((a, b) => a + b, 0) || 1;
-                const colors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#6b7280', '#8b5cf6'];
+                const colors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#6b7280', '#3d7a52'];
                 return statusCounts.map((count, i) => {
                   if (count === 0) return null;
                   const val = (count / total) * 100;
@@ -201,7 +201,7 @@ function AnalyticsWidgets({ appointments, staff }) {
               'Attended': 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
             };
             
-            const pieColors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#6b7280', '#8b5cf6'];
+            const pieColors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#6b7280', '#3d7a52'];
             
             if (count === 0) return null;
             
