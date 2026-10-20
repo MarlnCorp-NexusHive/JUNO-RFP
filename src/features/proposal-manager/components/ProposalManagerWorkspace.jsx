@@ -21,6 +21,7 @@ import {
   upsertWorkspaceAnswerInContentHub,
 } from "../services/proposalManagerStorage";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 import { extractFromFile, extractFromText } from "../services/extractFromDocument";
 import { RFP_DOCUMENT_TYPES, DOCUMENT_TYPE_TO_TAGS } from "../data/documentTypes";
 import {
@@ -61,8 +62,19 @@ import RichTextAnswerEditor, { toPlainTextFromHtml, toHtmlFromPlain } from "./do
 const ACCEPT = ".pdf,.doc,.docx,.txt,.xlsx,.xls";
 const MAX_FILE_MB = 25;
 
-/** Set true to show the styled Word export option again in the download modal. */
-const SHOW_STYLED_DOCUMENT_EXPORT = false;
+/** Demo proposal_manager login only — trial and other roles keep a single simple export. */
+function isDemoProposalManagerSession() {
+  if (isTrialUserSession()) return false;
+  const user = parseLocalStorageJson("rbac_current_user");
+  const username = String(user?.username || "").toLowerCase();
+  const role = String(user?.role || "").toLowerCase();
+  const team = String(user?.team || "").toLowerCase();
+  return (
+    username === "proposal_manager" ||
+    role === "proposal manager" ||
+    team === "proposal team"
+  );
+}
 
 /** Remove characters invalid in Windows / macOS download file names. */
 function sanitizeFileNameSegment(raw, maxLen = 100) {
@@ -213,6 +225,7 @@ export default function ProposalManagerWorkspace() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isTrial = isTrialUserSession();
+  const showStyledDocumentExport = isDemoProposalManagerSession();
   const { issuer, linkFromIntelligence, clearLink, disableIssuerTailoring, setDisableIssuerTailoring, effectiveIssuerName } =
     useProposalIssuer();
   const [issuerBrief, setIssuerBrief] = useState("");
@@ -1894,7 +1907,7 @@ export default function ProposalManagerWorkspace() {
             <div className="p-5 sm:p-6">
               <div
                 className={`grid grid-cols-1 gap-4 md:gap-5 ${
-                  SHOW_STYLED_DOCUMENT_EXPORT ? "md:grid-cols-2" : "max-w-md mx-auto"
+                  showStyledDocumentExport ? "md:grid-cols-2" : "max-w-md mx-auto"
                 }`}
               >
                 {/* Simple Q&A */}
@@ -1922,8 +1935,8 @@ export default function ProposalManagerWorkspace() {
                   </div>
                 </div>
 
-                {/* Styled proposal — Marln DXC template on server (kept; toggle SHOW_STYLED_DOCUMENT_EXPORT) */}
-                {SHOW_STYLED_DOCUMENT_EXPORT ? (
+                {/* Styled proposal — Marln DXC template; demo proposal_manager login only */}
+                {showStyledDocumentExport ? (
                 <div className="group relative flex flex-col rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] shadow-none transition-colors duration-200 hover:border-[#1A5336]/35 dark:hover:border-[#5eb094]/40">
                   <span className="absolute top-3 end-3 z-10 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 dark:bg-indigo-500/25 dark:text-indigo-100 ring-1 ring-indigo-300/50 dark:ring-indigo-500/30">
                     {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledBadge")}
@@ -1942,7 +1955,7 @@ export default function ProposalManagerWorkspace() {
                       type="button"
                       onClick={() => void handleDownloadStyledWorkspaceDocument()}
                       disabled={
-                        !SHOW_STYLED_DOCUMENT_EXPORT ||
+                        !showStyledDocumentExport ||
                         styledDocExporting ||
                         workspaceDocExporting ||
                         !workspaceDocId ||
