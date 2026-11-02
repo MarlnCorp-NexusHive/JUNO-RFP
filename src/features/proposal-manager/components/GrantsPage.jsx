@@ -47,9 +47,11 @@ import RetrievalConfidenceBadge from "./RetrievalConfidenceBadge.jsx";
 import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import MergedGrantsFeed from "./MergedGrantsFeed.jsx";
 import SortNewestButton from "./SortNewestButton.jsx";
+import WosbNaicsPanel from "./WosbNaicsPanel.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
 import { sortListings } from "../services/listingSort.js";
 import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
+import { WOSB_ELIGIBLE_NAICS } from "../data/wosbEligibleNaics.js";
 import { formatDateTime24 } from '../../../utils/dateTime';
 import {
   GRANARY_BTN_PRIMARY,
@@ -482,8 +484,9 @@ export default function GrantsPage() {
   const resultsId = useId();
 
   const [selectedModes, setSelectedModes] = useState(["grants"]);
-  const [sourceCategoryTab, setSourceCategoryTab] = useState("open"); // open | intel
+  const [sourceCategoryTab, setSourceCategoryTab] = useState("open"); // open | intel | wosb
 
+  const wosbTabActive = sourceCategoryTab === "wosb";
   const activeSourceModes = sourceCategoryTab === "intel" ? AWARD_INTEL_MODES : OPEN_OPP_MODES;
   const singleMode = selectedModes.length === 1 ? selectedModes[0] : null;
   const grantsAlone = singleMode === "grants";
@@ -722,6 +725,11 @@ export default function GrantsPage() {
                   label: t("proposalManagerGrants.categoryIntel"),
                   count: AWARD_INTEL_MODES.length,
                 },
+                {
+                  id: "wosb",
+                  label: t("proposalManagerGrants.categoryWosb"),
+                  count: WOSB_ELIGIBLE_NAICS.length,
+                },
               ].map((cat) => {
                 const active = sourceCategoryTab === cat.id;
                 return (
@@ -754,117 +762,129 @@ export default function GrantsPage() {
           </div>
 
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t("proposalManagerGrants.multiSelectHint")}
-            {" · "}
-            {sourceCategoryTab === "intel"
-              ? t("proposalManagerGrants.categoryIntelHint")
-              : t("proposalManagerGrants.categoryOpenHint")}
+            {wosbTabActive ? (
+              t("proposalManagerGrants.categoryWosbHint")
+            ) : (
+              <>
+                {t("proposalManagerGrants.multiSelectHint")}
+                {" · "}
+                {sourceCategoryTab === "intel"
+                  ? t("proposalManagerGrants.categoryIntelHint")
+                  : t("proposalManagerGrants.categoryOpenHint")}
+              </>
+            )}
           </p>
 
-          <div
-            role="group"
-            aria-label={
-              sourceCategoryTab === "intel"
-                ? t("proposalManagerGrants.modeTabsIntel")
-                : t("proposalManagerGrants.modeTabsOpen")
-            }
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
-          >
-            {activeSourceModes.map((tab) => {
-              const active = selectedModes.includes(tab.id);
-              const Icon = tab.Icon;
-              const isLive = tab.badge === "live";
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => toggleSource(tab.id)}
-                  className={`group relative flex min-h-[7.25rem] flex-col p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A5336] ${
-                    active
-                      ? GRANARY_CARD_ACTIVE
-                      : `${GRANARY_CARD} hover:border-[#1A5336]/30 hover:bg-[#F2F7F4] dark:hover:border-[#5eb094]/35 dark:hover:bg-[#1a2e24]`
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <span
-                      className={`inline-flex h-10 w-10 items-center justify-center rounded-[10px] border transition ${
+          {!wosbTabActive && (
+            <>
+              <div
+                role="group"
+                aria-label={
+                  sourceCategoryTab === "intel"
+                    ? t("proposalManagerGrants.modeTabsIntel")
+                    : t("proposalManagerGrants.modeTabsOpen")
+                }
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+              >
+                {activeSourceModes.map((tab) => {
+                  const active = selectedModes.includes(tab.id);
+                  const Icon = tab.Icon;
+                  const isLive = tab.badge === "live";
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleSource(tab.id)}
+                      className={`group relative flex min-h-[7.25rem] flex-col p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A5336] ${
                         active
-                          ? "border-[#1A5336]/25 bg-[#E4EDE7] text-[#1A5336] dark:border-[#5eb094]/40 dark:bg-[#1a2e24] dark:text-[#9fbfa9]"
-                          : "border-[#E5E7EB] bg-[#F8F9F8] text-slate-600 group-hover:border-[#1A5336]/25 group-hover:text-[#1A5336] dark:border-[#24352c] dark:bg-[#0B1410] dark:text-slate-300"
-                      }`}
-                      aria-hidden
-                    >
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                          isLive
-                            ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-200 dark:ring-emerald-800"
-                            : "bg-amber-50 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-800"
-                        }`}
-                      >
-                        {isLive
-                          ? t("proposalManagerGrants.badgeLive")
-                          : t("proposalManagerGrants.badgeCurated")}
-                      </span>
-                      <span
-                        className={`inline-flex h-5 w-5 items-center justify-center rounded-md border ${
-                          active
-                            ? "border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500"
-                            : "border-slate-300 bg-white text-transparent dark:border-slate-600 dark:bg-slate-800"
-                        }`}
-                        aria-hidden
-                      >
-                        <FiCheck className="h-3 w-3" />
-                      </span>
-                    </span>
-                  </div>
-                  <div className="mt-3 space-y-1">
-                    <p
-                      className={`text-sm font-semibold tracking-tight ${
-                        active ? "text-slate-900 dark:text-white" : "text-slate-800 dark:text-slate-100"
+                          ? GRANARY_CARD_ACTIVE
+                          : `${GRANARY_CARD} hover:border-[#1A5336]/30 hover:bg-[#F2F7F4] dark:hover:border-[#5eb094]/35 dark:hover:bg-[#1a2e24]`
                       }`}
                     >
-                      {t(`proposalManagerGrants.${tab.labelKey}`)}
-                    </p>
-                    <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                      {t(`proposalManagerGrants.${tab.descKey}`)}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                      <div className="flex items-start justify-between gap-3">
+                        <span
+                          className={`inline-flex h-10 w-10 items-center justify-center rounded-[10px] border transition ${
+                            active
+                              ? "border-[#1A5336]/25 bg-[#E4EDE7] text-[#1A5336] dark:border-[#5eb094]/40 dark:bg-[#1a2e24] dark:text-[#9fbfa9]"
+                              : "border-[#E5E7EB] bg-[#F8F9F8] text-slate-600 group-hover:border-[#1A5336]/25 group-hover:text-[#1A5336] dark:border-[#24352c] dark:bg-[#0B1410] dark:text-slate-300"
+                          }`}
+                          aria-hidden
+                        >
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                              isLive
+                                ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-200 dark:ring-emerald-800"
+                                : "bg-amber-50 text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-100 dark:ring-amber-800"
+                            }`}
+                          >
+                            {isLive
+                              ? t("proposalManagerGrants.badgeLive")
+                              : t("proposalManagerGrants.badgeCurated")}
+                          </span>
+                          <span
+                            className={`inline-flex h-5 w-5 items-center justify-center rounded-md border ${
+                              active
+                                ? "border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500"
+                                : "border-slate-300 bg-white text-transparent dark:border-slate-600 dark:bg-slate-800"
+                            }`}
+                            aria-hidden
+                          >
+                            <FiCheck className="h-3 w-3" />
+                          </span>
+                        </span>
+                      </div>
+                      <div className="mt-3 space-y-1">
+                        <p
+                          className={`text-sm font-semibold tracking-tight ${
+                            active ? "text-slate-900 dark:text-white" : "text-slate-800 dark:text-slate-100"
+                          }`}
+                        >
+                          {t(`proposalManagerGrants.${tab.labelKey}`)}
+                        </p>
+                        <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                          {t(`proposalManagerGrants.${tab.descKey}`)}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
 
-          {selectedModes.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-4 dark:border-slate-700/80">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                {t("proposalManagerGrants.selectedSources")}
-              </span>
-              {selectedModes.map((id) => {
-                const meta = findSourceMeta(id);
-                if (!meta) return null;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => removeSelectedSource(id)}
-                    title={t("proposalManagerGrants.removeSource")}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-900 hover:border-indigo-300 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-100"
-                  >
-                    {t(`proposalManagerGrants.${meta.labelKey}`)}
-                    {selectedModes.length > 1 ? <FiX className="h-3 w-3 opacity-70" aria-hidden /> : null}
-                  </button>
-                );
-              })}
-            </div>
+              {selectedModes.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-4 dark:border-slate-700/80">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    {t("proposalManagerGrants.selectedSources")}
+                  </span>
+                  {selectedModes.map((id) => {
+                    const meta = findSourceMeta(id);
+                    if (!meta) return null;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => removeSelectedSource(id)}
+                        title={t("proposalManagerGrants.removeSource")}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-900 hover:border-indigo-300 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-100"
+                      >
+                        {t(`proposalManagerGrants.${meta.labelKey}`)}
+                        {selectedModes.length > 1 ? <FiX className="h-3 w-3 opacity-70" aria-hidden /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
 
-      {multiSelected ? (
+      {wosbTabActive ? (
+        <WosbNaicsPanel />
+      ) : multiSelected ? (
         <MergedGrantsFeed selectedModes={selectedModes} />
       ) : singleMode === "contracts" ? (
         <SamContractsPanel />
