@@ -10,7 +10,7 @@ export function defaultWinSlideFromPursuit(pursuit, competitors) {
     ? (pursuit.debrief?.whyWon || []).slice(0, 4)
     : [
         "Document-grounded drafts and evaluator-ready exports",
-        "PM–auditor review trail the buyer can audit",
+        "PM–team member review trail the buyer can audit",
         "Issuer + competitive intel in the same pursuit file",
       ];
 

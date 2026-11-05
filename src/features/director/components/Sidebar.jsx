@@ -7,6 +7,10 @@ import SmartTourButton from "../../../components/tours/SmartTourButton";
 import { clearCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
 import { clearTrialSession } from "../../../services/trialAuthSession.js";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
+import {
+  setNavMode,
+  proposalManagerLandingPath,
+} from "../../proposal-manager/services/navModeStore.js";
 
 export default function Sidebar({
   features,
@@ -16,6 +20,8 @@ export default function Sidebar({
   role = "director",
   brandLogoSrc,
   brandLogoAlt,
+  showNavModeToggle = false,
+  navMode = "guided",
 }) {
   const { t } = useTranslation();
   const location = useLocation();
@@ -56,20 +62,20 @@ export default function Sidebar({
   };
 
   const shellClass = darkTheme
-    ? "bg-[#0B1410] text-emerald-50 border-r border-[#1a2e24]"
-    : "bg-white text-slate-800 border-r border-[#E5E7EB]";
-  const labelClass = darkTheme ? "text-emerald-50" : "text-slate-800";
+    ? "bg-[#0B1017] text-slate-50 border-r border-[#2A3548]"
+    : "bg-white text-slate-800 border-r border-[#D8E0EA]";
+  const labelClass = darkTheme ? "text-slate-50" : "text-slate-800";
   const navActiveClass = darkTheme
-    ? "bg-[#1a2e24] text-emerald-200"
-    : "bg-[#E4EDE7] text-[#1A5336]";
+    ? "bg-[#2A3548] text-slate-200"
+    : "bg-[#D8E0EA] text-[#3D4F66]";
   const navHoverClass = darkTheme
-    ? "hover:bg-[#122018]"
-    : "hover:bg-[#F2F7F4]";
-  const footerBorder = darkTheme ? "border-[#1a2e24]" : "border-[#E5E7EB]";
-  const footerHover = darkTheme ? "hover:bg-[#122018]" : "hover:bg-[#F2F7F4]";
+    ? "hover:bg-[#151D2A]"
+    : "hover:bg-[#F0F3F7]";
+  const footerBorder = darkTheme ? "border-[#2A3548]" : "border-[#D8E0EA]";
+  const footerHover = darkTheme ? "hover:bg-[#151D2A]" : "hover:bg-[#F0F3F7]";
   const collapseBtn = darkTheme
-    ? "bg-[#122018] hover:bg-[#1a2e24] text-emerald-100 border border-[#1a2e24]"
-    : "bg-[#F2F7F4] hover:bg-[#E4EDE7] text-[#1A5336] border border-[#E5E7EB]";
+    ? "bg-[#151D2A] hover:bg-[#2A3548] text-slate-100 border border-[#2A3548]"
+    : "bg-[#F0F3F7] hover:bg-[#D8E0EA] text-[#3D4F66] border border-[#D8E0EA]";
 
   return (
     <aside
@@ -114,7 +120,7 @@ export default function Sidebar({
                 `}
                 title={!expanded ? t(f.label, { defaultValue: f.label }) : undefined}
               >
-                <span className={`text-2xl flex-shrink-0 ${isActive ? (darkTheme ? 'text-emerald-300' : 'text-[#1A5336]') : ''}`}>{f.icon}</span>
+                <span className={`text-2xl flex-shrink-0 ${isActive ? (darkTheme ? 'text-slate-300' : 'text-[#3D4F66]') : ''}`}>{f.icon}</span>
                 {expanded && <span className="break-words min-w-0">{t(f.label, { defaultValue: f.label })}</span>}
                 {/* Tooltip for collapsed */}
                 {!expanded && (
@@ -132,6 +138,38 @@ export default function Sidebar({
 
       {/* Fixed Buttons at Bottom */}
       <div className={`flex flex-col items-center gap-2 p-4 border-t ${footerBorder}`}>
+        {showNavModeToggle ? (
+          <button
+            type="button"
+            onClick={() => {
+              const next = navMode === "guided" ? "classic" : "guided";
+              setNavMode(next);
+              if (next === "guided" && !location.pathname.startsWith("/app/home")) {
+                navigate(proposalManagerLandingPath());
+              }
+            }}
+            className={`flex items-center rounded-lg font-semibold transition-all duration-300 w-full text-xs ${labelClass} ${footerHover} ${
+              expanded ? (isRTLMode ? 'justify-end gap-2 px-3 py-2' : 'justify-start gap-2 px-3 py-2') : 'justify-center px-2 py-2'
+            }`}
+            title={
+              navMode === "guided"
+                ? t("proposalManagerNav.switchToClassic")
+                : t("proposalManagerNav.switchToGuided")
+            }
+          >
+            <span className="text-lg" aria-hidden>
+              {navMode === "guided" ? "🧭" : "📑"}
+            </span>
+            {expanded && (
+              <span className="break-words min-w-0 text-left leading-snug">
+                {navMode === "guided"
+                  ? t("proposalManagerNav.modeGuided")
+                  : t("proposalManagerNav.modeClassic")}
+              </span>
+            )}
+          </button>
+        ) : null}
+
         {/* Language Switcher */}
         <SidebarLanguageSwitcher expanded={expanded} darkTheme={darkTheme} />
         

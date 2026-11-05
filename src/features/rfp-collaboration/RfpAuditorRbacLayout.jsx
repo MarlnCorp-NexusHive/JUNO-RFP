@@ -26,7 +26,9 @@ export default function RfpAuditorRbacLayout() {
   const [collabError, setCollabError] = useState("");
 
   const user = readRbacUser();
-  const allowed = user?.team === "RFP Collaboration" && user?.role === "RFP Auditor";
+  const allowed =
+    user?.team === "RFP Collaboration" &&
+    (user?.role === "Team Member" || user?.role === "RFP Auditor");
 
   useEffect(() => {
     if (!allowed) {
@@ -56,7 +58,7 @@ export default function RfpAuditorRbacLayout() {
 
   if (!collabReady) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-[#F8F9F8] dark:bg-gray-900 text-gray-600 dark:text-gray-300">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-[#F4F6F9] dark:bg-gray-900 text-gray-600 dark:text-gray-300">
         <FiRefreshCw className="w-10 h-10 animate-spin text-indigo-500" />
         <p className="text-sm">{t("rfpCollaboration.connectingTeamCollab")}</p>
       </div>
@@ -65,7 +67,7 @@ export default function RfpAuditorRbacLayout() {
 
   if (collabError) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-[#F8F9F8] dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[#F4F6F9] dark:bg-gray-900">
         <div className="max-w-md rounded-xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-gray-800 p-6 text-sm text-red-800 dark:text-red-200">
           {collabError}
         </div>
@@ -76,7 +78,7 @@ export default function RfpAuditorRbacLayout() {
   return (
     <TourProvider>
       <div
-        className="bg-[#F8F9F8] dark:bg-[#0B1410] min-h-screen"
+        className="bg-[#F4F6F9] dark:bg-[#0B1017] min-h-screen"
         dir={isRTLMode ? "rtl" : "ltr"}
       >
         <div

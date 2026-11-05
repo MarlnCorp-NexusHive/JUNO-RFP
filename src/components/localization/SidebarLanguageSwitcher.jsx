@@ -28,7 +28,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
   }
 
   const textClass = darkTheme ? 'text-emerald-50' : 'text-slate-800';
-  const hoverClass = darkTheme ? 'hover:bg-[#122018]' : 'hover:bg-[#F2F7F4]';
+  const hoverClass = darkTheme ? 'hover:bg-[#151D2A]' : 'hover:bg-[#F0F3F7]';
 
   return (
     <button
@@ -66,7 +66,7 @@ const SidebarLanguageSwitcher = ({ expanded, darkTheme }) => {
           {/* Main language text */}
           <span className={`font-bold text-lg relative z-10 transition-all duration-300 ${
             isHovered
-              ? (darkTheme ? 'text-green-200' : 'text-[#1A5336]')
+              ? (darkTheme ? 'text-green-200' : 'text-[#3D4F66]')
               : (darkTheme ? 'text-emerald-50' : 'text-slate-800')
           }`}>
             {isEnglish ? 'EN' : 'AR'}

@@ -12,6 +12,7 @@ import {
   setTrialSession,
   trialUserToRbacUser,
 } from "../services/trialAuthSession.js";
+import { proposalManagerLandingPath } from "../features/proposal-manager/services/navModeStore.js";
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
 import RTLWrapper from "./localization/RTLWrapper";
@@ -39,14 +40,19 @@ const dashboardRoute = (user) => {
   if (user.team === "Transport Team" && user.role === "Head") return "/rbac/transport-head";
   if (user.team === "Procurement Team" && user.role === "Manager") return "/rbac/marketing-head";
   if (user.team === "Sales Enablement Team" && user.role === "Manager") return "/rbac/marketing-head";
-  if (user.team === "Proposal Team" && user.role === "Proposal Manager") return "/app/dashboard";
-  if (user.team === "RFP Collaboration" && user.role === "RFP Auditor") return "/rbac/rfp-auditor";
+  if (user.team === "Proposal Team" && user.role === "Proposal Manager") {
+    return proposalManagerLandingPath();
+  }
+  if (
+    user.team === "RFP Collaboration" &&
+    (user.role === "Team Member" || user.role === "RFP Auditor")
+  ) {
+    return "/rbac/rfp-auditor";
+  }
   // Add more as you build more dashboards
   // Default fallback
   return "/unauthorized";
 };
-
-const PRODUCT_HIGHLIGHT_KEYS = ["aiQa", "companyIntel", "exports", "collaboration"];
 
 /** Dedupe confirm calls (Strict Mode remount / double-click). */
 const confirmInFlight = new Map();
@@ -59,23 +65,6 @@ async function confirmTrialEmailOnce(token) {
   });
   confirmInFlight.set(token, promise);
   return promise;
-}
-
-function ProductHighlight({ label, darkTheme }) {
-  return (
-    <div className={`flex items-center gap-2 text-xs ${darkTheme ? "text-stone-300" : "text-stone-600"}`}>
-      <span
-        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
-          darkTheme ? "bg-[#C6A75E]/20 text-[#E8D5A3]" : "bg-[#8B6914]/12 text-[#8B6914]"
-        }`}
-      >
-        <svg width="8" height="8" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </span>
-      <span>{label}</span>
-    </div>
-  );
 }
 
 function EyeIcon({ off = false }) {
@@ -125,10 +114,11 @@ function LoginPageContent() {
   const [confirming, setConfirming] = useState(false);
   const [darkTheme, setDarkTheme] = useState(false);
   const [demoReloaded, setDemoReloaded] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation(['auth', 'common']);
-  const { isRTL, flexDirection, textAlign, margin, padding } = useRTL();
+  const { isRTL, flexDirection, textAlign } = useRTL();
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -254,7 +244,7 @@ function LoginPageContent() {
         );
         setTrialSession(data);
         localStorage.setItem("rbac_current_user", JSON.stringify(trialUserToRbacUser(data)));
-        navigate("/app/dashboard", { replace: true });
+        navigate(proposalManagerLandingPath(), { replace: true });
         return;
       } catch (trialErr) {
         const code = trialErr?.response?.data?.code;
@@ -333,291 +323,262 @@ function LoginPageContent() {
     setTimeout(() => setDemoReloaded(false), 3000);
   };
 
-  const inputClass = `w-full px-4 py-3 rounded-xl border transition-colors ${
-    darkTheme
-      ? "bg-[#1A1714] border-[#3A342C] text-[#F5F0E8] placeholder:text-[#A89F91] focus:border-[#C6A75E] focus:ring-[#C6A75E]/35"
-      : "bg-[#FFFcf7] border-[#E4DCCF] text-[#1C1917] placeholder:text-[#8A8278] focus:border-[#B8953D] focus:ring-[#B8953D]/30"
-  } focus:outline-none focus:ring-2 font-medium shadow-sm text-${textAlign("left")}`;
-  const labelClass = `block text-sm font-medium mb-1 text-${textAlign("left")} ${
-    darkTheme ? "text-[#E8E0D4]" : "text-[#3F3A34]"
-  }`;
-  const mutedCopyClass = darkTheme ? "text-[#B7AEA2]" : "text-[#6F675E]";
+  const pageBg = darkTheme ? "bg-[#0B1017]" : "bg-[#FFFFFF]";
+  const ink = darkTheme ? "text-[#F3F4F6]" : "text-[#111827]";
+  const muted = darkTheme ? "text-[#9CA3AF]" : "text-[#6B7280]";
+  const fieldBorder = darkTheme
+    ? "border-[#374151] bg-[#111827] text-[#F3F4F6] placeholder:text-[#6B7280] focus:border-[#9CA3AF]"
+    : "border-[#D1D5DB] bg-[#FFFFFF] text-[#111827] placeholder:text-[#9CA3AF] focus:border-[#111827]";
+  const inputClass = `w-full rounded-md border px-3.5 py-3 text-[15px] outline-none transition focus:ring-0 ${fieldBorder} text-${textAlign("left")}`;
+  const labelClass = `mb-1.5 block text-sm font-medium ${ink} text-${textAlign("left")}`;
   const linkClass = darkTheme
-    ? "text-[#E8D5A3] hover:text-[#F3E6C4]"
-    : "text-[#8B6914] hover:text-[#6F540F]";
+    ? "text-[#D1D5DB] underline decoration-[#6B7280] underline-offset-2 hover:text-white"
+    : "text-[#111827] underline decoration-[#9CA3AF] underline-offset-2 hover:decoration-[#111827]";
   const ctaClass = darkTheme
-    ? "w-full py-3 rounded-xl bg-gradient-to-r from-[#C6A75E] to-[#A8883A] text-[#1A1408] font-semibold text-lg shadow-[0_10px_30px_rgba(198,167,94,0.28)] hover:from-[#D4B56C] hover:to-[#B8953D] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-    : "w-full py-3 rounded-xl bg-[#1C1917] text-[#F8F4EC] font-semibold text-lg shadow-[0_10px_28px_rgba(28,25,23,0.22)] hover:bg-[#2A241C] hover:shadow-[0_12px_32px_rgba(28,25,23,0.28)] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed";
+    ? "w-full rounded-md bg-[#E5E7EB] py-3.5 text-center text-[15px] font-semibold text-[#111827] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+    : "w-full rounded-md bg-[#111827] py-3.5 text-center text-[15px] font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-70";
 
   return (
-    <RTLWrapper
-      className={`min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-10 ${
-        darkTheme ? "bg-[#0B0A09]" : "bg-[#F3F0EA]"
-      }`}
-    >
-      {/* Ambient stage — gold/espresso, tuned to the JUNO medallion */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        {darkTheme ? (
-          <>
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_30%,rgba(198,167,94,0.16),transparent_55%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_85%_75%,rgba(90,70,35,0.22),transparent_50%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.03),transparent_40%,rgba(0,0,0,0.35))]" />
-          </>
-        ) : (
-          <>
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_20%,rgba(214,190,120,0.28),transparent_50%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_90%_80%,rgba(120,95,50,0.10),transparent_45%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.55),transparent_35%,rgba(40,30,18,0.04))]" />
-          </>
-        )}
-      </div>
+    <RTLWrapper className={`relative min-h-screen ${pageBg}`}>
+      <header className="relative z-10 flex items-center justify-between px-5 py-5 sm:px-8">
+        <img
+          src="/juno-rfp-wordmark.jpg"
+          alt="JUNO RFP by MARLN Corporation"
+          className="h-24 w-auto object-contain sm:h-32"
+        />
 
-      {/* Language Switcher and Theme Toggle */}
-      <div className={`absolute top-6 ${isRTL ? "left-6" : "right-6"} z-10 flex items-center space-x-2 ${isRTL ? "space-x-reverse" : ""} top-controls`}>
-        <button
-          onClick={handleThemeToggle}
-          className={`
-            relative inline-flex items-center justify-center w-12 h-12 
-            rounded-full border shadow-lg
-            hover:scale-105 transition-all duration-300 ease-in-out group
-            ${isRTL ? "ml-2" : "mr-2"}
-            ${
-              darkTheme
-                ? "bg-[#1A1714]/80 border-[#C6A75E]/25 text-[#E8D5A3] hover:bg-[#241F1A] hover:border-[#C6A75E]/45"
-                : "bg-white/80 border-[#D9D0C2] text-[#5C5348] hover:bg-white hover:border-[#C6A75E]/50"
-            }
-          `}
-          title={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          aria-label={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          <svg
-            className={`w-5 h-5 text-[#C6A75E] transition-all duration-300 absolute ${
-              darkTheme ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-90 scale-0"
-            }`}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <svg
-            className={`w-5 h-5 text-[#5C5348] transition-all duration-300 absolute ${
-              darkTheme ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"
-            }`}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-          </svg>
-          <div className="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-[#C6A75E]/25 transition-all duration-300" />
-        </button>
-
-        <LanguageSwitcher />
-      </div>
-
-      <div
-        className={`relative z-[1] flex w-full max-w-4xl rounded-[1.75rem] overflow-hidden border shadow-[0_30px_80px_rgba(20,16,10,0.28)] ${flexDirection("row")} ${
-          darkTheme
-            ? "bg-[#14110F]/95 border-[#3A342C]/80"
-            : "bg-white/90 border-[#E8E0D4] shadow-[0_28px_70px_rgba(40,30,18,0.14)]"
-        }`}
-      >
-        {/* Brand stage — always espresso so the gold/white logo medallion sits naturally */}
-        <div
-          className={`hidden md:flex flex-col items-center justify-center w-[46%] relative overflow-hidden ${
-            isRTL ? "rounded-r-[1.75rem]" : "rounded-l-[1.75rem]"
-          }`}
-          style={{
-            background:
-              "radial-gradient(circle at 50% 42%, #3A2E22 0%, #1A140F 48%, #0B0908 100%)",
-          }}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle at 50% 45%, rgba(198,167,94,0.22), transparent 58%)",
-            }}
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute -inset-8 opacity-[0.07]"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 11px, rgba(255,255,255,0.35) 12px)",
-            }}
-            aria-hidden="true"
-          />
-
-          <div className="relative flex flex-col items-center px-10 py-12">
-            <div
-              className="relative flex items-center justify-center rounded-full p-3"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(198,167,94,0.18) 0%, rgba(198,167,94,0.05) 45%, transparent 70%)",
-                boxShadow: "0 0 0 1px rgba(198,167,94,0.18), 0 24px 60px rgba(0,0,0,0.45)",
+        <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+          {mode === "login" ? (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("signup");
+                setError("");
+                setInfo("");
               }}
+              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+                darkTheme
+                  ? "border-[#374151] text-[#E5E7EB] hover:bg-[#1F2937]"
+                  : "border-[#D1D5DB] text-[#111827] hover:bg-[#F9FAFB]"
+              }`}
             >
-              <img
-                src="/juno-rfp-logo.png"
-                alt="JUNO RFP"
-                className="w-full max-w-[15.5rem] object-contain"
-              />
-            </div>
-            <p className="mt-8 max-w-[16rem] text-center text-sm leading-relaxed text-[#D8CBAE]/85 tracking-wide">
-              Audit-Ready. Submission-Ready. Win-Ready.
-            </p>
-          </div>
+              {t("auth.login.signUp")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setInfo("");
+              }}
+              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+                darkTheme
+                  ? "border-[#374151] text-[#E5E7EB] hover:bg-[#1F2937]"
+                  : "border-[#D1D5DB] text-[#111827] hover:bg-[#F9FAFB]"
+              }`}
+            >
+              {t("auth.login.backToSignIn")}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleThemeToggle}
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition ${
+              darkTheme
+                ? "border-[#374151] text-[#D1D5DB] hover:bg-[#1F2937]"
+                : "border-[#E5E7EB] text-[#4B5563] hover:bg-[#F9FAFB]"
+            }`}
+            title={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {darkTheme ? (
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path
+                  fillRule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            )}
+          </button>
+          <LanguageSwitcher />
         </div>
+      </header>
 
-        {/* Form panel */}
-        <div
-          className={`flex-1 flex flex-col justify-center items-center p-8 md:p-14 form-container ${
-            isRTL ? "rounded-l-[1.75rem]" : "rounded-r-[1.75rem]"
-          } ${darkTheme ? "bg-[#171411]" : "bg-[#FFFcf8]"}`}
-        >
-          <div className="w-full max-w-sm">
-            {/* Mobile logo */}
-            <div className="md:hidden mb-8 flex justify-center">
-              <div
-                className="rounded-full p-2"
-                style={{
-                  background:
-                    "radial-gradient(circle, #2A2118 0%, #120E0B 70%)",
-                  boxShadow: "0 0 0 1px rgba(198,167,94,0.25), 0 12px 30px rgba(0,0,0,0.25)",
-                }}
-              >
-                <img src="/juno-rfp-logo.png" alt="JUNO RFP" className="w-36 object-contain" />
-              </div>
-            </div>
+      <main className="relative z-[1] mx-auto flex w-full max-w-[420px] flex-col px-5 pb-16 pt-6 sm:pt-10">
+        {mode === "login" ? (
+          <>
+            <p className={`text-sm ${muted}`}>
+              {t("auth.login.welcomeBack", { defaultValue: "Welcome back" })}
+            </p>
+            <h1
+              className={`mt-2 text-[2rem] font-semibold tracking-tight sm:text-[2.35rem] ${ink}`}
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              {t("auth.login.logInTo", { defaultValue: "Log in to JUNO RFP" })}
+            </h1>
 
-            <h2 className={`text-2xl font-bold text-center mb-2 ${darkTheme ? "text-[#F7F1E7]" : "text-[#1C1917]"}`}>
-              {mode === "signup" ? t("auth.signup.title") : t("auth.login.title")}
-            </h2>
-            {mode === "signup" && (
-              <p className={`text-center text-sm mb-6 ${mutedCopyClass}`}>{t("auth.signup.subtitle")}</p>
-            )}
-            {mode === "login" && !info && (
-              <p className={`text-center text-sm mb-6 ${mutedCopyClass}`}>{t("auth.login.subtitle")}</p>
-            )}
-            {mode === "login" && info && <div className="mb-2" />}
-
-            {mode === "login" ? (
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="mt-8 space-y-5">
               <div>
                 <label className={labelClass}>
-                  {t('auth.login.username')}
+                  {t("auth.login.username")} <span className="text-[#DC2626]">*</span>
                 </label>
-                <div className="relative input-with-icon">
-                  <input
-                    type="text"
-                    className={`${inputClass} ${isRTL ? 'pr-12' : 'pl-12'}`}
-                    placeholder={t('auth.login.usernamePlaceholder')}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    autoFocus
-                    disabled={isLoading || confirming}
-                  />
-                  <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#B8953D] input-icon`}>
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg>
-                  </span>
-                </div>
+                <input
+                  type="text"
+                  className={inputClass}
+                  placeholder={t("auth.login.usernamePlaceholder")}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoFocus
+                  disabled={isLoading || confirming}
+                />
               </div>
               <div>
                 <label className={labelClass}>
-                  {t('auth.login.password')}
+                  {t("auth.login.password")} <span className="text-[#DC2626]">*</span>
                 </label>
-                <div className="relative input-with-icon">
+                <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    className={`${inputClass} ${isRTL ? "pl-12 pr-12" : "pl-12 pr-12"}`}
-                    placeholder={t('auth.login.passwordPlaceholder')}
+                    className={`${inputClass} ${isRTL ? "pl-11" : "pr-11"}`}
+                    placeholder={t("auth.login.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading || confirming}
                     autoComplete="current-password"
                   />
-                  <span className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#B8953D] input-icon`}>
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-7V8a6 6 0 10-12 0v2a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2zm-8-2a4 4 0 118 0v2H6V8zm10 10H4v-6h16v6z" fill="currentColor"/></svg>
-                  </span>
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#B8953D] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#C6A75E]/40 dark:hover:bg-white/10`}
-                    aria-label={showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
-                    tabIndex={0}
+                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${muted} ${
+                      isRTL ? "left-2" : "right-2"
+                    } hover:opacity-80`}
+                    aria-label={
+                      showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")
+                    }
                   >
                     <EyeIcon off={showPassword} />
                   </button>
                 </div>
               </div>
+
+              <div
+                className={`flex flex-wrap items-center justify-between gap-3 text-sm ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                <label className={`flex cursor-pointer items-center gap-2 ${muted}`}>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-[#111827] focus:ring-[#111827]"
+                  />
+                  <span>
+                    {t("auth.login.rememberMe", {
+                      defaultValue: "Remember me on this computer",
+                    })}
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  className={linkClass}
+                  onClick={() =>
+                    setInfo(
+                      t("auth.login.forgotComingSoon", {
+                        defaultValue:
+                          "Password reset is coming soon. Contact support if you need help.",
+                      }),
+                    )
+                  }
+                >
+                  {t("auth.login.forgotPassword", {
+                    defaultValue: "Forgot your password?",
+                  })}
+                </button>
+              </div>
+
               {(error || info || confirming) && (
-                <div className={`text-sm text-center p-3 rounded-lg ${
-                  error
-                    ? (darkTheme ? 'text-red-400 bg-red-900/20' : 'text-red-500 bg-red-50')
-                    : (darkTheme ? 'text-emerald-300 bg-emerald-900/20' : 'text-emerald-700 bg-emerald-50')
-                }`}>
+                <div
+                  className={`rounded-md px-3 py-2.5 text-center text-sm ${
+                    error
+                      ? darkTheme
+                        ? "bg-red-900/20 text-red-300"
+                        : "bg-red-50 text-red-600"
+                      : darkTheme
+                        ? "bg-emerald-900/20 text-emerald-300"
+                        : "bg-emerald-50 text-emerald-700"
+                  }`}
+                >
                   {error || info}
                 </div>
               )}
               {devConfirmUrl && (
                 <a
                   href={devConfirmUrl}
-                  className={`block text-center text-sm font-semibold underline ${linkClass}`}
+                  className={`block text-center text-sm font-semibold ${linkClass}`}
                 >
                   {t("auth.signup.openConfirmLink")}
                 </a>
               )}
               {demoReloaded && (
-                <div className={`text-sm text-center p-3 rounded-lg ${darkTheme ? 'text-green-400 bg-green-900/20' : 'text-green-600 bg-green-50'}`}>
+                <div
+                  className={`rounded-md px-3 py-2.5 text-center text-sm ${
+                    darkTheme
+                      ? "bg-emerald-900/20 text-emerald-300"
+                      : "bg-emerald-50 text-emerald-700"
+                  }`}
+                >
                   Demo credentials reloaded. Try logging in again.
                 </div>
               )}
-              <button
-                type="submit"
-                disabled={isLoading || confirming}
-                className={`${ctaClass} ${flexDirection('row')} login-button`}
-              >
-                {isLoading ? t('auth.login.loading') : t('auth.login.signInButton')}
-                {!isLoading && (
-                  <svg 
-                    width="18" 
-                    height="18" 
-                    fill="none" 
-                    viewBox="0 0 24 24"
-                    className={isRTL ? 'rotate-180' : ''}
-                    data-arrow="true"
-                  >
-                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
+
+              <button type="submit" disabled={isLoading || confirming} className={ctaClass}>
+                {isLoading ? t("auth.login.loading") : t("auth.login.signInButton")}
               </button>
+            </form>
+
+            <p className={`mt-8 text-center text-sm ${muted}`}>
+              {t("auth.login.noAccount")}{" "}
               <button
                 type="button"
+                className={linkClass}
                 onClick={() => {
                   setMode("signup");
                   setError("");
                   setInfo("");
                 }}
-                className={`w-full mt-1 py-2 text-sm font-semibold hover:underline ${darkTheme ? "text-[#F7F1E7]" : "text-[#1C1917]"}`}
               >
-                {t("auth.login.noAccount")} {t("auth.login.signUp")}
+                {t("auth.login.signUp")}
               </button>
-              <button
-                type="button"
-                onClick={handleReloadDemoUsers}
-                className={`w-full py-2 text-sm hover:underline ${linkClass}`}
-              >
-                Reload demo credentials
-              </button>
-            </form>
-            ) : (
-            <form onSubmit={handleSignup} className="space-y-4">
+            </p>
+            <button
+              type="button"
+              onClick={handleReloadDemoUsers}
+              className={`mx-auto mt-4 block text-xs hover:underline ${muted}`}
+            >
+              Reload demo credentials
+            </button>
+          </>
+        ) : (
+          <>
+            <p className={`text-sm ${muted}`}>{t("auth.signup.subtitle")}</p>
+            <h1
+              className={`mt-2 text-[2rem] font-semibold tracking-tight sm:text-[2.35rem] ${ink}`}
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              {t("auth.signup.title")}
+            </h1>
+            <form onSubmit={handleSignup} className="mt-8 space-y-4">
               <div>
-                <label className={labelClass}>{t("auth.signup.name")}</label>
+                <label className={labelClass}>
+                  {t("auth.signup.name")} <span className="text-[#DC2626]">*</span>
+                </label>
                 <input
                   className={inputClass}
                   value={signupName}
@@ -628,7 +589,9 @@ function LoginPageContent() {
                 />
               </div>
               <div>
-                <label className={labelClass}>{t("auth.signup.company")}</label>
+                <label className={labelClass}>
+                  {t("auth.signup.company")} <span className="text-[#DC2626]">*</span>
+                </label>
                 <input
                   className={inputClass}
                   value={signupCompany}
@@ -639,7 +602,9 @@ function LoginPageContent() {
                 />
               </div>
               <div>
-                <label className={labelClass}>{t("auth.signup.email")}</label>
+                <label className={labelClass}>
+                  {t("auth.signup.email")} <span className="text-[#DC2626]">*</span>
+                </label>
                 <input
                   type="email"
                   className={inputClass}
@@ -651,11 +616,13 @@ function LoginPageContent() {
                 />
               </div>
               <div>
-                <label className={labelClass}>{t("auth.signup.password")}</label>
+                <label className={labelClass}>
+                  {t("auth.signup.password")} <span className="text-[#DC2626]">*</span>
+                </label>
                 <div className="relative">
                   <input
                     type={showSignupPassword ? "text" : "password"}
-                    className={`${inputClass} ${isRTL ? "pl-12" : "pr-12"}`}
+                    className={`${inputClass} ${isRTL ? "pl-11" : "pr-11"}`}
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     placeholder={t("auth.signup.passwordPlaceholder")}
@@ -667,19 +634,22 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSignupPassword((v) => !v)}
-                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#B8953D] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#C6A75E]/40 dark:hover:bg-white/10`}
-                    aria-label={showSignupPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
+                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${muted} ${
+                      isRTL ? "left-2" : "right-2"
+                    }`}
                   >
                     <EyeIcon off={showSignupPassword} />
                   </button>
                 </div>
               </div>
               <div>
-                <label className={labelClass}>{t("auth.signup.confirmPassword")}</label>
+                <label className={labelClass}>
+                  {t("auth.signup.confirmPassword")} <span className="text-[#DC2626]">*</span>
+                </label>
                 <div className="relative">
                   <input
                     type={showSignupConfirm ? "text" : "password"}
-                    className={`${inputClass} ${isRTL ? "pl-12" : "pr-12"}`}
+                    className={`${inputClass} ${isRTL ? "pl-11" : "pr-11"}`}
                     value={signupConfirm}
                     onChange={(e) => setSignupConfirm(e.target.value)}
                     minLength={8}
@@ -690,8 +660,9 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSignupConfirm((v) => !v)}
-                    className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#B8953D] hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-[#C6A75E]/40 dark:hover:bg-white/10`}
-                    aria-label={showSignupConfirm ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
+                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${muted} ${
+                      isRTL ? "left-2" : "right-2"
+                    }`}
                   >
                     <EyeIcon off={showSignupConfirm} />
                   </button>
@@ -699,14 +670,14 @@ function LoginPageContent() {
               </div>
               {(error || info) && (
                 <div
-                  className={`text-sm text-center p-3 rounded-lg ${
+                  className={`rounded-md px-3 py-2.5 text-center text-sm ${
                     error
                       ? darkTheme
-                        ? "text-red-400 bg-red-900/20"
-                        : "text-red-500 bg-red-50"
+                        ? "bg-red-900/20 text-red-300"
+                        : "bg-red-50 text-red-600"
                       : darkTheme
-                        ? "text-emerald-300 bg-emerald-900/20"
-                        : "text-emerald-700 bg-emerald-50"
+                        ? "bg-emerald-900/20 text-emerald-300"
+                        : "bg-emerald-50 text-emerald-700"
                   }`}
                 >
                   {error || info}
@@ -715,44 +686,36 @@ function LoginPageContent() {
               {devConfirmUrl && (
                 <a
                   href={devConfirmUrl}
-                  className={`block text-center text-sm font-semibold underline ${linkClass}`}
+                  className={`block text-center text-sm font-semibold ${linkClass}`}
                 >
                   {t("auth.signup.openConfirmLink")}
                 </a>
               )}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`${ctaClass} disabled:opacity-70`}
-              >
+              <button type="submit" disabled={isLoading} className={ctaClass}>
                 {isLoading ? t("auth.signup.loading") : t("auth.signup.submit")}
               </button>
+            </form>
+            <p className={`mt-8 text-center text-sm ${muted}`}>
+              {t("auth.login.haveAccount")}{" "}
               <button
                 type="button"
+                className={linkClass}
                 onClick={() => {
                   setMode("login");
                   setError("");
                   setInfo("");
                 }}
-                className={`w-full py-2 text-sm font-semibold hover:underline ${darkTheme ? "text-[#F7F1E7]" : "text-[#1C1917]"}`}
               >
-                {t("auth.login.haveAccount")} {t("auth.login.backToSignIn")}
+                {t("auth.login.backToSignIn")}
               </button>
-            </form>
-            )}
-
-            <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-2.5">
-              {PRODUCT_HIGHLIGHT_KEYS.map((key) => (
-                <ProductHighlight key={key} label={t(`auth.highlights.${key}`)} darkTheme={darkTheme} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+            </p>
+          </>
+        )}
+      </main>
     </RTLWrapper>
   );
 }
 
 export default function LoginPage() {
   return <LoginPageContent />;
-} 
+}

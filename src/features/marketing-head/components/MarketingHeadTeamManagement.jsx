@@ -308,7 +308,7 @@ export default function MarketingHeadTeamManagement() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
+      <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017]">
         <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
           <div className="text-center">
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">{isArabic ? "جارٍ التحميل..." : "Loading..."}</h1>
@@ -789,7 +789,7 @@ export default function MarketingHeadTeamManagement() {
   return (
     <div 
       key={`${i18n.language}-${languageVersion}`}
-      className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}
+      className={`flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017] ${isRTLMode ? 'rtl' : 'ltr'}`}
     >
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {/* Header Section */}

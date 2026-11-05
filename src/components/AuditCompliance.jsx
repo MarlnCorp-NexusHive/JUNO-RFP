@@ -87,7 +87,7 @@ export default function AuditCompliance() {
     </button>
   );
   return (
-    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
+    <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>
@@ -99,7 +99,7 @@ export default function AuditCompliance() {
             {complianceDomains.map(d => (
               <div key={d.label} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow flex flex-col items-center">
                 <svg className="w-16 h-16 mb-2" viewBox="0 0 40 40">
-                  <circle cx="20" cy="20" r="18" fill="none" stroke="#e5e7eb" strokeWidth="4" />
+                  <circle cx="20" cy="20" r="18" fill="none" stroke="#D8E0EA" strokeWidth="4" />
                   <circle cx="20" cy="20" r="18" fill="none" stroke={d.color} strokeWidth="4" strokeDasharray={113} strokeDashoffset={113 - (d.value / 100) * 113} strokeLinecap="round" />
                 </svg>
                 <span className="text-xl font-bold" style={{ color: d.color }}>{d.value}%</span>

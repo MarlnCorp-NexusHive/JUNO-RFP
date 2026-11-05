@@ -31,7 +31,7 @@ export const BOILERPLATE_PACK = [
           "Document-grounded AI Q&A that searches the full solicitation and answers as a proposal analyst — with honest gaps when the RFP is silent.",
           "Workspace extraction from PDF, Word, and Excel (including OCR) into reusable Q&A and facts.",
           "Content Hub library so winning language is reused, tagged, and exported instead of rewritten from scratch.",
-          "PM–auditor collaboration: assign questions, AI drafts, review, clarifications, and an activity trail.",
+          "PM–team member collaboration: assign questions, AI drafts, review, clarifications, and an activity trail.",
           "Company Intelligence on the issuer and Competitive Intelligence on peer SIs — datasheets, value propositions, and differentiators.",
           "Technical Solutioning that grounds architecture in your reference designs and maps it to RFP requirements.",
           "Submission artifacts: Word work documents, PowerPoint decks, and Marln-styled DOCX merge for the technical volume.",
@@ -45,7 +45,7 @@ export const BOILERPLATE_PACK = [
         bullets: [
           "Federal, civilian, and commercial SI / consulting pursuits",
           "Multi-volume responses (technical, management, past performance, pricing support)",
-          "Teams split between capture, proposal managers, and independent reviewers (auditors)",
+          "Teams split between capture, proposal managers, and independent reviewers (team members)",
         ],
       },
       {
@@ -75,7 +75,7 @@ export const BOILERPLATE_PACK = [
         heading: "Key differentiators",
         bullets: [
           "Proposal-analyst prompting, not chatbot improvisation — drafts cite the solicitation and admit gaps.",
-          "Role-true collaboration (Proposal Manager vs RFP Auditor) with review states, not a shared Google Doc.",
+          "Role-true collaboration (Proposal Manager vs Team Member) with review states, not a shared Google Doc.",
           "Issuer financials and peer SI comparison in the same product the writers use — capture and proposal stay aligned.",
           "Export is a first-class outcome (DOCX / PPTX / styled Marln template), not a copy-paste afterthought.",
           "Bilingual English / Arabic with RTL so regional pursuits do not fork into a second tool.",
@@ -106,7 +106,7 @@ export const BOILERPLATE_PACK = [
     fileBase: "Marln-JUNO-RFP-Lifecycle-Capabilities",
     title: "JUNO RFP — Pursuit Lifecycle Capabilities",
     subtitle: "How a proposal team runs a bid from kickoff to submission",
-    audience: "Proposal managers, capture leads, and reviewer / auditor teams",
+    audience: "Proposal managers, capture leads, and reviewer / team member teams",
     documentTypeId: "other",
     uploadedAt: "2026-09-13T08:10:00.000Z",
     sections: [
@@ -131,7 +131,7 @@ export const BOILERPLATE_PACK = [
       {
         heading: "4. Review like an evaluation board",
         paragraphs: [
-          "Proposal Managers assign questions to RFP Auditors. Auditors draft (including AI assist), submit, and request clarifications. The PM reviews, requests changes, and keeps an activity log — the audit trail evaluators expect internally even when it is not a FAR requirement.",
+          "Proposal Managers assign questions to Team Members. Team members draft (including AI assist), submit, and request clarifications. The PM reviews, requests changes, and keeps an activity log — the audit trail evaluators expect internally even when it is not a FAR requirement.",
         ],
       },
       {
@@ -149,21 +149,21 @@ export const BOILERPLATE_QAS = [
     id: "qa_boilerplate_who",
     question: "Who is Marln Corporation and what is JUNO RFP?",
     answer:
-      "Marln Corporation is the company behind JUNO RFP, a proposal operating system for teams responding to complex solicitations. JUNO covers ingest, grounded AI drafting, PM–auditor collaboration, issuer and competitive intelligence, technical solutioning, and submission-ready Word/PowerPoint export. Tagline: Audit-Ready. Submission-Ready. Win-Ready.",
+      "Marln Corporation is the company behind JUNO RFP, a proposal operating system for teams responding to complex solicitations. JUNO covers ingest, grounded AI drafting, PM–team member collaboration, issuer and competitive intelligence, technical solutioning, and submission-ready Word/PowerPoint export. Tagline: Audit-Ready. Submission-Ready. Win-Ready.",
     tags: ["Boilerplate", "Capabilities", "Past Performance"],
   },
   {
     id: "qa_boilerplate_capabilities",
     question: "What winning RFP capabilities does JUNO provide?",
     answer:
-      "Document-grounded AI Q&A; Workspace extraction (PDF/DOCX/XLSX + OCR); Content Hub reusable tagged answers; PM–auditor collaboration with review states; Company Intelligence on issuers; Competitive Intelligence on peer SIs; Technical Solutioning with requirement traceability; Word, PowerPoint, and Marln-styled DOCX export; English/Arabic + RTL.",
+      "Document-grounded AI Q&A; Workspace extraction (PDF/DOCX/XLSX + OCR); Content Hub reusable tagged answers; PM–team member collaboration with review states; Company Intelligence on issuers; Competitive Intelligence on peer SIs; Technical Solutioning with requirement traceability; Word, PowerPoint, and Marln-styled DOCX export; English/Arabic + RTL.",
     tags: ["Boilerplate", "Capabilities"],
   },
   {
     id: "qa_boilerplate_differentiators",
     question: "What are JUNO’s key differentiators versus generic GenAI or a shared drive?",
     answer:
-      "Proposal-analyst prompting that admits gaps; role-true PM vs auditor workflow; issuer and competitor intel in the same workspace as writers; evaluator-ready exports as a first-class outcome; bilingual EN/AR; architecture designs traced to RFP requirements rather than a disconnected Visio file.",
+      "Proposal-analyst prompting that admits gaps; role-true PM vs team member workflow; issuer and competitor intel in the same workspace as writers; evaluator-ready exports as a first-class outcome; bilingual EN/AR; architecture designs traced to RFP requirements rather than a disconnected Visio file.",
     tags: ["Boilerplate", "Capabilities", "Past Performance"],
   },
   {

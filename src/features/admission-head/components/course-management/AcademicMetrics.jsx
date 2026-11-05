@@ -47,30 +47,30 @@ const options = {
     legend: { 
       position: 'top',
       labels: {
-        color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
+        color: document.documentElement.classList.contains('dark') ? '#F0F3F7' : '#2A3548'
       }
     },
     title: { 
       display: true, 
       text: 'Pipeline Metrics by Course',
-      color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
+      color: document.documentElement.classList.contains('dark') ? '#F0F3F7' : '#2A3548'
     },
   },
   scales: {
     x: {
       ticks: {
-        color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
+        color: document.documentElement.classList.contains('dark') ? '#F0F3F7' : '#2A3548'
       },
       grid: {
-        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+        color: document.documentElement.classList.contains('dark') ? '#2A3548' : '#D8E0EA'
       }
     },
     y: {
       ticks: {
-        color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
+        color: document.documentElement.classList.contains('dark') ? '#F0F3F7' : '#2A3548'
       },
       grid: {
-        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+        color: document.documentElement.classList.contains('dark') ? '#2A3548' : '#D8E0EA'
       }
     }
   }

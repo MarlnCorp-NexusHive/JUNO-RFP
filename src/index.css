@@ -13,32 +13,32 @@
 }
 
 .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
-  background-color: #d1d5db;
+  background-color: #B8C5D6;
   border-radius: 3px;
 }
 
 .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
-  background-color: #4b5563;
+  background-color: #3D4F66;
   border-radius: 3px;
 }
 
 .scrollbar-track-gray-100::-webkit-scrollbar-track {
-  background-color: #f3f4f6;
+  background-color: #F0F3F7;
   border-radius: 3px;
 }
 
 .scrollbar-track-gray-700::-webkit-scrollbar-track {
-  background-color: #374151;
+  background-color: #2A3548;
   border-radius: 3px;
 }
 
 /* Hover effects for scrollbar */
 .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb:hover {
-  background-color: #9ca3af;
+  background-color: #8FA3B8;
 }
 
 .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
-  background-color: #6b7280;
+  background-color: #5A6F86;
 }
 
 /* Smooth scrolling for tabs */
@@ -349,56 +349,56 @@ html[lang="ar"] {
 
 @layer base {
   :root {
-    /* Granary surfaces — JUNO keeps product name; colors only */
-    --background: 120 11% 97%;
-    --foreground: 160 28% 12%;
+    /* Steel blue-grey brand surfaces — JUNO keeps product name; colors only */
+    --background: 214 28% 97%;
+    --foreground: 214 30% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 160 28% 12%;
+    --card-foreground: 214 30% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 160 28% 12%;
-    --primary: 151 52% 21%;
+    --popover-foreground: 214 30% 12%;
+    --primary: 214 25% 32%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 140 18% 94%;
-    --secondary-foreground: 151 52% 21%;
-    --muted: 140 12% 94%;
-    --muted-foreground: 160 8% 40%;
-    --accent: 140 22% 92%;
-    --accent-foreground: 151 52% 21%;
+    --secondary: 214 28% 96%;
+    --secondary-foreground: 214 25% 32%;
+    --muted: 214 22% 95%;
+    --muted-foreground: 214 14% 42%;
+    --accent: 214 28% 94%;
+    --accent-foreground: 214 25% 32%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 140 8% 90%;
-    --input: 140 8% 90%;
-    --ring: 151 52% 21%;
-    --radius: 0.625rem; /* ~10px Granary cards */
-    --granary-mint: #5eb094;
-    --granary-forest: #1a5336;
-    --granary-card-border: #e5e7eb;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 214 25% 32%;
+    --radius: 0.625rem; /* ~10px cards */
+    --granary-mint: #8fa3b8;
+    --granary-forest: #3d4f66;
+    --granary-card-border: #d8e0ea;
     --granary-card-bg: #ffffff;
-    --granary-canvas: #f8f9f8;
+    --granary-canvas: #f4f6f9;
   }
   .dark {
-    --background: 150 22% 6%;
-    --foreground: 140 18% 94%;
-    --card: 150 16% 9%;
-    --card-foreground: 140 18% 94%;
-    --popover: 150 16% 9%;
-    --popover-foreground: 140 18% 94%;
-    --primary: 155 35% 55%;
-    --primary-foreground: 150 30% 8%;
-    --secondary: 150 14% 14%;
-    --secondary-foreground: 140 18% 94%;
-    --muted: 150 12% 14%;
-    --muted-foreground: 140 10% 65%;
-    --accent: 150 14% 16%;
-    --accent-foreground: 140 18% 94%;
+    --background: 216 35% 7%;
+    --foreground: 214 25% 96%;
+    --card: 216 28% 12%;
+    --card-foreground: 214 25% 96%;
+    --popover: 216 28% 12%;
+    --popover-foreground: 214 25% 96%;
+    --primary: 214 22% 68%;
+    --primary-foreground: 216 35% 8%;
+    --secondary: 216 24% 14%;
+    --secondary-foreground: 214 25% 96%;
+    --muted: 216 22% 14%;
+    --muted-foreground: 214 14% 65%;
+    --accent: 216 24% 16%;
+    --accent-foreground: 214 25% 96%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 150 14% 16%;
-    --input: 150 14% 16%;
-    --ring: 155 35% 55%;
-    --granary-card-border: #24352c;
-    --granary-card-bg: #122018;
-    --granary-canvas: #0b1410;
+    --border: 216 22% 18%;
+    --input: 216 22% 18%;
+    --ring: 214 22% 68%;
+    --granary-card-border: #2a3548;
+    --granary-card-bg: #151d2a;
+    --granary-canvas: #0b1017;
   }
 }
 
@@ -445,30 +445,30 @@ body.dark .dark\:bg-gray-800.rounded-xl {
   box-shadow: none;
 }
 
-/* Dark mode primary CTAs → mint fill + dark text (artifact Sign in) */
+/* Dark mode primary CTAs → soft steel fill + dark text */
 body.dark .bg-indigo-600 {
   background-color: var(--granary-mint) !important;
-  color: #0b1410 !important;
+  color: #0b1017 !important;
 }
 body.dark .bg-indigo-600:hover,
 body.dark .hover\:bg-indigo-500:hover {
-  background-color: #6bc4a3 !important;
+  background-color: #b8c5d6 !important;
 }
 body.dark .bg-indigo-500 {
   background-color: var(--granary-mint) !important;
-  color: #0b1410 !important;
+  color: #0b1017 !important;
 }
 body.dark .from-indigo-600,
 body.dark .to-blue-600,
 body.dark .to-violet-600 {
-  --tw-gradient-from: #5eb094 var(--tw-gradient-from-position);
-  --tw-gradient-to: #3d7a52 var(--tw-gradient-to-position);
+  --tw-gradient-from: #8fa3b8 var(--tw-gradient-from-position);
+  --tw-gradient-to: #5a6f86 var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
 /* Dark Mode Component Styles */
 body.dark .bg-gradient-to-br {
-  background: linear-gradient(to bottom right, #0b1410, #122018, #1a2e24);
+  background: linear-gradient(to bottom right, #0b1017, #151d2a, #2a3548);
 }
 
 /* Dark mode for login form container */
@@ -541,15 +541,15 @@ body.dark .backdrop-blur-lg {
 
 /* Dark mode RTL scrollbar */
 .dark .rtl-layout ::-webkit-scrollbar-track {
-  background: #374151;
+  background: #2A3548;
 }
 
 .dark .rtl-layout ::-webkit-scrollbar-thumb {
-  background: #6b7280;
+  background: #5A6F86;
 }
 
 .dark .rtl-layout ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #8FA3B8;
 }
 
 /* Firefox RTL scrollbar support */
@@ -559,7 +559,7 @@ body.dark .backdrop-blur-lg {
 }
 
 .dark .rtl-layout {
-  scrollbar-color: #6b7280 #374151;
+  scrollbar-color: #5A6F86 #2A3548;
 }
 
 /* Ultra-thin scrollbar for modern browsers */

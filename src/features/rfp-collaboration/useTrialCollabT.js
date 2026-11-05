@@ -11,8 +11,8 @@ export function isTrialUserSession() {
 }
 
 /**
- * i18n keys whose demo copy says "auditor" — trial uses parallel *.trial.* keys
- * that say "Team member" instead. API roles / field names stay "auditor".
+ * i18n keys with optional *.trial.* overrides (kept for A/B copy).
+ * Default EN/AR strings now say "Team member"; API roles / field names stay "auditor".
  */
 const TRIAL_COPY_KEYS = {
   "rfpCollaboration.pmHubTitle": "rfpCollaboration.trial.pmHubTitle",
@@ -51,8 +51,7 @@ const TRIAL_COPY_KEYS = {
 };
 
 /**
- * Translation helper: same as `t`, but for trial sessions remaps auditor wording
- * to "Team member". Demo / non-trial is unchanged.
+ * Translation helper: same as `t`, with optional trial-specific overrides.
  */
 export function useTrialCollabT() {
   const { t } = useTranslation();

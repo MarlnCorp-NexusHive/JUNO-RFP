@@ -54,7 +54,7 @@ export default function MarketingHeadProcurement() {
   return (
     <div 
       key={`${i18n.language}-${languageVersion}`}
-      className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}
+      className={`flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017] ${isRTLMode ? 'rtl' : 'ltr'}`}
     >
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {/* Header */}

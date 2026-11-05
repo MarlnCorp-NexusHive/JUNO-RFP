@@ -25,10 +25,19 @@ const KEYS = {
 };
 
 export const CONTENT_HUB_CHANGED_EVENT = "juno-content-hub-changed";
+export const WORKSPACE_DOCS_CHANGED_EVENT = "juno-workspace-docs-changed";
 
 function notifyContentHubChanged() {
   try {
     window.dispatchEvent(new CustomEvent(CONTENT_HUB_CHANGED_EVENT));
+  } catch {
+    /* ignore */
+  }
+}
+
+function notifyWorkspaceDocsChanged() {
+  try {
+    window.dispatchEvent(new CustomEvent(WORKSPACE_DOCS_CHANGED_EVENT));
   } catch {
     /* ignore */
   }
@@ -97,6 +106,7 @@ export function getDocuments() {
 
 export function saveDocuments(docs) {
   save(KEYS.DOCUMENTS, docs);
+  notifyWorkspaceDocsChanged();
 }
 
 export function addDocument({ folderId, name, fileType, documentTypeId, uploadedAt, extractedFacts = [], extractedQAs = [], rawText = "" }) {

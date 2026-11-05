@@ -407,11 +407,19 @@ export function startPursuitFromBrief(brief) {
     return prev ? { ...item, done: !!prev.done } : item;
   });
 
+  const deadline =
+    brief.snapshot?.deadline ||
+    brief.dates?.find((d) => /deadline|close|due/i.test(String(d.label || d.id || "")))?.date ||
+    brief.dates?.[0]?.date ||
+    existing?.deadline ||
+    "";
+
   return upsertPursuitState(brief.key, {
     startedAt: existing?.startedAt || new Date().toISOString(),
     title: brief.title || existing?.title || brief.snapshot?.title || "Grant pursuit",
     source: brief.source || existing?.source || "",
     opportunityId: brief.opportunityId || existing?.opportunityId || "",
+    deadline: deadline || existing?.deadline || "",
     documentTypeId: "grants",
     forms,
     checklist: mergedChecklist.length

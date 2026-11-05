@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import FullCalendar from "@fullcalendar/react";
@@ -22,12 +22,15 @@ import {
 import { calendarApi } from "../../../services/calendarApi.js";
 import {
   loadCalendarBundle,
+  resolveCalendarWorkspaceTarget,
   toFullCalendarEvent,
 } from "../services/proposalManagerCalendarService.js";
 import { EVENT_TYPE_ICONS } from "../services/proposalManagerCalendarMockData.js";
 import { FULLCALENDAR_TIME_24 } from "../../../utils/dateTime.js";
 import { subscribeShortlist, updateShortlistItem, removeShortlist } from "../services/shortlistStore.js";
 import { subscribeTeam, updateTeamAssignment, removeTeamAssignment } from "../services/teamStore.js";
+import { subscribePursuit } from "../services/grantPursuitStore.js";
+import { WORKSPACE_DOCS_CHANGED_EVENT } from "../services/proposalManagerStorage.js";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 const TYPE_OPTIONS = [
   "all",
@@ -66,6 +69,7 @@ function typeBadgeClass(type) {
 
 export default function ProposalManagerCalendar() {
   const { t } = useTranslation("common");
+  const navigate = useNavigate();
   const isTrial = isTrialUserSession();
   const [events, setEvents] = useState([]);
   const [team, setTeam] = useState(null);
@@ -108,7 +112,6 @@ export default function ProposalManagerCalendar() {
   }, [refresh]);
 
   useEffect(() => {
-    if (!isTrialUserSession()) return undefined;
     let timer = null;
     const softRefresh = () => {
       if (timer) clearTimeout(timer);
@@ -117,11 +120,16 @@ export default function ProposalManagerCalendar() {
       }, 300);
     };
     const unsubShort = subscribeShortlist(softRefresh);
-    const unsubTeam = subscribeTeam(softRefresh);
+    const unsubTeam = isTrialUserSession() ? subscribeTeam(softRefresh) : () => {};
+    const unsubPursuit = subscribePursuit(softRefresh);
+    const onDocs = () => softRefresh();
+    window.addEventListener(WORKSPACE_DOCS_CHANGED_EVENT, onDocs);
     return () => {
       if (timer) clearTimeout(timer);
       unsubShort();
       unsubTeam();
+      unsubPursuit();
+      window.removeEventListener(WORKSPACE_DOCS_CHANGED_EVENT, onDocs);
     };
   }, [refresh]);
 
@@ -234,6 +242,12 @@ export default function ProposalManagerCalendar() {
       end: props.end || info.event.endStr || null,
       allDay: props.allDay ?? info.event.allDay,
     };
+    const target = resolveCalendarWorkspaceTarget(ev);
+    if (target?.href) {
+      info.jsEvent?.preventDefault?.();
+      navigate(target.href);
+      return;
+    }
     setSelected(ev);
   };
 
@@ -627,14 +641,20 @@ export default function ProposalManagerCalendar() {
                   </div>
                 )}
                 {selected.description && <p className="text-xs mt-2">{selected.description}</p>}
-                {selected.source === "collaboration" && selected.workspaceId && (
-                  <Link
-                    to={`/app/rfp-collaboration/w/${selected.workspaceId}`}
-                    className="inline-block text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    {t("proposalManagerCalendar.openWorkspace")}
-                  </Link>
-                )}
+                {(() => {
+                  const target = resolveCalendarWorkspaceTarget(selected);
+                  if (!target?.href) return null;
+                  return (
+                    <Link
+                      to={target.href}
+                      className="inline-block text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {target.kind === "collaboration"
+                        ? t("proposalManagerCalendar.openWorkspace")
+                        : t("proposalManagerCalendar.openPmWorkspace")}
+                    </Link>
+                  );
+                })()}
               </div>
               <div className="mt-4 flex gap-2">
                 {canEditEvent(selected) && (

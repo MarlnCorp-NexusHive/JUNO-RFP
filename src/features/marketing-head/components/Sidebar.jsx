@@ -45,20 +45,20 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
   };
 
   const shellClass = darkTheme
-    ? "bg-[#0B1410] text-emerald-50 border-r border-[#1a2e24]"
-    : "bg-white text-slate-800 border-r border-[#E5E7EB]";
-  const labelClass = darkTheme ? "text-emerald-50" : "text-slate-800";
+    ? "bg-[#0B1017] text-slate-50 border-r border-[#2A3548]"
+    : "bg-white text-slate-800 border-r border-[#D8E0EA]";
+  const labelClass = darkTheme ? "text-slate-50" : "text-slate-800";
   const navActiveClass = darkTheme
-    ? "bg-[#1a2e24] text-emerald-200"
-    : "bg-[#E4EDE7] text-[#1A5336]";
+    ? "bg-[#2A3548] text-slate-200"
+    : "bg-[#D8E0EA] text-[#3D4F66]";
   const navHoverClass = darkTheme
-    ? "hover:bg-[#122018]"
-    : "hover:bg-[#F2F7F4]";
-  const footerBorder = darkTheme ? "border-[#1a2e24]" : "border-[#E5E7EB]";
-  const footerHover = darkTheme ? "hover:bg-[#122018]" : "hover:bg-[#F2F7F4]";
+    ? "hover:bg-[#151D2A]"
+    : "hover:bg-[#F0F3F7]";
+  const footerBorder = darkTheme ? "border-[#2A3548]" : "border-[#D8E0EA]";
+  const footerHover = darkTheme ? "hover:bg-[#151D2A]" : "hover:bg-[#F0F3F7]";
   const collapseBtn = darkTheme
-    ? "bg-[#122018] hover:bg-[#1a2e24] text-emerald-100 border border-[#1a2e24]"
-    : "bg-[#F2F7F4] hover:bg-[#E4EDE7] text-[#1A5336] border border-[#E5E7EB]";
+    ? "bg-[#151D2A] hover:bg-[#2A3548] text-slate-100 border border-[#2A3548]"
+    : "bg-[#F0F3F7] hover:bg-[#D8E0EA] text-[#3D4F66] border border-[#D8E0EA]";
 
   return (
     <aside
@@ -97,7 +97,7 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
                 `}
                 title={!expanded ? t(f.label, { defaultValue: f.label }) : undefined}
               >
-                <span className={`text-2xl ${isActive ? (darkTheme ? 'text-emerald-300' : 'text-[#1A5336]') : ''}`}>{f.icon}</span>
+                <span className={`text-2xl ${isActive ? (darkTheme ? 'text-slate-300' : 'text-[#3D4F66]') : ''}`}>{f.icon}</span>
                 {expanded && <span className="whitespace-nowrap">{t(f.label, { defaultValue: f.label })}</span>}
                 {/* Tooltip for collapsed */}
                 {!expanded && (

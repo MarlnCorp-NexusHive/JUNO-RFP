@@ -508,7 +508,7 @@ export default function CompanyIntelligencePage() {
                         window.setTimeout(() => setSyncNotice(false), 5000);
                       }
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#1A5336] text-white text-sm font-semibold shadow-none hover:bg-[#164430] transition-all dark:bg-[#5eb094] dark:text-[#0B1410] dark:hover:bg-[#6bc4a3]"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#3D4F66] text-white text-sm font-semibold shadow-none hover:bg-[#2A3548] transition-all dark:bg-[#8FA3B8] dark:text-[#0B1017] dark:hover:bg-[#B8C5D6]"
                   >
                     <FiZap className="w-4 h-4" />
                       {t("proposalManagerCompanyIntelligence.syncToProposalForms")}
@@ -524,7 +524,7 @@ export default function CompanyIntelligencePage() {
             )}
 
             {result.financials && !result.error && (
-              <div className="rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] p-4 md:p-6 shadow-none">
+              <div className="rounded-[10px] border border-[#D8E0EA] bg-white dark:border-[#2A3548] dark:bg-[#151D2A] p-4 md:p-6 shadow-none">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
                   <FiZap className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   {t("proposalManagerCompanyIntelligence.aiBriefing.title")}
@@ -579,7 +579,7 @@ export default function CompanyIntelligencePage() {
                 </div>
 
                 {chartData.length > 0 && (
-                  <div className="bg-white dark:bg-[#122018] rounded-[10px] border border-[#E5E7EB] dark:border-[#24352c] shadow-none p-4 md:p-6">
+                  <div className="bg-white dark:bg-[#151D2A] rounded-[10px] border border-[#D8E0EA] dark:border-[#2A3548] shadow-none p-4 md:p-6">
                     <FinancialTrendsChart
                       rows={chartData}
                       showRevenue={Boolean(result.trends?.revenue?.length)}
@@ -590,7 +590,7 @@ export default function CompanyIntelligencePage() {
                 )}
 
                 {assetsBarRows.length > 0 && (
-                  <div className="bg-white dark:bg-[#122018] rounded-[10px] border border-[#E5E7EB] dark:border-[#24352c] shadow-none p-4 md:p-6">
+                  <div className="bg-white dark:bg-[#151D2A] rounded-[10px] border border-[#D8E0EA] dark:border-[#2A3548] shadow-none p-4 md:p-6">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                       {t("proposalManagerCompanyIntelligence.charts.assetsTitle")}
                     </h3>
@@ -611,7 +611,7 @@ export default function CompanyIntelligencePage() {
                           <Bar
                             dataKey="value"
                             name={t("proposalManagerCompanyIntelligence.charts.labels.assets")}
-                            fill="#3d7a52"
+                            fill="#5A6F86"
                             radius={[4, 4, 0, 0]}
                           />
                         </BarChart>

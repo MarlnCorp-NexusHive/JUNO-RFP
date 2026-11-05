@@ -46,7 +46,7 @@ function StatusDonutChart({ data, t }) {
     '#ef4444', // red
     '#3b82f6', // blue
     '#a21caf', // purple
-    '#1A5336', // indigo
+    '#3D4F66', // indigo
     '#10b981', // emerald
   ];
   return (
@@ -473,8 +473,8 @@ export default function Applications() {
                       <div className="flex items-center gap-1">
                         <span className="relative flex items-center">
                           <svg width="28" height="28">
-                            <circle cx="14" cy="14" r="12" fill="#f3f4f6" />
-                            <circle cx="14" cy="14" r="12" fill="none" stroke="#1A5336" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
+                            <circle cx="14" cy="14" r="12" fill="#F0F3F7" />
+                            <circle cx="14" cy="14" r="12" fill="none" stroke="#3D4F66" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
                           </svg>
                           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-blue-700 dark:text-blue-300">{app.ai.likelihood}%</span>
                         </span>
@@ -512,8 +512,8 @@ export default function Applications() {
                 </div>
                 <div className="flex items-center gap-2">
                   <svg width="28" height="28">
-                    <circle cx="14" cy="14" r="12" fill="#f3f4f6" />
-                    <circle cx="14" cy="14" r="12" fill="none" stroke="#1A5336" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
+                    <circle cx="14" cy="14" r="12" fill="#F0F3F7" />
+                    <circle cx="14" cy="14" r="12" fill="none" stroke="#3D4F66" strokeWidth="3" strokeDasharray={`${(app.ai.likelihood / 100) * 75} 100`} transform="rotate(-90 14 14)" />
                   </svg>
                   <span className="text-xs font-bold text-blue-700 dark:text-blue-300">{app.ai.likelihood}% {t('applications.ai.likelihood')}</span>
                   {app.ai.topPercentile && <span className="ml-1 bg-green-200 text-green-800 text-xs px-2 py-0.5 rounded-full animate-pulse">{t('applications.ai.topPercentile')}</span>}
@@ -617,7 +617,7 @@ export default function Applications() {
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs text-gray-500">{t('applications.sections.offersAccepted')}</span>
           <svg width="32" height="32">
-            <circle cx="16" cy="16" r="14" fill="#f3f4f6" />
+            <circle cx="16" cy="16" r="14" fill="#F0F3F7" />
             <circle cx="16" cy="16" r="14" fill="none" stroke="#22c55e" strokeWidth="3" strokeDasharray="22 44" transform="rotate(-90 16 16)" />
           </svg>
           <span className="text-xs font-bold text-green-600">{Math.round((offers.filter(o => o.accepted).length / offers.length) * 100)}%</span>

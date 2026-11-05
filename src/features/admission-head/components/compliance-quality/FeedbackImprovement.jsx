@@ -42,7 +42,7 @@ const feedbacks = [
   },
   {
     id: 'FB004',
-    source: 'Auditor',
+    source: 'Team member',
     date: '2026-10-30',
     feedback: 'Policy document not updated on website.',
     status: 'Addressed',

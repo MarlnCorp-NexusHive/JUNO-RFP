@@ -6,7 +6,7 @@ const TYPE_COLORS = {
   deadline: "#dc2626",
   milestone: "#ea580c",
   meeting: "#2563eb",
-  assignment: "#1A5336",
+  assignment: "#3D4F66",
   submission: "#16a34a",
   review: "#0891b2",
   task: "#6366f1",
@@ -24,7 +24,7 @@ function userName(userId) {
 }
 
 function withColor(ev) {
-  return { ...ev, color: ev.color || TYPE_COLORS[ev.type] || "#4b5563" };
+  return { ...ev, color: ev.color || TYPE_COLORS[ev.type] || "#3D4F66" };
 }
 
 function serializeEvent(record) {
@@ -233,12 +233,14 @@ function synthesizeCollaborationEvents() {
   const events = [];
   const actionMap = {
     "Question assigned to auditor": "assignment",
+    "Question assigned to team member": "assignment",
     "Submitted answer": "submission",
     "Answer approved": "review",
     "Answer rejected": "review",
     "Changes requested": "review",
     "Workspace created": "milestone",
     "Auditor asked clarification": "task",
+    "Team member asked clarification": "task",
     "Proposal Manager replied to clarification": "task",
   };
 
@@ -333,7 +335,7 @@ function synthesizeCollaborationEvents() {
         type: "milestone",
         source: "collaboration",
         status: "unassigned",
-        description: "Assign auditors from Team Collab so work appears on their calendars.",
+        description: "Assign team members from Team Collab so work appears on their calendars.",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }),

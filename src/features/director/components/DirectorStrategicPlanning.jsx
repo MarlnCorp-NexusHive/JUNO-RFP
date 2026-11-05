@@ -113,7 +113,7 @@ export default function DirectorStrategicPlanning() {
   };
 
   if (!ready) {
-    return <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] items-center justify-center">
+    return <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017] items-center justify-center">
       <div className="text-lg text-gray-600 dark:text-gray-300">{isArabic ? "جارٍ التحميل..." : "Loading..."}</div>
     </div>;
   }
@@ -248,7 +248,7 @@ export default function DirectorStrategicPlanning() {
     { label: t('strategicPlanning.trends.enrollment'), values: [1200, 1300, 1400, 1550, 1700], years: ["2022","2023","2024","2025","2026"], color: "#3b82f6" },
     { label: t('strategicPlanning.trends.placements'), values: [800, 900, 950, 1100, 1200], years: ["2022","2023","2024","2025","2026"], color: "#10b981" },
     { label: t('strategicPlanning.trends.researchFunding'), values: [200, 250, 300, 350, 400], years: ["2022","2023","2024","2025","2026"], color: "#f59e0b" },
-    { label: t('strategicPlanning.trends.facultyPublications'), values: [50, 60, 70, 85, 90], years: ["2022","2023","2024","2025","2026"], color: "#3d7a52" },
+    { label: t('strategicPlanning.trends.facultyPublications'), values: [50, 60, 70, 85, 90], years: ["2022","2023","2024","2025","2026"], color: "#5A6F86" },
     { label: t('strategicPlanning.trends.internationalCollaborations'), values: [2, 3, 4, 6, 8], years: ["2022","2023","2024","2025","2026"], color: "#ef4444" },
   ];
 
@@ -287,7 +287,7 @@ export default function DirectorStrategicPlanning() {
   };
 
   return (
-    <div className={`flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] ${isRTLMode ? 'rtl' : 'ltr'}`}>
+    <div className={`flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017] ${isRTLMode ? 'rtl' : 'ltr'}`}>
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-8 overflow-x-auto">
         {/* Header Section */}
         <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
@@ -394,7 +394,7 @@ export default function DirectorStrategicPlanning() {
               >
                 <div className={`flex items-center justify-between mb-4 ${isRTLMode ? 'flex-row-reverse' : ''}`}>
                   <div className={`p-2 rounded-lg ${isRTLMode ? 'ml-3' : 'mr-3'}`} style={{ backgroundColor: `${kpi.icon === FiUsers ? '#dbeafe' : kpi.icon === FiBookOpen ? '#fef3c7' : kpi.icon === FiCheckCircle ? '#d1fae5' : '#e0e7ff'}` }}>
-                    <kpi.icon className={`w-5 h-5 ${isRTLMode ? 'ml-0' : 'mr-0'}`} style={{ color: `${kpi.icon === FiUsers ? '#3b82f6' : kpi.icon === FiBookOpen ? '#f59e0b' : kpi.icon === FiCheckCircle ? '#10b981' : '#3d7a52'}` }} />
+                    <kpi.icon className={`w-5 h-5 ${isRTLMode ? 'ml-0' : 'mr-0'}`} style={{ color: `${kpi.icon === FiUsers ? '#3b82f6' : kpi.icon === FiBookOpen ? '#f59e0b' : kpi.icon === FiCheckCircle ? '#10b981' : '#5A6F86'}` }} />
                   </div>
                   {getTrendIcon(kpi.trend)}
                 </div>
@@ -654,13 +654,13 @@ export default function DirectorStrategicPlanning() {
                   <h3 className="font-semibold text-lg mb-4 text-gray-900 dark:text-white">{trend.label}</h3>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F3F7" />
                       <XAxis dataKey="year" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} />
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: 'white', 
-                          border: '1px solid #e5e7eb',
+                          border: '1px solid #D8E0EA',
                           borderRadius: '8px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                         }} 

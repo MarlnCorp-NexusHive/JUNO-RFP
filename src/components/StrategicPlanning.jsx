@@ -52,7 +52,7 @@ export default function StrategicPlanning() {
   const [selectedYear, setSelectedYear] = useState("2026");
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
+    <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017]">
       <div className="sticky top-0 h-screen z-30">
         <Sidebar features={directorFeatures} userLabel={user?.displayName || user?.role || "Director"} />
       </div>
@@ -75,7 +75,7 @@ export default function StrategicPlanning() {
               <div key={kpi.label} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow flex flex-col items-center">
                 <div className="relative w-20 h-20 mb-2">
                   <svg className="w-full h-full" viewBox="0 0 40 40">
-                    <circle cx="20" cy="20" r="18" fill="none" stroke="#e5e7eb" strokeWidth="4" />
+                    <circle cx="20" cy="20" r="18" fill="none" stroke="#D8E0EA" strokeWidth="4" />
                     <circle cx="20" cy="20" r="18" fill="none" stroke="#2563eb" strokeWidth="4" strokeDasharray={113} strokeDashoffset={113 - (kpi.value / (kpi.target || 100)) * 113} strokeLinecap="round" />
                   </svg>
                   <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-blue-700 dark:text-blue-300">{kpi.value}{kpi.unit || ''}</span>

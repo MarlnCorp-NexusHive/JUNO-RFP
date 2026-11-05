@@ -553,7 +553,7 @@ export function assignQuestion(pmUserId, { workspaceId, questionId, auditorUserI
 
   pushLog(workspaceId, {
     user: userName(pmUserId),
-    action: "Question assigned to auditor",
+    action: "Question assigned to team member",
     question: q,
     extra: { auditor: auditor.name, auditor_id: auditorUserId },
   });
@@ -763,7 +763,7 @@ export function askClarification(auditorUserId, { workspaceId, questionId, messa
 
   pushLog(workspaceId, {
     user: userName(auditorUserId),
-    action: "Auditor asked clarification",
+    action: "Team member asked clarification",
     question: q,
     extra: { message_id: msg.id, preview: body.slice(0, 200) },
   });

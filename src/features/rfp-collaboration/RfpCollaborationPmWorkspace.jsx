@@ -480,7 +480,11 @@ export default function RfpCollaborationPmWorkspace() {
                 .map((log, i) => (
                   <li key={`${log.timestamp}-${i}`} className="border-b border-gray-100 dark:border-gray-700 pb-2">
                     <div className="font-medium text-gray-800 dark:text-gray-200">{log.user}</div>
-                    <div className="text-gray-600 dark:text-gray-300">{log.action}</div>
+                    <div className="text-gray-600 dark:text-gray-300">
+                      {String(log.action || "")
+                        .replace(/\bauditor\b/gi, "team member")
+                        .replace(/\bAuditor\b/g, "Team member")}
+                    </div>
                     {log.question_id != null ? (
                       <div className="text-gray-500">
                         {t("rfpCollaboration.questionRef")} {log.question_id}

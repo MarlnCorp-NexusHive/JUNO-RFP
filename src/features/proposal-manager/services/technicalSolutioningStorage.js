@@ -70,7 +70,7 @@ Capabilities delivered to proposal teams:
 1. RFP Ingest — PDF/DOCX parsing, AI requirement structuring, deadline extraction
 2. Response Workspace — Q&A drafting with rich editor, AI-assisted answers grounded in source docs
 3. Content Hub — reusable answer library with tagging (Technical, Section L/M, Pricing)
-4. Team Collaboration — PM assigns requirements to writers/auditors; review workflow with clarifications
+4. Team Collaboration — PM assigns requirements to writers/team members; review workflow with clarifications
 5. Company Intelligence — issuer financial context for tailored executive summaries
 6. Export Engine — styled DOCX (OOXML template merge) and PPTX slide decks from approved content
 7. Compliance traceability — requirement-to-answer mapping with approval status
@@ -99,7 +99,7 @@ Scope: Sync opportunities, team assignments, and submission artifacts between JU
 
 Inbound (ERP → JUNO):
 - Opportunity created/updated webhook → auto-create pursuit workspace
-- Team roster sync → map ERP roles to JUNO RBAC (Proposal Manager, Auditor, Pricing)
+- Team roster sync → map ERP roles to JUNO RBAC (Proposal Manager, Team member, Pricing)
 - Calendar deadlines → sync to proposal calendar module
 
 Outbound (JUNO → ERP):

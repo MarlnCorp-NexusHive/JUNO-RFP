@@ -43,7 +43,7 @@ const JUNO_OVERLAY = {
     },
     {
       id: "juno-collab",
-      label: "PM–Auditor",
+      label: "PM–Team member",
       layer: "JUNO overlay",
       icon: "collab",
       owner: "juno",
@@ -100,7 +100,7 @@ export const TOPOLOGY_TEMPLATES = [
     placements: [
       { capability: "Source Docs / Workspace", sitsOn: "Agency portal & records", why: "Solicitations and amendments land as PDFs; JUNO extracts Section L/M without a new agency system of record." },
       { capability: "Content Hub + boilerplate", sitsOn: "Mission knowledge workers", why: "Reusable win themes sit beside case/ERP users — not a second content silo." },
-      { capability: "PM–auditor collab", sitsOn: "ICAM-gated reviewers", why: "Reviewers keep PIV-style ownership; JUNO adds assignment states, not a new IdP." },
+      { capability: "PM–team member collab", sitsOn: "ICAM-gated reviewers", why: "Reviewers keep PIV-style ownership; JUNO adds assignment states, not a new IdP." },
       { capability: "Styled export", sitsOn: "Proposal volumes back to the portal", why: "Word/PPTX leave JUNO in evaluator format; agency systems stay systems of record." },
     ],
   },
@@ -138,7 +138,7 @@ export const TOPOLOGY_TEMPLATES = [
     placements: [
       { capability: "JUNO Ingest", sitsOn: "Health IT PMO, not the EHR", why: "EHR remains clinical system of record; JUNO only consumes RFP PDFs and architecture exhibits." },
       { capability: "Content Hub", sitsOn: "Privacy-aware proposal library", why: "Boilerplate is proposal language — PHI never needs to enter JUNO." },
-      { capability: "Collaboration", sitsOn: "SSO-gated capture team", why: "Auditors review outside the EHR; IAM stays the customer’s." },
+      { capability: "Collaboration", sitsOn: "SSO-gated capture team", why: "Team members review outside the EHR; IAM stays the customer’s." },
       { capability: "Exports", sitsOn: "Procurement / RCM adjacent IT bids", why: "Submission files return as documents, not HL7 messages." },
     ],
   },
@@ -176,7 +176,7 @@ export const TOPOLOGY_TEMPLATES = [
     placements: [
       { capability: "JUNO Ingest", sitsOn: "Change-the-bank PMO", why: "Core and AML stay production; JUNO reads solicitation packs and architecture appendices only." },
       { capability: "Intel + Content Hub", sitsOn: "Capture next to CRM", why: "Issuer/competitor intel informs win themes without touching customer PII in the core." },
-      { capability: "Auditor workflow", sitsOn: "2LOD-style review", why: "Proposal review mimics control challenge — named owners, not a shared drive." },
+      { capability: "Team member workflow", sitsOn: "2LOD-style review", why: "Proposal review mimics control challenge — named owners, not a shared drive." },
       { capability: "Exports", sitsOn: "Deal / procurement room", why: "Evaluator-ready DOCX/PPTX, not a core posting." },
     ],
   },
@@ -252,7 +252,7 @@ export const TOPOLOGY_TEMPLATES = [
     placements: [
       { capability: "JUNO Ingest", sitsOn: "The posted RFP on the city site", why: "Same PDFs already in Source Docs (water, landscape, airport) become structured Q&A." },
       { capability: "Content Hub boilerplate", sitsOn: "Public-works pursuit team", why: "Capability statements are shared with leads without touching GIS or AP." },
-      { capability: "Collaboration", sitsOn: "Staff AD accounts", why: "Auditors review city RFPs with named owners." },
+      { capability: "Collaboration", sitsOn: "Staff AD accounts", why: "Team members review city RFPs with named owners." },
       { capability: "Exports", sitsOn: "Finance / clerk submission", why: "Word volumes go out the same path as today’s paper/PDF response." },
     ],
   },

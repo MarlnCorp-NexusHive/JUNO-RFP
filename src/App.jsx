@@ -105,6 +105,7 @@ import TopologyPage from './features/proposal-manager/components/TopologyPage';
 import WinLossScoringPage from './features/proposal-manager/components/WinLossScoringPage';
 import WinSlidePage from './features/proposal-manager/components/WinSlidePage';
 import GrantsPage from './features/proposal-manager/components/GrantsPage';
+import AwardManagementPage from './features/proposal-manager/components/AwardManagementPage';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
@@ -112,6 +113,9 @@ import CompanyIntelligencePage from './features/proposal-manager/components/Comp
 import CompetitiveIntelligencePage from './features/proposal-manager/components/CompetitiveIntelligencePage';
 import ProposalManagerContentHub from './features/proposal-manager/components/ProposalManagerContentHub';
 import ProposalManagerCalendar from './features/proposal-manager/components/ProposalManagerCalendar';
+import ProposalManagerHome from './features/proposal-manager/components/ProposalManagerHome';
+import ProposalManagerHubPage from './features/proposal-manager/components/ProposalManagerHubPage';
+import { proposalManagerLandingPath } from './features/proposal-manager/services/navModeStore.js';
 import RfpCollaborationPmHub from "./features/rfp-collaboration/RfpCollaborationPmHub.jsx";
 import RfpCollaborationPmWorkspace from "./features/rfp-collaboration/RfpCollaborationPmWorkspace.jsx";
 import RfpAuditorShell from "./features/rfp-collaboration/RfpAuditorShell.jsx";
@@ -129,11 +133,12 @@ import DirectorAIChat from "./features/director/pages/DirectorAIChat";
 import MarketingHeadAIChat from "./features/marketing-head/pages/MarketingHeadAIChat";
 import AdmissionHeadAIChat from "./features/admission-head/pages/AdmissionHeadAIChat";
 
-/** Old bookmarks: /rbac/proposal-manager/... → /app/... (index → /app/dashboard). */
+/** Old bookmarks: /rbac/proposal-manager/... → /app/... */
 function LegacyProposalManagerRedirect() {
   const location = useLocation();
   const rest = location.pathname.replace(/^\/rbac\/proposal-manager\/?/, "");
-  const to = `/app/${rest || "dashboard"}${location.search}${location.hash}`;
+  const fallback = proposalManagerLandingPath().replace(/^\/app\/?/, "") || "home";
+  const to = `/app/${rest || fallback}${location.search}${location.hash}`;
   return <Navigate to={to} replace />;
 }
 
@@ -141,8 +146,13 @@ function LegacyProposalManagerRedirect() {
 function LegacyDashboardRedirect() {
   const location = useLocation();
   const rest = location.pathname.replace(/^\/dashboard\/?/, "");
-  const to = `/app/${rest || "dashboard"}${location.search}${location.hash}`;
+  const fallback = proposalManagerLandingPath().replace(/^\/app\/?/, "") || "home";
+  const to = `/app/${rest || fallback}${location.search}${location.hash}`;
   return <Navigate to={to} replace />;
+}
+
+function AppIndexRedirect() {
+  return <Navigate to={proposalManagerLandingPath().replace(/^\/app\/?/, "") || "home"} replace />;
 }
 
 export default function App() {
@@ -250,7 +260,9 @@ export default function App() {
         <Route path="/rbac/proposal-manager/*" element={<LegacyProposalManagerRedirect />} />
         <Route path="/dashboard/*" element={<LegacyDashboardRedirect />} />
         <Route path="/app" element={<ProposalManagerLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route index element={<AppIndexRedirect />} />
+          <Route path="home" element={<ProposalManagerHome />} />
+          <Route path="home/:hubId" element={<ProposalManagerHubPage />} />
           <Route path="dashboard" element={<DirectorDashboard basePath="/app" dashboardTitle="JUNO RFP Dashboard" welcomeMessage="Welcome to JUNO RFP - Audit-Ready. Submission-Ready. Win-Ready." />} />
           <Route path="source-docs" element={<SourceDocsPage />} />
           <Route path="company-intelligence" element={<CompanyIntelligencePage />} />
@@ -260,6 +272,7 @@ export default function App() {
           <Route path="scoring" element={<WinLossScoringPage />} />
           <Route path="win-slide" element={<WinSlidePage />} />
           <Route path="grants" element={<GrantsPage />} />
+          <Route path="award-management" element={<AwardManagementPage />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
           <Route path="content-hub" element={<ProposalManagerContentHub />} />
           <Route path="pricing" element={<ProposalPricingPage />} />

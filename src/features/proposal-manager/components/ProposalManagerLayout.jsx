@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "../../director/components/Sidebar";
-import { proposalManagerFeatures } from "./proposalManagerFeatures";
+import {
+  HUB_HOME_FEATURE,
+  hubForRoute,
+  featuresForHub,
+  proposalManagerFeatures,
+} from "./proposalManagerFeatures";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useLocalization } from "../../../hooks/useLocalization";
 import TourOverlay from "../../../components/tours/TourOverlay";
@@ -8,6 +13,12 @@ import { TourProvider } from "../../../components/tours/TourContext";
 import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 import { getTrialSession } from "../../../services/trialAuthSession.js";
+import GlobalFloatingCalendar from "./GlobalFloatingCalendar.jsx";
+import {
+  getNavMode,
+  proposalManagerLandingPath,
+  subscribeNavMode,
+} from "../services/navModeStore.js";
 
 function isTrialUser() {
   const session = getTrialSession();
@@ -27,7 +38,7 @@ function sidebarUserLabel() {
   return "Proposal Manager";
 }
 
-function sidebarFeatures() {
+function allSidebarFeatures() {
   if (!isTrialUser()) return proposalManagerFeatures;
   return proposalManagerFeatures.filter((f) => {
     const route = String(f.route || "");
@@ -62,25 +73,37 @@ function sidebarBrandLogo() {
 
 export default function ProposalManagerLayout() {
   const [expanded, setExpanded] = useState(false);
+  const [navMode, setNavModeState] = useState(getNavMode);
   const { isRTLMode } = useLocalization();
   const location = useLocation();
   const userLabel = sidebarUserLabel();
-  const features = sidebarFeatures();
   const brandLogo = sidebarBrandLogo();
+  const baseFeatures = useMemo(() => allSidebarFeatures(), []);
 
-  // Trial: hide Topology + Capture Strategy — bounce direct URL hits back to dashboard
+  useEffect(() => subscribeNavMode(setNavModeState), []);
+
+  const features = useMemo(() => {
+    if (navMode !== "guided") return baseFeatures;
+    const currentHub = hubForRoute(location.pathname, baseFeatures);
+    const hubTools = currentHub
+      ? featuresForHub(currentHub, baseFeatures)
+      : [];
+    return [HUB_HOME_FEATURE, ...hubTools];
+  }, [navMode, baseFeatures, location.pathname]);
+
+  // Trial: hide Topology + Capture Strategy — bounce direct URL hits back to landing
   const trialBlocked =
     isTrialUser() &&
     (String(location.pathname || "").includes("/topology") ||
       String(location.pathname || "").includes("/capture-strategy"));
   if (trialBlocked) {
-    return <Navigate to="/app/dashboard" replace />;
+    return <Navigate to={proposalManagerLandingPath()} replace />;
   }
 
   return (
     <TourProvider>
       <ProposalIssuerProvider>
-      <div className="bg-[#F8F9F8] dark:bg-[#0B1410] min-h-screen" dir={isRTLMode ? 'rtl' : 'ltr'}>
+      <div className="bg-[#F4F6F9] dark:bg-[#0B1017] min-h-screen" dir={isRTLMode ? 'rtl' : 'ltr'}>
         {/* Fixed Sidebar */}
         <div className={`${expanded ? "w-56" : "w-12"} flex-shrink-0 transition-all duration-300 fixed top-0 h-screen z-30 ${
           isRTLMode ? 'right-0' : 'left-0'
@@ -93,6 +116,8 @@ export default function ProposalManagerLayout() {
             role="proposal-manager"
             brandLogoSrc={brandLogo?.src}
             brandLogoAlt={brandLogo?.alt}
+            showNavModeToggle
+            navMode={navMode}
           />
         </div>
         {/* Main content with dynamic margin */}
@@ -103,6 +128,8 @@ export default function ProposalManagerLayout() {
         }`}>
           <Outlet />
         </main>
+
+        <GlobalFloatingCalendar />
 
         {/* Tour Overlay */}
         <TourOverlay />

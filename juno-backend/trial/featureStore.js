@@ -20,6 +20,7 @@ export const FEATURE_KEYS = [
   "manageTeam",
   "compliance",
   "dashboard",
+  "awardManagement",
 ];
 
 const EMPTY_BY_KEY = {
@@ -49,6 +50,7 @@ const EMPTY_BY_KEY = {
   applicantFit: { profile: null },
   manageTeam: { members: [], trainings: [], assignments: [], updatedAt: null },
   compliance: { areas: [], logs: [], risks: [] },
+  awardManagement: { awards: [], freshReset: true },
   dashboard: {
     docInsights: {},
     charts: {

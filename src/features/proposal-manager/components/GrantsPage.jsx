@@ -796,18 +796,18 @@ export default function GrantsPage() {
                       type="button"
                       aria-pressed={active}
                       onClick={() => toggleSource(tab.id)}
-                      className={`group relative flex min-h-[7.25rem] flex-col p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A5336] ${
+                      className={`group relative flex min-h-[7.25rem] flex-col p-4 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3D4F66] ${
                         active
                           ? GRANARY_CARD_ACTIVE
-                          : `${GRANARY_CARD} hover:border-[#1A5336]/30 hover:bg-[#F2F7F4] dark:hover:border-[#5eb094]/35 dark:hover:bg-[#1a2e24]`
+                          : `${GRANARY_CARD} hover:border-[#3D4F66]/30 hover:bg-[#F0F3F7] dark:hover:border-[#8FA3B8]/35 dark:hover:bg-[#2A3548]`
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <span
                           className={`inline-flex h-10 w-10 items-center justify-center rounded-[10px] border transition ${
                             active
-                              ? "border-[#1A5336]/25 bg-[#E4EDE7] text-[#1A5336] dark:border-[#5eb094]/40 dark:bg-[#1a2e24] dark:text-[#9fbfa9]"
-                              : "border-[#E5E7EB] bg-[#F8F9F8] text-slate-600 group-hover:border-[#1A5336]/25 group-hover:text-[#1A5336] dark:border-[#24352c] dark:bg-[#0B1410] dark:text-slate-300"
+                              ? "border-[#3D4F66]/25 bg-[#D8E0EA] text-[#3D4F66] dark:border-[#8FA3B8]/40 dark:bg-[#2A3548] dark:text-[#B8C5D6]"
+                              : "border-[#D8E0EA] bg-[#F4F6F9] text-slate-600 group-hover:border-[#3D4F66]/25 group-hover:text-[#3D4F66] dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-slate-300"
                           }`}
                           aria-hidden
                         >

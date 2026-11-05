@@ -141,7 +141,7 @@ function ExportSimpleFormatThumbnail({ className = "" }) {
 function ExportStyledFormatThumbnail({ className = "" }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-[10px] border border-[#E5E7EB] bg-[#F8F9F8] dark:border-[#24352c] dark:bg-[#0F1A14] shadow-none ${className}`}
+      className={`relative overflow-hidden rounded-[10px] border border-[#D8E0EA] bg-[#F4F6F9] dark:border-[#2A3548] dark:bg-[#0B1017] shadow-none ${className}`}
       aria-hidden
     >
       <div className="flex h-14 bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 px-2.5 py-2 items-center gap-2">
@@ -351,6 +351,14 @@ export default function ProposalManagerWorkspace() {
   const rfpBackfillDone = useRef(new Set());
   const qaLibrarySyncTimerRef = useRef(null);
   const [rfpId, setRfpId] = useState(null);
+  useEffect(() => {
+    const docId = String(searchParams.get("doc") || "").trim();
+    if (!docId) return;
+    const exists = getDocuments().some((d) => d.id === docId);
+    if (!exists) return;
+    setRfpId(docId);
+    setDocumentTypeId((prev) => (prev === "grants" ? prev : "solicitation"));
+  }, [searchParams]);
   const [answers, setAnswers] = useState({});
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -1146,7 +1154,7 @@ export default function ProposalManagerWorkspace() {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#F8F9F8] dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-[#F4F6F9] dark:bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div
           data-tour="1"
@@ -1168,7 +1176,7 @@ export default function ProposalManagerWorkspace() {
         />
 
         <section
-          className="rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] p-5 shadow-none space-y-3"
+          className="rounded-[10px] border border-[#D8E0EA] bg-white dark:border-[#2A3548] dark:bg-[#151D2A] p-5 shadow-none space-y-3"
           data-tour="2"
           data-tour-title-en="Issuer & document context"
           data-tour-title-ar="سياق الجهة والمستند"
@@ -1911,7 +1919,7 @@ export default function ProposalManagerWorkspace() {
                 }`}
               >
                 {/* Simple Q&A */}
-                <div className="group flex flex-col rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] shadow-none transition-colors duration-200 hover:border-[#1A5336]/35 dark:hover:border-[#5eb094]/40">
+                <div className="group flex flex-col rounded-[10px] border border-[#D8E0EA] bg-white dark:border-[#2A3548] dark:bg-[#151D2A] shadow-none transition-colors duration-200 hover:border-[#3D4F66]/35 dark:hover:border-[#8FA3B8]/40">
                   <div className="p-4 pb-0">
                     <ExportSimpleFormatThumbnail className="h-[7.5rem] w-full" />
                   </div>
@@ -1926,7 +1934,7 @@ export default function ProposalManagerWorkspace() {
                       type="button"
                       onClick={() => void handleDownloadWorkspaceDocument()}
                       disabled={workspaceDocExporting || styledDocExporting || !workspaceDocId}
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#1A5336] hover:bg-[#164430] disabled:opacity-50 text-white text-sm font-semibold shadow-none transition dark:bg-[#5eb094] dark:text-[#0B1410] dark:hover:bg-[#6bc4a3]"
+                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#3D4F66] hover:bg-[#2A3548] disabled:opacity-50 text-white text-sm font-semibold shadow-none transition dark:bg-[#8FA3B8] dark:text-[#0B1017] dark:hover:bg-[#B8C5D6]"
                     >
                       {workspaceDocExporting
                         ? t("proposalManagerWorkspace.rfpWorkspace.exportPreparing")
@@ -1937,7 +1945,7 @@ export default function ProposalManagerWorkspace() {
 
                 {/* Styled proposal — Marln DXC template; demo proposal_manager login only */}
                 {showStyledDocumentExport ? (
-                <div className="group relative flex flex-col rounded-[10px] border border-[#E5E7EB] bg-white dark:border-[#24352c] dark:bg-[#122018] shadow-none transition-colors duration-200 hover:border-[#1A5336]/35 dark:hover:border-[#5eb094]/40">
+                <div className="group relative flex flex-col rounded-[10px] border border-[#D8E0EA] bg-white dark:border-[#2A3548] dark:bg-[#151D2A] shadow-none transition-colors duration-200 hover:border-[#3D4F66]/35 dark:hover:border-[#8FA3B8]/40">
                   <span className="absolute top-3 end-3 z-10 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 dark:bg-indigo-500/25 dark:text-indigo-100 ring-1 ring-indigo-300/50 dark:ring-indigo-500/30">
                     {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledBadge")}
                   </span>
@@ -1961,7 +1969,7 @@ export default function ProposalManagerWorkspace() {
                         !workspaceDocId ||
                         answeredCount === 0
                       }
-                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#1A5336] hover:bg-[#164430] disabled:opacity-50 text-white text-sm font-semibold shadow-none transition dark:bg-[#5eb094] dark:text-[#0B1410] dark:hover:bg-[#6bc4a3]"
+                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] bg-[#3D4F66] hover:bg-[#2A3548] disabled:opacity-50 text-white text-sm font-semibold shadow-none transition dark:bg-[#8FA3B8] dark:text-[#0B1017] dark:hover:bg-[#B8C5D6]"
                     >
                       {styledDocExporting
                         ? t("proposalManagerWorkspace.rfpWorkspace.exportStyledPreparing")

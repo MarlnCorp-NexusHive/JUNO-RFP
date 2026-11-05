@@ -2,10 +2,10 @@ const COLORS = {
   deadline: "#dc2626",
   milestone: "#ea580c",
   meeting: "#2563eb",
-  assignment: "#1A5336",
+  assignment: "#3D4F66",
   submission: "#16a34a",
   review: "#0891b2",
-  task: "#1A5336",
+  task: "#3D4F66",
 };
 
 const BIDS = [
@@ -121,7 +121,7 @@ export function generateMockCalendarEvents() {
   ]);
   addDay(1, [
     { type: "meeting", title: "Red team prep", bidName: BIDS[2], time: [13, 0], location: "Main Conference", assigneeNames: WRITERS.slice(0, 3) },
-    { type: "assignment", title: "Q15–Q18 → auditors", bidName: BIDS[5], assigneeNames: AUDITORS },
+    { type: "assignment", title: "Q15–Q18 → team members", bidName: BIDS[5], assigneeNames: AUDITORS },
   ]);
   addDay(2, [
     { type: "deadline", title: "Internal draft due — Landscape", bidName: BIDS[1], description: "Complete technical + management volumes." },

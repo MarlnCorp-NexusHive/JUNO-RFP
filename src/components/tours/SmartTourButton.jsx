@@ -96,8 +96,8 @@ const SmartTourButton = ({
 
   const currentPage = getCurrentPage();
   const tourStatus = getTourStatus(role, currentPage);
-  const tooltipText = tourStatus.available
-    ? [tourStatus.text, tourStatus.title, tourStatus.description].filter(Boolean).join(" — ")
+  const buttonLabel = tourStatus.available
+    ? t("sidebar.startTour", { defaultValue: "Start Tour" })
     : tourStatus.text;
 
   // Handle button click
@@ -120,32 +120,33 @@ const SmartTourButton = ({
     }
   };
 
-  // Get button styling based on tour status
+  // Steel brand treatment — readable in light + dark, no candy yellow
   const getButtonStyles = () => {
-    const baseTransitions = 'transition-all duration-300 transform hover:scale-105';
-    const shadowEffects = tourStatus.available 
-      ? 'shadow-lg hover:shadow-xl' 
-      : 'shadow-md';
+    const layout = `flex items-center gap-2 px-3 py-2 rounded-xl font-semibold transition-all duration-300 w-full active:scale-[0.98] ${
+      expanded ? "justify-start" : "justify-center"
+    }`;
 
     if (tourStatus.available) {
-      const bgGradient = 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500';
-      const hoverEffect = 'hover:from-yellow-300 hover:via-yellow-400 hover:to-orange-400';
-      const activeEffect = 'active:scale-95';
-      const glowEffect = pulseAnimation ? 'shadow-lg shadow-yellow-400/15 ring-1 ring-yellow-400/10' : '';
-      
-      return `flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full text-white ${
-        expanded ? 'justify-start' : 'justify-center'
-      } ${bgGradient} ${hoverEffect} ${shadowEffects} ${activeEffect} ${glowEffect}`;
-    } else {
-      const bgGradient = 'bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700';
-      const hoverEffect = darkTheme 
-        ? 'hover:from-gray-400 hover:via-gray-500 hover:to-gray-600' 
-        : 'hover:from-gray-400 hover:via-gray-500 hover:to-gray-600';
-      
-      return `flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 w-full text-white ${
-        expanded ? 'justify-start' : 'justify-center'
-      } ${bgGradient} ${hoverEffect} ${shadowEffects} opacity-80 hover:opacity-90`;
+      const pulseRing = pulseAnimation
+        ? darkTheme
+          ? "ring-2 ring-[#B8C5D6]/35 shadow-[0_0_20px_rgba(184,197,214,0.25)]"
+          : "ring-2 ring-[#3D4F66]/20 shadow-[0_8px_22px_rgba(61,79,102,0.28)]"
+        : darkTheme
+          ? "shadow-[0_6px_18px_rgba(0,0,0,0.35)]"
+          : "shadow-[0_6px_18px_rgba(61,79,102,0.22)]";
+
+      return `${layout} ${pulseRing} ${
+        darkTheme
+          ? "bg-gradient-to-b from-[#8FA3B8] to-[#6B7F96] text-[#0B1017] hover:from-[#A8B8C9] hover:to-[#8FA3B8]"
+          : "bg-gradient-to-b from-[#4A5F7A] to-[#3D4F66] text-white hover:from-[#5A708C] hover:to-[#4A5F7A]"
+      }`;
     }
+
+    return `${layout} opacity-75 hover:opacity-95 ${
+      darkTheme
+        ? "bg-[#1A2332] text-[#C5D0DE] border border-[#2A3548] hover:bg-[#243044]"
+        : "bg-[#E8EEF4] text-[#3D4F66] border border-[#D0D8E2] hover:bg-[#DCE4ED]"
+    }`;
   };
 
   // Get icon based on tour status with enhanced animations
@@ -163,122 +164,75 @@ const SmartTourButton = ({
     
     if (tourStatus.available) {
       return (
-        <div className={`relative ${isHovered ? 'animate-bounce' : ''}`}>
-          {/* Glowing background effect */}
-          <div className="absolute inset-0 bg-yellow-300 rounded-full blur-sm opacity-40 animate-pulse"></div>
-          
-          {/* Main star icon */}
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="w-5 h-5 relative z-10">
-            <path 
-              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" 
-              fill="currentColor"
-              className="drop-shadow-sm"
-            />
-          </svg>
-          
-          {/* Sparkle effects for expanded mode */}
-          {expanded && tourStatus.available && (
-            <>
-              <div className="absolute -top-1 -right-1 w-1 h-1 bg-white rounded-full animate-ping"></div>
-              <div className="absolute -bottom-1 -left-1 w-1 h-1 bg-white rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
-            </>
-          )}
-        </div>
-      );
-    } else {
-      return (
-        <div className="relative">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="w-5 h-5 opacity-70">
-            <path 
-              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" 
-              fill="currentColor"
-            />
-            <path 
-              d="M8 8l8 8M16 8l-8 8" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="w-5 h-5">
+          <path
+            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+            fill="currentColor"
+          />
+        </svg>
       );
     }
+
+    return (
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" className="w-5 h-5 opacity-80">
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+          fill="currentColor"
+        />
+      </svg>
+    );
   };
 
   return (
     <div className="relative w-full flex items-center justify-center">
       {/* Enhanced tooltip for collapsed mode */}
       {!expanded && (
-        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-50 shadow-xl">
-          <div className="flex items-start gap-2">
-            {tourStatus.available && (
-              <span className="w-2 h-2 mt-1 bg-yellow-400 rounded-full animate-pulse shrink-0"></span>
-            )}
-            {isLoading ? t('common.loading') : (
-              <div className="max-w-xs">
-                <div className="font-semibold whitespace-nowrap">{tourStatus.text}</div>
-                {tourStatus.title ? <div className="opacity-90 mt-0.5">{tourStatus.title}</div> : null}
-                {tourStatus.description ? (
-                  <div className="opacity-75 mt-1 whitespace-normal leading-snug">{tourStatus.description}</div>
-                ) : null}
-              </div>
-            )}
-          </div>
-          {/* Tooltip arrow */}
-          <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black"></div>
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-50 shadow-xl whitespace-nowrap">
+          {isLoading ? t("common.loading") : buttonLabel}
+          <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black" />
         </div>
       )}
       
       <button
         onClick={handleClick}
         className={`${getButtonStyles()} group relative overflow-hidden`}
-        title={tooltipText}
+        title={buttonLabel}
         disabled={isLoading}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Icon container with enhanced styling */}
-        <span className={`text-2xl ${tourStatus.available ? 'text-white' : 'text-gray-200'} ${
-          isHovered && tourStatus.available ? 'scale-110' : ''
-        } transition-transform duration-200 flex-shrink-0`}>
+        <span
+          className={`flex-shrink-0 transition-transform duration-200 ${
+            isHovered && tourStatus.available ? "scale-110" : ""
+          }`}
+        >
           {getIcon()}
         </span>
         
-        {/* Text container for expanded mode */}
         {expanded && (
-          <span className={`whitespace-nowrap font-medium ${
-            tourStatus.available ? 'text-white' : 'text-gray-200'
-          } ${isHovered ? 'translate-x-1' : ''} transition-transform duration-200 flex-1 text-left min-w-0`}>
+          <span className={`flex-1 text-left min-w-0 font-medium transition-transform duration-200 ${
+            isHovered ? "translate-x-0.5" : ""
+          }`}>
             {isLoading ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-pulse">{t('common.loading')}</span>
-                <div className="flex space-x-1">
-                  <div className="w-1 h-1 bg-white rounded-full animate-bounce"></div>
-                  <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
-              </span>
+              <span className="animate-pulse">{t("common.loading")}</span>
             ) : (
-              <span className="flex flex-col items-start min-w-0">
-                <span>{tourStatus.text}</span>
-                {tourStatus.title ? (
-                  <span className="text-[11px] font-normal opacity-90 truncate max-w-[9.5rem]">
-                    {tourStatus.title}
-                  </span>
-                ) : null}
-              </span>
+              <span>{buttonLabel}</span>
             )}
           </span>
         )}
         
-        {/* Shine effect for available tours */}
         {tourStatus.available && !isLoading && (
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 -skew-x-12 transition-all duration-700 rounded-lg"></div>
+          <div className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
         )}
         
-        {/* Floating indicator for collapsed mode when tour is available */}
         {!expanded && tourStatus.available && !isLoading && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
+          <div
+            className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 ${
+              darkTheme
+                ? "border-[#0B1017] bg-[#B8C5D6]"
+                : "border-white bg-[#8FA3B8]"
+            }`}
+          />
         )}
       </button>
     </div>

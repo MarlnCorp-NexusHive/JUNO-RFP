@@ -119,7 +119,7 @@ export default function RichTextAnswerEditor({
       <style>{`
         [contenteditable][data-placeholder]:empty:before {
           content: attr(data-placeholder);
-          color: #9ca3af;
+          color: #8FA3B8;
         }
       `}</style>
     </div>

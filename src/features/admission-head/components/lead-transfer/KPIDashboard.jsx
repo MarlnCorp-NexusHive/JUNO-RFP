@@ -185,22 +185,22 @@ const KPIDashboard = () => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={transferTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#2A3548" opacity={0.3} />
               <XAxis 
                 dataKey="month" 
-                stroke="#6B7280"
+                stroke="#5A6F86"
                 fontSize={12}
               />
               <YAxis 
-                stroke="#6B7280"
+                stroke="#5A6F86"
                 fontSize={12}
               />
               <Tooltip 
                 contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: '1px solid #374151',
+                  backgroundColor: '#151D2A',
+                  border: '1px solid #2A3548',
                   borderRadius: '8px',
-                  color: '#F9FAFB'
+                  color: '#F4F6F9'
                 }}
               />
               <Legend />

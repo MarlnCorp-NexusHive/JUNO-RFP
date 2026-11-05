@@ -147,7 +147,7 @@ const rollingWinRateByProcurement = [
   { month: "May", "FAR Part 15 (Best Value)": 38, "FAR Part 15 (LPTA)": 47, "FAR Part 16 (Task Orders)": 56, "Sole Source": 98, "Full & Open": 31 },
   { month: "Jun", "FAR Part 15 (Best Value)": 39, "FAR Part 15 (LPTA)": 48, "FAR Part 16 (Task Orders)": 57, "Sole Source": 99, "Full & Open": 32 },
 ];
-const WIN_RATE_COLORS = { "FAR Part 15 (Best Value)": "#1A5336", "FAR Part 15 (LPTA)": "#22c55e", "FAR Part 16 (Task Orders)": "#f59e0b", "Sole Source": "#ec4899", "Full & Open": "#14b8a6" };
+const WIN_RATE_COLORS = { "FAR Part 15 (Best Value)": "#3D4F66", "FAR Part 15 (LPTA)": "#22c55e", "FAR Part 16 (Task Orders)": "#f59e0b", "Sole Source": "#ec4899", "Full & Open": "#14b8a6" };
 const WIN_RATE_KEYS = ["FAR Part 15 (Best Value)", "FAR Part 15 (LPTA)", "FAR Part 16 (Task Orders)", "Sole Source", "Full & Open"];
 const WIN_RATE_GRADIENT_IDS = ["winRate-far15best", "winRate-far15lpta", "winRate-far16task", "winRate-solesource", "winRate-fullopen"];
 const financeData = [
@@ -164,7 +164,7 @@ const winRateVsLeadTimeData = [
   { winRate: 38, label: "61–90 days" },
   { winRate: 45, label: "91–180 days" },
 ];
-const COLORS = ["#1A5336", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
+const COLORS = ["#3D4F66", "#22c55e", "#f59e42", "#eab308", "#a3a3a3"];
 const deptPerformance = [
   { dept: "Operations", KPI: 85 },
   { dept: "HR", KPI: 78 },
@@ -202,12 +202,12 @@ const sectionMScoringData = [
   { period: '2026', competitiveIntelligence: 92, competitiveDifferentiation: 63, incumbentAdvantage: 93, priceTechnical: 70, bidDensity: 52, agencyWinPattern: 86, discriminatorStrength: 77 },
 ];
 const SECTION_M_COLORS = {
-  competitiveIntelligence: '#1A5336',
+  competitiveIntelligence: '#3D4F66',
   competitiveDifferentiation: '#22c55e',
   incumbentAdvantage: '#f59e0b',
   priceTechnical: '#ec4899',
   bidDensity: '#14b8a6',
-  agencyWinPattern: '#3d7a52',
+  agencyWinPattern: '#5A6F86',
   discriminatorStrength: '#ef4444',
 };
 const deptLeaderboard = [
@@ -588,7 +588,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
       : dashboardTitle ?? (t('dashboard.title') || 'Director Dashboard');
 
   if (!ready) {
-    return <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410] items-center justify-center">
+    return <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017] items-center justify-center">
       <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
     </div>;
   }
@@ -936,7 +936,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   const renderModalContent = (card) => {
     if (!card) return null;
     const spark = Array.isArray(card.spark) ? card.spark : [];
-    const sparkLight = card.sparkColor?.light || "#1A5336";
+    const sparkLight = card.sparkColor?.light || "#3D4F66";
     const sparkDark = card.sparkColor?.dark || "#a5b4fc";
     const label = String(card.label || "");
     // Example extra details for each card type
@@ -1193,7 +1193,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <YAxis />
               <Tooltip formatter={isPM ? ((value, name) => [value, pmGraphLabel(name)]) : undefined} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
               <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
-              <Line type="monotone" dataKey="Actual" name={isPM ? pmGraphLabel("Actual") : undefined} stroke="#1A5336" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
+              <Line type="monotone" dataKey="Actual" name={isPM ? pmGraphLabel("Actual") : undefined} stroke="#3D4F66" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
               <Line type="monotone" dataKey="Forecast" name={isPM ? pmGraphLabel("Forecast") : undefined} stroke="#22c55e" strokeDasharray="5 5" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
@@ -1227,7 +1227,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <YAxis tickFormatter={isPM ? (v => `$${v}M`) : (v => `$${v.toLocaleString()}`)} />
               <Tooltip formatter={isPM ? ((v, name) => [`$${v}M`, pmGraphLabel(name)]) : (v => `$${v.toLocaleString()}`)} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
               <Bar dataKey="Actual" name={isPM ? pmGraphLabel("Actual") : undefined} fill="#22c55e" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Forecast" name={isPM ? pmGraphLabel("Forecast") : undefined} fill="#1A5336" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+              <Bar dataKey="Forecast" name={isPM ? pmGraphLabel("Forecast") : undefined} fill="#3D4F66" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -1247,7 +1247,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <XAxis dataKey="year" />
               <YAxis domain={[80, 100]} tickFormatter={v => `${v}%`} />
               <Tooltip formatter={v => `${v}%`} />
-              <Bar dataKey="Actual" fill="#1A5336" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Actual" fill="#3D4F66" radius={[8, 8, 0, 0]} />
               <Bar dataKey="Forecast" fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
@@ -1289,7 +1289,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <PolarGrid />
               <PolarAngleAxis dataKey="kpi" />
               <PolarRadiusAxis angle={30} domain={[60, 100]} />
-              <Radar name="You" dataKey="You" stroke="#1A5336" fill="#1A5336" fillOpacity={0.5} />
+              <Radar name="You" dataKey="You" stroke="#3D4F66" fill="#3D4F66" fillOpacity={0.5} />
               <Radar name="Peer" dataKey="Peer" stroke="#f59e42" fill="#f59e42" fillOpacity={0.3} />
               <Legend />
               <Tooltip />
@@ -1308,7 +1308,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <YAxis domain={isPM ? [25, 40] : undefined} tickFormatter={isPM ? (v => `${v}%`) : undefined} />
               <Tooltip formatter={isPM ? (v => [`${v}%`, pmText('Win rate', 'معدل الفوز')]) : undefined} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
               <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
-              <Line type="monotone" dataKey="Rate" stroke="#1A5336" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} />
+              <Line type="monotone" dataKey="Rate" stroke="#3D4F66" strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 10 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -1341,7 +1341,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <YAxis tickFormatter={isPM ? (v => `$${v}M`) : (v => `$${v.toLocaleString()}`)} />
               <Tooltip formatter={isPM ? ((v, name) => [`$${v}M`, pmGraphLabel(name)]) : (v => `$${v.toLocaleString()}`)} labelFormatter={isPM ? ((label) => pmGraphLabel(label)) : undefined} />
               <Legend formatter={isPM ? ((value) => pmGraphLabel(value)) : undefined} />
-              <Bar dataKey="Revenue" name={isPM ? pmGraphLabel("Revenue") : undefined} fill={isPM ? '#74c69d' : '#1A5336'} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Revenue" name={isPM ? pmGraphLabel("Revenue") : undefined} fill={isPM ? '#74c69d' : '#3D4F66'} radius={[8, 8, 0, 0]} />
               <Bar dataKey="Projected" name={isPM ? pmGraphLabel("Projected") : undefined} fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
@@ -1393,7 +1393,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
               <Legend formatter={(value) => pmGraphLabel(value)} />
               <Bar dataKey="Actual" name={pmGraphLabel("Actual")} fill="#22c55e" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Forecast" name={pmGraphLabel("Forecast")} fill="#1A5336" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+              <Bar dataKey="Forecast" name={pmGraphLabel("Forecast")} fill="#3D4F66" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -1403,7 +1403,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
           <ResponsiveContainer width="100%" height="90%">
             <PieChart>
               <Pie data={employeeDemographicsData.regions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
-                <Cell fill="#1A5336" />
+                <Cell fill="#3D4F66" />
                 <Cell fill="#22c55e" />
                 <Cell fill="#f59e42" />
                 <Cell fill="#ef4444" />
@@ -1425,7 +1425,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <YAxis tickFormatter={v => `$${v}M`} />
               <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
               <Legend formatter={(value) => pmGraphLabel(value)} />
-              <Bar dataKey="Pipeline" name={pmGraphLabel("Pipeline")} fill="#1A5336" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Pipeline" name={pmGraphLabel("Pipeline")} fill="#3D4F66" radius={[8, 8, 0, 0]} />
               <Bar dataKey="Wins" name={pmGraphLabel("Wins")} fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
             </BarChart>
           </ResponsiveContainer>
@@ -1438,7 +1438,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
               <PolarGrid />
               <PolarAngleAxis dataKey="dept" />
               <PolarRadiusAxis angle={30} />
-              <Radar name="Current" dataKey="Revenue" stroke="#1A5336" fill="#1A5336" fillOpacity={0.5} />
+              <Radar name="Current" dataKey="Revenue" stroke="#3D4F66" fill="#3D4F66" fillOpacity={0.5} />
               <Radar name="Projected" dataKey="Projected" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} />
               <Legend />
               <Tooltip />
@@ -1461,7 +1461,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 {isPM ? (
                   <>
                     <Radar name={pmGraphLabel("Current")} dataKey="Revenue" stroke="#74c69d" fill="#74c69d" fillOpacity={0.5} />
-                    <Radar name={pmGraphLabel("Projected")} dataKey="Projected" stroke="#1A5336" fill="#1A5336" fillOpacity={0.3} />
+                    <Radar name={pmGraphLabel("Projected")} dataKey="Projected" stroke="#3D4F66" fill="#3D4F66" fillOpacity={0.3} />
                   </>
                 ) : (
                   <Radar name="Profit" dataKey="Profit" stroke="#22c55e" fill="#22c55e" fillOpacity={0.5} />
@@ -1493,7 +1493,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9F8] dark:bg-[#0B1410]">
+    <div className="flex min-h-screen bg-[#F4F6F9] dark:bg-[#0B1017]">
       <main className="flex-1 p-6 md:p-10 flex flex-col gap-8 overflow-x-auto">
         {/* Dashboard Header - Tour Target */}
         <div
@@ -1738,7 +1738,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         </linearGradient>
                       ))}
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#D8E0EA" />
                     <XAxis dataKey="month" tick={{ fontSize: 11 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
                     <Tooltip formatter={(value, name) => [`${value}%`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} contentStyle={{ borderRadius: 8 }} />
@@ -1761,7 +1761,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="Applications" stroke="#1A5336" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="Applications" stroke="#3D4F66" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
                     <Line type="monotone" dataKey="Hired" stroke="#22c55e" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -1782,12 +1782,12 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{pmText("Win rate % by proposal lead time (days)", "نسبة الفوز حسب مدة تجهيز العرض (بالأيام)")}</p>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={trialWinRateVsLead} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#D8E0EA" />
                     <XAxis dataKey="label" tick={{ fontSize: 11 }} tickFormatter={pmGraphLabel} />
                     <YAxis domain={[0, 60]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
                     <Tooltip formatter={(value) => [`${value}%`, pmText("Win Rate", "معدل الفوز")]} labelFormatter={(label) => `${pmText("Lead time", "مدة الالتقاط")}: ${label}`} contentStyle={{ borderRadius: 8 }} />
                     <Legend formatter={(value) => pmGraphLabel(value)} />
-                    <Line type="monotone" dataKey="winRate" name={pmText("Win Rate %", "معدل الفوز %")} stroke="#1A5336" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="winRate" name={pmText("Win Rate %", "معدل الفوز %")} stroke="#3D4F66" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </>
@@ -1877,7 +1877,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="Onboarded" stroke="#1A5336" strokeWidth={2} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="Onboarded" stroke="#3D4F66" strokeWidth={2} dot={{ r: 4 }} />
                     <Line type="monotone" dataKey="Completed" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
                   </LineChart>
                 )}
@@ -1980,8 +1980,8 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <YAxis />
                       <Tooltip formatter={(value, name) => [value, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
                       <Legend formatter={(value) => pmGraphLabel(value)} />
-                      <Bar dataKey="Pending" name={pmText("Pending", "معلّق")} stackId="a" fill="#1A5336" />
-                      <Bar dataKey="InProgress" name={pmText("In Progress", "قيد التنفيذ")} stackId="a" fill="#3d7a52" />
+                      <Bar dataKey="Pending" name={pmText("Pending", "معلّق")} stackId="a" fill="#3D4F66" />
+                      <Bar dataKey="InProgress" name={pmText("In Progress", "قيد التنفيذ")} stackId="a" fill="#5A6F86" />
                       <Bar dataKey="Approved" name={pmText("Approved", "معتمد")} stackId="a" fill="#f59e0b" />
                       <Bar dataKey="Delivered" name={pmText("Delivered", "مسلّم")} stackId="a" fill="#22c55e" />
                     </BarChart>
@@ -2013,7 +2013,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="FullTime" stackId="a" fill="#1A5336" />
+                      <Bar dataKey="FullTime" stackId="a" fill="#3D4F66" />
                       <Bar dataKey="PartTime" stackId="a" fill="#a3a3a3" />
                       <Bar dataKey="Contract" stackId="a" fill="#f59e42" />
                     </BarChart>
@@ -2068,7 +2068,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <Tooltip formatter={(value, name) => [value, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
                       <Legend formatter={(value) => pmGraphLabel(value)} />
                       <Line type="monotone" dataKey="Readiness" name={pmLabel("Readiness")} stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
-                      <Line type="monotone" dataKey="Velocity" name={pmLabel("Velocity")} stroke="#1A5336" strokeWidth={2} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="Velocity" name={pmLabel("Velocity")} stroke="#3D4F66" strokeWidth={2} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -2103,7 +2103,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <XAxis dataKey="period" tickFormatter={pmGraphLabel} />
                       <YAxis domain={[50, 90]} />
                       <Tooltip formatter={(value) => [value, pmText("Position", "المركز")]} />
-                      <Line type="monotone" dataKey="Position" name={pmText("Position", "المركز")} stroke="#3d7a52" strokeWidth={2} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="Position" name={pmText("Position", "المركز")} stroke="#5A6F86" strokeWidth={2} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -2174,7 +2174,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis />
                         <Tooltip formatter={(value, name) => [value, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
-                        <Line type="monotone" dataKey="Actual" name={pmGraphLabel("Actual")} stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
+                        <Line type="monotone" dataKey="Actual" name={pmGraphLabel("Actual")} stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
                         <Line type="monotone" dataKey="Forecast" name={pmGraphLabel("Forecast")} stroke="#22c55e" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
                       </LineChart>
                     </ResponsiveContainer>
@@ -2253,7 +2253,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <YAxis tickFormatter={v => `$${v}M`} />
                         <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
                         <Bar dataKey="Actual" name={pmGraphLabel("Actual")} fill="#22c55e" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="Forecast" name={pmGraphLabel("Forecast")} fill="#1A5336" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+                        <Bar dataKey="Forecast" name={pmGraphLabel("Forecast")} fill="#3D4F66" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -2289,7 +2289,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} />
                         <Tooltip formatter={v => `${v}%`} labelFormatter={(label) => pmGraphLabel(label)} />
-                        <Line type="monotone" dataKey="Rate" stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
+                        <Line type="monotone" dataKey="Rate" stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} connectNulls />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -2351,7 +2351,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                         <YAxis domain={[25, 40]} tickFormatter={v => `${v}%`} />
                         <Tooltip formatter={v => `${v}%`} labelFormatter={(label) => pmGraphLabel(label)} />
-                        <Line type="monotone" dataKey="Rate" stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="Rate" stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -2417,7 +2417,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <YAxis type="category" dataKey="vehicle" width={90} tick={{ fontSize: 10 }} />
                         <Tooltip formatter={v => [`$${v}M`, '']} />
                         <Bar dataKey="Revenue" fill="#74c69d" radius={[0, 8, 8, 0]} />
-                        <Bar dataKey="Projected" fill="#1A5336" radius={[0, 8, 8, 0]} fillOpacity={0.6} />
+                        <Bar dataKey="Projected" fill="#3D4F66" radius={[0, 8, 8, 0]} fillOpacity={0.6} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -2454,7 +2454,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
-                        <Line type="monotone" dataKey="Actual" stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="Actual" stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} />
                         <Line type="monotone" dataKey="Forecast" stroke="#22c55e" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -2523,7 +2523,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <YAxis tickFormatter={v => `$${v.toLocaleString()}`} />
                         <Tooltip formatter={v => `$${v.toLocaleString()}`} />
                         <Bar dataKey="Actual" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="Forecast" fill="#1A5336" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+                        <Bar dataKey="Forecast" fill="#3D4F66" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
                       </BarChart>
                     </ResponsiveContainer>
                     <span className="hidden group-hover:block absolute text-xs text-green-500 bg-white dark:bg-gray-900 px-2 py-1 rounded shadow top-2 left-2">{t('dashboard.aiLabels.clickToEnlarge')}</span>
@@ -2558,7 +2558,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
-                        <Line type="monotone" dataKey="Rate" stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="Rate" stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
                     <span className="hidden group-hover:block absolute text-xs text-blue-500 bg-white dark:bg-gray-900 px-2 py-1 rounded shadow top-2 left-2">{t('dashboard.aiLabels.clickToEnlarge')}</span>
@@ -2632,7 +2632,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                     <XAxis dataKey="dept" />
                     <YAxis tickFormatter={v => `$${v.toLocaleString()}`} />
                     <Tooltip formatter={v => `$${v.toLocaleString()}`} />
-                    <Bar dataKey="Revenue" fill="#1A5336" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="Revenue" fill="#3D4F66" radius={[8, 8, 0, 0]} />
                     <Bar dataKey="Projected" fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -2689,7 +2689,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <XAxis dataKey="month" tickFormatter={pmGraphLabel} />
                       <YAxis domain={[25, 40]} tickFormatter={v => `${v}%`} />
                       <Tooltip formatter={v => [`${v}%`, pmText('Win rate', 'معدل الفوز')]} labelFormatter={(label) => pmGraphLabel(label)} />
-                      <Line type="monotone" dataKey="Rate" stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="Rate" stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -2754,7 +2754,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <XAxis dataKey="agency" tickFormatter={pmGraphLabel} />
                       <YAxis tickFormatter={v => `$${v}M`} />
                       <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
-                      <Bar dataKey="Pipeline" name={pmGraphLabel("Pipeline")} fill="#1A5336" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="Pipeline" name={pmGraphLabel("Pipeline")} fill="#3D4F66" radius={[8, 8, 0, 0]} />
                       <Bar dataKey="Wins" name={pmGraphLabel("Wins")} fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.8} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -2788,7 +2788,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <YAxis tickFormatter={v => `$${v}M`} />
                       <Tooltip formatter={(v, name) => [`$${v}M`, pmGraphLabel(name)]} labelFormatter={(label) => pmGraphLabel(label)} />
                       <Bar dataKey="Revenue" name={pmGraphLabel("Revenue")} fill="#74c69d" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="Projected" name={pmGraphLabel("Projected")} fill="#1A5336" radius={[8, 8, 0, 0]} fillOpacity={0.6} />
+                      <Bar dataKey="Projected" name={pmGraphLabel("Projected")} fill="#3D4F66" radius={[8, 8, 0, 0]} fillOpacity={0.6} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -2820,7 +2820,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <PolarAngleAxis dataKey="vehicle" tick={{ fontSize: 8 }} tickFormatter={pmGraphLabel} />
                       <PolarRadiusAxis angle={30} tickFormatter={v => `$${v}M`} />
                       <Radar name="Current" dataKey="Revenue" stroke="#74c69d" fill="#74c69d" fillOpacity={0.5} />
-                      <Radar name="Projected" dataKey="Projected" stroke="#1A5336" fill="#1A5336" fillOpacity={0.3} />
+                      <Radar name="Projected" dataKey="Projected" stroke="#3D4F66" fill="#3D4F66" fillOpacity={0.3} />
                       <Legend />
                       <Tooltip formatter={v => [`$${v}M`, '']} />
                     </RadarChart>
@@ -2855,7 +2855,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <YAxis tickFormatter={v => `$${v}M`} />
                       <Tooltip formatter={v => [`$${v}M`, '']} />
                       <Bar dataKey="Actual" fill="#22c55e" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="Forecast" fill="#1A5336" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
+                      <Bar dataKey="Forecast" fill="#3D4F66" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -2889,7 +2889,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <XAxis dataKey="month" />
                       <YAxis />
                       <Tooltip />
-                      <Line type="monotone" dataKey="Rate" stroke="#1A5336" strokeWidth={2.5} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="Rate" stroke="#3D4F66" strokeWidth={2.5} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -2955,7 +2955,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <PolarGrid />
                       <PolarAngleAxis dataKey="dept" />
                       <PolarRadiusAxis angle={30} />
-                      <Radar name="Current" dataKey="Revenue" stroke="#1A5336" fill="#1A5336" fillOpacity={0.5} />
+                      <Radar name="Current" dataKey="Revenue" stroke="#3D4F66" fill="#3D4F66" fillOpacity={0.5} />
                       <Radar name="Projected" dataKey="Projected" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} />
                       <Legend />
                       <Tooltip />
@@ -3023,7 +3023,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                       <XAxis dataKey="dept" />
                       <YAxis tickFormatter={v => `$${v.toLocaleString()}`} />
                       <Tooltip formatter={v => `$${v.toLocaleString()}`} />
-                      <Bar dataKey="Revenue" fill="#1A5336" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="Revenue" fill="#3D4F66" radius={[8, 8, 0, 0]} />
                       <Bar dataKey="Projected" fill="#22c55e" radius={[8, 8, 0, 0]} fillOpacity={0.7} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -3054,7 +3054,7 @@ export default function DirectorDashboard({ basePath = "/rbac/director", dashboa
                   <ResponsiveContainer width="100%" height={120}>
                     <PieChart>
                       <Pie data={employeeDemographicsData.regions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={40} label>
-                        <Cell fill="#1A5336" />
+                        <Cell fill="#3D4F66" />
                         <Cell fill="#22c55e" />
                         <Cell fill="#f59e42" />
                         <Cell fill="#ef4444" />

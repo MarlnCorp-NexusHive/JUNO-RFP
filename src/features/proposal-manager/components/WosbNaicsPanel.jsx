@@ -49,7 +49,7 @@ export default function WosbNaicsPanel() {
     <section className="space-y-4" aria-label={t("proposalManagerGrants.wosbPanelLabel")}>
       <header className={`${GRANARY_PANEL} space-y-3`}>
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1A5336] dark:text-[#9fbfa9]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#3D4F66] dark:text-[#B8C5D6]">
             {t("proposalManagerGrants.wosbEyebrow")}
           </p>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
@@ -80,7 +80,7 @@ export default function WosbNaicsPanel() {
           <div
             role="group"
             aria-label={t("proposalManagerGrants.wosbFilterLabel")}
-            className="inline-flex rounded-[10px] border border-[#E5E7EB] bg-[#F8F9F8] p-1 dark:border-[#24352c] dark:bg-[#0B1410]"
+            className="inline-flex rounded-[10px] border border-[#D8E0EA] bg-[#F4F6F9] p-1 dark:border-[#2A3548] dark:bg-[#0B1017]"
           >
             {FILTERS.map((f) => {
               const active = setAsideFilter === f.id;
@@ -92,7 +92,7 @@ export default function WosbNaicsPanel() {
                   onClick={() => setSetAsideFilter(f.id)}
                   className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
                     active
-                      ? "bg-white text-slate-900 shadow-sm dark:bg-[#122018] dark:text-white"
+                      ? "bg-white text-slate-900 shadow-sm dark:bg-[#151D2A] dark:text-white"
                       : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
                   }`}
                 >
@@ -116,8 +116,8 @@ export default function WosbNaicsPanel() {
             </p>
           ) : (
             <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-              <thead className="sticky top-0 z-10 bg-[#F8F9F8] dark:bg-[#0F1A14]">
-                <tr className="border-b border-[#E5E7EB] text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-[#24352c] dark:text-slate-400">
+              <thead className="sticky top-0 z-10 bg-[#F4F6F9] dark:bg-[#0B1017]">
+                <tr className="border-b border-[#D8E0EA] text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-[#2A3548] dark:text-slate-400">
                   <th className="px-4 py-3">{t("proposalManagerGrants.wosbColCode")}</th>
                   <th className="px-4 py-3">{t("proposalManagerGrants.wosbColTitle")}</th>
                   <th className="px-4 py-3">{t("proposalManagerGrants.wosbColSetAside")}</th>
@@ -127,7 +127,7 @@ export default function WosbNaicsPanel() {
                 {filtered.map((row) => (
                   <tr
                     key={row.code}
-                    className="border-b border-[#E5E7EB]/80 last:border-0 dark:border-[#24352c]/80"
+                    className="border-b border-[#D8E0EA]/80 last:border-0 dark:border-[#2A3548]/80"
                   >
                     <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs font-semibold tabular-nums text-slate-800 dark:text-slate-100">
                       {row.code}
@@ -154,7 +154,7 @@ export default function WosbNaicsPanel() {
           href={WOSB_NAICS_SOURCE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-semibold text-[#1A5336] hover:underline dark:text-[#9fbfa9]"
+          className="inline-flex items-center gap-1 font-semibold text-[#3D4F66] hover:underline dark:text-[#B8C5D6]"
         >
           {t("proposalManagerGrants.wosbSourceLink")}
           <FiExternalLink className="h-3 w-3" aria-hidden />

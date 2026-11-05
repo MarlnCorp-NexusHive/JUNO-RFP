@@ -1,5 +1,5 @@
 // preloadDemoUsers.js
-/** Canonical demo accounts (ids 1–27). Merged into localStorage so older cached lists still get RFP auditors. */
+/** Canonical demo accounts (ids 1–27). Merged into localStorage so older cached lists still get RFP team members. */
 function getCanonicalDemoUsers() {
   return [
     // Superadmin
@@ -42,11 +42,11 @@ function getCanonicalDemoUsers() {
     { id: 22, username: "sales_enablement_manager", password: "Salesenablement@2026", displayName: "Sales Enablement Manager", team: "Sales Enablement Team", role: "Manager", createdAt: Date.now() },
     // Proposal Team
     { id: 23, username: "proposal_manager", password: "Proposal_manager@2026", displayName: "Proposal Manager", team: "Proposal Team", role: "Proposal Manager", createdAt: Date.now() },
-    // RFP Collaboration — auditors (main login; collab* fields sync /rfp-collab API)
-    { id: 24, username: "aiyana_yazzie", password: "aud123", displayName: "Aiyana Yazzie", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "aiyana@juno", collabPassword: "aud123", createdAt: Date.now() },
-    { id: 25, username: "chayton_bitsui", password: "aud123", displayName: "Chayton Bitsui", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "chayton@juno", collabPassword: "aud123", createdAt: Date.now() },
-    { id: 26, username: "talise_nez", password: "aud123", displayName: "Talise Nez", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "talise@juno", collabPassword: "aud123", createdAt: Date.now() },
-    { id: 27, username: "kiona_tsosie", password: "aud123", displayName: "Kiona Tsosie", team: "RFP Collaboration", role: "RFP Auditor", collabEmail: "kiona@juno", collabPassword: "aud123", createdAt: Date.now() },
+    // RFP Collaboration — team members (main login; collab* fields sync /rfp-collab API)
+    { id: 24, username: "aiyana_yazzie", password: "aud123", displayName: "Aiyana Yazzie", team: "RFP Collaboration", role: "Team Member", collabEmail: "aiyana@juno", collabPassword: "aud123", createdAt: Date.now() },
+    { id: 25, username: "chayton_bitsui", password: "aud123", displayName: "Chayton Bitsui", team: "RFP Collaboration", role: "Team Member", collabEmail: "chayton@juno", collabPassword: "aud123", createdAt: Date.now() },
+    { id: 26, username: "talise_nez", password: "aud123", displayName: "Talise Nez", team: "RFP Collaboration", role: "Team Member", collabEmail: "talise@juno", collabPassword: "aud123", createdAt: Date.now() },
+    { id: 27, username: "kiona_tsosie", password: "aud123", displayName: "Kiona Tsosie", team: "RFP Collaboration", role: "Team Member", collabEmail: "kiona@juno", collabPassword: "aud123", createdAt: Date.now() },
   ];
 }
 
@@ -70,5 +70,22 @@ export function preloadDemoUsers() {
     byId.set(u.id, u);
   }
   const merged = Array.from(byId.values()).sort((a, b) => a.id - b.id);
+  // Rename legacy display role for any leftover non-canonical entries
+  for (const u of merged) {
+    if (u?.role === "RFP Auditor") u.role = "Team Member";
+  }
   localStorage.setItem(key, JSON.stringify(merged));
+
+  try {
+    const curRaw = localStorage.getItem("rbac_current_user");
+    if (curRaw) {
+      const cur = JSON.parse(curRaw);
+      if (cur?.role === "RFP Auditor") {
+        cur.role = "Team Member";
+        localStorage.setItem("rbac_current_user", JSON.stringify(cur));
+      }
+    }
+  } catch {
+    /* ignore */
+  }
 }

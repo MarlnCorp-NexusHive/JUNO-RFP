@@ -4,7 +4,7 @@ import React from 'react';
 const Card = ({ className, ...props }) => {
   return (
     <div
-      className={`rounded-[10px] border border-[#E5E7EB] bg-white text-card-foreground shadow-none dark:border-[#24352c] dark:bg-[#122018] ${className || ''}`}
+      className={`rounded-[10px] border border-[#D8E0EA] bg-white text-card-foreground shadow-none dark:border-[#2A3548] dark:bg-[#151D2A] ${className || ''}`}
       {...props}
     />
   );

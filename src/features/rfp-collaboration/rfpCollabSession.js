@@ -7,7 +7,14 @@ const PM_TEAM = "Proposal Team";
 const PM_ROLE = "Proposal Manager";
 
 const RFP_COLLAB_TEAM = "RFP Collaboration";
-const RFP_AUDITOR_ROLE = "RFP Auditor";
+/** Display role for collaboration reviewers (was "RFP Auditor"). */
+export const RFP_TEAM_MEMBER_ROLE = "Team Member";
+/** Legacy demo role label — still accepted for older sessions. */
+const RFP_AUDITOR_ROLE_LEGACY = "RFP Auditor";
+
+export function isRfpTeamMemberRole(role) {
+  return role === RFP_TEAM_MEMBER_ROLE || role === RFP_AUDITOR_ROLE_LEGACY;
+}
 
 function readRbacUser() {
   try {
@@ -40,10 +47,10 @@ function withSignedUpIdentity(user) {
   const isPm =
     user.role === "proposal_manager" &&
     (rbac?.team === PM_TEAM && rbac?.role === PM_ROLE);
-  const isAuditor =
+  const isTeamMember =
     user.role === "auditor" &&
-    (rbac?.team === RFP_COLLAB_TEAM && rbac?.role === RFP_AUDITOR_ROLE);
-  if (!isPm && !isAuditor) return user;
+    (rbac?.team === RFP_COLLAB_TEAM && isRfpTeamMemberRole(rbac?.role));
+  if (!isPm && !isTeamMember) return user;
   if (user.name === name) return user;
   return { ...user, name };
 }
@@ -52,14 +59,14 @@ function withSignedUpIdentity(user) {
 export function isMainAppRfpAuditor() {
   try {
     const u = readRbacUser();
-    return u?.team === RFP_COLLAB_TEAM && u?.role === RFP_AUDITOR_ROLE;
+    return u?.team === RFP_COLLAB_TEAM && isRfpTeamMemberRole(u?.role);
   } catch {
     return false;
   }
 }
 
 /**
- * After main JUNO login as RFP Auditor, sync collaboration API session.
+ * After main JUNO login as Team Member, sync collaboration API session.
  * Trial: company-scoped reviewer from trial JWT (never seeded aiyana@juno).
  * Demo: seeded email/password on user record.
  */
@@ -77,7 +84,7 @@ export async function ensureRbacAuditorCollabSession() {
     }
     const { data } = await rfpCollab.trialAuditorSession();
     if (data.user?.role !== "auditor") {
-      throw new Error("Collaboration auditor account mismatch");
+      throw new Error("Collaboration team member account mismatch");
     }
     saveCollabSession(data.token, data.user);
     return loadCollabSession();
@@ -93,7 +100,7 @@ export async function ensureRbacAuditorCollabSession() {
   if (!email || !password) return null;
   const { data } = await rfpCollab.login(email, password);
   if (data.user?.role !== "auditor") {
-    throw new Error("Collaboration auditor account mismatch");
+    throw new Error("Collaboration team member account mismatch");
   }
   saveCollabSession(data.token, data.user);
   return loadCollabSession();
