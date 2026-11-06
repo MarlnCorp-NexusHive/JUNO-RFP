@@ -52,16 +52,27 @@ function load(key, defaultValue = []) {
   }
 }
 
+/** @returns {boolean} false when localStorage quota/write failed */
 function save(key, data) {
+  let ok = true;
   try {
     localStorage.setItem(scopedStorageKey(key), JSON.stringify(data));
   } catch (e) {
+    ok = false;
     console.warn("proposalManagerStorage save failed", key, e);
   }
   if (canUseTrialFeatures()) {
     if (key === KEYS.FOLDERS || key === KEYS.DOCUMENTS) {
+      // Never sync huge fileDataUrl blobs to the trial feature API — strip for network persist
       const folders = key === KEYS.FOLDERS ? data : load(KEYS.FOLDERS, []);
-      const documents = key === KEYS.DOCUMENTS ? data : load(KEYS.DOCUMENTS, []);
+      const documentsRaw = key === KEYS.DOCUMENTS ? data : load(KEYS.DOCUMENTS, []);
+      const documents = Array.isArray(documentsRaw)
+        ? documentsRaw.map((d) => {
+            if (!d?.fileDataUrl) return d;
+            const { fileDataUrl: _omit, ...rest } = d;
+            return rest;
+          })
+        : [];
       void persistTrialFeatureData("workspace", { folders, documents });
     }
     if (key === KEYS.CONTENT_HUB_QA) {
@@ -71,6 +82,7 @@ function save(key, data) {
   } else if (key === KEYS.CONTENT_HUB_QA) {
     notifyContentHubChanged();
   }
+  return ok;
 }
 
 // ——— Folders ———
@@ -109,10 +121,61 @@ export function saveDocuments(docs) {
   notifyWorkspaceDocsChanged();
 }
 
-export function addDocument({ folderId, name, fileType, documentTypeId, uploadedAt, extractedFacts = [], extractedQAs = [], rawText = "" }) {
+/** In-memory fallback when localStorage cannot hold original file bytes (quota / large PDFs). */
+const sessionFileBytes = new Map();
+
+/** Prefer persisting originals under this raw size so base64 fits localStorage more reliably. */
+export const WORKSPACE_FILE_PERSIST_MAX_BYTES = 8 * 1024 * 1024;
+
+export function stashWorkspaceFileBytes(docId, payload) {
+  if (!docId || !payload?.dataUrl) return;
+  sessionFileBytes.set(String(docId), {
+    dataUrl: String(payload.dataUrl),
+    name: String(payload.name || ""),
+    fileType: String(payload.fileType || ""),
+  });
+}
+
+export function getWorkspaceFileBytes(docId) {
+  const id = String(docId || "");
+  if (!id) return null;
+  const fromSession = sessionFileBytes.get(id);
+  if (fromSession?.dataUrl) return fromSession;
+  const doc = getDocuments().find((d) => d.id === id);
+  if (doc?.fileDataUrl) {
+    return {
+      dataUrl: String(doc.fileDataUrl),
+      name: String(doc.name || ""),
+      fileType: String(doc.fileType || ""),
+    };
+  }
+  return null;
+}
+
+export function clearWorkspaceFileBytes(docId) {
+  if (docId) sessionFileBytes.delete(String(docId));
+}
+
+export function addDocument({
+  folderId,
+  name,
+  fileType,
+  documentTypeId,
+  uploadedAt,
+  extractedFacts = [],
+  extractedQAs = [],
+  rawText = "",
+  fileDataUrl = "",
+  fileByteLength = 0,
+}) {
   const docs = getDocuments();
   const id = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-  docs.push({
+  const dataUrl = typeof fileDataUrl === "string" ? fileDataUrl : "";
+  const bytes = Number(fileByteLength) || 0;
+  const persistOriginal =
+    Boolean(dataUrl) && (!bytes || bytes <= WORKSPACE_FILE_PERSIST_MAX_BYTES);
+
+  const doc = {
     id,
     folderId: folderId || null,
     name,
@@ -122,8 +185,29 @@ export function addDocument({ folderId, name, fileType, documentTypeId, uploaded
     extractedFacts,
     extractedQAs,
     rawText: rawText ? rawText.slice(0, 50000) : "", // cap for localStorage
-  });
-  saveDocuments(docs);
+  };
+  if (persistOriginal) {
+    doc.fileDataUrl = dataUrl;
+    doc.fileByteLength = bytes || undefined;
+  }
+  docs.push(doc);
+
+  if (dataUrl) {
+    stashWorkspaceFileBytes(id, { dataUrl, name, fileType });
+  }
+
+  const saved = save(KEYS.DOCUMENTS, docs);
+  notifyWorkspaceDocsChanged();
+  if (!saved && persistOriginal) {
+    // Quota: keep session stash, persist metadata without fileDataUrl
+    const withoutFile = docs.map((d) => {
+      if (d.id !== id) return d;
+      const { fileDataUrl: _drop, ...rest } = d;
+      return rest;
+    });
+    save(KEYS.DOCUMENTS, withoutFile);
+    notifyWorkspaceDocsChanged();
+  }
   return id;
 }
 
@@ -133,6 +217,7 @@ export function updateDocument(id, updates) {
 }
 
 export function deleteDocument(id) {
+  clearWorkspaceFileBytes(id);
   saveDocuments(getDocuments().filter((d) => d.id !== id));
 }
 

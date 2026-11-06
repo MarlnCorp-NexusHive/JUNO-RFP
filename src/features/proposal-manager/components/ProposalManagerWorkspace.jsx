@@ -19,6 +19,7 @@ import {
   hydrateContentHubFromBackend,
   buildQaLibraryContextForRequirement,
   upsertWorkspaceAnswerInContentHub,
+  getWorkspaceFileBytes,
 } from "../services/proposalManagerStorage";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
@@ -37,6 +38,7 @@ import {
   FiGrid,
   FiSearch,
   FiX,
+  FiMail,
 } from "react-icons/fi";
 import { useProposalIssuer } from "./ProposalIssuerContext";
 import { SAMPLE_COMPANIES } from "../data/companyIntelligenceSamples";
@@ -50,6 +52,8 @@ import {
   getWorkspaceDocument,
   exportWorkspaceDocument,
   exportWorkspaceDocumentStyled,
+  emailWorkspaceDocument,
+  getWorkspaceEmailStatus,
 } from "../../../services/api.js";
 import { rfpCollab } from "../../../services/rfpCollabApi.js";
 import { ensureProposalManagerCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
@@ -385,6 +389,15 @@ export default function ProposalManagerWorkspace() {
   const [workspaceDocExporting, setWorkspaceDocExporting] = useState(false);
   const [styledDocExporting, setStyledDocExporting] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailKind, setEmailKind] = useState("original"); // original | simple | styled
+  const [emailTo, setEmailTo] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailSuccess, setEmailSuccess] = useState("");
+  const [emailConfigured, setEmailConfigured] = useState(null);
 
   const refreshDocs = useCallback(() => setDocuments(getDocuments()));
   const refreshFolders = useCallback(() => setFolders(getFolders()));
@@ -429,6 +442,17 @@ export default function ProposalManagerWorkspace() {
       if (file.size > MAX_FILE_MB * 1024 * 1024) continue;
 
       const uploadedAt = new Date().toISOString();
+      let fileDataUrl = "";
+      try {
+        fileDataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ""));
+          reader.onerror = () => reject(reader.error || new Error("read failed"));
+          reader.readAsDataURL(file);
+        });
+      } catch {
+        fileDataUrl = "";
+      }
       const docId = addDocument({
         folderId: selectedFolderId,
         name: file.name,
@@ -438,6 +462,8 @@ export default function ProposalManagerWorkspace() {
         extractedFacts: [],
         extractedQAs: [],
         rawText: "",
+        fileDataUrl,
+        fileByteLength: file.size || 0,
       });
       refreshDocs();
 
@@ -1151,6 +1177,139 @@ export default function ProposalManagerWorkspace() {
     questions,
     answers,
     effectiveIssuerName,
+  ]);
+
+  const originalFileForEmail = useMemo(() => {
+    if (!rfpId) return null;
+    return getWorkspaceFileBytes(rfpId);
+  }, [rfpId, documents]);
+
+  const openEmailModal = useCallback(async () => {
+    setEmailError("");
+    setEmailSuccess("");
+    setEmailSubject("");
+    setEmailMessage("");
+    const hasOriginal = Boolean(getWorkspaceFileBytes(rfpId)?.dataUrl);
+    setEmailKind(hasOriginal ? "original" : workspaceDocId ? "simple" : "original");
+    setShowEmailModal(true);
+    try {
+      const status = await getWorkspaceEmailStatus();
+      setEmailConfigured(Boolean(status?.configured));
+    } catch {
+      setEmailConfigured(false);
+    }
+  }, [rfpId, workspaceDocId]);
+
+  const handleSendWorkspaceEmail = useCallback(async () => {
+    setEmailError("");
+    setEmailSuccess("");
+    const to = emailTo.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      setEmailError(
+        t("proposalManagerWorkspace.rfpWorkspace.emailInvalidTo", {
+          defaultValue: "Enter a valid recipient email address.",
+        }),
+      );
+      return;
+    }
+
+    setEmailSending(true);
+    try {
+      const user = parseLocalStorageJson("rbac_current_user");
+      const senderName =
+        String(user?.name || user?.username || "").trim() || "JUNO RFP teammate";
+
+      let payload = {
+        to,
+        subject: emailSubject.trim() || undefined,
+        message: emailMessage.trim() || undefined,
+        senderName,
+        kind: emailKind,
+      };
+
+      if (emailKind === "original") {
+        const file = getWorkspaceFileBytes(rfpId);
+        if (!file?.dataUrl) {
+          setEmailError(
+            t("proposalManagerWorkspace.rfpWorkspace.emailMissingOriginal", {
+              defaultValue:
+                "Original file is not available. Re-upload the RFP/grant in this browser session, then try again.",
+            }),
+          );
+          return;
+        }
+        payload = {
+          ...payload,
+          filename: file.name || activeRfpDoc?.name || "document",
+          contentBase64: file.dataUrl,
+          contentType: file.fileType || activeRfpDoc?.fileType || "application/octet-stream",
+        };
+      } else {
+        if (!workspaceDocId) {
+          setEmailError(
+            t("proposalManagerWorkspace.rfpWorkspace.emailMissingWorkspace", {
+              defaultValue: "Link or open a response workspace before emailing an export.",
+            }),
+          );
+          return;
+        }
+        if (emailKind === "styled" && answeredCount === 0) {
+          setEmailError(
+            t("proposalManagerWorkspace.rfpWorkspace.emailStyledNeedsAnswers", {
+              defaultValue: "Add at least one answer before emailing the styled proposal.",
+            }),
+          );
+          return;
+        }
+        await saveWorkspaceDocument(workspaceDocId, computedDocumentModel);
+        payload = {
+          ...payload,
+          workspaceId: workspaceDocId,
+          issuerName: effectiveIssuerName || undefined,
+        };
+      }
+
+      const result = await emailWorkspaceDocument(payload);
+      setEmailSuccess(
+        t("proposalManagerWorkspace.rfpWorkspace.emailSent", {
+          defaultValue: "Email sent to {{to}}.",
+          to: result?.to || to,
+        }),
+      );
+    } catch (e) {
+      const code = e?.response?.data?.code;
+      const msg = e?.response?.data?.error || e?.message;
+      if (code === "email_not_configured") {
+        setEmailError(
+          t("proposalManagerWorkspace.rfpWorkspace.emailNotConfigured", {
+            defaultValue:
+              "Email is not configured on the server. Set RESEND_API_KEY (and RESEND_FROM) on the backend.",
+          }),
+        );
+      } else {
+        setEmailError(
+          msg ||
+            t("proposalManagerWorkspace.rfpWorkspace.emailFailed", {
+              defaultValue: "Could not send email. Try again.",
+            }),
+        );
+      }
+    } finally {
+      setEmailSending(false);
+    }
+  }, [
+    emailTo,
+    emailSubject,
+    emailMessage,
+    emailKind,
+    rfpId,
+    activeRfpDoc?.name,
+    activeRfpDoc?.fileType,
+    workspaceDocId,
+    computedDocumentModel,
+    effectiveIssuerName,
+    answeredCount,
+    t,
   ]);
 
   return (
@@ -1876,6 +2035,17 @@ export default function ProposalManagerWorkspace() {
                                 ? t("proposalManagerWorkspace.rfpWorkspace.exportPreparing")
                                 : t("proposalManagerWorkspace.rfpWorkspace.downloadDocument")}
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => void openEmailModal()}
+                              disabled={emailSending}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#3D4F66]/40 bg-white dark:bg-gray-800 text-[#3D4F66] dark:text-[#B8C5D6] hover:bg-[#EEF2F6] dark:hover:bg-gray-700 disabled:opacity-50 text-sm font-medium"
+                            >
+                              <FiMail className="w-4 h-4 shrink-0" />
+                              {t("proposalManagerWorkspace.rfpWorkspace.sendByEmail", {
+                                defaultValue: "Send by email",
+                              })}
+                            </button>
                           </div>
                           {aiError ? (
                             <p className="mt-2 text-sm text-red-600 dark:text-red-400">{aiError}</p>
@@ -1989,6 +2159,212 @@ export default function ProposalManagerWorkspace() {
                   className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
                   {t("proposalManagerWorkspace.cancel")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showEmailModal ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4">
+          <div
+            className="w-full max-w-lg rounded-2xl border border-gray-200/90 dark:border-gray-600/80 bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="email-modal-title"
+          >
+            <div className="px-6 pt-6 pb-3 border-b border-gray-100 dark:border-gray-800">
+              <h3 id="email-modal-title" className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {t("proposalManagerWorkspace.rfpWorkspace.emailModalTitle", {
+                  defaultValue: "Send by email",
+                })}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1.5">
+                {t("proposalManagerWorkspace.rfpWorkspace.emailModalSubtitle", {
+                  defaultValue:
+                    "Email the original uploaded RFP/grant or a completed response export to a designated address.",
+                })}
+              </p>
+              {emailConfigured === false ? (
+                <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+                  {t("proposalManagerWorkspace.rfpWorkspace.emailNotConfigured", {
+                    defaultValue:
+                      "Email is not configured on the server. Set RESEND_API_KEY (and RESEND_FROM) on the backend.",
+                  })}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="p-5 sm:p-6 space-y-4">
+              <fieldset>
+                <legend className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
+                  {t("proposalManagerWorkspace.rfpWorkspace.emailAttachmentLabel", {
+                    defaultValue: "Attachment",
+                  })}
+                </legend>
+                <div className="space-y-2">
+                  <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <input
+                      type="radio"
+                      name="email-kind"
+                      className="mt-1"
+                      checked={emailKind === "original"}
+                      onChange={() => setEmailKind("original")}
+                      disabled={!originalFileForEmail?.dataUrl}
+                    />
+                    <span>
+                      <span className="font-medium">
+                        {t("proposalManagerWorkspace.rfpWorkspace.emailKindOriginal", {
+                          defaultValue: "Original uploaded file",
+                        })}
+                      </span>
+                      <span className="block text-xs text-gray-500 dark:text-gray-400">
+                        {originalFileForEmail?.dataUrl
+                          ? originalFileForEmail.name || activeRfpDoc?.name
+                          : t("proposalManagerWorkspace.rfpWorkspace.emailOriginalUnavailable", {
+                              defaultValue: "Unavailable — re-upload the file in this session",
+                            })}
+                      </span>
+                      {originalFileForEmail?.dataUrl ? (
+                        <a
+                          href={originalFileForEmail.dataUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-[#635BFF] underline underline-offset-2"
+                        >
+                          {t("proposalManagerWorkspace.rfpWorkspace.emailViewOriginal", {
+                            defaultValue: "View / open file",
+                          })}
+                        </a>
+                      ) : null}
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <input
+                      type="radio"
+                      name="email-kind"
+                      className="mt-1"
+                      checked={emailKind === "simple"}
+                      onChange={() => setEmailKind("simple")}
+                      disabled={!workspaceDocId}
+                    />
+                    <span>
+                      <span className="font-medium">
+                        {t("proposalManagerWorkspace.rfpWorkspace.emailKindSimple", {
+                          defaultValue: "Standard Q&A export (Word)",
+                        })}
+                      </span>
+                      <span className="block text-xs text-gray-500 dark:text-gray-400">
+                        {t("proposalManagerWorkspace.rfpWorkspace.exportOptionSimpleDescription")}
+                      </span>
+                    </span>
+                  </label>
+                  {showStyledDocumentExport ? (
+                    <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <input
+                        type="radio"
+                        name="email-kind"
+                        className="mt-1"
+                        checked={emailKind === "styled"}
+                        onChange={() => setEmailKind("styled")}
+                        disabled={!workspaceDocId || answeredCount === 0}
+                      />
+                      <span>
+                        <span className="font-medium">
+                          {t("proposalManagerWorkspace.rfpWorkspace.emailKindStyled", {
+                            defaultValue: "Styled proposal export (Word)",
+                          })}
+                        </span>
+                        <span className="block text-xs text-gray-500 dark:text-gray-400">
+                          {t("proposalManagerWorkspace.rfpWorkspace.exportOptionStyledDescription")}
+                        </span>
+                      </span>
+                    </label>
+                  ) : null}
+                </div>
+              </fieldset>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  {t("proposalManagerWorkspace.rfpWorkspace.emailToLabel", {
+                    defaultValue: "To",
+                  })}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={emailTo}
+                  onChange={(e) => setEmailTo(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 outline-none focus:border-[#635BFF]"
+                  autoComplete="email"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  {t("proposalManagerWorkspace.rfpWorkspace.emailSubjectLabel", {
+                    defaultValue: "Subject",
+                  })}
+                </label>
+                <input
+                  type="text"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder={t("proposalManagerWorkspace.rfpWorkspace.emailSubjectPlaceholder", {
+                    defaultValue: "Optional — defaults to the file name",
+                  })}
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 outline-none focus:border-[#635BFF]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  {t("proposalManagerWorkspace.rfpWorkspace.emailMessageLabel", {
+                    defaultValue: "Message",
+                  })}
+                </label>
+                <textarea
+                  value={emailMessage}
+                  onChange={(e) => setEmailMessage(e.target.value)}
+                  rows={3}
+                  placeholder={t("proposalManagerWorkspace.rfpWorkspace.emailMessagePlaceholder", {
+                    defaultValue: "Optional note to the recipient",
+                  })}
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 outline-none focus:border-[#635BFF] resize-y"
+                />
+              </div>
+
+              {emailError ? (
+                <p className="text-sm text-red-600 dark:text-red-400">{emailError}</p>
+              ) : null}
+              {emailSuccess ? (
+                <p className="text-sm text-emerald-700 dark:text-emerald-300">{emailSuccess}</p>
+              ) : null}
+
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!emailSending) setShowEmailModal(false);
+                  }}
+                  className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                >
+                  {t("proposalManagerWorkspace.cancel")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleSendWorkspaceEmail()}
+                  disabled={emailSending}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#201A44] hover:bg-[#181838] disabled:opacity-50 text-white text-sm font-semibold"
+                >
+                  <FiMail className="w-4 h-4" />
+                  {emailSending
+                    ? t("proposalManagerWorkspace.rfpWorkspace.emailSending", {
+                        defaultValue: "Sending…",
+                      })
+                    : t("proposalManagerWorkspace.rfpWorkspace.emailSendButton", {
+                        defaultValue: "Send email",
+                      })}
                 </button>
               </div>
             </div>

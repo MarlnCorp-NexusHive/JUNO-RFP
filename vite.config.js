@@ -22,6 +22,9 @@ export default defineConfig(({ mode }) => {
     "/extract-structured-data": prox(),
     "/get-tables": prox(),
     "/workspace-document": prox(),
+    // Must be more specific than a bare "/workspace" prefix (would also match workspace-document).
+    "/workspace/email-document": prox(),
+    "/workspace/email-status": prox(),
     "/export-document": prox(),
     "/calendar": prox(),
     "/generate-slide-deck": prox(),

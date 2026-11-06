@@ -269,6 +269,34 @@ export const exportWorkspaceDocumentStyled = async (workspaceId, issuerDisplayNa
   return assertBlobIsDocxOrThrow(res, "Styled export");
 };
 
+/** Whether Resend is configured on the backend. */
+export const getWorkspaceEmailStatus = async () => {
+  const res = await API.get("/workspace/email-status");
+  return res.data;
+};
+
+/**
+ * Email an original Workspace upload or a completed export (simple/styled DOCX).
+ * @param {{
+ *   to: string,
+ *   subject?: string,
+ *   message?: string,
+ *   senderName?: string,
+ *   kind: "original"|"simple"|"styled",
+ *   workspaceId?: string,
+ *   filename?: string,
+ *   contentBase64?: string,
+ *   contentType?: string,
+ *   issuerName?: string,
+ * }} payload
+ */
+export const emailWorkspaceDocument = async (payload) => {
+  const res = await API.post("/workspace/email-document", payload || {}, {
+    timeout: 120_000,
+  });
+  return res.data;
+};
+
 async function errorMessageFromBlobResponse(blob, fallback) {
   if (!(blob instanceof Blob)) return fallback;
   const text = await blob.text();

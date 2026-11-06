@@ -32,6 +32,10 @@ import { registerPricingAiRoutes } from "./pricingAiService.js";
 import { registerPursuitLifecycleAiRoutes } from "./pursuitLifecycleAiService.js";
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
+import {
+  isEmailConfigured,
+  sendWorkspaceDocumentEmail,
+} from "./trial/emailService.js";
 import { registerGrantsGovRoutes } from "./grantsGovService.js";
 import { registerAltGrantsRoutes } from "./altGrantsService.js";
 import { registerUsaSpendingRoutes } from "./usaSpendingService.js";
@@ -73,8 +77,8 @@ const app = express();
 
 /* ================= CORE MIDDLEWARE ================= */
 app.use(cors());
-app.use(express.json({ limit: "12mb" }));
-app.use(express.urlencoded({ extended: true, limit: "12mb" }));
+app.use(express.json({ limit: "16mb" }));
+app.use(express.urlencoded({ extended: true, limit: "16mb" }));
 
 /* ================= DEBUG LOGGER ================= */
 app.use((req, res, next) => {
@@ -542,6 +546,133 @@ app.get("/export-document/:workspaceId", async (req, res) => {
   }
 });
 
+const WORKSPACE_EMAIL_MAX_BYTES = 10 * 1024 * 1024;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function stripDataUrlBase64(raw) {
+  const s = String(raw || "").trim();
+  const m = /^data:[^;]+;base64,(.+)$/i.exec(s);
+  return m ? m[1] : s.replace(/\s+/g, "");
+}
+
+function approxBase64Bytes(b64) {
+  const len = String(b64 || "").length;
+  if (!len) return 0;
+  const padding = b64.endsWith("==") ? 2 : b64.endsWith("=") ? 1 : 0;
+  return Math.max(0, Math.floor((len * 3) / 4) - padding);
+}
+
+/**
+ * Email an original uploaded RFP/grant file or a completed Workspace export.
+ * Body: { to, subject?, message?, senderName?, kind: "original"|"simple"|"styled",
+ *         workspaceId?, filename?, contentBase64?, contentType?, issuerName? }
+ */
+app.post("/workspace/email-document", async (req, res) => {
+  try {
+    if (!isEmailConfigured()) {
+      return res.status(503).json({
+        error: "Email is not configured on the server (RESEND_API_KEY).",
+        code: "email_not_configured",
+      });
+    }
+
+    const body = req.body || {};
+    const to = String(body.to || "").trim();
+    if (!EMAIL_RE.test(to)) {
+      return res.status(400).json({ error: "A valid recipient email is required.", code: "invalid_to" });
+    }
+
+    const kind = String(body.kind || "").trim().toLowerCase();
+    if (!["original", "simple", "styled"].includes(kind)) {
+      return res.status(400).json({
+        error: 'kind must be "original", "simple", or "styled".',
+        code: "invalid_kind",
+      });
+    }
+
+    let filename = "";
+    let contentType = "application/octet-stream";
+    let contentBase64 = "";
+
+    if (kind === "original") {
+      contentBase64 = stripDataUrlBase64(body.contentBase64 || body.fileDataUrl || "");
+      filename = String(body.filename || body.fileName || "document").trim() || "document";
+      contentType = String(body.contentType || body.fileType || "application/octet-stream").trim();
+      if (!contentBase64) {
+        return res.status(400).json({
+          error: "Original file bytes are missing. Re-upload the RFP/grant in Workspace, then try again.",
+          code: "missing_original",
+        });
+      }
+    } else {
+      const workspaceId = String(body.workspaceId || "").trim();
+      if (!workspaceId) {
+        return res.status(400).json({ error: "workspaceId is required for exports.", code: "missing_workspace" });
+      }
+
+      if (kind === "styled") {
+        const issuerDisplayName =
+          typeof body.issuerName === "string" && body.issuerName.trim()
+            ? body.issuerName.trim()
+            : "";
+        const built = await buildStyledWorkspaceDocx(
+          openai,
+          workspaceId,
+          issuerDisplayName ? { issuerDisplayName } : {},
+        );
+        contentBase64 = Buffer.from(built.buffer).toString("base64");
+        filename = built.filename || `styled-response-${workspaceId}.docx`;
+        contentType = built.contentType || "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      } else {
+        const built = await buildWorkspaceDocumentDocx(workspaceId);
+        contentBase64 = Buffer.from(built.buffer).toString("base64");
+        filename = built.filename || `response-${workspaceId}.docx`;
+        contentType = built.contentType || "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      }
+    }
+
+    const byteLen = approxBase64Bytes(contentBase64);
+    if (byteLen > WORKSPACE_EMAIL_MAX_BYTES) {
+      return res.status(413).json({
+        error: `Attachment is too large (${Math.round(byteLen / (1024 * 1024))} MB). Max is 10 MB.`,
+        code: "attachment_too_large",
+      });
+    }
+
+    const result = await sendWorkspaceDocumentEmail({
+      to,
+      subject: body.subject,
+      message: body.message,
+      senderName: body.senderName,
+      fileName: filename,
+      attachment: {
+        filename,
+        content: contentBase64,
+        contentType,
+      },
+    });
+
+    return res.json({
+      ok: true,
+      id: result?.id || null,
+      filename,
+      kind,
+      to,
+    });
+  } catch (err) {
+    console.error("WORKSPACE EMAIL DOCUMENT ERROR:", err.message);
+    const code = err.code === "email_not_configured" ? 503 : err.statusCode || 500;
+    return res.status(code).json({
+      error: err.message || "Failed to email workspace document",
+      code: err.code || "email_send_failed",
+    });
+  }
+});
+
+app.get("/workspace/email-status", (_req, res) => {
+  res.json({ configured: isEmailConfigured() });
+});
+
 /* ================= CONTENT HUB → WORK DOCUMENT (DOCX) ================= */
 
 app.post("/generate-work-document", async (req, res) => {
@@ -624,6 +755,8 @@ app.listen(PORT, () => {
   console.log("GET  /workspace-document/:workspaceId");
   console.log("POST /workspace-document/:workspaceId/seed");
   console.log("GET  /export-document/:workspaceId (?style=styled for template merge)");
+  console.log("POST /workspace/email-document (original | simple | styled attachment)");
+  console.log("GET  /workspace/email-status");
   console.log("POST /structure-rfp-requirements");
   console.log("POST /ask-with-context");
   console.log("POST /company-intelligence-remote");
