@@ -323,28 +323,63 @@ function LoginPageContent() {
     setTimeout(() => setDemoReloaded(false), 3000);
   };
 
-  const pageBg = darkTheme ? "bg-[#0B1017]" : "bg-[#FFFFFF]";
-  const ink = darkTheme ? "text-[#F3F4F6]" : "text-[#111827]";
-  const muted = darkTheme ? "text-[#9CA3AF]" : "text-[#6B7280]";
+  const ink = darkTheme ? "text-[#F7F4EF]" : "text-[#1A2433]";
+  const muted = darkTheme ? "text-[#C9D0DB]" : "text-[#5B6B7C]";
+  const accent = darkTheme ? "text-[#9DC4EE]" : "text-[#2F6BA8]";
   const fieldBorder = darkTheme
-    ? "border-[#374151] bg-[#111827] text-[#F3F4F6] placeholder:text-[#6B7280] focus:border-[#9CA3AF]"
-    : "border-[#D1D5DB] bg-[#FFFFFF] text-[#111827] placeholder:text-[#9CA3AF] focus:border-[#111827]";
-  const inputClass = `w-full rounded-md border px-3.5 py-3 text-[15px] outline-none transition focus:ring-0 ${fieldBorder} text-${textAlign("left")}`;
-  const labelClass = `mb-1.5 block text-sm font-medium ${ink} text-${textAlign("left")}`;
+    ? "border-white/12 bg-[#121A26]/88 text-[#F7F4EF] placeholder:text-[#8B97A8] focus:border-[#8EC1EC] focus:ring-[#8EC1EC]/25"
+    : "border-[#D5DEE8] bg-white/92 text-[#1A2433] placeholder:text-[#8FA0B2] focus:border-[#4F85B5] focus:ring-[#4F85B5]/20";
+  const inputClass = `w-full rounded-xl border px-4 py-3.5 text-[15px] font-loginUi font-medium tracking-[-0.01em] outline-none transition duration-200 focus:ring-4 ${fieldBorder} text-${textAlign("left")}`;
+  const labelClass = `mb-2 block text-[12px] font-loginUi font-semibold uppercase tracking-[0.14em] ${muted} text-${textAlign("left")}`;
   const linkClass = darkTheme
-    ? "text-[#D1D5DB] underline decoration-[#6B7280] underline-offset-2 hover:text-white"
-    : "text-[#111827] underline decoration-[#9CA3AF] underline-offset-2 hover:decoration-[#111827]";
+    ? "font-loginUi font-medium text-[#D7E7F7] underline decoration-[#6B849C]/70 underline-offset-4 hover:text-white hover:decoration-white"
+    : "font-loginUi font-medium text-[#2F6BA8] underline decoration-[#9DC4EE] underline-offset-4 hover:text-[#1A2433] hover:decoration-[#2F6BA8]";
   const ctaClass = darkTheme
-    ? "w-full rounded-md bg-[#E5E7EB] py-3.5 text-center text-[15px] font-semibold text-[#111827] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
-    : "w-full rounded-md bg-[#111827] py-3.5 text-center text-[15px] font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-70";
+    ? "w-full rounded-xl bg-gradient-to-b from-[#E8EEF6] to-[#D5DFEC] py-3.5 text-center text-[15px] font-loginUi font-semibold tracking-[0.02em] text-[#121A26] shadow-[0_10px_24px_rgba(0,0,0,0.28)] transition hover:from-white hover:to-[#E8EEF6] disabled:cursor-not-allowed disabled:opacity-70"
+    : "w-full rounded-xl bg-gradient-to-b from-[#243F5B] to-[#1A3148] py-3.5 text-center text-[15px] font-loginUi font-semibold tracking-[0.02em] text-white shadow-[0_12px_28px_rgba(36,63,91,0.32)] transition hover:from-[#2E4F70] hover:to-[#243F5B] disabled:cursor-not-allowed disabled:opacity-70";
+  const chipBtn = darkTheme
+    ? "rounded-full border border-white/20 bg-black/35 font-loginUi text-[13px] font-medium tracking-wide text-[#E5E7EB] backdrop-blur-md hover:bg-black/50"
+    : "rounded-full border border-black/10 bg-white/80 font-loginUi text-[13px] font-medium tracking-wide text-[#1A2433] backdrop-blur-md hover:bg-white";
+  const iconBtn = darkTheme
+    ? "border-white/20 bg-black/35 text-[#D1D5DB] backdrop-blur-md hover:bg-black/50"
+    : "border-black/10 bg-white/80 text-[#4B5563] backdrop-blur-md hover:bg-white";
+  const panelClass = darkTheme
+    ? "rounded-[1.75rem] border border-white/12 bg-[linear-gradient(160deg,rgba(18,26,38,0.88),rgba(11,16,23,0.78))] p-7 shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-2xl sm:p-9"
+    : "rounded-[1.75rem] border border-white/70 bg-[linear-gradient(160deg,rgba(255,255,255,0.92),rgba(247,250,253,0.82))] p-7 shadow-[0_30px_80px_rgba(36,63,91,0.22)] backdrop-blur-2xl sm:p-9";
+  const requiredMark = darkTheme ? "text-[#9DC4EE]" : "text-[#4F85B5]";
+  const loginVideoSrc = darkTheme
+    ? "/login-bg/golden-gate-night.mp4"
+    : "/login-bg/golden-gate-day.mp4";
 
   return (
-    <RTLWrapper className={`relative min-h-screen ${pageBg}`}>
+    <RTLWrapper className="relative min-h-screen overflow-hidden bg-[#0B1017]">
+      {/* Theme-aware Golden Gate Bridge backgrounds (Pexels, free license) */}
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+        <video
+          key={loginVideoSrc}
+          className="h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        >
+          <source src={loginVideoSrc} type="video/mp4" />
+        </video>
+        <div
+          className={`absolute inset-0 ${
+            darkTheme
+              ? "bg-gradient-to-b from-black/55 via-black/40 to-black/65"
+              : "bg-gradient-to-b from-white/45 via-white/25 to-white/50"
+          }`}
+        />
+      </div>
+
       <header className="relative z-10 flex items-center justify-between px-5 py-5 sm:px-8">
         <img
-          src="/juno-rfp-wordmark.jpg"
+          src={darkTheme ? "/juno-rfp-wordmark-dark.png" : "/juno-rfp-wordmark.png"}
           alt="JUNO RFP by MARLN Corporation"
-          className="h-24 w-auto object-contain sm:h-32"
+          className="h-24 w-auto object-contain sm:h-32 bg-transparent drop-shadow-sm"
         />
 
         <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -356,11 +391,7 @@ function LoginPageContent() {
                 setError("");
                 setInfo("");
               }}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                darkTheme
-                  ? "border-[#374151] text-[#E5E7EB] hover:bg-[#1F2937]"
-                  : "border-[#D1D5DB] text-[#111827] hover:bg-[#F9FAFB]"
-              }`}
+              className={`px-4 py-1.5 text-sm font-medium transition ${chipBtn}`}
             >
               {t("auth.login.signUp")}
             </button>
@@ -372,11 +403,7 @@ function LoginPageContent() {
                 setError("");
                 setInfo("");
               }}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                darkTheme
-                  ? "border-[#374151] text-[#E5E7EB] hover:bg-[#1F2937]"
-                  : "border-[#D1D5DB] text-[#111827] hover:bg-[#F9FAFB]"
-              }`}
+              className={`px-4 py-1.5 text-sm font-medium transition ${chipBtn}`}
             >
               {t("auth.login.backToSignIn")}
             </button>
@@ -384,11 +411,7 @@ function LoginPageContent() {
           <button
             type="button"
             onClick={handleThemeToggle}
-            className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition ${
-              darkTheme
-                ? "border-[#374151] text-[#D1D5DB] hover:bg-[#1F2937]"
-                : "border-[#E5E7EB] text-[#4B5563] hover:bg-[#F9FAFB]"
-            }`}
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition ${iconBtn}`}
             title={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
             aria-label={darkTheme ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
@@ -410,23 +433,31 @@ function LoginPageContent() {
         </div>
       </header>
 
-      <main className="relative z-[1] mx-auto flex w-full max-w-[420px] flex-col px-5 pb-16 pt-6 sm:pt-10">
+      <main className="relative z-[1] mx-auto flex w-full max-w-[460px] flex-col px-5 pb-16 pt-6 font-loginUi sm:pt-10">
+        <div className={panelClass}>
         {mode === "login" ? (
           <>
-            <p className={`text-sm ${muted}`}>
+            <p className={`text-[13px] font-medium tracking-[0.18em] uppercase ${accent}`}>
               {t("auth.login.welcomeBack", { defaultValue: "Welcome back" })}
             </p>
             <h1
-              className={`mt-2 text-[2rem] font-semibold tracking-tight sm:text-[2.35rem] ${ink}`}
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+              className={`mt-3 font-loginDisplay text-[2.15rem] font-semibold leading-[1.18] tracking-[-0.015em] sm:text-[2.55rem] ${ink}`}
             >
               {t("auth.login.logInTo", { defaultValue: "Log in to JUNO RFP" })}
             </h1>
+            <p className={`mt-3 max-w-[22rem] text-[15px] leading-relaxed ${muted}`}>
+              {t("auth.login.tagline", {
+                defaultValue: "Pick up where you left off — proposals, deadlines, and your team, waiting.",
+              })}
+            </p>
 
-            <form onSubmit={handleLogin} className="mt-8 space-y-5">
+            <form onSubmit={handleLogin} className="mt-9 space-y-5">
               <div>
                 <label className={labelClass}>
-                  {t("auth.login.username")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.login.username")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <input
                   type="text"
@@ -440,7 +471,10 @@ function LoginPageContent() {
               </div>
               <div>
                 <label className={labelClass}>
-                  {t("auth.login.password")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.login.password")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <div className="relative">
                   <input
@@ -468,18 +502,22 @@ function LoginPageContent() {
               </div>
 
               <div
-                className={`flex flex-wrap items-center justify-between gap-3 text-sm ${
+                className={`flex flex-wrap items-center justify-between gap-3 text-[13.5px] ${
                   isRTL ? "flex-row-reverse" : ""
                 }`}
               >
-                <label className={`flex cursor-pointer items-center gap-2 ${muted}`}>
+                <label className={`flex cursor-pointer items-center gap-2.5 ${muted}`}>
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-[#111827] focus:ring-[#111827]"
+                    className={`h-4 w-4 rounded border ${
+                      darkTheme
+                        ? "border-white/25 bg-[#121A26] text-[#9DC4EE] focus:ring-[#8EC1EC]/40"
+                        : "border-[#C5D0DC] bg-white text-[#243F5B] focus:ring-[#4F85B5]/30"
+                    }`}
                   />
-                  <span>
+                  <span className="font-medium leading-snug">
                     {t("auth.login.rememberMe", {
                       defaultValue: "Remember me on this computer",
                     })}
@@ -505,14 +543,14 @@ function LoginPageContent() {
 
               {(error || info || confirming) && (
                 <div
-                  className={`rounded-md px-3 py-2.5 text-center text-sm ${
+                  className={`rounded-xl px-4 py-3 text-center text-[13.5px] font-medium leading-relaxed ${
                     error
                       ? darkTheme
-                        ? "bg-red-900/20 text-red-300"
-                        : "bg-red-50 text-red-600"
+                        ? "border border-red-400/20 bg-red-950/40 text-red-200"
+                        : "border border-red-200/80 bg-red-50/90 text-red-700"
                       : darkTheme
-                        ? "bg-emerald-900/20 text-emerald-300"
-                        : "bg-emerald-50 text-emerald-700"
+                        ? "border border-emerald-400/20 bg-emerald-950/35 text-emerald-200"
+                        : "border border-emerald-200/80 bg-emerald-50/90 text-emerald-800"
                   }`}
                 >
                   {error || info}
@@ -528,10 +566,10 @@ function LoginPageContent() {
               )}
               {demoReloaded && (
                 <div
-                  className={`rounded-md px-3 py-2.5 text-center text-sm ${
+                  className={`rounded-xl px-4 py-3 text-center text-[13.5px] font-medium ${
                     darkTheme
-                      ? "bg-emerald-900/20 text-emerald-300"
-                      : "bg-emerald-50 text-emerald-700"
+                      ? "border border-emerald-400/20 bg-emerald-950/35 text-emerald-200"
+                      : "border border-emerald-200/80 bg-emerald-50/90 text-emerald-800"
                   }`}
                 >
                   Demo credentials reloaded. Try logging in again.
@@ -543,7 +581,7 @@ function LoginPageContent() {
               </button>
             </form>
 
-            <p className={`mt-8 text-center text-sm ${muted}`}>
+            <p className={`mt-9 text-center text-[14px] ${muted}`}>
               {t("auth.login.noAccount")}{" "}
               <button
                 type="button"
@@ -560,24 +598,28 @@ function LoginPageContent() {
             <button
               type="button"
               onClick={handleReloadDemoUsers}
-              className={`mx-auto mt-4 block text-xs hover:underline ${muted}`}
+              className={`mx-auto mt-5 block text-[11px] font-medium tracking-[0.08em] uppercase opacity-70 transition hover:opacity-100 hover:underline ${muted}`}
             >
               Reload demo credentials
             </button>
           </>
         ) : (
           <>
-            <p className={`text-sm ${muted}`}>{t("auth.signup.subtitle")}</p>
+            <p className={`text-[13px] font-medium tracking-[0.18em] uppercase ${accent}`}>
+              {t("auth.signup.subtitle")}
+            </p>
             <h1
-              className={`mt-2 text-[2rem] font-semibold tracking-tight sm:text-[2.35rem] ${ink}`}
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+              className={`mt-3 font-loginDisplay text-[2.15rem] font-semibold leading-[1.18] tracking-[-0.015em] sm:text-[2.55rem] ${ink}`}
             >
               {t("auth.signup.title")}
             </h1>
-            <form onSubmit={handleSignup} className="mt-8 space-y-4">
+            <form onSubmit={handleSignup} className="mt-9 space-y-4">
               <div>
                 <label className={labelClass}>
-                  {t("auth.signup.name")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.signup.name")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <input
                   className={inputClass}
@@ -590,7 +632,10 @@ function LoginPageContent() {
               </div>
               <div>
                 <label className={labelClass}>
-                  {t("auth.signup.company")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.signup.company")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <input
                   className={inputClass}
@@ -603,7 +648,10 @@ function LoginPageContent() {
               </div>
               <div>
                 <label className={labelClass}>
-                  {t("auth.signup.email")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.signup.email")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <input
                   type="email"
@@ -617,7 +665,10 @@ function LoginPageContent() {
               </div>
               <div>
                 <label className={labelClass}>
-                  {t("auth.signup.password")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.signup.password")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <div className="relative">
                   <input
@@ -644,7 +695,10 @@ function LoginPageContent() {
               </div>
               <div>
                 <label className={labelClass}>
-                  {t("auth.signup.confirmPassword")} <span className="text-[#DC2626]">*</span>
+                  {t("auth.signup.confirmPassword")}{" "}
+                  <span className={`${requiredMark} normal-case tracking-normal`} aria-hidden="true">
+                    *
+                  </span>
                 </label>
                 <div className="relative">
                   <input
@@ -670,14 +724,14 @@ function LoginPageContent() {
               </div>
               {(error || info) && (
                 <div
-                  className={`rounded-md px-3 py-2.5 text-center text-sm ${
+                  className={`rounded-xl px-4 py-3 text-center text-[13.5px] font-medium leading-relaxed ${
                     error
                       ? darkTheme
-                        ? "bg-red-900/20 text-red-300"
-                        : "bg-red-50 text-red-600"
+                        ? "border border-red-400/20 bg-red-950/40 text-red-200"
+                        : "border border-red-200/80 bg-red-50/90 text-red-700"
                       : darkTheme
-                        ? "bg-emerald-900/20 text-emerald-300"
-                        : "bg-emerald-50 text-emerald-700"
+                        ? "border border-emerald-400/20 bg-emerald-950/35 text-emerald-200"
+                        : "border border-emerald-200/80 bg-emerald-50/90 text-emerald-800"
                   }`}
                 >
                   {error || info}
@@ -695,7 +749,7 @@ function LoginPageContent() {
                 {isLoading ? t("auth.signup.loading") : t("auth.signup.submit")}
               </button>
             </form>
-            <p className={`mt-8 text-center text-sm ${muted}`}>
+            <p className={`mt-9 text-center text-[14px] ${muted}`}>
               {t("auth.login.haveAccount")}{" "}
               <button
                 type="button"
@@ -711,6 +765,7 @@ function LoginPageContent() {
             </p>
           </>
         )}
+        </div>
       </main>
     </RTLWrapper>
   );

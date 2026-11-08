@@ -27,6 +27,18 @@ module.exports = {
           '"Segoe UI"',
           "sans-serif",
         ],
+        loginDisplay: [
+          "Newsreader",
+          "Georgia",
+          '"Times New Roman"',
+          "serif",
+        ],
+        loginUi: [
+          "Outfit",
+          '"Public Sans"',
+          "ui-sans-serif",
+          "sans-serif",
+        ],
       },
       colors: {
         border: "hsl(var(--border))",
