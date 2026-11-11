@@ -232,7 +232,8 @@
     "technicalSolutioning": "الحلول التقنية",
     "topology": "الطوبولوجيا",
     "grants": "RFP/الحوافز",
-    "awardManagement": "إدارة الجوائز"
+    "awardManagement": "إدارة الجوائز",
+    "projectWorkspace": "مساحة المشاريع"
   },
   "proposalManagerNav": {
     "home": "الرئيسية",
@@ -265,6 +266,27 @@
         "longTitle": "إدارة المستخدمين",
         "subtitle": "المستخدمون والمساعدة والإعدادات"
       }
+    }
+  },
+  "proposalManagerProjectWorkspace": {
+    "title": "مساحة المشاريع",
+    "subtitle": "خطّط للعمل وتتبّع الميزانية وانشر تحديثات الحالة عبر جوائزك ومقترحاتك.",
+    "createProject": "إنشاء مشروع",
+    "myTasks": "مهامي",
+    "portfolio": "المحفظة",
+    "projects": "المشاريع",
+    "noProjects": "لا توجد مشاريع بعد",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "work": "العمل",
+      "budget": "الميزانية",
+      "status": "الحالة"
+    },
+    "views": {
+      "kanban": "كانبان",
+      "table": "جدول",
+      "calendar": "تقويم",
+      "gantt": "غانت"
     }
   },
   "proposalManagerFloatingCalendar": {

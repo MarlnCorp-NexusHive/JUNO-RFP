@@ -39,6 +39,7 @@ export const proposalManagerFeatures = [
   { label: "director.dashboard", icon: "📊", route: "/app/dashboard", description: "Performance Overview, KPI Summary, Alerts & Notices", hub: "manage" },
   { label: "proposalManager.grants", icon: "🏛️", route: "/app/grants", description: "Federal Grants.gov (live) + private foundations (live IRS/ProPublica) + state/local-eligible Grants.gov + SAM.gov contracts (curated)", hub: "find" },
   { label: "proposalManager.awardManagement", icon: "📈", route: "/app/award-management", description: "Post-award Grant Pulse portfolio — spend, deliverables, deadlines, and priority actions", hub: "manage" },
+  { label: "proposalManager.projectWorkspace", icon: "🗂️", route: "/app/project-workspace", description: "Project workspace — kanban, table, calendar, and Gantt work views with budget and status updates", hub: "manage" },
   { label: "director.workspace", icon: "📁", route: "/app/workspace", description: "Workspace and tasks", hub: "respond" },
   { label: "proposalManager.companyIntelligence", icon: "🌐", route: "/app/company-intelligence", description: "RFP issuer financials, trends, and customers from public sources", hub: "find" },
   { label: "proposalManager.competitiveIntelligence", icon: "🎯", route: "/app/competitive-intelligence", description: "Look up any competitor or compare curated peers — datasheets and differentiators", hub: "find" },

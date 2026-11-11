@@ -674,3 +674,18 @@ body.dark .backdrop-blur-lg {
   border-top-left-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
 }
+
+/* Login fields: keep typed credentials readable (incl. browser autofill) */
+.login-field {
+  color-scheme: light;
+}
+
+.login-field:-webkit-autofill,
+.login-field:-webkit-autofill:hover,
+.login-field:-webkit-autofill:focus,
+.login-field:-webkit-autofill:active {
+  -webkit-text-fill-color: #121a26 !important;
+  caret-color: #121a26;
+  box-shadow: 0 0 0 1000px #f4f7fb inset !important;
+  transition: background-color 99999s ease-in-out 0s;
+}

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import FullCalendar from "@fullcalendar/react";
@@ -8,7 +8,9 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import {
+  FiBarChart2,
   FiCalendar,
+  FiCheckSquare,
   FiClock,
   FiFilter,
   FiPlus,
@@ -32,6 +34,22 @@ import { subscribeTeam, updateTeamAssignment, removeTeamAssignment } from "../se
 import { subscribePursuit } from "../services/grantPursuitStore.js";
 import { WORKSPACE_DOCS_CHANGED_EVENT } from "../services/proposalManagerStorage.js";
 import { isTrialUserSession } from "../../rfp-collaboration/useTrialCollabT.js";
+import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
+import {
+  getDemoProjects,
+  getDemoTasks,
+} from "../data/projectWorkspaceDemoData.js";
+import {
+  ensureProjectWorkspaceFresh,
+  getProjectWorkspaceData,
+  hydrateProjectWorkspaceFromServer,
+  subscribeProjectWorkspace,
+} from "../services/projectWorkspaceStore.js";
+import {
+  ProjectTaskCalendarView,
+  ProjectTaskGanttView,
+} from "./ProjectTaskScheduleViews.jsx";
+
 const TYPE_OPTIONS = [
   "all",
   "deadline",
@@ -42,6 +60,25 @@ const TYPE_OPTIONS = [
   "review",
   "task",
 ];
+
+const CALENDAR_MODES = [
+  { id: "company", icon: FiCalendar, labelKey: "modeCompany", fallback: "Company calendar" },
+  { id: "tasks", icon: FiCheckSquare, labelKey: "modeTasks", fallback: "Task calendar" },
+  { id: "gantt", icon: FiBarChart2, labelKey: "modeGantt", fallback: "Timeline / Gantt" },
+];
+
+function isDemoProposalManagerSession() {
+  if (isTrialUserSession()) return false;
+  const user = parseLocalStorageJson("rbac_current_user");
+  const username = String(user?.username || "").toLowerCase();
+  const role = String(user?.role || "").toLowerCase();
+  const team = String(user?.team || "").toLowerCase();
+  return (
+    username === "proposal_manager" ||
+    role === "proposal manager" ||
+    team === "proposal team"
+  );
+}
 
 const EMPTY_FORM = {
   title: "",
@@ -70,7 +107,11 @@ function typeBadgeClass(type) {
 export default function ProposalManagerCalendar() {
   const { t } = useTranslation("common");
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isTrial = isTrialUserSession();
+  const isDemo = isDemoProposalManagerSession();
+  const modeParam = String(searchParams.get("view") || "company").toLowerCase();
+  const calendarMode = CALENDAR_MODES.some((m) => m.id === modeParam) ? modeParam : "company";
   const [events, setEvents] = useState([]);
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,6 +127,19 @@ export default function ProposalManagerCalendar() {
   const [hasDemo, setHasDemo] = useState(false);
   const refreshSeq = useRef(0);
   const hydrateOnce = useRef(false);
+  const [pwBlob, setPwBlob] = useState(() =>
+    isDemo
+      ? { projects: getDemoProjects(), tasks: getDemoTasks() }
+      : getProjectWorkspaceData(),
+  );
+  const [projectFilter, setProjectFilter] = useState("all");
+
+  const setCalendarMode = (next) => {
+    const params = new URLSearchParams(searchParams);
+    if (next === "company") params.delete("view");
+    else params.set("view", next);
+    setSearchParams(params, { replace: true });
+  };
 
   const refresh = useCallback(async ({ soft = false } = {}) => {
     const seq = ++refreshSeq.current;
@@ -110,6 +164,45 @@ export default function ProposalManagerCalendar() {
   useEffect(() => {
     refresh({ soft: false });
   }, [refresh]);
+
+  useEffect(() => {
+    if (isDemo) {
+      setPwBlob({ projects: getDemoProjects(), tasks: getDemoTasks() });
+      return undefined;
+    }
+    let alive = true;
+    (async () => {
+      await hydrateProjectWorkspaceFromServer();
+      if (!alive) return;
+      ensureProjectWorkspaceFresh();
+      setPwBlob(getProjectWorkspaceData());
+    })();
+    const unsub = subscribeProjectWorkspace((next) => setPwBlob(next));
+    return () => {
+      alive = false;
+      unsub();
+    };
+  }, [isDemo]);
+
+  const pwProjects = pwBlob?.projects || [];
+  const pwTasksAll = useMemo(() => {
+    const projectsById = Object.fromEntries(pwProjects.map((p) => [p.id, p]));
+    return (pwBlob?.tasks || []).map((task) => ({
+      ...task,
+      color: projectsById[task.p]?.color || "#4F6BFF",
+      projectName: projectsById[task.p]?.name || "",
+    }));
+  }, [pwBlob, pwProjects]);
+
+  const pwTasks = useMemo(() => {
+    if (projectFilter === "all") return pwTasksAll;
+    return pwTasksAll.filter((t) => t.p === projectFilter);
+  }, [pwTasksAll, projectFilter]);
+
+  const ganttColor =
+    projectFilter !== "all"
+      ? pwProjects.find((p) => p.id === projectFilter)?.color || "#4F6BFF"
+      : "#4F6BFF";
 
   useEffect(() => {
     let timer = null;
@@ -404,15 +497,51 @@ export default function ProposalManagerCalendar() {
               <FiRefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               {t("proposalManagerCalendar.refresh")}
             </button>
-            <button
-              type="button"
-              onClick={() => openCreate("")}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
-            >
-              <FiPlus className="w-4 h-4" />
-              {t("proposalManagerCalendar.addEvent")}
-            </button>
+            {calendarMode === "company" ? (
+              <button
+                type="button"
+                onClick={() => openCreate("")}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
+              >
+                <FiPlus className="w-4 h-4" />
+                {t("proposalManagerCalendar.addEvent")}
+              </button>
+            ) : (
+              <Link
+                to="/app/project-workspace"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
+              >
+                <FiPlus className="w-4 h-4" />
+                {t("proposalManagerCalendar.openProjectWorkspace", {
+                  defaultValue: "Open project workspace",
+                })}
+              </Link>
+            )}
           </div>
+        </div>
+
+        <div
+          className="mt-5 flex flex-wrap gap-2"
+          role="tablist"
+          aria-label={t("proposalManagerCalendar.modeLabel", { defaultValue: "Calendar views" })}
+        >
+          {CALENDAR_MODES.map(({ id, icon: Icon, labelKey, fallback }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={calendarMode === id}
+              onClick={() => setCalendarMode(id)}
+              className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition ${
+                calendarMode === id
+                  ? "bg-[#3D4F66] text-white dark:bg-[#8FA3B8] dark:text-[#0B1017]"
+                  : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {t(`proposalManagerCalendar.${labelKey}`, { defaultValue: fallback })}
+            </button>
+          ))}
         </div>
       </motion.div>
 
@@ -422,6 +551,7 @@ export default function ProposalManagerCalendar() {
         </div>
       )}
 
+      {calendarMode === "company" ? (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: t("proposalManagerCalendar.statTotal"), value: stats.total, color: "text-gray-900 dark:text-white", bg: "bg-gray-50 dark:bg-gray-700/50" },
@@ -435,10 +565,47 @@ export default function ProposalManagerCalendar() {
           </div>
         ))}
       </div>
+      ) : (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          {
+            label: t("proposalManagerCalendar.statProjects", { defaultValue: "Projects" }),
+            value: pwProjects.length,
+            color: "text-gray-900 dark:text-white",
+            bg: "bg-gray-50 dark:bg-gray-700/50",
+          },
+          {
+            label: t("proposalManagerCalendar.statTasks", { defaultValue: "Tasks in view" }),
+            value: pwTasks.length,
+            color: "text-indigo-600",
+            bg: "bg-indigo-50 dark:bg-indigo-900/20",
+          },
+          {
+            label: t("proposalManagerCalendar.statOpenTasks", { defaultValue: "Open tasks" }),
+            value: pwTasks.filter((x) => x.status !== "done").length,
+            color: "text-amber-600",
+            bg: "bg-amber-50 dark:bg-amber-900/20",
+          },
+          {
+            label: t("proposalManagerCalendar.statMilestones", { defaultValue: "Milestones" }),
+            value: pwTasks.filter((x) => x.ms).length,
+            color: "text-emerald-600",
+            bg: "bg-emerald-50 dark:bg-emerald-900/20",
+          },
+        ].map((s) => (
+          <div key={s.label} className={`rounded-xl p-4 border border-gray-100 dark:border-gray-700 ${s.bg}`}>
+            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         <div className="xl:col-span-3 space-y-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+            {calendarMode === "company" ? (
+              <>
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <FiFilter className="w-4 h-4 text-gray-500" />
               <select
@@ -502,6 +669,80 @@ export default function ProposalManagerCalendar() {
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-center">
               {t("proposalManagerCalendar.monthEventCount", { count: eventsInVisibleMonth })}
             </p>
+              </>
+            ) : (
+              <>
+                <div className="mb-4 flex flex-wrap items-center gap-3">
+                  <FiFilter className="h-4 w-4 text-gray-500" />
+                  <select
+                    value={projectFilter}
+                    onChange={(e) => setProjectFilter(e.target.value)}
+                    className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+                    aria-label={t("proposalManagerCalendar.filterProject", {
+                      defaultValue: "Filter by project",
+                    })}
+                  >
+                    <option value="all">
+                      {t("proposalManagerCalendar.allProjects", { defaultValue: "All projects" })}
+                    </option>
+                    {pwProjects.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {calendarMode === "tasks"
+                      ? t("proposalManagerCalendar.taskCalHint", {
+                          defaultValue: "Project task due dates from Project workspace.",
+                        })
+                      : t("proposalManagerCalendar.ganttHint", {
+                          defaultValue: "Timeline of project tasks with start and due dates.",
+                        })}
+                  </p>
+                </div>
+                {calendarMode === "tasks" ? (
+                  <ProjectTaskCalendarView
+                    tasks={pwTasks}
+                    onOpen={(task) =>
+                      navigate(`/app/project-workspace`, { state: { openTaskId: task.id, projectId: task.p } })
+                    }
+                    labels={{
+                      today: t("proposalManagerCalendar.today", { defaultValue: "Today" }),
+                      prevMonth: t("proposalManagerCalendar.prevMonth", {
+                        defaultValue: "Previous month",
+                      }),
+                      nextMonth: t("proposalManagerCalendar.nextMonth", {
+                        defaultValue: "Next month",
+                      }),
+                      taskCalEmpty: t("proposalManagerCalendar.taskCalEmpty", {
+                        defaultValue:
+                          "No project tasks with due dates yet. Create tasks in Project workspace to see them here.",
+                      }),
+                      moreCount: t("proposalManagerCalendar.moreCount", {
+                        defaultValue: "+{{count}} more",
+                      }),
+                    }}
+                  />
+                ) : (
+                  <ProjectTaskGanttView
+                    tasks={pwTasks}
+                    color={ganttColor}
+                    onOpen={(task) =>
+                      navigate(`/app/project-workspace`, { state: { openTaskId: task.id, projectId: task.p } })
+                    }
+                    labels={{
+                      colTitle: t("proposalManagerCalendar.colTitle", { defaultValue: "Title" }),
+                      ganttEmpty: t("proposalManagerCalendar.ganttEmpty", {
+                        defaultValue:
+                          "Add tasks with start and due dates in Project workspace to see the timeline.",
+                      }),
+                      baseline: t("proposalManagerCalendar.baseline", { defaultValue: "Baseline" }),
+                    }}
+                  />
+                )}
+              </>
+            )}
           </div>
         </div>
 

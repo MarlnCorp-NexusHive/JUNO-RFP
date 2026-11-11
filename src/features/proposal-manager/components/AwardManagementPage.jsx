@@ -342,6 +342,9 @@ export default function AwardManagementPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Link to="/app/project-workspace" className={GRANARY_BTN_SECONDARY}>
+            {t("proposalManager.projectWorkspace")}
+          </Link>
           {demoMode ? (
             <span className="inline-flex self-start rounded-full bg-[#D8E0EA] px-2.5 py-1 text-[11px] font-semibold text-[#3D4F66] ring-1 ring-[#3D4F66]/20 dark:bg-[#2A3548] dark:text-[#B8C5D6] dark:ring-[#8FA3B8]/30">
               {t("proposalManagerAwardManagement.demoBadge")}

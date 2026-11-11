@@ -327,8 +327,8 @@ function LoginPageContent() {
   const muted = darkTheme ? "text-[#C9D0DB]" : "text-[#5B6B7C]";
   const accent = darkTheme ? "text-[#9DC4EE]" : "text-[#2F6BA8]";
   const fieldBorder = darkTheme
-    ? "border-white/12 bg-[#121A26]/88 text-[#F7F4EF] placeholder:text-[#8B97A8] focus:border-[#8EC1EC] focus:ring-[#8EC1EC]/25"
-    : "border-[#D5DEE8] bg-white/92 text-[#1A2433] placeholder:text-[#8FA0B2] focus:border-[#4F85B5] focus:ring-[#4F85B5]/20";
+    ? "login-field login-field--dark border-white/20 bg-[#F4F7FB] text-[#121A26] placeholder:text-[#6B7C8F] caret-[#121A26] focus:border-[#8EC1EC] focus:ring-[#8EC1EC]/30"
+    : "login-field border-[#D5DEE8] bg-white/92 text-[#1A2433] placeholder:text-[#8FA0B2] caret-[#1A2433] focus:border-[#4F85B5] focus:ring-[#4F85B5]/20";
   const inputClass = `w-full rounded-xl border px-4 py-3.5 text-[15px] font-loginUi font-medium tracking-[-0.01em] outline-none transition duration-200 focus:ring-4 ${fieldBorder} text-${textAlign("left")}`;
   const labelClass = `mb-2 block text-[12px] font-loginUi font-semibold uppercase tracking-[0.14em] ${muted} text-${textAlign("left")}`;
   const linkClass = darkTheme
@@ -347,6 +347,10 @@ function LoginPageContent() {
     ? "rounded-[1.75rem] border border-white/12 bg-[linear-gradient(160deg,rgba(18,26,38,0.88),rgba(11,16,23,0.78))] p-7 shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-2xl sm:p-9"
     : "rounded-[1.75rem] border border-white/70 bg-[linear-gradient(160deg,rgba(255,255,255,0.92),rgba(247,250,253,0.82))] p-7 shadow-[0_30px_80px_rgba(36,63,91,0.22)] backdrop-blur-2xl sm:p-9";
   const requiredMark = darkTheme ? "text-[#9DC4EE]" : "text-[#4F85B5]";
+  // Inputs stay light in dark mode for readable typed text; icons must match.
+  const fieldIcon = darkTheme
+    ? "text-[#526274] hover:text-[#121A26]"
+    : `${muted} hover:opacity-80`;
   const loginVideoSrc = darkTheme
     ? "/login-bg/golden-gate-night.mp4"
     : "/login-bg/golden-gate-day.mp4";
@@ -489,9 +493,9 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${muted} ${
+                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${fieldIcon} ${
                       isRTL ? "left-2" : "right-2"
-                    } hover:opacity-80`}
+                    }`}
                     aria-label={
                       showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")
                     }
@@ -685,7 +689,7 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSignupPassword((v) => !v)}
-                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${muted} ${
+                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${fieldIcon} ${
                       isRTL ? "left-2" : "right-2"
                     }`}
                   >
@@ -714,7 +718,7 @@ function LoginPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSignupConfirm((v) => !v)}
-                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${muted} ${
+                    className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${fieldIcon} ${
                       isRTL ? "left-2" : "right-2"
                     }`}
                   >

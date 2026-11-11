@@ -23,6 +23,7 @@ export const TRIAL_FEATURE_KEYS = [
   "compliance",
   "dashboard",
   "awardManagement",
+  "projectWorkspace",
 ];
 
 export function canUseTrialFeatures() {

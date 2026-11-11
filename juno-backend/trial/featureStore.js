@@ -21,6 +21,7 @@ export const FEATURE_KEYS = [
   "compliance",
   "dashboard",
   "awardManagement",
+  "projectWorkspace",
 ];
 
 const EMPTY_BY_KEY = {
@@ -51,6 +52,7 @@ const EMPTY_BY_KEY = {
   manageTeam: { members: [], trainings: [], assignments: [], updatedAt: null },
   compliance: { areas: [], logs: [], risks: [] },
   awardManagement: { awards: [], freshReset: true },
+  projectWorkspace: { projects: [], tasks: [], updates: [], freshReset: true },
   dashboard: {
     docInsights: {},
     charts: {
