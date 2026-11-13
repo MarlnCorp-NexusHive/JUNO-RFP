@@ -1,14 +1,15 @@
 import React from "react";
+import { publicUrl } from "../../../utils/publicUrl.js";
 
 /**
  * Local Microsoft Fluent Emoji 3D assets (vendored under /public/hub-emoji).
  * Soft float + hover tilt for a product-grade 3D feel.
  */
 const HUB_3D = {
-  find: { src: "/hub-emoji/find.png", fallback: "🔍" },
-  respond: { src: "/hub-emoji/respond.png", fallback: "✍️" },
-  manage: { src: "/hub-emoji/manage.png", fallback: "📋" },
-  account: { src: "/hub-emoji/account.png", fallback: "👤" },
+  find: { src: publicUrl("hub-emoji/find.png"), fallback: "🔍" },
+  respond: { src: publicUrl("hub-emoji/respond.png"), fallback: "✍️" },
+  manage: { src: publicUrl("hub-emoji/manage.png"), fallback: "📋" },
+  account: { src: publicUrl("hub-emoji/account.png"), fallback: "👤" },
 };
 
 export function HubIcon({ id, className = "h-8 w-8" }) {

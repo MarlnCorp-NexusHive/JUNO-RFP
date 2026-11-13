@@ -16,6 +16,7 @@ import { proposalManagerLandingPath } from "../features/proposal-manager/service
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
 import RTLWrapper from "./localization/RTLWrapper";
+import { publicUrl } from "../utils/publicUrl.js";
 import "../utils/i18n"; // Initialize i18n
 
 // Map team/role to dashboard route
@@ -352,13 +353,12 @@ function LoginPageContent() {
     ? "text-[#526274] hover:text-[#121A26]"
     : `${muted} hover:opacity-80`;
   // Public assets live under Vite base (/r/ on junorfp.com combined deploy).
-  const assetBase = import.meta.env.BASE_URL || "/";
   const loginVideoSrc = darkTheme
-    ? `${assetBase}login-bg/golden-gate-night.mp4`
-    : `${assetBase}login-bg/golden-gate-day.mp4`;
+    ? publicUrl("login-bg/golden-gate-night.mp4")
+    : publicUrl("login-bg/golden-gate-day.mp4");
   const wordmarkSrc = darkTheme
-    ? `${assetBase}juno-rfp-wordmark-dark.png`
-    : `${assetBase}juno-rfp-wordmark.png`;
+    ? publicUrl("juno-rfp-wordmark-dark.png")
+    : publicUrl("juno-rfp-wordmark.png");
 
   return (
     <RTLWrapper className="relative min-h-screen overflow-hidden bg-[#0B1017]">

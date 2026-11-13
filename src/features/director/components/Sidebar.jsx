@@ -11,6 +11,7 @@ import {
   setNavMode,
   proposalManagerLandingPath,
 } from "../../proposal-manager/services/navModeStore.js";
+import { publicUrl } from "../../../utils/publicUrl.js";
 
 export default function Sidebar({
   features,
@@ -90,7 +91,7 @@ export default function Sidebar({
           className={`flex items-center hover:opacity-80 transition-opacity ${isRTLMode ? 'space-x-reverse space-x-3' : 'space-x-3'}`}
         >
           <img
-            src={brandLogoSrc || "/marlncorplogo.png"}
+            src={brandLogoSrc || publicUrl("marlncorplogo.png")}
             alt={brandLogoAlt || t('sidebar.mbscLogo')}
             className={`transition-all duration-300 ${expanded ? 'w-12 h-12' : 'w-10 h-10'} ${
               brandLogoSrc ? 'rounded-md bg-white object-contain p-0.5' : ''

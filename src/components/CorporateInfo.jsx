@@ -7,6 +7,7 @@ import {
   FiUsers, FiBarChart2, FiSearch, FiShield,
   FiCheckCircle, FiFileText, FiCpu
 } from 'react-icons/fi';
+import { publicUrl } from '../utils/publicUrl.js';
 
 export default function CorporateInfo() {
   const navigate = useNavigate();
@@ -134,7 +135,7 @@ export default function CorporateInfo() {
               </button>
               <div className={`flex items-center space-x-4 ${isRTLMode ? 'space-x-reverse' : ''}`}>
                 <img
-                  src={`${import.meta.env.BASE_URL || "/"}juno-rfp-logo.png`}
+                  src={publicUrl("juno-rfp-logo.png")}
                   alt="JUNO RFP"
                   className="h-16 w-auto max-w-[10rem] object-contain"
                 />

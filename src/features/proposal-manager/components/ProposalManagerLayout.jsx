@@ -19,6 +19,7 @@ import {
   proposalManagerLandingPath,
   subscribeNavMode,
 } from "../services/navModeStore.js";
+import { publicUrl } from "../../../utils/publicUrl.js";
 
 function isTrialUser() {
   const session = getTrialSession();
@@ -66,9 +67,9 @@ function sidebarBrandLogo() {
 
   // Default trial branding is MARLN; WBEC only for WBEC-flagged tenants.
   if (useWbec) {
-    return { src: "/wbec-pacific-logo.png", alt: "WBEC Pacific" };
+    return { src: publicUrl("wbec-pacific-logo.png"), alt: "WBEC Pacific" };
   }
-  return null; // Sidebar falls back to /marlncorplogo.png
+  return null; // Sidebar falls back to marlncorplogo.png via publicUrl
 }
 
 export default function ProposalManagerLayout() {
