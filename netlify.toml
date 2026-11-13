@@ -1,16 +1,27 @@
-# Netlify only hosts the static SPA. The Express API (juno-backend) must run elsewhere
-# (Railway, Render, Fly, EC2, etc.). In Netlify: Site settings → Environment variables →
-# add VITE_API_URL = https://your-api-host.example.com (no trailing slash), then redeploy.
-# Without it, production builds default to http://localhost:3000 and downloads/API fail.
+# junorfp.com — marketing site + Stripe/AI functions + /workspace demo.
+# Publish the static site from website/ (no Vite build).
+# React app SPA settings live in netlify-spa.toml (use on a separate Netlify site).
 
 [build]
-  command = "npm run build"
-  publish = "dist"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  command = "npm --prefix website install --no-fund --no-audit"
+  publish = "website"
+  functions = "website/netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self)"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"
