@@ -57,6 +57,7 @@ Desktop.ini
 # Build outputs
 build/
 out/
+_site/
 
 # Coverage directory used by tools like istanbul
 coverage/

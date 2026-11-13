@@ -1,15 +1,56 @@
-# junorfp.com — marketing site + Stripe/AI functions + /workspace demo.
-# Publish the static site from website/ (no Vite build).
-# React app SPA settings live in netlify-spa.toml (use on a separate Netlify site).
+# junorfp.com — marketing website + JUNO RFP app on the SAME domain.
+# Marketing: /  and /workspace/
+# App SPA:   /login, /app/*, /rbac/*, …  → /r/index.html (Vite assets under /r/)
 
 [build]
-  command = "npm --prefix website install --no-fund --no-audit"
-  publish = "website"
+  command = "npm run build:site"
+  publish = "_site"
   functions = "website/netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
+
+# SPA fallbacks (do not catch marketing /, /workspace, or static assets)
+[[redirects]]
+  from = "/login"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/app/*"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/rbac/*"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/collaboration"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/collaboration/*"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cookie-policy"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/corporate-info"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/r/*"
+  to = "/r/index.html"
+  status = 200
 
 [[headers]]
   for = "/*"
@@ -19,7 +60,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self)"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
 
 [[headers]]
   for = "/api/*"

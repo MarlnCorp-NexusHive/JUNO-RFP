@@ -1,13 +1,15 @@
 # JUNO RFP
 
-Monorepo for the **JunoRFP marketing website** and the **JUNO RFP** React app.
+Monorepo for the **JunoRFP marketing website** and the **JUNO RFP** React app on **one domain** (`junorfp.com`).
 
-| Path | What | Netlify |
-|------|------|---------|
-| `website/` | junorfp.com marketing site, Stripe checkout, `/workspace` demo | Publish `website`, functions `website/netlify/functions` (no build command) |
-| `/` (`src/`, `juno-backend/`) | JUNO RFP product app (Vite + Express API) | Build `npm run build`, publish `dist`; API hosts separately |
+| Path | What |
+|------|------|
+| `website/` | Marketing site + `/workspace` demo + Stripe/AI Netlify functions |
+| `src/` + `juno-backend/` | JUNO RFP product app (Vite SPA + Express API) |
 
-**Log in** on the website points to `https://app.junorfp.com/login` in production (local: `http://localhost:5173/login`).
+**Netlify (junorfp.com):** `npm run build:site` → publish `_site` (marketing at `/`, app under `/r` with rewrites for `/login` and `/app/*`). API still hosts separately (`VITE_API_URL`).
+
+**Log in** is same-origin: `https://junorfp.com/login` (local marketing → `http://localhost:5173/login`).
 
 ---
 
