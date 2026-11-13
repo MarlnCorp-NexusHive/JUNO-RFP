@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "deploy:netlify": "npm run build && npx --yes netlify-cli@17 deploy --prod --dir=dist",
+    "deploy:netlify": "npm run build && npx --yes netlify-cli@17 deploy --prod --dir=dist --site=214b1fe2-e996-4cf3-a348-9bd8b914fea9",
     "vercel-build": "npm run build",
     "refresh-companies": "node scripts/refresh-company-intelligence-samples.mjs",
     "generate-boilerplate": "node scripts/generate-boilerplate-pack.mjs",

@@ -617,7 +617,7 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
       </div>
     </nav>
     <div class="nav-right">
-      <a class="login" href="https://juno-rfp.netlify.app/login" id="appLoginLink">Log in</a>
+      <a class="login" href="https://juno-rfp-app.netlify.app/login" id="appLoginLink">Log in</a>
       <a class="btn btn-lime" href="#demo">Book a demo</a>
     </div>
     <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" id="burger"><svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
@@ -1510,8 +1510,8 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
     if (!el) return;
     var host = (location.hostname || '').toLowerCase();
     var local = host === 'localhost' || host === '127.0.0.1';
-    // Production app is the Vite SPA on Netlify until app.junorfp.com DNS is added.
-    el.href = local ? 'http://localhost:5173/login' : 'https://juno-rfp.netlify.app/login';
+    // Production app site (latest SPA). Old juno-rfp.netlify.app is stale / other account.
+    el.href = local ? 'http://localhost:5173/login' : 'https://juno-rfp-app.netlify.app/login';
   })();
 
   /* ---------- Help center content ---------- */
