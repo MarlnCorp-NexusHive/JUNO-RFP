@@ -351,9 +351,14 @@ function LoginPageContent() {
   const fieldIcon = darkTheme
     ? "text-[#526274] hover:text-[#121A26]"
     : `${muted} hover:opacity-80`;
+  // Public assets live under Vite base (/r/ on junorfp.com combined deploy).
+  const assetBase = import.meta.env.BASE_URL || "/";
   const loginVideoSrc = darkTheme
-    ? "/login-bg/golden-gate-night.mp4"
-    : "/login-bg/golden-gate-day.mp4";
+    ? `${assetBase}login-bg/golden-gate-night.mp4`
+    : `${assetBase}login-bg/golden-gate-day.mp4`;
+  const wordmarkSrc = darkTheme
+    ? `${assetBase}juno-rfp-wordmark-dark.png`
+    : `${assetBase}juno-rfp-wordmark.png`;
 
   return (
     <RTLWrapper className="relative min-h-screen overflow-hidden bg-[#0B1017]">
@@ -381,7 +386,7 @@ function LoginPageContent() {
 
       <header className="relative z-10 flex items-center justify-between px-5 py-5 sm:px-8">
         <img
-          src={darkTheme ? "/juno-rfp-wordmark-dark.png" : "/juno-rfp-wordmark.png"}
+          src={wordmarkSrc}
           alt="JUNO RFP by MARLN Corporation"
           className="h-24 w-auto object-contain sm:h-32 bg-transparent drop-shadow-sm"
         />
