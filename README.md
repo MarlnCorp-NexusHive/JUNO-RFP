@@ -1,3 +1,16 @@
+# JUNO RFP
+
+Monorepo for the **JunoRFP marketing website** and the **JUNO RFP** React app.
+
+| Path | What | Netlify |
+|------|------|---------|
+| `website/` | junorfp.com marketing site, Stripe checkout, `/workspace` demo | Publish `website`, functions `website/netlify/functions` (no build command) |
+| `/` (`src/`, `juno-backend/`) | JUNO RFP product app (Vite + Express API) | Build `npm run build`, publish `dist`; API hosts separately |
+
+**Log in** on the website points to `https://app.junorfp.com/login` in production (local: `http://localhost:5173/login`).
+
+---
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
