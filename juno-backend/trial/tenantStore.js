@@ -34,6 +34,8 @@ function emptyDb() {
 }
 
 const USED_TOKEN_TTL_MS = 48 * 60 * 60 * 1000;
+/** How long a signup confirmation link stays valid. */
+const CONFIRM_TOKEN_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** Default self-serve / provisioned trial length (weekdays only). Clock starts on email confirm (or first login fallback). */
 export const DEFAULT_TRIAL_DAYS = 7;
@@ -600,7 +602,7 @@ export function registerTrialSignup({
 
     db.emailTokens = (db.emailTokens || []).filter((t) => t.userId !== existing.id);
     const confirmToken = crypto.randomBytes(32).toString("hex");
-    const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const confirmExpiresAt = new Date(Date.now() + CONFIRM_TOKEN_TTL_MS).toISOString();
     db.emailTokens.push({
       token: confirmToken,
       userId: existing.id,
@@ -671,7 +673,7 @@ export function registerTrialSignup({
   };
 
   const confirmToken = crypto.randomBytes(32).toString("hex");
-  const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const confirmExpiresAt = new Date(Date.now() + CONFIRM_TOKEN_TTL_MS).toISOString();
 
   db.users.push(user);
   if (!db.emailTokens) db.emailTokens = [];
@@ -783,7 +785,7 @@ export function reissueEmailConfirmation({ email, password }) {
 
   db.emailTokens = (db.emailTokens || []).filter((t) => t.userId !== user.id || t.purpose !== "email_confirm");
   const confirmToken = crypto.randomBytes(32).toString("hex");
-  const confirmExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const confirmExpiresAt = new Date(Date.now() + CONFIRM_TOKEN_TTL_MS).toISOString();
   db.emailTokens.push({
     token: confirmToken,
     userId: user.id,

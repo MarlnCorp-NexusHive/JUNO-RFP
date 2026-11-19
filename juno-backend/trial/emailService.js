@@ -96,10 +96,10 @@ export async function sendTrialConfirmationEmail({ to, name, confirmUrl }) {
       </p>
       <p style="margin:0 0 8px;font-size:13px;color:#475569">Or paste this link into your browser:</p>
       <p style="margin:0 0 16px;font-size:13px;word-break:break-all"><a href="${confirmUrl}">${confirmUrl}</a></p>
-      <p style="margin:0;font-size:12px;color:#64748b">This confirmation link expires in 24 hours. If you did not request a trial, you can ignore this email.</p>
+      <p style="margin:0;font-size:12px;color:#64748b">This confirmation link expires in 72 hours. If you did not request a trial, you can ignore this email.</p>
     </div>
   `;
-  const text = `Hi ${displayName},\n\nConfirm your JUNO RFP trial (your 7-business-day trial starts when you confirm):\n${confirmUrl}\n\nThis confirmation link expires in 24 hours.`;
+  const text = `Hi ${displayName},\n\nConfirm your JUNO RFP trial (your 7-business-day trial starts when you confirm):\n${confirmUrl}\n\nThis confirmation link expires in 72 hours.`;
 
   return sendEmail({ to, subject, html, text });
 }
