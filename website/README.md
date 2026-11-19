@@ -20,11 +20,11 @@ To use payments and AI, deploy from Git or the Netlify command line, not drag-an
    - Add one account per payout currency.
 4. Create products: under **Product catalog**, create three products, each with two recurring prices in USD. Copy each price ID (it starts with `price_`).
 
-   | Product | Monthly price | Annual price (20% off) |
+   | Product | Monthly price | Annual price (10% off) |
    |---|---|---|
-   | JunoRFP Team | $599 / month | $5,750 / year |
-   | JunoRFP Professional | $899 / month | $8,630 / year |
-   | JunoRFP Enterprise Pro | $1,400 / month | $13,440 / year |
+   | JunoRFP Team | $599 / month | $6,468 / year |
+   | JunoRFP Professional | $899 / month | $9,708 / year |
+   | JunoRFP Enterprise Pro | $1,400 / month | $15,120 / year |
 
    Once Stripe is connected, the website shows the prices from Stripe, so whatever you charge is what visitors see.
 5. Under **Settings → Payments → Payment methods**, turn on cards, Apple Pay, Google Pay, Link and the local methods your customers use. If Adaptive Pricing is offered for your account, turn it on so customers see prices in their local currency.

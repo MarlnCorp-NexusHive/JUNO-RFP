@@ -1218,10 +1218,10 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
   <div class="page-hero"><div class="wrap"><div class="box">
     <span class="eyebrow">Pricing</span>
     <h1>One platform for every grant and bid, pre-award to post-award.</h1>
-    <p>Find, write, review and win, then run the award. Save 20% with annual billing.</p>
+    <p>Find, write, review and win, then run the award. Save 10% with annual billing.</p>
   </div></div></div>
   <div class="wrap" style="padding-block:36px 32px" id="plans">
-    <div class="bill-toggle" role="group" aria-label="Billing period"><button type="button" data-period="monthly">Monthly</button><button type="button" class="on" data-period="annual">Annual <span class="save-chip">Save 20%</span></button></div>
+    <div class="bill-toggle" role="group" aria-label="Billing period"><button type="button" data-period="monthly">Monthly</button><button type="button" class="on" data-period="annual">Annual <span class="save-chip">Save 10%</span></button></div>
     <div class="plans">
       <div class="plan" data-plan="team"><span class="tag">Team</span><h3>Pre-award essentials for grant and proposal teams</h3><div class="price" data-price="team"></div>
         <ul><li>Find grants with fit scores, saved searches and deadline alerts</li><li>Grant pipeline from researching to awarded</li><li>RFP and NOFO compliance matrix</li><li>Drafts grounded in your approved content library</li><li>Comments, @mentions and version history</li><li>Word and PDF export</li><li>AI assistant and drafting included<sup>*</sup></li></ul>
@@ -1236,7 +1236,7 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
         <ul><li>Everything in Enterprise Pro</li><li>Custom workflows, fields, approvals and reports</li><li>Integrations with your CRM, ERP and accounting systems</li><li>Your branding, templates and document formats</li><li>Data migration and dedicated onboarding</li><li>Dedicated hosting region and security reviews</li><li>AI usage sized to your volume<sup>*</sup></li></ul>
         <a class="btn btn-line buy" data-buy="custom" href="#register?plan=custom">Request a custom plan</a></div>
     </div>
-    <p class="pay-note" id="payNote">Prices in US dollars, before applicable tax. Annual plans save 20%. <sup>*</sup>AI usage is subject to the limits in your subscription agreement. Terms and conditions apply. Prefer to talk first? <a href="#demo">Contact sales</a>.</p>
+    <p class="pay-note" id="payNote">Prices in US dollars, before applicable tax. Annual plans save 10%. <sup>*</sup>AI usage is subject to the limits in your subscription agreement. Terms and conditions apply. Prefer to talk first? <a href="#demo">Contact sales</a>.</p>
     <div class="cmp-mini"><table><thead><tr><th>What you get</th><th>Team</th><th>Professional</th><th>Enterprise Pro</th><th>Custom</th></tr></thead><tbody>
       <tr><td>Grant search, pipeline and alerts</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
       <tr><td>Compliance matrix and cited drafts</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
@@ -1253,7 +1253,7 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
       <div><svg><use href="#i-check"/></svg><b>Cancel anytime</b><span>Manage or cancel your plan from the billing portal. Receipts and invoices are sent automatically.</span></div>
     </div>
     <div class="faq-grid">
-      <details class="faq"><summary>How does annual billing work?</summary><p>Annual plans are paid once a year and cost 20% less than paying monthly. The yearly total and your savings are shown before you pay.</p></details>
+      <details class="faq"><summary>How does annual billing work?</summary><p>Annual plans are paid once a year and cost 10% less than paying monthly. The yearly total and your savings are shown before you pay.</p></details>
       <details class="faq"><summary>Is AI usage included?</summary><p>Yes. Every plan includes the AI assistant, drafting and document reading for normal business use. Usage limits are set out in your subscription agreement. Terms and conditions apply.</p></details>
       <details class="faq"><summary>How is my payment kept secure?</summary><p>You pay on Stripe’s hosted, encrypted checkout page. JunoRFP never sees or stores your full card number. Stripe is certified to PCI DSS Level 1 and supports 3D Secure.</p></details>
       <details class="faq"><summary>What does post-award project management include?</summary><p>Enterprise Pro turns an award letter into a live project with tasks, owners, budget lines and report deadlines. It adds Kanban, Gantt, budgets, obligations, funder reports, a team calendar and escalating reminders.</p></details>
@@ -1744,7 +1744,7 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
   }
 
   /* Pricing, registration and Stripe checkout */
-  var CATALOG={team:{name:'Team',monthly:59900,annual:575000},pro:{name:'Professional',monthly:89900,annual:863000},ent:{name:'Enterprise Pro',monthly:140000,annual:1344000},custom:{name:'Custom',custom:true}};
+  var CATALOG={team:{name:'Team',monthly:59900,annual:646800},pro:{name:'Professional',monthly:89900,annual:970800},ent:{name:'Enterprise Pro',monthly:140000,annual:1512000},custom:{name:'Custom',custom:true}};
   var PAID=['team','pro','ent'];
   var CUR='usd',PLANS=null,PERIOD='annual',REG=null;
   var COUNTRIES=['United States','Canada','United Kingdom','Australia','Germany','France','Ireland','Netherlands','India','United Arab Emirates','Singapore','Other'];
@@ -1769,9 +1769,9 @@ details.faq p{color:var(--muted);margin-top:10px;max-width:46em}
   function summary(){if(REG.plan==='custom')return summaryCustom();var q=quote(REG.plan,REG.period);var renew=new Date();if(REG.period==='annual')renew.setFullYear(renew.getFullYear()+1);else renew.setMonth(renew.getMonth()+1);
     return '<aside class="reg-sum"><b class="sum-h">Order summary</b>'+
      planRadios()+
-     '<div class="bill-toggle sm" role="group" aria-label="Billing period"><button type="button" class="'+(REG.period==='monthly'?'on':'')+'" data-regperiod="monthly">Monthly</button><button type="button" class="'+(REG.period==='annual'?'on':'')+'" data-regperiod="annual">Annual <span class="save-chip">−20%</span></button></div>'+
+     '<div class="bill-toggle sm" role="group" aria-label="Billing period"><button type="button" class="'+(REG.period==='monthly'?'on':'')+'" data-regperiod="monthly">Monthly</button><button type="button" class="'+(REG.period==='annual'?'on':'')+'" data-regperiod="annual">Annual <span class="save-chip">−10%</span></button></div>'+
      '<dl class="sum-lines"><dt>'+CATALOG[REG.plan].name+' · '+(REG.period==='annual'?'billed annually':'billed monthly')+'</dt><dd>'+(REG.period==='annual'?'<s>'+money(q.list,q.cur)+'</s> ':'')+money(q.due,q.cur)+'</dd>'+
-     (REG.period==='annual'?'<dt class="save">Annual savings (20%)</dt><dd class="save">−'+money(q.save,q.cur)+'</dd>':'<dt class="muted">Save '+money(q.save,q.cur)+' a year with annual</dt><dd><button type="button" class="linkbtn" data-regperiod="annual">Switch</button></dd>')+
+     (REG.period==='annual'?'<dt class="save">Annual savings (10%)</dt><dd class="save">−'+money(q.save,q.cur)+'</dd>':'<dt class="muted">Save '+money(q.save,q.cur)+' a year with annual</dt><dd><button type="button" class="linkbtn" data-regperiod="annual">Switch</button></dd>')+
      '<dt class="tot">Due today</dt><dd class="tot">'+money(q.due,q.cur)+'</dd></dl><p class="sum-note">Plus applicable tax. Renews '+renew.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' at '+money(q.due,q.cur)+'. Cancel anytime.</p>'+
      '<div class="sum-trust"><span><svg><use href="#i-lock"/></svg>Encrypted, Stripe-hosted checkout</span><span><svg><use href="#i-check"/></svg>PCI DSS Level 1 payment processing</span><span><svg><use href="#i-globe"/></svg>Cards, Apple Pay, Google Pay</span></div></aside>'}
   function renderReg(){var el=document.getElementById('register');if(!el||!REG)return;var d=REG.data,e=REG.errors,isC=REG.plan==='custom',q=isC?null:quote(REG.plan,REG.period);var main='';
