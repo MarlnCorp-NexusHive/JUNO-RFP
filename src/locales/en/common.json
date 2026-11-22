@@ -1094,7 +1094,7 @@
     "badgeCurated": "Curated",
     "modeGrants": "Grants.gov",
     "modePrivate": "Private funding",
-    "modeLocal": "Local & state",
+    "modeLocal": "Local & State",
     "modeContracts": "SAM.gov Contracts",
     "modeCa": "CA Grants Portal",
     "modeSbir": "SBIR / STTR",
@@ -1416,7 +1416,7 @@
   },
   "proposalManagerLocalGrants": {
     "eyebrow": "State & local · live",
-    "title": "Local & state grants",
+    "title": "Local & State grants",
     "subtitle": "Live Grants.gov opportunities eligible for state, county, city, special district, school district, and public housing authorities. Results refresh as you search — open the NOFO on Grants.gov before applying.",
     "liveFrom": "Live from {{source}} · fetched {{time}}",
     "refresh": "Refresh",

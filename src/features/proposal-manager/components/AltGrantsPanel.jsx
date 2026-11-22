@@ -251,7 +251,7 @@ export default function AltGrantsPanel({ variant }) {
           <div
             className="space-y-1"
             data-tour="2"
-            data-tour-title-en={isPrivate ? "Private funders (live)" : "Local & state eligible (live)"}
+            data-tour-title-en={isPrivate ? "Private funders (live)" : "Local & State eligible (live)"}
             data-tour-title-ar={isPrivate ? "الممولون الخاصون (مباشر)" : "محلي وولائي مؤهل (مباشر)"}
             data-tour-content-en={
               isPrivate
