@@ -1409,7 +1409,7 @@ const scrollToAISection = (sectionRef) => {
         </div>
       </section>
 
-      {/* 9. AI Copilot Panel */}
+      {/* 9. Sage AI Panel */}
       <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
         <div className="flex items-center gap-2 mb-4">
           <FiZap className="text-yellow-500 animate-pulse" />

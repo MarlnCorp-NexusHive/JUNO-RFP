@@ -179,7 +179,7 @@ export default function TrialBidVaultPanel({ isArabic = false }) {
           : label(`Added ${added} pursuits from Source Docs.`, `أُضيف ${added} فرصاً من مستندات المصدر.`),
       );
     } catch (err) {
-      setAiError(err?.response?.data?.error || err?.message || label("AI suggest failed", "فشل الاقتراح"));
+      setAiError(err?.response?.data?.error || err?.message || label("Sage AI suggest failed", "فشل الاقتراح"));
     } finally {
       setAiBusy(false);
     }
@@ -390,7 +390,7 @@ export default function TrialBidVaultPanel({ isArabic = false }) {
           {submissions.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-8">
               {label(
-                "No pursuits yet. Add one, pull from shortlist/Source Docs, or run AI suggest.",
+                "No pursuits yet. Add one, pull from shortlist/Source Docs, or run Sage AI suggest.",
                 "لا فرص بعد. أضف واحدة، أو اسحب من القائمة المختصرة/مستندات المصدر، أو شغّل اقتراح AI.",
               )}
             </p>

@@ -31,7 +31,7 @@ export const BOILERPLATE_PACK = [
           "Document-grounded AI Q&A that searches the full solicitation and answers as a proposal analyst — with honest gaps when the RFP is silent.",
           "Workspace extraction from PDF, Word, and Excel (including OCR) into reusable Q&A and facts.",
           "Content Hub library so winning language is reused, tagged, and exported instead of rewritten from scratch.",
-          "PM–team member collaboration: assign questions, AI drafts, review, clarifications, and an activity trail.",
+          "PM–team member collaboration: assign questions, Sage AI drafts, review, clarifications, and an activity trail.",
           "Company Intelligence on the issuer and Competitive Intelligence on peer SIs — datasheets, value propositions, and differentiators.",
           "Technical Solutioning that grounds architecture in your reference designs and maps it to RFP requirements.",
           "Submission artifacts: Word work documents, PowerPoint decks, and Marln-styled DOCX merge for the technical volume.",
@@ -96,7 +96,7 @@ export const BOILERPLATE_PACK = [
           "Content Hub ask → answer → Download Word Document / Generate slide deck.",
           "Workspace styled export into the Marln technical proposal template.",
           "Competitive Intelligence live enrichment of peer datasheets and differentiators.",
-          "Team Collab assignment, AI draft, submit, and PM review cycle.",
+          "Team Collab assignment, Sage AI draft, submit, and PM review cycle.",
         ],
       },
     ],
@@ -149,7 +149,7 @@ export const BOILERPLATE_QAS = [
     id: "qa_boilerplate_who",
     question: "Who is Marln Corporation and what is JUNO RFP?",
     answer:
-      "Marln Corporation is the company behind JUNO RFP, a proposal operating system for teams responding to complex solicitations. JUNO covers ingest, grounded AI drafting, PM–team member collaboration, issuer and competitive intelligence, technical solutioning, and submission-ready Word/PowerPoint export. Tagline: Audit-Ready. Submission-Ready. Win-Ready.",
+      "Marln Corporation is the company behind JUNO RFP, a proposal operating system for teams responding to complex solicitations. JUNO covers ingest, grounded Sage AI drafting, PM–team member collaboration, issuer and competitive intelligence, technical solutioning, and submission-ready Word/PowerPoint export. Tagline: Audit-Ready. Submission-Ready. Win-Ready.",
     tags: ["Boilerplate", "Capabilities", "Past Performance"],
   },
   {

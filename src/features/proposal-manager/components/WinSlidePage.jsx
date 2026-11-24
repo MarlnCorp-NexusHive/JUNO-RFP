@@ -197,7 +197,7 @@ export default function WinSlidePage() {
       }
       if (result.outcomeHint) setOutcome(result.outcomeHint);
     } catch (err) {
-      setAiError(err?.response?.data?.error || err?.message || "AI draft failed");
+      setAiError(err?.response?.data?.error || err?.message || "Sage AI draft failed");
     } finally {
       setAiBusy(false);
     }
@@ -301,7 +301,7 @@ export default function WinSlidePage() {
                 <FiZap className="h-4 w-4" />
                 {aiBusy
                   ? t("proposalManagerWinSlide.aiDrafting", { defaultValue: "Drafting…" })
-                  : t("proposalManagerWinSlide.aiDraft", { defaultValue: "AI draft from Scoring + Source Docs" })}
+                  : t("proposalManagerWinSlide.aiDraft", { defaultValue: "Sage AI draft from Scoring + Source Docs" })}
               </button>
             ) : null}
             <button
@@ -322,7 +322,7 @@ export default function WinSlidePage() {
             <FiFileText className="h-3.5 w-3.5" />
             {t("proposalManagerWinSlide.sourceDocsContext", {
               count: sourceDocCount,
-              defaultValue: "{{count}} Source Docs feeding AI draft context",
+              defaultValue: "{{count}} Source Docs feeding Sage AI draft context",
             })}
           </p>
         ) : null}

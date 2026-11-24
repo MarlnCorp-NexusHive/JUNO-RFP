@@ -12,7 +12,7 @@ export const ICON_LEGEND = [
   { id: "lock", label: "Identity / security" },
   { id: "network", label: "Network / integration" },
   { id: "document", label: "Content / records" },
-  { id: "spark", label: "JUNO AI / drafting" },
+  { id: "spark", label: "Sage AI / drafting" },
   { id: "collab", label: "Review / collaboration" },
   { id: "export", label: "Submission export" },
 ];

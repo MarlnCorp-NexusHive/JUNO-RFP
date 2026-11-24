@@ -67,7 +67,7 @@ class AISearchService {
       
       ??? ??????? ?? ??? ??? ?????? ?? ?????.`
       
-      : `You are an AI assistant for marketing data search. The user is searching for: "${query}"
+      : `You are Sage AI, an assistant for marketing data search. The user is searching for: "${query}"
       
       Analyze this search and provide suggestions for relevant data. Look for:
       - Matching leads/prospects

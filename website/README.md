@@ -3,7 +3,7 @@
 This folder deploys:
 - `/`: the JunoRFP website. It includes the Solutions sections, Pricing with Stripe checkout and the Help Center.
 - `/workspace/`: the full JunoRFP and Juno Workspace app.
-- `/api/*`: secure server functions for checkout, plan prices, Stripe webhooks and the AI Copilot.
+- `/api/*`: secure server functions for checkout, plan prices, Stripe webhooks and Sage AI.
 
 ## 1. Deploy
 To use payments and AI, deploy from Git or the Netlify command line, not drag-and-drop.
@@ -46,7 +46,7 @@ Go to **Site configuration → Environment variables**:
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` (from step 4 below) |
 | `STRIPE_PORTAL_URL` | Optional: the customer portal link |
 | `STRIPE_AUTOMATIC_TAX` | Optional: `true` if Stripe Tax is set up |
-| `OPENAI_API_KEY` | Turns on the AI features in the app (see the AI section) |
+| `OPENAI_API_KEY` | Turns on Sage AI features in the app (see the Sage AI section) |
 
 Start with **test mode** keys (`sk_test_`/`rk_test_`) and test card 4242 4242 4242 4242. Switch to live keys when you're ready.
 
@@ -78,14 +78,14 @@ The **Custom** plan has no payment step: **Request a custom plan → Your detail
 - If Stripe isn't connected yet, the registration is still saved and the visitor is told your team will email a secure payment link.
 
 ## AI (OpenAI GPT), token allowances and budgets
-The app's AI features (Copilot, drafting, the award and solicitation readers, funder reports) run through the server function `/api/copilot`. It calls the **OpenAI API**, so your key never reaches the browser.
+The app's Sage AI features (assistant, drafting, the award and solicitation readers, funder reports) run through the server function `/api/copilot`. It calls the **OpenAI API**, so your key never reaches the browser.
 
 **Environment variables (Netlify → Site configuration → Environment variables):**
 
 | Variable | Purpose |
 |---|---|
 | `OPENAI_API_KEY` | Required. Your OpenAI API key. |
-| `OPENAI_MODEL` | Main model for drafting, Copilot and reports. Default `gpt-6.1-sol`. |
+| `OPENAI_MODEL` | Main model for drafting, Sage AI and reports. Default `gpt-6.1-sol`. |
 | `OPENAI_FAST_MODEL` | Fast model for quick tasks. Default `gpt-6-luna`. |
 | `AI_DEFAULT_BUDGET_USD` | Hard monthly AI spend limit per workspace. Default `250`. |
 | `AI_BUDGETS_JSON` | Optional limits per workspace, e.g. `{"w1":400,"w3":120}`. |
@@ -94,7 +94,7 @@ The app's AI features (Copilot, drafting, the award and solicitation readers, fu
 | `ADMIN_TOKEN` | A long random secret for the admin usage endpoint. |
 
 **How the limits work:**
-- Before each AI request, the server checks this month's spend for the workspace and for the whole company. If either limit is reached, it refuses the request (HTTP 402) and the app shows "AI features are paused". The built-in tools keep working.
+- Before each AI request, the server checks this month's spend for the workspace and for the whole company. If either limit is reached, it refuses the request (HTTP 402) and the app shows "Sage AI features are paused". The built-in tools keep working.
 - After each request, the server records the exact token counts and cost. They're stored in Netlify Blobs, which `package.json` installs automatically.
 - Admin view of every workspace: `GET /api/ai-usage?all=1` with the header `Authorization: Bearer <ADMIN_TOKEN>`. One workspace: `GET /api/ai-usage?ws=w1`.
 

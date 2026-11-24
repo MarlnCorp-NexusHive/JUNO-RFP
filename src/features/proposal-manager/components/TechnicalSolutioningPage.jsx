@@ -558,7 +558,7 @@ export default function TechnicalSolutioningPage() {
               data-tour="2"
               data-tour-title-en="Inputs & generate"
               data-tour-title-ar="المدخلات والتوليد"
-              data-tour-content-en="Select references and requirements, then generate or refine the architecture with AI."
+              data-tour-content-en="Select references and requirements, then generate or refine the architecture with Sage AI."
               data-tour-content-ar="اختر المراجع والمتطلبات ثم ولّد أو حسّن الهندسة بالذكاء الاصطناعي."
               data-tour-position="top"
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 py-3.5 text-white font-semibold shadow-lg hover:from-indigo-700 hover:to-blue-700 disabled:opacity-60"

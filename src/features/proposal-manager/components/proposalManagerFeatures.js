@@ -45,7 +45,7 @@ export const proposalManagerFeatures = [
   { label: "proposalManager.competitiveIntelligence", icon: "🎯", route: "/app/competitive-intelligence", description: "Look up any competitor or compare curated peers — datasheets and differentiators", hub: "find" },
   { label: "proposalManager.sourceDocs", icon: "📄", route: "/app/source-docs", description: "Source documents and reference materials", hub: "respond" },
   { label: "proposalManager.manageTeam", icon: "👥", route: "/app/team", description: "Team Management and Collaboration", hub: "manage" },
-  { label: "proposalManager.rfpCollaboration", icon: "🤝", route: "/app/rfp-collaboration", description: "Assign RFP questions to team members, AI drafts, review, activity log", hub: "respond", matchPrefix: true },
+  { label: "proposalManager.rfpCollaboration", icon: "🤝", route: "/app/rfp-collaboration", description: "Assign RFP questions to team members, Sage AI drafts, review, activity log", hub: "respond", matchPrefix: true },
   { label: "proposalManager.technicalSolutioning", icon: "🏗️", route: "/app/technical-solutioning", description: "AI solution architecture from reference designs and RFP requirements", hub: "respond" },
   { label: "proposalManager.topology", icon: "🧭", route: "/app/topology", description: "Customer infrastructure topography with JUNO overlay and RFP legends", hub: "respond" },
   { label: "proposalManager.bidVault", icon: "📦", route: "/app/bid-vault", description: "Bid repository and submissions", hub: "respond" },
