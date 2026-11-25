@@ -27,7 +27,11 @@ import OrgMatchBadge from "./OrgMatchBadge.jsx";
 import SortNewestButton from "./SortNewestButton.jsx";
 import { filterOpenListings } from "../services/openListingFilter.js";
 import { sortListings } from "../services/listingSort.js";
-import { getOrgMatchProfile, subscribeOrgMatchProfile } from "../services/orgMatchProfileStore.js";
+import {
+  getOrgMatchProfile,
+  subscribeOrgMatchProfile,
+  US_STATE_OPTIONS,
+} from "../services/orgMatchProfileStore.js";
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
@@ -161,6 +165,19 @@ export default function AltGrantsPanel({ variant }) {
     ];
   }, [isPrivate]);
 
+  const stateOptions = useMemo(
+    () => [...US_STATE_OPTIONS].sort((a, b) => a.name.localeCompare(b.name)),
+    [],
+  );
+
+  /** Private APIs expect state codes; Grants.gov local search works better with full names. */
+  const geographyQuery = useMemo(() => {
+    if (!geography) return "";
+    if (isPrivate) return geography;
+    const match = US_STATE_OPTIONS.find((s) => s.id === geography);
+    return match ? match.name : geography;
+  }, [geography, isPrivate]);
+
   const runSearch = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -169,7 +186,7 @@ export default function AltGrantsPanel({ variant }) {
       const data = await searchAltGrants({
         variant: isPrivate ? "private" : "local",
         keyword,
-        geography,
+        geography: geographyQuery,
         status: isPrivate ? "" : status,
         focus,
         rows: 25,
@@ -197,7 +214,7 @@ export default function AltGrantsPanel({ variant }) {
     } finally {
       setLoading(false);
     }
-  }, [focus, geography, i18nRoot, isPrivate, keyword, page, sizeBucket, sortBy, status, t]);
+  }, [focus, geographyQuery, i18nRoot, isPrivate, keyword, page, sizeBucket, sortBy, status, t]);
 
   useEffect(() => {
     runSearch();
@@ -342,16 +359,28 @@ export default function AltGrantsPanel({ variant }) {
                 />
               </div>
             </label>
-            <label className="w-full lg:w-36">
+            <label className="w-full lg:w-56">
               <span className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-200">
                 {t(`${i18nRoot}.geography`)}
               </span>
-              <input
+              <select
                 value={draftGeography}
-                onChange={(e) => setDraftGeography(e.target.value)}
-                placeholder={t(`${i18nRoot}.geographyPlaceholder`)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setDraftGeography(next);
+                  setGeography(next);
+                  setPage(0);
+                }}
                 className={inputClass}
-              />
+                aria-label={t(`${i18nRoot}.geography`)}
+              >
+                <option value="">{t(`${i18nRoot}.geographyAll`)}</option>
+                {stateOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.name}
+                  </option>
+                ))}
+              </select>
             </label>
             {!isPrivate && (
               <label className="w-full lg:w-40">
