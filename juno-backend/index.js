@@ -32,6 +32,7 @@ import { registerPricingAiRoutes } from "./pricingAiService.js";
 import { registerPursuitLifecycleAiRoutes } from "./pursuitLifecycleAiService.js";
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
+import { instrumentOpenAiForTrialSettings } from "./trial/aiUsageTelemetry.js";
 import {
   isEmailConfigured,
   sendWorkspaceDocumentEmail,
@@ -90,9 +91,11 @@ app.use((req, res, next) => {
 });
 
 /* ================= OPENAI ================= */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = instrumentOpenAiForTrialSettings(
+  new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  }),
+);
 
 registerTrialSystem(app);
 

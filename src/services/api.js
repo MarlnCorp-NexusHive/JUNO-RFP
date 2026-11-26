@@ -48,6 +48,25 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+API.interceptors.response.use((response) => {
+  try {
+    const method = String(response?.config?.method || "").toLowerCase();
+    const url = String(response?.config?.url || "");
+    if (
+      method === "post" &&
+      !url.includes("/trial/settings") &&
+      !url.includes("/trial/auth") &&
+      typeof window !== "undefined" &&
+      localStorage.getItem("juno_trial_session")
+    ) {
+      window.dispatchEvent(new CustomEvent("juno:ai-usage-updated"));
+    }
+  } catch {
+    /* ignore */
+  }
+  return response;
+});
+
 /** DOCX is a ZIP (PK…). If the server returned JSON/HTML, surface it as a normal Error. */
 async function assertBlobIsDocxOrThrow(response, label) {
   const blob = response.data;

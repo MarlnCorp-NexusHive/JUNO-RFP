@@ -22,6 +22,7 @@ export const FEATURE_KEYS = [
   "dashboard",
   "awardManagement",
   "projectWorkspace",
+  "settings",
 ];
 
 const EMPTY_BY_KEY = {
@@ -53,6 +54,7 @@ const EMPTY_BY_KEY = {
   compliance: { areas: [], logs: [], risks: [] },
   awardManagement: { awards: [], freshReset: true },
   projectWorkspace: { projects: [], tasks: [], updates: [], freshReset: true },
+  settings: { cfg: null, log: [] },
   dashboard: {
     docInsights: {},
     charts: {
