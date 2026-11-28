@@ -8,6 +8,9 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import dns from "dns/promises";
+import net from "net";
+import { writeJsonAtomic } from "./utils/atomicFile.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = path.join(__dirname, "data", "usPhilanthropicGrantmakers.json");
@@ -202,28 +205,131 @@ const BROWSER_HEADERS = {
   "Upgrade-Insecure-Requests": "1",
 };
 
+const MAX_FETCH_BODY_BYTES = 1_500_000;
+const MAX_REDIRECT_HOPS = 3;
+
+function isPrivateOrReservedIp(ip) {
+  if (!ip) return true;
+  const clean = ip.replace(/^::ffff:/i, "");
+  if (net.isIPv4(clean)) {
+    const parts = clean.split(".").map(Number);
+    if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return true;
+    const [a, b] = parts;
+    if (a === 0 || a === 10 || a === 127) return true;
+    if (a === 169 && b === 254) return true; // link-local & cloud metadata
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
+    if (a >= 224) return true; // multicast / reserved
+    return false;
+  }
+  if (net.isIPv6(clean)) {
+    const lower = clean.toLowerCase();
+    if (lower === "::" || lower === "::1") return true;
+    if (lower.startsWith("fc") || lower.startsWith("fd")) return true; // ULA
+    if (lower.startsWith("fe8") || lower.startsWith("fe9") || lower.startsWith("fea") || lower.startsWith("feb")) return true; // link-local
+    if (lower.startsWith("ff")) return true; // multicast
+    return false;
+  }
+  return true;
+}
+
+async function assertSafePublicUrl(rawUrl) {
+  let parsed;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new Error("invalid_url");
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("blocked_protocol");
+  }
+  const host = parsed.hostname.toLowerCase();
+  if (
+    !host ||
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".local") ||
+    host.endsWith(".internal")
+  ) {
+    throw new Error("blocked_host");
+  }
+  if (net.isIP(host)) {
+    if (isPrivateOrReservedIp(host)) throw new Error("blocked_private_ip");
+    return parsed.toString();
+  }
+  const records = await dns.lookup(host, { all: true });
+  if (!records.length || records.some((r) => isPrivateOrReservedIp(r.address))) {
+    throw new Error("blocked_private_ip");
+  }
+  return parsed.toString();
+}
+
+async function readResponseTextCapped(res, maxBytes = MAX_FETCH_BODY_BYTES) {
+  if (!res.body || typeof res.body.getReader !== "function") {
+    return (await res.text()).slice(0, 700_000);
+  }
+  const reader = res.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        const remaining = maxBytes - total;
+        if (remaining <= 0) break;
+        chunks.push(value.byteLength > remaining ? value.subarray(0, remaining) : value);
+        total += Math.min(value.byteLength, remaining);
+        if (total >= maxBytes) break;
+      }
+    }
+  } finally {
+    try {
+      await reader.cancel();
+    } catch {
+      /* ignore */
+    }
+  }
+  return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString("utf8").slice(0, 700_000);
+}
+
 async function fetchPage(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    let referer;
-    try {
-      referer = new URL(url).origin + "/";
-    } catch {
-      referer = undefined;
+    let currentUrl = await assertSafePublicUrl(url);
+    let res = null;
+    for (let hop = 0; hop <= MAX_REDIRECT_HOPS; hop += 1) {
+      let referer;
+      try {
+        referer = new URL(currentUrl).origin + "/";
+      } catch {
+        referer = undefined;
+      }
+      res = await fetch(currentUrl, {
+        method: "GET",
+        redirect: "manual",
+        signal: controller.signal,
+        headers: { ...BROWSER_HEADERS, ...(referer ? { Referer: referer } : {}) },
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get("location");
+        if (!location || hop === MAX_REDIRECT_HOPS) {
+          throw new Error("redirect_limit");
+        }
+        const nextUrl = new URL(location, currentUrl).toString();
+        currentUrl = await assertSafePublicUrl(nextUrl);
+        continue;
+      }
+      break;
     }
-    const res = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: { ...BROWSER_HEADERS, ...(referer ? { Referer: referer } : {}) },
-    });
-    const html = await res.text();
+    const html = await readResponseTextCapped(res);
     return {
       ok: res.ok,
       status: res.status,
-      finalUrl: res.url || url,
-      html: html.slice(0, 700_000),
+      finalUrl: currentUrl,
+      html,
       blocked: res.status === 403 || res.status === 401 || res.status === 429,
     };
   } catch (err) {
@@ -310,9 +416,7 @@ function readDurableOpenIndex() {
 
 function writeDurableOpenIndex(doc) {
   ensureDataDir();
-  const tmp = `${OPEN_INDEX_PATH}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(doc, null, 2), "utf8");
-  fs.renameSync(tmp, OPEN_INDEX_PATH);
+  writeJsonAtomic(OPEN_INDEX_PATH, doc, { pretty: true, backup: false });
 }
 
 /** Persist counts/checked flags used by directory sort — survives ops-cache TTL. */
@@ -353,9 +457,7 @@ function rebuildOpenIndexFromOpsCache() {
 
 function writeOpsCache(payload) {
   const file = cachePath(payload.funderId);
-  const tmp = `${file}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2), "utf8");
-  fs.renameSync(tmp, file);
+  writeJsonAtomic(file, payload, { pretty: true, backup: false });
   upsertOpenIndexEntry(payload);
 }
 
@@ -654,10 +756,11 @@ async function crawlFunderPages(funder) {
   const followCandidates = allLinks
     .filter((l) => {
       try {
-        const host = new URL(l.url).hostname.replace(/^www\./, "");
+        const parsed = new URL(l.url);
+        const host = parsed.hostname.replace(/^www\./, "");
         const baseHost = new URL(base).hostname.replace(/^www\./, "");
         if (host === baseHost || host.endsWith(`.${baseHost}`) || baseHost.endsWith(`.${host}`)) return true;
-        return portalOrigins.some((origin) => l.url.startsWith(origin));
+        return portalOrigins.includes(parsed.origin);
       } catch {
         return false;
       }

@@ -104,7 +104,7 @@ i18n
     supportedLngs: ['en', 'ar'],
     nonExplicitSupportedLngs: true,
     load: 'languageOnly',
-    debug: process.env.NODE_ENV === 'development',
+    debug: Boolean(import.meta.env?.DEV),
     
     interpolation: {
       escapeValue: false,

@@ -2,13 +2,18 @@ import { Router } from "express";
 import { requireTrialAuth } from "./authMiddleware.js";
 import {
   buildTrialConfirmUrl,
+  buildPasswordResetUrl,
   isEmailConfigured,
   sendTrialConfirmationEmail,
+  sendPasswordResetEmail,
+  sendPasswordChangedEmail,
 } from "./emailService.js";
 import {
   changeUserPassword,
   confirmTrialEmail,
+  createPasswordResetToken,
   createSession,
+  deleteUserAccount,
   ensureTrialClockStarted,
   findTenantById,
   findUserByEmail,
@@ -20,9 +25,14 @@ import {
   publicUser,
   registerTrialSignup,
   reissueEmailConfirmation,
+  resetPasswordWithToken,
   revokeSession,
-  verifyPassword,
+  updateUserProfile,
+  verifyPasswordAsync,
 } from "./tenantStore.js";
+import { exportAllTenantFeatures } from "./featureStore.js";
+import { purgeTenantSatelliteData } from "../privacy/purgeTenantData.js";
+import { appendPrivacyAudit } from "../privacy/privacyAuditLog.js";
 
 const router = Router();
 
@@ -46,13 +56,40 @@ router.post("/signup", async (req, res) => {
       password,
       companyName,
       company,
+      privacyAccepted,
+      privacyPolicyVersion,
     } = req.body || {};
+
+    if (privacyAccepted !== true) {
+      return res.status(400).json({
+        error: "You must accept the Privacy Policy to create an account.",
+        code: "privacy_consent_required",
+      });
+    }
 
     const result = registerTrialSignup({
       contactName: name || contactName,
       email,
       password,
       companyName: companyName || company,
+      privacyAccepted: true,
+      privacyPolicyVersion: privacyPolicyVersion || "2026-11",
+      privacyMeta: {
+        ip: req.ip || req.socket?.remoteAddress || "",
+        userAgent: String(req.headers["user-agent"] || "").slice(0, 180),
+        source: "signup",
+      },
+    });
+
+    appendPrivacyAudit({
+      action: "consent_accepted",
+      userId: result.user?.id,
+      tenantId: result.tenant?.id,
+      email: result.user?.email,
+      detail: `policy=${privacyPolicyVersion || "2026-11"}`,
+      ip: req.ip,
+      userAgent: String(req.headers["user-agent"] || ""),
+      requestId: req.requestId,
     });
 
     const delivery = await deliverConfirmation({
@@ -86,7 +123,8 @@ router.post("/signup", async (req, res) => {
         ? 409
         : code === "trial_expired" || code === "tenant_disabled"
           ? 403
-        : code === "missing_name" ||
+        : code === "privacy_consent_required" ||
+            code === "missing_name" ||
             code === "missing_company" ||
             code === "invalid_email" ||
             code === "password_too_short"
@@ -170,7 +208,7 @@ router.post("/resend-confirmation", async (req, res) => {
   }
 });
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const email = String(req.body?.email || req.body?.username || "").trim().toLowerCase();
     const password = String(req.body?.password || "");
@@ -179,7 +217,8 @@ router.post("/login", (req, res) => {
     }
 
     const user = findUserByEmail(email);
-    if (!user || !verifyPassword(password, user.passwordSalt, user.passwordHash)) {
+    const passOk = user ? await verifyPasswordAsync(password, user.passwordSalt, user.passwordHash) : false;
+    if (!user || !passOk) {
       return res.status(401).json({ error: "Invalid trial credentials", code: "invalid_credentials" });
     }
 
@@ -261,9 +300,14 @@ router.get("/members", requireTrialAuth, (req, res) => {
   }
 });
 
-/** Public disk/path diagnostics — no passwords or tokens. */
+/** Public health/persistence check — redacted so filesystem paths and tenant counts are not leaked. */
 router.get("/storage-status", (_req, res) => {
-  return res.json(getTrialStorageStatus());
+  const status = getTrialStorageStatus();
+  return res.json({
+    ok: true,
+    exists: Boolean(status?.exists),
+    persistent: Boolean(status?.usingCustomPath),
+  });
 });
 
 router.post("/logout", (req, res) => {
@@ -303,6 +347,177 @@ router.post("/change-password", requireTrialAuth, (req, res) => {
             : 500;
     if (status >= 500) console.error("[trial] change-password error:", err);
     return res.status(status).json({ error: err.message || "Could not change password", code });
+  }
+});
+
+/** Anti-enumeration forgot-password — always returns ok. */
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json({ error: "Email is required", code: "invalid_email" });
+    }
+    const issued = createPasswordResetToken(email);
+    if (issued.issued && isEmailConfigured()) {
+      const resetUrl = buildPasswordResetUrl(issued.resetToken);
+      await sendPasswordResetEmail({
+        to: issued.user.email,
+        name: issued.user.name,
+        resetUrl,
+      });
+      appendPrivacyAudit({
+        action: "password_reset_requested",
+        userId: issued.user.id,
+        tenantId: issued.user.tenantId,
+        email: issued.user.email,
+        ip: req.ip,
+        userAgent: String(req.headers["user-agent"] || ""),
+        requestId: req.requestId,
+      });
+      return res.json({ ok: true, emailSent: true });
+    }
+    if (issued.issued && !isEmailConfigured()) {
+      // Dev fallback: return link only when email is not configured
+      return res.json({
+        ok: true,
+        emailSent: false,
+        resetUrl: buildPasswordResetUrl(issued.resetToken),
+        message: "Email is not configured — use the reset link returned (dev mode).",
+      });
+    }
+    return res.json({
+      ok: true,
+      emailSent: false,
+      message: "If an account exists for that email, a reset link has been sent.",
+    });
+  } catch (err) {
+    console.error("[trial] forgot-password error:", err);
+    return res.status(500).json({ error: "Could not process password reset", code: "forgot_failed" });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  try {
+    const token = req.body?.token || req.query?.token;
+    const newPassword = String(req.body?.newPassword || req.body?.password || "");
+    const result = resetPasswordWithToken(token, newPassword);
+    if (isEmailConfigured()) {
+      try {
+        await sendPasswordChangedEmail({ to: result.user.email, name: result.user.name });
+      } catch {
+        /* non-blocking */
+      }
+    }
+    appendPrivacyAudit({
+      action: "password_reset_completed",
+      userId: result.user.id,
+      tenantId: result.user.tenantId,
+      email: result.user.email,
+      ip: req.ip,
+      userAgent: String(req.headers["user-agent"] || ""),
+      requestId: req.requestId,
+    });
+    return res.json({ ok: true, message: "Password updated. You can sign in now." });
+  } catch (err) {
+    const code = err.code || "reset_failed";
+    const status =
+      code === "missing_token" || code === "invalid_token" || code === "token_expired" || code === "password_too_short"
+        ? 400
+        : code === "user_missing"
+          ? 404
+          : 500;
+    if (status >= 500) console.error("[trial] reset-password error:", err);
+    return res.status(status).json({ error: err.message || "Could not reset password", code });
+  }
+});
+
+/** Right to rectification */
+router.patch("/profile", requireTrialAuth, (req, res) => {
+  try {
+    const result = updateUserProfile(req.trialUser.id, { name: req.body?.name });
+    appendPrivacyAudit({
+      action: "profile_rectification",
+      userId: req.trialUser.id,
+      tenantId: req.tenantId,
+      email: req.trialUser.email,
+      detail: "name_updated",
+      ip: req.ip,
+      userAgent: String(req.headers["user-agent"] || ""),
+      requestId: req.requestId,
+    });
+    return res.json({ ok: true, user: result.user });
+  } catch (err) {
+    const code = err.code || "profile_update_failed";
+    const status = code === "missing_name" ? 400 : code === "user_missing" ? 404 : 500;
+    if (status >= 500) console.error("[trial] profile update error:", err);
+    return res.status(status).json({ error: err.message || "Could not update profile", code });
+  }
+});
+
+/**
+ * Right to Access / Data Portability (GDPR Art. 15/20, CCPA, PDPL, PIPEDA):
+ * Exports the authenticated user's profile, consent record, tenant metadata, usage, and stored feature data.
+ */
+router.get("/export-my-data", requireTrialAuth, (req, res) => {
+  try {
+    const tenant = findTenantById(req.tenantId);
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      policyVersion: "2026-11",
+      jurisdictions: ["GDPR", "CCPA/CPRA", "PDPL", "PIPEDA"],
+      user: publicUser(req.trialUser),
+      tenant: publicTenant(tenant),
+      usage: getUsageSnapshot(req.tenantId),
+      features: exportAllTenantFeatures(req.tenantId),
+    };
+    res.setHeader("Content-Disposition", `attachment; filename="juno-rfp-my-data-${req.trialUser.id}.json"`);
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    appendPrivacyAudit({
+      action: "dsar_export",
+      userId: req.trialUser.id,
+      tenantId: req.tenantId,
+      email: req.trialUser.email,
+      ip: req.ip,
+      userAgent: String(req.headers["user-agent"] || ""),
+      requestId: req.requestId,
+    });
+    return res.json(payload);
+  } catch (err) {
+    console.error("[trial] export-my-data error:", err);
+    return res.status(500).json({ error: "Could not export user data", code: "export_failed" });
+  }
+});
+
+/**
+ * Right to Erasure (GDPR Art. 17, CCPA, PDPL, PIPEDA):
+ * Permanently deletes the authenticated user's account, revokes sessions, and purges tenant data if sole member.
+ */
+router.delete("/account", requireTrialAuth, (req, res) => {
+  try {
+    const result = deleteUserAccount(req.trialUser.id);
+    if (result.tenantDeleted) {
+      purgeTenantSatelliteData(result.tenantId, "account_erasure");
+    }
+    appendPrivacyAudit({
+      action: "dsar_erasure",
+      userId: result.deletedUserId,
+      tenantId: result.tenantId,
+      email: req.trialUser.email,
+      detail: result.tenantDeleted ? "tenant_purged" : "user_only",
+      ip: req.ip,
+      userAgent: String(req.headers["user-agent"] || ""),
+      requestId: req.requestId,
+    });
+    return res.json({
+      ok: true,
+      message: "Your account and associated data have been permanently deleted.",
+      ...result,
+    });
+  } catch (err) {
+    const code = err.code || "delete_account_failed";
+    const status = code === "user_missing" ? 404 : 500;
+    if (status >= 500) console.error("[trial] delete account error:", err);
+    return res.status(status).json({ error: err.message || "Could not delete account", code });
   }
 });
 

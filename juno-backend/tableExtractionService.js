@@ -4,15 +4,64 @@
  * In-memory storage keyed by workspaceId → documentId.
  */
 
+import path from "path";
+import { getTrialDataPath } from "./trial/tenantStore.js";
+import { readJsonSafe, writeJsonAtomic } from "./utils/atomicFile.js";
+
 const MAX_DOC_CHARS = 120_000;
 const MAX_TABLE_ROWS = 200;
 const MAX_CELL_CHARS = 4_000;
 const MAX_RAW_TABLE_CHARS = 24_000;
 const FIGURE_CONTEXT_BEFORE = 400;
 const FIGURE_CONTEXT_AFTER = 800;
+const MAX_AI_TABLE_CALLS = 10;
+const MAX_AI_FIGURE_CALLS = 15;
+const MAX_TABLE_WORKSPACES = 200;
 
 /** @type {Map<string, Map<string, { tables: object[], figures: object[], updatedAt: string }>>} */
 const workspaceById = new Map();
+let tablesLoadedFromDisk = false;
+
+function getTablesStorePath() {
+  return path.join(path.dirname(getTrialDataPath()), "workspace-tables.json");
+}
+
+function ensureTablesLoaded() {
+  if (tablesLoadedFromDisk) return;
+  tablesLoadedFromDisk = true;
+  try {
+    const { exists, data } = readJsonSafe(getTablesStorePath(), "workspace-tables");
+    if (exists && data && typeof data === "object") {
+      for (const [ws, docsObj] of Object.entries(data)) {
+        if (!ws || !docsObj || typeof docsObj !== "object") continue;
+        const m = new Map();
+        for (const [docId, entry] of Object.entries(docsObj)) {
+          if (docId && entry && typeof entry === "object") m.set(docId, entry);
+        }
+        workspaceById.set(ws, m);
+      }
+    }
+  } catch (err) {
+    console.warn("[workspace-tables] failed to load persisted tables:", err?.message || err);
+  }
+}
+
+function persistTablesStore() {
+  try {
+    while (workspaceById.size > MAX_TABLE_WORKSPACES) {
+      const oldestKey = workspaceById.keys().next().value;
+      if (oldestKey === undefined) break;
+      workspaceById.delete(oldestKey);
+    }
+    const serialized = {};
+    for (const [ws, byDoc] of workspaceById.entries()) {
+      serialized[ws] = Object.fromEntries(byDoc);
+    }
+    writeJsonAtomic(getTablesStorePath(), serialized, { pretty: false, backup: true });
+  } catch (err) {
+    console.warn("[workspace-tables] failed to persist tables:", err?.message || err);
+  }
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -243,6 +292,7 @@ export async function extractStructuredData(openai, documentText, options = {}) 
   const tables = [];
   const blocks = extractTableBlocks(text);
   let tableIdx = 0;
+  let aiTableCalls = 0;
 
   for (const block of blocks) {
     const normalized = normalizeRowsToHeaders(block.rows);
@@ -258,7 +308,8 @@ export async function extractStructuredData(openai, documentText, options = {}) 
       normalized.rows.some((r) => r.length !== normalized.headers.length) ||
       normalized.headers.length === 0;
 
-    if (!skipAi && openai && (messy || block.raw_text.length > 2000)) {
+    if (!skipAi && openai && aiTableCalls < MAX_AI_TABLE_CALLS && (messy || block.raw_text.length > 2000)) {
+      aiTableCalls += 1;
       const ai = await structureTableWithAi(openai, block.raw_text);
       if (ai && (ai.headers?.length || ai.rows?.length)) {
         table = {
@@ -279,9 +330,11 @@ export async function extractStructuredData(openai, documentText, options = {}) 
   const figureCandidates = extractFigureCandidates(text);
   const figures = [];
   let figIdx = 0;
+  let aiFigureCalls = 0;
   for (const fc of figureCandidates) {
     let description = "";
-    if (!skipAi && openai) {
+    if (!skipAi && openai && aiFigureCalls < MAX_AI_FIGURE_CALLS) {
+      aiFigureCalls += 1;
       description = await describeFigureWithAi(openai, fc.caption, fc.context);
     } else {
       description = "AI description skipped; see caption and RFP context in surrounding text.";
@@ -300,6 +353,7 @@ export async function extractStructuredData(openai, documentText, options = {}) 
  * Persist under workspace + document for later GET.
  */
 export function storeStructuredData(workspaceId, documentId, payload) {
+  ensureTablesLoaded();
   const ws = String(workspaceId || "").trim();
   const doc = String(documentId || "").trim();
   if (!ws || !doc) return;
@@ -313,9 +367,11 @@ export function storeStructuredData(workspaceId, documentId, payload) {
     figures: Array.isArray(payload.figures) ? payload.figures : [],
     updatedAt: nowIso(),
   });
+  persistTablesStore();
 }
 
 export function getStructuredDataForWorkspace(workspaceId) {
+  ensureTablesLoaded();
   const ws = String(workspaceId || "").trim();
   const byDoc = workspaceById.get(ws);
   if (!byDoc) {

@@ -8,11 +8,16 @@ const ThemeToggleButton = ({ expanded, darkTheme, onToggle, isRTLMode = false })
 
   // Glow animation every 7 seconds
   useEffect(() => {
+    let resetTimeout = null;
     const interval = setInterval(() => {
       setGlowAnimation(true);
-      setTimeout(() => setGlowAnimation(false), 1500);
+      if (resetTimeout) clearTimeout(resetTimeout);
+      resetTimeout = setTimeout(() => setGlowAnimation(false), 1500);
     }, 7000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (resetTimeout) clearTimeout(resetTimeout);
+    };
   }, []);
 
   const textClass = darkTheme ? 'text-emerald-50' : 'text-slate-800';

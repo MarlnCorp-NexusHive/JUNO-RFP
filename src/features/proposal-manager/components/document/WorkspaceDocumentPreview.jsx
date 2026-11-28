@@ -1,4 +1,5 @@
 import React from "react";
+import { sanitizeRichHtml } from "../../../../utils/sanitizeHtml.js";
 
 export default function WorkspaceDocumentPreview({ model }) {
   const title = model?.title || "RFP Response";
@@ -19,7 +20,7 @@ export default function WorkspaceDocumentPreview({ model }) {
                 </h2>
                 <div
                   className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: section.answerHtml || "<p></p>" }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(section.answerHtml || "<p></p>") }}
                 />
               </section>
             ))}

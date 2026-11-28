@@ -52,6 +52,7 @@ async function searchCaGrants({ keyword = "", status = "", page = 0, limit = 25 
   }
 
   const res = await fetch(`${DATASTORE_URL}?${params}`, {
+    signal: AbortSignal.timeout(25_000),
     headers: { Accept: "application/json" },
   });
   const text = await res.text();

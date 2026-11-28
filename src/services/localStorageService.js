@@ -11,11 +11,22 @@ const KEYS = {
 };
 
 function getItem(key) {
-  return JSON.parse(localStorage.getItem(key) || '[]');
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 function setItem(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore storage quota / private mode errors */
+  }
 }
 
 export const localStorageService = {
@@ -42,6 +53,10 @@ export const localStorageService = {
   getAudit: () => getItem(KEYS.AUDIT),
   setAudit: (audit) => setItem(KEYS.AUDIT, audit),
   clearAll: () => {
-    Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
+    try {
+      Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
+    } catch {
+      /* ignore */
+    }
   },
 }; 

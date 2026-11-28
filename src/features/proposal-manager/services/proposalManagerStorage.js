@@ -124,8 +124,8 @@ export function saveDocuments(docs) {
 /** In-memory fallback when localStorage cannot hold original file bytes (quota / large PDFs). */
 const sessionFileBytes = new Map();
 
-/** Prefer persisting originals under this raw size so base64 fits localStorage more reliably. */
-export const WORKSPACE_FILE_PERSIST_MAX_BYTES = 8 * 1024 * 1024;
+/** Prefer persisting originals under this raw size (~2 MB base64) so it fits browser ~5 MB localStorage quota reliably; larger files stay in sessionFileBytes. */
+export const WORKSPACE_FILE_PERSIST_MAX_BYTES = Math.floor(1.5 * 1024 * 1024);
 
 export function stashWorkspaceFileBytes(docId, payload) {
   if (!docId || !payload?.dataUrl) return;

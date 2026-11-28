@@ -10,7 +10,10 @@ import {
   getWalkthroughCredentials,
   loadTrialDb,
   migrateTrialDurationsOnBoot,
+  purgeExpiredTenants,
 } from "./tenantStore.js";
+import { purgeTenantSatelliteData } from "../privacy/purgeTenantData.js";
+import { logger } from "../utils/logger.js";
 
 /** AI / generative routes that should count against trial quotas when a trial token is present. */
 const METERED_PATH_PREFIXES = [
@@ -28,6 +31,9 @@ const METERED_PATH_PREFIXES = [
   "/extract-qas",
   "/extract-structured-data",
   "/technical-solution/",
+  "/communication/ai/",
+  "/pricing/ai/",
+  "/pursuit/ai/",
   "/grants/philanthropic/opportunities",
   "/grants/brief/",
 ];
@@ -141,6 +147,25 @@ export function registerTrialSystem(app) {
     console.warn("[trial] permanent walkthrough seed failed:", err.message);
   }
 
+  // Retention limitation: purge tenants expired beyond grace period (default 30 days).
+  const runRetentionPurge = () => {
+    try {
+      const graceDays = Number(process.env.TRIAL_RETENTION_GRACE_DAYS || 30);
+      const result = purgeExpiredTenants({ graceDays });
+      for (const tenantId of result.purgedTenantIds || []) {
+        purgeTenantSatelliteData(tenantId, "retention_expiry");
+      }
+      if (result.purgedTenantIds?.length) {
+        logger.info("trial_retention_purge", result);
+      }
+    } catch (err) {
+      logger.warn("trial_retention_purge_failed", { error: err?.message });
+    }
+  };
+  runRetentionPurge();
+  const retentionHours = Math.max(1, Number(process.env.TRIAL_RETENTION_INTERVAL_HOURS || 24));
+  setInterval(runRetentionPurge, retentionHours * 60 * 60 * 1000).unref?.();
+
   app.use(attachTrialContext);
   app.use("/trial/auth", trialRoutes);
   app.use("/trial/features", featureRoutes);
@@ -152,7 +177,10 @@ export function registerTrialSystem(app) {
   });
 
   console.log(
-    "Trial tenancy API: /trial/auth/login, /signup, /confirm, /resend-confirmation, /me, /logout, /change-password",
+    "Trial tenancy API: /trial/auth/login, /signup, /confirm, /resend-confirmation, /me, /logout, /change-password, /export-my-data, DELETE /account",
   );
   console.log(`Trial feature store: ${getFeaturesStoragePath()} (GET/PUT/DELETE /trial/features/:key)`);
+  console.log(
+    `[trial] retention purge: grace=${process.env.TRIAL_RETENTION_GRACE_DAYS || 30}d · interval=${retentionHours}h`,
+  );
 }

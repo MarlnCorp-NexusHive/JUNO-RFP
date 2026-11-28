@@ -37,7 +37,7 @@ function snapToSourceVerbatim(source, candidate) {
   if (direct >= 0) return src.slice(direct, direct + cand.length);
 
   const words = cand.split(/\s+/).filter(Boolean);
-  if (words.length < 4) return cand;
+  if (words.length < 4 || words.length > 40 || cand.length > 400) return cand;
   try {
     const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     const re = new RegExp(escaped.join("\\s+"), "i");

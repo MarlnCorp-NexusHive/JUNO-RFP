@@ -37,6 +37,13 @@ class TrialService {
   // Save usage data to localStorage
   saveUsage() {
     try {
+      // Prune stale sessions (older than 7 days or beyond 20 entries) to prevent unbounded localStorage growth.
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const entries = Object.entries(this.usage || {})
+        .filter(([id, rec]) => id === this.currentSession || (rec?.startTime || 0) >= cutoff)
+        .sort((a, b) => (b[1]?.startTime || 0) - (a[1]?.startTime || 0))
+        .slice(0, 20);
+      this.usage = Object.fromEntries(entries);
       window.localStorage.setItem(TRIAL_CONFIG.STORAGE_KEY, JSON.stringify(this.usage));
     } catch (error) {
       console.error('Error saving trial usage:', error);

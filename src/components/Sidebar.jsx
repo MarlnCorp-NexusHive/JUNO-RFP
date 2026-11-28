@@ -6,6 +6,7 @@ import SidebarLanguageSwitcher from "./localization/SidebarLanguageSwitcher";
 import SmartTourButton from '../components/tours/SmartTourButton';
 import ThemeToggleButton from './ui/ThemeToggleButton';
 import { clearTrialSession } from '../services/trialAuthSession.js';
+import { endTabSession } from '../services/tabSessionManager.js';
 import marlnLogo from "../assets/MARLN logo.png";
 
 export default function Sidebar({ features, userLabel }) {
@@ -38,9 +39,9 @@ export default function Sidebar({ features, userLabel }) {
   }, [darkTheme]);
 
   const handleLogout = () => {
-    localStorage.removeItem("rbac_current_user");
     clearTrialSession();
-    navigate("/login");
+    endTabSession({ clearSharedAuth: true, broadcast: true });
+    navigate("/login", { replace: true });
   };
 
   const handleThemeToggle = () => {

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "create-trial": "node scripts/create-trial-tenant.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test tests/*.test.mjs"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "openai": "^6.33.0",
     "pdf-parse": "^2.4.5",
     "pizzip": "^3.2.0",
-    "pptxgenjs": "^4.0.1"
+    "pptxgenjs": "^4.0.1",
+    "prom-client": "^15.1.3"
   }
 }

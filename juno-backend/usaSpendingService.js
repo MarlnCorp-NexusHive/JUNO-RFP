@@ -97,6 +97,7 @@ async function queryGroup({ award_type_codes, keyword, page, limit }) {
 
   const res = await fetch(`${USA_BASE}/search/spending_by_award/`, {
     method: "POST",
+    signal: AbortSignal.timeout(25_000),
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
       filters,

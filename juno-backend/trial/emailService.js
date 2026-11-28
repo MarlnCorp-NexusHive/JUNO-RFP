@@ -60,6 +60,7 @@ export async function sendEmail({ to, subject, html, text, attachments }) {
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
+    signal: AbortSignal.timeout(25_000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
@@ -79,6 +80,10 @@ export async function sendEmail({ to, subject, html, text, attachments }) {
 
 export function buildTrialConfirmUrl(token) {
   return `${getAppUrl()}/login?trialConfirm=${encodeURIComponent(token)}`;
+}
+
+export function buildPasswordResetUrl(token) {
+  return `${getAppUrl()}/login?resetToken=${encodeURIComponent(token)}`;
 }
 
 export async function sendTrialConfirmationEmail({ to, name, confirmUrl }) {
@@ -101,6 +106,42 @@ export async function sendTrialConfirmationEmail({ to, name, confirmUrl }) {
   `;
   const text = `Hi ${displayName},\n\nConfirm your JUNO RFP trial (your 7-business-day trial starts when you confirm):\n${confirmUrl}\n\nThis confirmation link expires in 72 hours.`;
 
+  return sendEmail({ to, subject, html, text });
+}
+
+export async function sendPasswordResetEmail({ to, name, resetUrl }) {
+  const displayName = name || to;
+  const subject = "Reset your JUNO RFP password";
+  const html = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;line-height:1.5;color:#0f172a;max-width:560px;margin:0 auto">
+      <h1 style="font-size:20px;margin:0 0 12px">Password reset</h1>
+      <p style="margin:0 0 12px">Hi ${escapeHtml(displayName)},</p>
+      <p style="margin:0 0 16px">We received a request to reset your JUNO RFP password. Click the button below to choose a new password. This link expires in <strong>1 hour</strong>.</p>
+      <p style="margin:0 0 20px">
+        <a href="${resetUrl}" style="display:inline-block;background:#243F5B;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600">
+          Reset password
+        </a>
+      </p>
+      <p style="margin:0 0 8px;font-size:13px;color:#475569">Or paste this link into your browser:</p>
+      <p style="margin:0 0 16px;font-size:13px;word-break:break-all"><a href="${resetUrl}">${resetUrl}</a></p>
+      <p style="margin:0;font-size:12px;color:#64748b">If you did not request this, you can ignore this email. Your password will remain unchanged.</p>
+    </div>
+  `;
+  const text = `Hi ${displayName},\n\nReset your JUNO RFP password (expires in 1 hour):\n${resetUrl}\n\nIf you did not request this, ignore this email.`;
+  return sendEmail({ to, subject, html, text });
+}
+
+export async function sendPasswordChangedEmail({ to, name }) {
+  const displayName = name || to;
+  const subject = "Your JUNO RFP password was changed";
+  const html = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;line-height:1.5;color:#0f172a;max-width:560px;margin:0 auto">
+      <h1 style="font-size:20px;margin:0 0 12px">Password changed</h1>
+      <p style="margin:0 0 12px">Hi ${escapeHtml(displayName)},</p>
+      <p style="margin:0 0 16px">Your JUNO RFP account password was changed successfully. If you did not make this change, contact <a href="mailto:privacy@marlncorp.ai">privacy@marlncorp.ai</a> immediately.</p>
+    </div>
+  `;
+  const text = `Hi ${displayName},\n\nYour JUNO RFP password was changed. If this wasn't you, contact privacy@marlncorp.ai immediately.`;
   return sendEmail({ to, subject, html, text });
 }
 

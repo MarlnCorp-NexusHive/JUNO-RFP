@@ -6,6 +6,7 @@ import SidebarLanguageSwitcher from "../../../components/localization/SidebarLan
 import SmartTourButton from "../../../components/tours/SmartTourButton";
 import { clearCollabSession } from "../../rfp-collaboration/rfpCollabSession.js";
 import { clearTrialSession } from "../../../services/trialAuthSession.js";
+import { endTabSession } from "../../../services/tabSessionManager.js";
 import ThemeToggleButton from "../../../components/ui/ThemeToggleButton";
 import {
   setNavMode,
@@ -52,10 +53,10 @@ export default function Sidebar({
   }, [darkTheme]);
 
   const handleLogout = () => {
-    localStorage.removeItem("rbac_current_user");
     clearCollabSession();
     clearTrialSession();
-    navigate("/login");
+    endTabSession({ clearSharedAuth: true, broadcast: true });
+    navigate("/login", { replace: true });
   };
 
   const handleThemeToggle = () => {

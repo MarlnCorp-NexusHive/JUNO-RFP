@@ -1,4 +1,8 @@
-import PptxGenJS from "pptxgenjs";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const _pptxMod = require("pptxgenjs");
+const PptxGenJS = _pptxMod?.default || _pptxMod;
 
 const SLIDE_MODEL = process.env.SLIDE_DECK_MODEL || "gpt-4o";
 const MIN_CONTENT_CHARS = 120;

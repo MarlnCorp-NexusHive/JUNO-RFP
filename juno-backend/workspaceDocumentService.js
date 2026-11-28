@@ -1,3 +1,4 @@
+import path from "path";
 import {
   Document,
   Packer,
@@ -6,9 +7,50 @@ import {
   TextRun,
   AlignmentType,
 } from "docx";
+import { getTrialDataPath } from "./trial/tenantStore.js";
+import { readJsonSafe, writeJsonAtomic } from "./utils/atomicFile.js";
 
 /** @type {Map<string, { title: string, sections: Array<{id:string, question:string, answerHtml:string}>, updatedAt: string }>} */
 const workspaceDocuments = new Map();
+const MAX_WORKSPACE_DOCS = 250;
+let loadedFromDisk = false;
+
+function getDocsStorePath() {
+  return path.join(path.dirname(getTrialDataPath()), "workspace-documents.json");
+}
+
+function ensureDocsLoaded() {
+  if (loadedFromDisk) return;
+  loadedFromDisk = true;
+  try {
+    const { exists, data } = readJsonSafe(getDocsStorePath(), "workspace-docs");
+    if (exists && data && typeof data === "object") {
+      for (const [id, doc] of Object.entries(data)) {
+        if (id && doc && typeof doc === "object") {
+          workspaceDocuments.set(id, doc);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[workspace-docs] failed to load persisted docs:", err?.message || err);
+  }
+}
+
+function persistWorkspaceDocuments() {
+  try {
+    while (workspaceDocuments.size > MAX_WORKSPACE_DOCS) {
+      const oldestKey = workspaceDocuments.keys().next().value;
+      if (oldestKey === undefined) break;
+      workspaceDocuments.delete(oldestKey);
+    }
+    writeJsonAtomic(getDocsStorePath(), Object.fromEntries(workspaceDocuments), {
+      pretty: false,
+      backup: true,
+    });
+  } catch (err) {
+    console.warn("[workspace-docs] failed to persist docs:", err?.message || err);
+  }
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -30,9 +72,31 @@ function sanitizeWordPlainText(s) {
     .replace(/[\uD800-\uDFFF]/g, "");
 }
 
+const ALLOWED_HTML_TAGS = new Set([
+  "p",
+  "br",
+  "h1",
+  "h2",
+  "h3",
+  "ul",
+  "ol",
+  "li",
+  "strong",
+  "b",
+  "em",
+  "i",
+  "u",
+  "s",
+]);
+
 export function sanitizeAnswerHtml(html) {
   const input = String(html || "");
-  const normalizedBlocks = input
+  // Strip executable/container elements along with their inner content first.
+  const withoutDangerousBlocks = input
+    .replace(/<(script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+
+  const normalizedBlocks = withoutDangerousBlocks
     .replace(/<div\b[^>]*>/gi, "<p>")
     .replace(/<\/div>/gi, "</p>")
     .replace(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi, (_m, attrs = "", inner = "") => {
@@ -45,10 +109,14 @@ export function sanitizeAnswerHtml(html) {
       return inner;
     });
 
+  // Allow ONLY whitelisted tag names with ZERO attributes (prevents all on*, style, href=javascript:, etc.).
   return normalizedBlocks
-    .replace(/<(?!\/?(p|br|h1|h2|h3|ul|ol|li|strong|b|em|i)\b)[^>]*>/gi, "")
-    .replace(/\s+on\w+="[^"]*"/gi, "")
-    .replace(/\s+on\w+='[^']*'/gi, "")
+    .replace(/<(\/?)\s*([a-z0-9]+)\b[^>]*>/gi, (_m, slash, tagName) => {
+      const tag = String(tagName || "").toLowerCase();
+      if (!ALLOWED_HTML_TAGS.has(tag)) return "";
+      if (tag === "br") return slash ? "" : "<br/>";
+      return `<${slash ? "/" : ""}${tag}>`;
+    })
     .trim();
 }
 
@@ -74,17 +142,40 @@ export function normalizeWorkspaceDocumentModel(model) {
 }
 
 export function saveWorkspaceDocument(workspaceId, model) {
+  ensureDocsLoaded();
   const id = String(workspaceId || "").trim();
   if (!id) throw new Error("workspaceId is required");
   const normalized = normalizeWorkspaceDocumentModel(model);
+  workspaceDocuments.delete(id);
   workspaceDocuments.set(id, normalized);
+  persistWorkspaceDocuments();
   return normalized;
 }
 
 export function getWorkspaceDocument(workspaceId) {
+  ensureDocsLoaded();
   const id = String(workspaceId || "").trim();
   if (!id) return null;
   return workspaceDocuments.get(id) || null;
+}
+
+/**
+ * Delete workspace documents whose id contains the tenant key (erasure / retention).
+ * @returns {number} count deleted
+ */
+export function purgeWorkspaceDocumentsMatching(tenantKey) {
+  ensureDocsLoaded();
+  const key = String(tenantKey || "").trim();
+  if (!key) return 0;
+  let removed = 0;
+  for (const id of [...workspaceDocuments.keys()]) {
+    if (String(id).includes(key)) {
+      workspaceDocuments.delete(id);
+      removed += 1;
+    }
+  }
+  if (removed > 0) persistWorkspaceDocuments();
+  return removed;
 }
 
 function stripTags(html) {
@@ -294,5 +385,6 @@ export function ensureWorkspaceDocument(workspaceId, questions = [], answers = {
     updatedAt: nowIso(),
   };
   workspaceDocuments.set(String(workspaceId), seeded);
+  persistWorkspaceDocuments();
   return seeded;
 }

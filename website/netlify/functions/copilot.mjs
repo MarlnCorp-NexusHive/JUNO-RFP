@@ -19,21 +19,40 @@ const json = (body, status = 200) => new Response(JSON.stringify(body), { status
 const month = () => new Date().toISOString().slice(0, 7);
 const wsId = (v) => (/^[a-z0-9_-]{1,40}$/i.test(v || "") ? v : "default");
 function prices() { let o = {}; try { o = JSON.parse(process.env.AI_PRICES_JSON || "{}"); } catch {} return { ...PRICES, ...o }; }
-export function costOf(model, u) { const p = prices()[model] || prices()[process.env.OPENAI_MODEL || "gpt-6.1-sol"] || { in: 2, cin: 0.1, out: 10 }; const c = u.cached_tokens || 0; return ((u.input_tokens - c) * p.in + c * p.cin + u.output_tokens * p.out) / 1e6; }
+export function costOf(model, u) {
+  const table = prices();
+  const modelKey = String(model || "");
+  let p = table[modelKey];
+  if (!p && modelKey) {
+    // Match dated OpenAI snapshots (e.g. gpt-4o-2024-08-06) by longest prefix.
+    const match = Object.keys(table)
+      .filter((k) => modelKey.startsWith(k))
+      .sort((a, b) => b.length - a.length)[0];
+    if (match) p = table[match];
+  }
+  p = p || table[process.env.OPENAI_MODEL || "gpt-6.1-sol"] || { in: 2, cin: 0.1, out: 10 };
+  const inp = Math.max(0, Number(u?.input_tokens) || 0);
+  const outTok = Math.max(0, Number(u?.output_tokens) || 0);
+  const c = Math.min(inp, Math.max(0, Number(u?.cached_tokens) || 0));
+  return ((inp - c) * p.in + c * p.cin + outTok * p.out) / 1e6;
+}
 export function budgetFor(ws) { let o = {}; try { o = JSON.parse(process.env.AI_BUDGETS_JSON || "{}"); } catch {} return Number(o[ws] ?? process.env.AI_DEFAULT_BUDGET_USD ?? 250); }
 export const store = () => getStore({ name: "ai-usage", consistency: "strong" });
 
 // Anthropic-style messages <-> OpenAI chat completions
 function toOpenAI(messages, system) {
-  const out = system ? [{ role: "system", content: system }] : [];
+  const out = typeof system === "string" && system ? [{ role: "system", content: system.slice(0, 200_000) }] : [];
   for (const m of messages) {
+    if (!m || typeof m !== "object") continue;
     if (typeof m.content === "string") { out.push({ role: m.role, content: m.content }); continue; }
+    if (!Array.isArray(m.content)) continue;
     if (m.role === "assistant") {
-      const text = m.content.filter((c) => c.type === "text").map((c) => c.text).join("");
-      const calls = m.content.filter((c) => c.type === "tool_use").map((c) => ({ id: c.id, type: "function", function: { name: c.name, arguments: JSON.stringify(c.input || {}) } }));
+      const text = m.content.filter((c) => c && c.type === "text").map((c) => c.text).join("");
+      const calls = m.content.filter((c) => c && c.type === "tool_use").map((c) => ({ id: c.id, type: "function", function: { name: c.name, arguments: JSON.stringify(c.input || {}) } }));
       out.push({ role: "assistant", content: text || null, ...(calls.length ? { tool_calls: calls } : {}) });
     } else {
       for (const c of m.content) {
+        if (!c || typeof c !== "object") continue;
         if (c.type === "tool_result") out.push({ role: "tool", tool_call_id: c.tool_use_id, content: typeof c.content === "string" ? c.content : JSON.stringify(c.content) });
         else if (c.type === "text") out.push({ role: "user", content: c.text });
       }
@@ -85,21 +104,24 @@ export default async (req) => {
     const payload = { model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5", max_tokens: maxTok, messages: b.messages };
     if (typeof b.system === "string" && b.system) payload.system = b.system.slice(0, 200_000);
     if (Array.isArray(b.tools) && b.tools.length) payload.tools = b.tools.slice(0, 16);
-    const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" }, body: JSON.stringify(payload) });
-    const j = await r.json(); if (!r.ok) return json({ error: (j.error && j.error.type) || "upstream_error" }, r.status === 429 ? 429 : 502);
-    out = { content: j.content, stop_reason: j.stop_reason, model: j.model, usage: { input_tokens: j.usage.input_tokens || 0, output_tokens: j.usage.output_tokens || 0, cached_tokens: j.usage.cache_read_input_tokens || 0 } };
+    const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", signal: AbortSignal.timeout(60_000), headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" }, body: JSON.stringify(payload) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) return json({ error: (j.error && j.error.type) || "upstream_error" }, r.status === 429 ? 429 : 502);
+    out = { content: j.content, stop_reason: j.stop_reason, model: j.model, usage: { input_tokens: (j.usage && j.usage.input_tokens) || 0, output_tokens: (j.usage && j.usage.output_tokens) || 0, cached_tokens: (j.usage && j.usage.cache_read_input_tokens) || 0 } };
   } else {
     const model = quick ? (process.env.OPENAI_FAST_MODEL || "gpt-6-luna") : (process.env.OPENAI_MODEL || "gpt-6.1-sol");
     const payload = { model, max_completion_tokens: maxTok, messages: toOpenAI(b.messages, b.system), user: `ws-${ws}` };
     if (Array.isArray(b.tools) && b.tools.length) payload.tools = b.tools.slice(0, 16).map((t) => ({ type: "function", function: { name: t.name, description: t.description || "", parameters: t.input_schema || { type: "object", properties: {} } } }));
-    const r = await fetch("https://api.openai.com/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${key}` }, body: JSON.stringify(payload) });
-    const j = await r.json(); if (!r.ok) return json({ error: (j.error && (j.error.code || j.error.type)) || "upstream_error" }, r.status === 429 ? 429 : 502);
+    const r = await fetch("https://api.openai.com/v1/chat/completions", { method: "POST", signal: AbortSignal.timeout(60_000), headers: { "content-type": "application/json", authorization: `Bearer ${key}` }, body: JSON.stringify(payload) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) return json({ error: (j.error && (j.error.code || j.error.type)) || "upstream_error" }, r.status === 429 ? 429 : 502);
     out = fromOpenAI(j);
   }
 
   const cost = costOf(out.model, out.usage); const tok = out.usage.input_tokens + out.usage.output_tokens;
-  const feature = String(req.headers.get("x-juno-feature") || "").slice(0, 40);
-  await st.setJSON(`${mk}:${ws}`, { tokens: use.tokens + tok, cost: use.cost + cost, calls: use.calls + 1, byFeature: { ...(use.byFeature || {}), [feature || "other"]: ((use.byFeature || {})[feature || "other"] || 0) + tok } });
+  const rawFeat = String(req.headers.get("x-juno-feature") || "").trim();
+  const feature = /^[a-z0-9_-]{1,40}$/i.test(rawFeat) && !["__proto__", "constructor", "prototype"].includes(rawFeat) ? rawFeat : "other";
+  const nextByFeature = Object.assign(Object.create(null), use.byFeature || {});
+  nextByFeature[feature] = (Number(nextByFeature[feature]) || 0) + tok;
+  await st.setJSON(`${mk}:${ws}`, { tokens: use.tokens + tok, cost: use.cost + cost, calls: use.calls + 1, byFeature: { ...nextByFeature } });
   await st.setJSON(`${mk}:_all`, { tokens: all.tokens + tok, cost: all.cost + cost, calls: all.calls + 1 });
   out.usage.model = out.model; out.budget = { month: mk, workspace: ws, cost: use.cost + cost, cap };
   return json(out);

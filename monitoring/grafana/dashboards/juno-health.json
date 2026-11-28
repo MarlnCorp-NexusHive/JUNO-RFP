@@ -1,0 +1,59 @@
+{
+  "title": "JUNO RFP — Application Health & Usage",
+  "uid": "juno-rfp-health",
+  "timezone": "browser",
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Active Users Online",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "targets": [{ "expr": "juno_active_user_sessions", "refId": "A" }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total User Logins",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "targets": [{ "expr": "sum(juno_user_logins_total)", "refId": "A" }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cumulative Time Spent (sec)",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+      "targets": [{ "expr": "juno_user_session_time_spent_seconds_total", "refId": "A" }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Process Memory RSS (MB)",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
+      "targets": [{ "expr": "juno_process_resident_memory_bytes / 1024 / 1024", "refId": "A" }]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Node.js Memory Usage (RSS vs Heap MB)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "targets": [
+        { "expr": "juno_process_resident_memory_bytes / 1024 / 1024", "legendFormat": "RSS (MB)", "refId": "A" },
+        { "expr": "juno_nodejs_heap_size_used_bytes / 1024 / 1024", "legendFormat": "Heap Used (MB)", "refId": "B" },
+        { "expr": "juno_nodejs_heap_size_total_bytes / 1024 / 1024", "legendFormat": "Heap Total (MB)", "refId": "C" }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "HTTP Requests Rate & Event Loop Lag",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "targets": [
+        { "expr": "sum(rate(juno_http_requests_total[1m]))", "legendFormat": "Req / sec", "refId": "A" },
+        { "expr": "juno_nodejs_eventloop_lag_p99_seconds * 1000", "legendFormat": "Event Loop p99 (ms)", "refId": "B" }
+      ]
+    }
+  ]
+}

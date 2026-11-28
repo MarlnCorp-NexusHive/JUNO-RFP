@@ -4,17 +4,17 @@
  */
 
 import * as pdfjsLib from "pdfjs-dist";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import { createWorker } from "tesseract.js";
 import * as mammoth from "mammoth";
 import * as XLSX from "xlsx";
 
-// PDF.js worker: same version as pdfjs-dist package (must match for compatibility)
-const PDFJS_VERSION = "5.5.207";
+// PDF.js worker bundled locally as a same-origin Vite asset (works under strict CSP & offline)
 let workerSrcSet = false;
 function ensurePdfWorker() {
   if (workerSrcSet) return;
   if (typeof pdfjsLib.GlobalWorkerOptions !== "undefined") {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${PDFJS_VERSION}/build/pdf.worker.mjs`;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
     workerSrcSet = true;
   }
 }

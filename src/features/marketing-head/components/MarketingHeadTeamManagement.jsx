@@ -180,7 +180,7 @@ export default function MarketingHeadTeamManagement() {
     setLanguageVersion(prev => prev + 1);
   }, [i18n.language]);
 
-  const user = JSON.parse(localStorage.getItem('rbac_current_user') || "null");
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user') || "null"); } catch { return null; } })();
   const [members, setMembers] = useState(() => {
     if (location.pathname.includes("/app/team") && canUseTrialFeatures()) {
       return getTeamData().members;

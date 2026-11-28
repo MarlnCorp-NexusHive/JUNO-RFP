@@ -2,6 +2,10 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import { promisify } from "util";
+import { readJsonSafe, writeJsonAtomic, writeJsonAtomicAsync } from "../utils/atomicFile.js";
+
+const scryptAsync = promisify(crypto.scrypt);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DATA_PATH = path.join(__dirname, "..", "data", "trial-tenants.json");
@@ -148,59 +152,128 @@ function ensureDir() {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-export function loadTrialDb() {
-  const dataPath = getTrialDataPath();
-  try {
-    if (!fs.existsSync(dataPath)) return emptyDb();
-    const raw = fs.readFileSync(dataPath, "utf8");
-    const parsed = JSON.parse(raw);
-    return {
-      tenants: Array.isArray(parsed.tenants) ? parsed.tenants : [],
-      users: Array.isArray(parsed.users) ? parsed.users : [],
-      sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
-      usage: parsed.usage && typeof parsed.usage === "object" ? parsed.usage : {},
-      emailTokens: Array.isArray(parsed.emailTokens) ? parsed.emailTokens : [],
-      usedEmailTokens: Array.isArray(parsed.usedEmailTokens) ? parsed.usedEmailTokens : [],
-    };
-  } catch (err) {
-    console.warn("[trial] failed to load trial DB:", dataPath, err.message);
-    return emptyDb();
+/**
+ * In-memory cache + coalesced async disk writer for high concurrency (50+ simultaneous logins).
+ * Mutations update the single in-memory DB synchronously (preventing lost-update races)
+ * and flush atomically to disk asynchronously without blocking the event loop.
+ */
+let cachedDb = null;
+let cachedDataPath = null;
+let sessionsIndex = new Map();
+let flushTimer = null;
+let flushInFlight = false;
+let flushPending = false;
+let exitHookRegistered = false;
+
+function rebuildSessionIndex(db) {
+  sessionsIndex = new Map();
+  for (const s of db.sessions || []) {
+    if (s?.token) sessionsIndex.set(s.token, s);
   }
 }
 
-export function saveTrialDb(db) {
-  const dataPath = getTrialDataPath();
-  ensureDir();
-  const payload = JSON.stringify(db, null, 2);
-  const tmp = `${dataPath}.tmp`;
-  const fd = fs.openSync(tmp, "w");
-  try {
-    fs.writeFileSync(fd, payload, "utf8");
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmp, dataPath);
-  // Best-effort directory fsync so the rename itself survives a sudden restart.
-  try {
-    const dirFd = fs.openSync(path.dirname(dataPath), "r");
+function registerExitFlushOnce() {
+  if (exitHookRegistered) return;
+  exitHookRegistered = true;
+  const onExit = () => {
     try {
-      fs.fsyncSync(dirFd);
-    } finally {
-      fs.closeSync(dirFd);
+      flushTrialDbSync();
+    } catch {
+      /* best-effort on shutdown */
     }
-  } catch {
-    // Some environments disallow directory fsync; file write already succeeded.
+  };
+  process.once("SIGINT", onExit);
+  process.once("SIGTERM", onExit);
+  process.once("beforeExit", onExit);
+}
+
+async function runAsyncFlush() {
+  if (flushInFlight || !cachedDb || !cachedDataPath) return;
+  flushInFlight = true;
+  try {
+    do {
+      flushPending = false;
+      const targetPath = cachedDataPath;
+      const snapshot = cachedDb;
+      await writeJsonAtomicAsync(targetPath, snapshot, { pretty: true, backup: true });
+    } while (flushPending);
+  } catch (err) {
+    console.error("[trial] async flush failed:", err?.message || err);
+  } finally {
+    flushInFlight = false;
   }
-  const bytes = Buffer.byteLength(payload, "utf8");
-  console.log(
-    `[trial] saved ${db.tenants?.length || 0} tenant(s), ${db.users?.length || 0} user(s) → ${dataPath} (${bytes} bytes)`,
-  );
+}
+
+function scheduleTrialDbFlush() {
+  flushPending = true;
+  registerExitFlushOnce();
+  if (flushTimer) return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    void runAsyncFlush();
+  }, 50);
+  if (typeof flushTimer.unref === "function") flushTimer.unref();
+}
+
+export function flushTrialDbSync() {
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+  if (!cachedDb || !cachedDataPath) return;
+  flushPending = false;
+  ensureDir();
+  writeJsonAtomic(cachedDataPath, cachedDb, { pretty: true, dirFsync: true, backup: true });
+}
+
+export function invalidateTrialDbCache() {
+  cachedDb = null;
+  cachedDataPath = null;
+  sessionsIndex = new Map();
+}
+
+export function loadTrialDb() {
+  const dataPath = getTrialDataPath();
+  if (cachedDb && cachedDataPath === dataPath) {
+    return cachedDb;
+  }
+  const { exists, data: parsed } = readJsonSafe(dataPath, "trial");
+  const normalized = !exists || !parsed
+    ? emptyDb()
+    : {
+        tenants: Array.isArray(parsed.tenants) ? parsed.tenants : [],
+        users: Array.isArray(parsed.users) ? parsed.users : [],
+        sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
+        usage: parsed.usage && typeof parsed.usage === "object" ? parsed.usage : {},
+        emailTokens: Array.isArray(parsed.emailTokens) ? parsed.emailTokens : [],
+        usedEmailTokens: Array.isArray(parsed.usedEmailTokens) ? parsed.usedEmailTokens : [],
+      };
+  cachedDb = normalized;
+  cachedDataPath = dataPath;
+  rebuildSessionIndex(cachedDb);
+  return cachedDb;
+}
+
+export function saveTrialDb(db, { sync = false } = {}) {
+  const dataPath = getTrialDataPath();
+  cachedDb = db;
+  cachedDataPath = dataPath;
+  rebuildSessionIndex(db);
+  if (sync) {
+    flushTrialDbSync();
+  } else {
+    scheduleTrialDbFlush();
+  }
 }
 
 export function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
   const hash = crypto.scryptSync(String(password), salt, 64).toString("hex");
   return { salt, hash };
+}
+
+export async function hashPasswordAsync(password, salt = crypto.randomBytes(16).toString("hex")) {
+  const derived = await scryptAsync(String(password), salt, 64);
+  return { salt, hash: Buffer.from(derived).toString("hex") };
 }
 
 export function verifyPassword(password, salt, expectedHash) {
@@ -213,13 +286,26 @@ export function verifyPassword(password, salt, expectedHash) {
   }
 }
 
+/** Non-blocking scrypt verification on Node's libuv threadpool (safe for 50+ concurrent logins). */
+export async function verifyPasswordAsync(password, salt, expectedHash) {
+  if (!salt || !expectedHash) return false;
+  try {
+    const derived = await scryptAsync(String(password), salt, 64);
+    const expected = Buffer.from(expectedHash, "hex");
+    if (derived.length !== expected.length) return false;
+    return crypto.timingSafeEqual(derived, expected);
+  } catch {
+    return false;
+  }
+}
+
 export function slugifyTenantId(name) {
   const base = String(name || "tenant")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 40) || "tenant";
-  return `t_${base}_${crypto.randomBytes(3).toString("hex")}`;
+  return `t_${base}_${crypto.randomBytes(6).toString("hex")}`;
 }
 
 /** Case/space-insensitive company match so teammates land on one tenant. */
@@ -357,6 +443,7 @@ export function publicUser(user) {
     name: user.name,
     role: user.role,
     team: user.team,
+    privacyConsent: user.privacyConsent || null,
   };
 }
 
@@ -558,12 +645,20 @@ export function registerTrialSignup({
   trialDays = DEFAULT_TRIAL_DAYS,
   aiDailyLimit = null,
   aiMonthlyLimit = null,
+  privacyAccepted = false,
+  privacyPolicyVersion = "2026-11",
+  privacyMeta = null,
 }) {
   const db = loadTrialDb();
   const emailNorm = String(email || "").trim().toLowerCase();
   const name = String(contactName || "").trim();
   const company = String(companyName || "").trim();
 
+  if (privacyAccepted !== true) {
+    const err = new Error("You must accept the Privacy Policy to create an account.");
+    err.code = "privacy_consent_required";
+    throw err;
+  }
   if (!name) {
     const err = new Error("Name is required");
     err.code = "missing_name";
@@ -598,7 +693,14 @@ export function registerTrialSignup({
     existing.passwordSalt = salt;
     existing.passwordHash = hash;
     existing.name = name;
-    if (tenant) tenant.name = company;
+    // Only allow renaming a pending tenant if this unverified user is its sole member.
+    if (
+      tenant &&
+      tenant.status === "pending_verification" &&
+      db.users.filter((u) => u.tenantId === tenant.id).length === 1
+    ) {
+      tenant.name = company;
+    }
 
     db.emailTokens = (db.emailTokens || []).filter((t) => t.userId !== existing.id);
     const confirmToken = crypto.randomBytes(32).toString("hex");
@@ -669,6 +771,18 @@ export function registerTrialSignup({
     role: "Proposal Manager",
     team: "Proposal Team",
     emailVerified: false,
+    privacyConsent: {
+      accepted: true,
+      version: String(privacyPolicyVersion || "2026-11").slice(0, 32),
+      acceptedAt: now.toISOString(),
+      ...(privacyMeta && typeof privacyMeta === "object"
+        ? {
+            ip: privacyMeta.ip ? String(privacyMeta.ip).slice(0, 80) : undefined,
+            userAgent: privacyMeta.userAgent ? String(privacyMeta.userAgent).slice(0, 180) : undefined,
+            source: privacyMeta.source ? String(privacyMeta.source).slice(0, 40) : "signup",
+          }
+        : { source: "signup" }),
+    },
     createdAt: now.toISOString(),
   };
 
@@ -833,7 +947,7 @@ export function revokeSession(token) {
 export function resolveSession(token) {
   if (!token) return null;
   const db = loadTrialDb();
-  const session = (db.sessions || []).find((s) => s.token === token);
+  const session = sessionsIndex.get(token) || (db.sessions || []).find((s) => s.token === token);
   if (!session) return null;
   if (Date.parse(session.expiresAt) <= Date.now()) {
     db.sessions = db.sessions.filter((s) => s.token !== token);
@@ -966,6 +1080,115 @@ export function changeUserPassword(userId, currentPassword, newPassword, { keepT
   return { user: publicUser(user), passwordChangedAt: user.passwordChangedAt };
 }
 
+const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+/**
+ * Issue a one-time password-reset token. Always returns a generic payload for anti-enumeration.
+ */
+export function createPasswordResetToken(email) {
+  const db = loadTrialDb();
+  const emailNorm = String(email || "").trim().toLowerCase();
+  const user = (db.users || []).find((u) => String(u.email || "").toLowerCase() === emailNorm);
+  if (!user) {
+    return { issued: false };
+  }
+  db.emailTokens = (db.emailTokens || []).filter(
+    (t) => !(t && t.userId === user.id && t.purpose === "password_reset"),
+  );
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS).toISOString();
+  db.emailTokens.push({
+    token: resetToken,
+    userId: user.id,
+    tenantId: user.tenantId,
+    purpose: "password_reset",
+    expiresAt,
+    createdAt: new Date().toISOString(),
+  });
+  saveTrialDb(db);
+  return {
+    issued: true,
+    resetToken,
+    expiresAt,
+    user: publicUser(user),
+  };
+}
+
+export function resetPasswordWithToken(token, newPassword) {
+  const db = loadTrialDb();
+  const raw = String(token || "").trim();
+  if (!raw) {
+    const err = new Error("Reset token is required");
+    err.code = "missing_token";
+    throw err;
+  }
+  const next = String(newPassword || "");
+  if (next.length < 8) {
+    const err = new Error("Password must be at least 8 characters");
+    err.code = "password_too_short";
+    throw err;
+  }
+  const record = (db.emailTokens || []).find(
+    (t) => t && t.token === raw && t.purpose === "password_reset",
+  );
+  if (!record) {
+    const err = new Error("Invalid or expired reset link");
+    err.code = "invalid_token";
+    throw err;
+  }
+  if (Date.parse(record.expiresAt) <= Date.now()) {
+    db.emailTokens = (db.emailTokens || []).filter((t) => t.token !== raw);
+    saveTrialDb(db);
+    const err = new Error("This reset link has expired");
+    err.code = "token_expired";
+    throw err;
+  }
+  const user = (db.users || []).find((u) => u.id === record.userId);
+  if (!user) {
+    const err = new Error("User not found");
+    err.code = "user_missing";
+    throw err;
+  }
+  const { salt, hash } = hashPassword(next);
+  user.passwordSalt = salt;
+  user.passwordHash = hash;
+  user.passwordChangedAt = new Date().toISOString();
+  db.emailTokens = (db.emailTokens || []).filter((t) => t.token !== raw);
+  // Revoke all sessions after reset
+  const removed = [];
+  db.sessions = (db.sessions || []).filter((s) => {
+    if (s && s.userId === user.id) {
+      if (s.token) removed.push(s.token);
+      return false;
+    }
+    return true;
+  });
+  for (const tok of removed) sessionsIndex.delete(tok);
+  saveTrialDb(db);
+  return { user: publicUser(user), passwordChangedAt: user.passwordChangedAt };
+}
+
+/** Right to rectification — update name (email changes require re-verification; not allowed here). */
+export function updateUserProfile(userId, { name } = {}) {
+  const db = loadTrialDb();
+  const user = (db.users || []).find((u) => u.id === userId);
+  if (!user) {
+    const err = new Error("User not found");
+    err.code = "user_missing";
+    throw err;
+  }
+  const nextName = String(name || "").trim();
+  if (!nextName || nextName.length < 2) {
+    const err = new Error("Name is required");
+    err.code = "missing_name";
+    throw err;
+  }
+  user.name = nextName.slice(0, 120);
+  user.updatedAt = new Date().toISOString();
+  saveTrialDb(db);
+  return { user: publicUser(user) };
+}
+
 export function dataFilePath() {
   return getTrialDataPath();
 }
@@ -1012,5 +1235,119 @@ export function getTrialStorageStatus() {
     tenants,
     users,
     render: Boolean(process.env.RENDER),
+  };
+}
+
+/**
+ * Right to Erasure (GDPR / CCPA / DPDP):
+ * Permanently deletes a user account, revokes all active sessions & pending email tokens,
+ * and removes the parent tenant if this user was its sole member (excluding permanent walkthrough tenants).
+ */
+export function deleteUserAccount(userId) {
+  const db = loadTrialDb();
+  const idx = (db.users || []).findIndex((u) => u && u.id === userId);
+  if (idx === -1) {
+    const err = new Error("User not found");
+    err.code = "user_missing";
+    throw err;
+  }
+  const user = db.users[idx];
+  const tenantId = user.tenantId;
+  db.users.splice(idx, 1);
+
+  // Revoke all sessions and pending verification tokens for this user
+  const removedTokens = [];
+  db.sessions = (db.sessions || []).filter((s) => {
+    if (s && s.userId === userId) {
+      if (s.token) removedTokens.push(s.token);
+      return false;
+    }
+    return true;
+  });
+  for (const tok of removedTokens) {
+    sessionsIndex.delete(tok);
+  }
+  db.emailTokens = (db.emailTokens || []).filter((t) => t && t.userId !== userId);
+
+  // If no users remain in a non-permanent tenant, purge the tenant & usage record too
+  let tenantDeleted = false;
+  const remainingMembers = (db.users || []).filter((u) => u && u.tenantId === tenantId);
+  const tenant = (db.tenants || []).find((t) => t && t.id === tenantId);
+  if (remainingMembers.length === 0 && tenant && !isPermanentTenant(tenant)) {
+    db.tenants = (db.tenants || []).filter((t) => t && t.id !== tenantId);
+    if (db.usage && db.usage[tenantId]) {
+      delete db.usage[tenantId];
+    }
+    tenantDeleted = true;
+  }
+
+  saveTrialDb(db);
+  return {
+    deletedUserId: userId,
+    tenantId,
+    tenantDeleted,
+    deletedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Retention limitation (Privacy by Design):
+ * Permanently purge expired non-permanent tenants after a grace period (default 30 days).
+ * Returns tenant IDs that were removed so callers can purge satellite stores (features/calendar/docs).
+ */
+export function purgeExpiredTenants({ graceDays = 30 } = {}) {
+  const db = loadTrialDb();
+  const graceMs = Math.max(0, Number(graceDays) || 30) * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const purgeIds = [];
+
+  for (const tenant of [...(db.tenants || [])]) {
+    if (!tenant || isPermanentTenant(tenant)) continue;
+    const ends = Date.parse(tenant.trialEndsAt || "");
+    if (!Number.isFinite(ends)) continue;
+    if (now < ends + graceMs) continue;
+    purgeIds.push(tenant.id);
+  }
+
+  if (!purgeIds.length) {
+    return { purgedTenantIds: [], purgedUsers: 0, graceDays: Number(graceDays) || 30 };
+  }
+
+  const idSet = new Set(purgeIds);
+  let purgedUsers = 0;
+  const removedTokens = [];
+
+  db.users = (db.users || []).filter((u) => {
+    if (u && idSet.has(u.tenantId)) {
+      purgedUsers += 1;
+      return false;
+    }
+    return true;
+  });
+
+  db.sessions = (db.sessions || []).filter((s) => {
+    if (s && idSet.has(s.tenantId)) {
+      if (s.token) removedTokens.push(s.token);
+      return false;
+    }
+    // Also drop sessions for deleted users (matched by tenant above primarily)
+    return true;
+  });
+  for (const tok of removedTokens) sessionsIndex.delete(tok);
+
+  db.emailTokens = (db.emailTokens || []).filter((t) => !(t && idSet.has(t.tenantId)));
+  db.tenants = (db.tenants || []).filter((t) => !(t && idSet.has(t.id)));
+  if (db.usage) {
+    for (const id of purgeIds) {
+      if (db.usage[id]) delete db.usage[id];
+    }
+  }
+
+  saveTrialDb(db);
+  return {
+    purgedTenantIds: purgeIds,
+    purgedUsers,
+    graceDays: Number(graceDays) || 30,
+    purgedAt: new Date().toISOString(),
   };
 }

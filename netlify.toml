@@ -8,7 +8,7 @@
   functions = "website/netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
 # SPA fallbacks (do not catch marketing /, /workspace, or static assets)
@@ -18,12 +18,37 @@
   status = 200
 
 [[redirects]]
+  from = "/app"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
   from = "/app/*"
   to = "/r/index.html"
   status = 200
 
 [[redirects]]
+  from = "/dashboard"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/*"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/rbac"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
   from = "/rbac/*"
+  to = "/r/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/unauthorized"
   to = "/r/index.html"
   status = 200
 
@@ -60,7 +85,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self)"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https: wss: data: blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
 
 [[headers]]
   for = "/api/*"

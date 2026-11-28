@@ -137,8 +137,8 @@ const TEMPLATE_RECIPIENT_NAME_PART2 =
   '<w:t xml:space="preserve"> for Training and Consultancy Company</w:t>';
 
 function applyWorkspaceRecipientCompanyNameToDocumentXml(documentXml, displayName) {
-  const plain = sanitizePlainForXml(String(displayName || "").trim()).slice(0, 500);
-  if (!plain || !documentXml.includes("Dalilna")) return documentXml;
+  if (!documentXml.includes("Dalilna")) return documentXml;
+  const plain = sanitizePlainForXml(String(displayName || "").trim()).slice(0, 500) || "Client Organization";
   const esc = escapeXmlText(plain);
   let out = documentXml;
   if (out.includes(TEMPLATE_RECIPIENT_NAME_PART1)) {

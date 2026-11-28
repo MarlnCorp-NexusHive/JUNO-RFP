@@ -1,6 +1,8 @@
 // POST /api/checkout {plan, period}: creates a Stripe-hosted Checkout Session and returns its URL.
 // Card details are entered on Stripe's page, never on this site. Only allow-listed price IDs can be sold.
 // Env vars: STRIPE_SECRET_KEY, the STRIPE_PRICE_* IDs (see plans.mjs), optional STRIPE_AUTOMATIC_TAX=true.
+import { createHash } from "node:crypto";
+
 const json = (b, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { "content-type": "application/json", "cache-control": "no-store" } });
 export default async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
@@ -14,7 +16,7 @@ export default async (req) => {
   const map = {
     team: { monthly: process.env.STRIPE_PRICE_TEAM_MONTHLY, annual: process.env.STRIPE_PRICE_TEAM_ANNUAL },
     pro: { monthly: process.env.STRIPE_PRICE_PRO_MONTHLY, annual: process.env.STRIPE_PRICE_PRO_ANNUAL },
-  ent: { monthly: process.env.STRIPE_PRICE_ENT_MONTHLY, annual: process.env.STRIPE_PRICE_ENT_ANNUAL },
+    ent: { monthly: process.env.STRIPE_PRICE_ENT_MONTHLY, annual: process.env.STRIPE_PRICE_ENT_ANNUAL },
   };
   const price = map[b && b.plan] && map[b.plan][b && b.period];
   if (!price || !/^price_[A-Za-z0-9]+$/.test(price)) return json({ error: "unknown_plan" }, 400);
@@ -22,7 +24,9 @@ export default async (req) => {
   const clean = (v, n = 100) => String(v || "").replace(/[\u0000-\u001f]/g, "").trim().slice(0, n);
   const email = clean(c.email, 200);
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ error: "bad_email" }, 400);
-  const base = site || origin;
+  // Only build redirect URLs from configured site URL or an explicitly allow-listed deploy origin.
+  const base = (site || (origin && allowed.includes(origin) ? origin : "")).replace(/\/$/, "");
+  if (!base) return json({ error: "site_url_not_configured" }, 500);
   const f = new URLSearchParams({
     mode: "subscription",
     "line_items[0][price]": price,
@@ -39,14 +43,21 @@ export default async (req) => {
   const meta = { name: clean(`${clean(c.first, 50)} ${clean(c.last, 50)}`), organization: clean(c.org), title: clean(c.title), country: clean(c.country, 60), org_type: clean(c.orgtype, 60), team_size: clean(c.size, 20) };
   for (const [k, v] of Object.entries(meta)) if (v) { f.set(`metadata[${k}]`, v); f.set(`subscription_data[metadata][${k}]`, v); }
   f.set("subscription_data[metadata][plan]", b.plan);
+  f.set("subscription_data[metadata][period]", b.period);
   if (meta.organization) f.set("custom_text[submit][message]", `Subscription for ${meta.organization}. You can cancel anytime from the billing portal.`);
   if (process.env.STRIPE_AUTOMATIC_TAX === "true") f.set("automatic_tax[enabled]", "true");
+
+  const windowBucket = Math.floor(Date.now() / 60_000);
+  const idemSeed = clean(b?.idempotencyKey, 80) || `${b.plan}:${b.period}:${email || "anon"}:${windowBucket}`;
+  const idempotencyKey = createHash("sha256").update(idemSeed).digest("hex").slice(0, 48);
+
   const r = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
-    headers: { authorization: `Bearer ${key}`, "content-type": "application/x-www-form-urlencoded", "idempotency-key": crypto.randomUUID() },
+    signal: AbortSignal.timeout(20_000),
+    headers: { authorization: `Bearer ${key}`, "content-type": "application/x-www-form-urlencoded", "idempotency-key": idempotencyKey },
     body: f,
   });
-  const s = await r.json();
+  const s = await r.json().catch(() => ({}));
   if (!r.ok) { console.error("stripe checkout error", s.error && s.error.type, s.error && s.error.code); return json({ error: "stripe_error" }, 502); }
   return json({ url: s.url });
 };

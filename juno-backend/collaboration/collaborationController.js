@@ -200,8 +200,25 @@ export function logsStream(req, res) {
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders?.();
 
+  const cleanup = () => {
+    clearInterval(ping);
+    activityBus.off("activity", onActivity);
+  };
+
+  const safeWrite = (chunk) => {
+    if (res.writableEnded || res.destroyed) {
+      cleanup();
+      return;
+    }
+    try {
+      res.write(chunk);
+    } catch {
+      cleanup();
+    }
+  };
+
   const send = (payload) => {
-    res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    safeWrite(`data: ${JSON.stringify(payload)}\n\n`);
   };
 
   const onActivity = (payload) => {
@@ -215,13 +232,11 @@ export function logsStream(req, res) {
   send({ type: "connected", workspaceId, timestamp: new Date().toISOString() });
 
   const ping = setInterval(() => {
-    res.write(`: ping ${Date.now()}\n\n`);
+    safeWrite(`: ping ${Date.now()}\n\n`);
   }, 25000);
 
-  req.on("close", () => {
-    clearInterval(ping);
-    activityBus.off("activity", onActivity);
-  });
+  req.on("close", cleanup);
+  res.on("error", cleanup);
 }
 
 export function quarterlyGet(req, res) {

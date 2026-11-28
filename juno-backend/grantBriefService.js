@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { getTrialDataPath } from "./trial/tenantStore.js";
+import { writeJsonAtomic } from "./utils/atomicFile.js";
 
 const MODEL = process.env.GRANT_BRIEF_MODEL || "gpt-4.1-mini";
 
@@ -39,9 +40,17 @@ function briefFilePath(key) {
   // Windows forbids `:` in filenames — keep logical key as `source:id`, file as `source__id`.
   const safe = String(key)
     .replace(/:/g, "__")
+    .replace(/\.\.+/g, "_")
     .replace(/[^a-zA-Z0-9._-]+/g, "_")
+    .replace(/^\.+/, "_")
     .slice(0, 200);
-  return path.join(ensureDir(), `${safe}.json`);
+  if (!safe) throw new Error("Invalid brief key");
+  const dir = path.resolve(ensureDir());
+  const full = path.resolve(dir, `${safe}.json`);
+  if (!full.startsWith(dir + path.sep)) {
+    throw new Error("Invalid brief key");
+  }
+  return full;
 }
 
 function snapshotHash(opportunity = {}) {
@@ -71,9 +80,7 @@ export function readCachedBrief(key) {
 
 function writeCachedBrief(brief) {
   const file = briefFilePath(brief.key);
-  const tmp = `${file}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(brief, null, 2), "utf8");
-  fs.renameSync(tmp, file);
+  writeJsonAtomic(file, brief, { pretty: true, backup: false });
   return brief;
 }
 
