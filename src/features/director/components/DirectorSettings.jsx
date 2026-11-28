@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useLocalization } from "../../../hooks/useLocalization";
-import { getTrialSession } from "../../../services/trialAuthSession.js";
+import { getTrialSession, patchTrialSessionUser } from "../../../services/trialAuthSession.js";
+import { exportMyTrialData, deleteMyTrialAccount, updateTrialProfile } from "../../../services/api.js";
+import { endTabSession } from "../../../services/tabSessionManager.js";
 import TrialChangePasswordModal from "../../proposal-manager/components/TrialChangePasswordModal.jsx";
 import { 
   FiHome,
@@ -19,8 +21,12 @@ import {
 
 export default function DirectorSettings() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [privacyBusy, setPrivacyBusy] = useState(false);
+  const [privacyStatus, setPrivacyStatus] = useState("");
+  const [profileName, setProfileName] = useState("");
   const isPM = location.pathname.includes("/app/settings");
-  const user = JSON.parse(localStorage.getItem('rbac_current_user') || "null");
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user') || "null"); } catch { return null; } })();
   const trialSession = getTrialSession();
   const isTrialUser = Boolean(trialSession?.token || user?.isTrialUser);
   const signupCompany =
@@ -28,6 +34,7 @@ export default function DirectorSettings() {
     user?.tenantName ||
     "";
   const signupContactName =
+    profileName ||
     trialSession?.user?.name ||
     user?.name ||
     "";
@@ -565,6 +572,125 @@ export default function DirectorSettings() {
             </div>
           </motion.section>
         ))}
+
+        {/* Privacy & Data Rights (GDPR / CCPA / DPDP) */}
+        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 md:p-8 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <FiShield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                Privacy &amp; Data Rights
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                GDPR · CCPA/CPRA · PDPL · PIPEDA controls: download, correct, or delete your data. We do not sell personal information.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <Link to="/privacy-policy" className="text-blue-600 dark:text-blue-400 underline">
+                Privacy Policy
+              </Link>
+              <Link to="/cookie-policy" className="text-blue-600 dark:text-blue-400 underline">
+                Cookie Policy
+              </Link>
+            </div>
+          </div>
+
+          {privacyStatus && (
+            <div className="rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-4 py-2.5 text-sm text-blue-800 dark:text-blue-200">
+              {privacyStatus}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            {isTrialUser && (
+              <button
+                type="button"
+                disabled={privacyBusy}
+                onClick={async () => {
+                  const name = window.prompt("Update your display name:", signupContactName || "");
+                  if (name == null) return;
+                  setPrivacyBusy(true);
+                  setPrivacyStatus("");
+                  try {
+                    const trimmed = name.trim();
+                    const result = await updateTrialProfile({ name: trimmed });
+                    const updatedName = result?.user?.name || trimmed;
+                    patchTrialSessionUser({ name: updatedName });
+                    setProfileName(updatedName);
+                    setPrivacyStatus("Profile updated (right to rectification).");
+                  } catch (err) {
+                    setPrivacyStatus(err?.response?.data?.error || err?.message || "Could not update profile.");
+                  } finally {
+                    setPrivacyBusy(false);
+                  }
+                }}
+                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 disabled:opacity-60 transition"
+              >
+                Correct My Name
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={privacyBusy}
+              onClick={async () => {
+                setPrivacyBusy(true);
+                setPrivacyStatus("");
+                try {
+                  const data = isTrialUser
+                    ? await exportMyTrialData()
+                    : {
+                        exportedAt: new Date().toISOString(),
+                        mode: "demo",
+                        user: user || null,
+                      };
+                  const blob = new Blob([JSON.stringify(data, null, 2)], {
+                    type: "application/json",
+                  });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `juno-rfp-my-data-${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  setPrivacyStatus("Your data export has been downloaded.");
+                } catch (err) {
+                  setPrivacyStatus(err?.response?.data?.error || err?.message || "Could not export data.");
+                } finally {
+                  setPrivacyBusy(false);
+                }
+              }}
+              className="rounded-lg bg-[#243F5B] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2E4F70] disabled:opacity-60 transition"
+            >
+              Download My Data (JSON)
+            </button>
+
+            {isTrialUser && (
+              <button
+                type="button"
+                disabled={privacyBusy}
+                onClick={async () => {
+                  const confirmed = window.confirm(
+                    "Permanently delete your account and associated workspace data? This action cannot be undone.",
+                  );
+                  if (!confirmed) return;
+                  setPrivacyBusy(true);
+                  setPrivacyStatus("");
+                  try {
+                    await deleteMyTrialAccount();
+                    endTabSession({ clearSharedAuth: true, broadcast: true });
+                    navigate("/login", { replace: true });
+                  } catch (err) {
+                    setPrivacyStatus(err?.response?.data?.error || err?.message || "Could not delete account.");
+                    setPrivacyBusy(false);
+                  }
+                }}
+                className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/40 disabled:opacity-60 transition"
+              >
+                Delete My Account &amp; Data
+              </button>
+            )}
+          </div>
+        </section>
       </main>
       {isPM && isTrialUser && (
         <TrialChangePasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />

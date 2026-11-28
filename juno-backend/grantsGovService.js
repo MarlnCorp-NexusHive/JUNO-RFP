@@ -8,6 +8,7 @@ const GRANTS_GOV_BASE = "https://api.grants.gov/v1/api";
 async function postGrantsGov(path, body) {
   const res = await fetch(`${GRANTS_GOV_BASE}/${path}`, {
     method: "POST",
+    signal: AbortSignal.timeout(25_000),
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(body || {}),
   });

@@ -5,6 +5,7 @@ import { useLocalization } from "../../../hooks/useLocalization";
 import SidebarLanguageSwitcher from "../../../components/localization/SidebarLanguageSwitcher";
 import SmartTourButton from '../../../components/tours/SmartTourButton';
 import ThemeToggleButton from '../../../components/ui/ThemeToggleButton';
+import { endTabSession } from '../../../services/tabSessionManager.js';
 import marlnLogo from "../../../assets/MARLN logo.png";
 
 export default function Sidebar({ features, userLabel, expanded, setExpanded }) {
@@ -36,8 +37,8 @@ export default function Sidebar({ features, userLabel, expanded, setExpanded }) 
   }, [darkTheme]);
 
   const handleLogout = () => {
-    localStorage.removeItem("rbac_current_user");
-    navigate("/login");
+    endTabSession({ clearSharedAuth: true, broadcast: true });
+    navigate("/login", { replace: true });
   };
 
   const handleThemeToggle = () => {

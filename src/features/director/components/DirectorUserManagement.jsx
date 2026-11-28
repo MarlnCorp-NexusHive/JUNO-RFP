@@ -45,7 +45,7 @@ export default function DirectorUserManagement() {
   const location = useLocation();
   const isPM = location.pathname.includes("/app/user-management");
   const isTrialPm = isPM && isTrialUserSession();
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");

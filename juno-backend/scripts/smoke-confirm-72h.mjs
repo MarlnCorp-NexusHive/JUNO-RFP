@@ -36,6 +36,7 @@ const s1 = registerTrialSignup({
   email,
   password,
   companyName: `Smoke Co ${stamp}`,
+  privacyAccepted: true,
 });
 const h1 = (Date.parse(s1.confirmExpiresAt) - Date.now()) / 3600000;
 assert("signup confirmExpiresAt ~72h", h1 > 71.5 && h1 < 72.5, `${h1.toFixed(3)}h`);
@@ -64,6 +65,7 @@ const s2 = registerTrialSignup({
   email: email2,
   password,
   companyName: `Expire Co ${stamp}`,
+  privacyAccepted: true,
 });
 const db = readDb();
 const rec = (db.emailTokens || []).find((t) => t.token === s2.confirmToken);

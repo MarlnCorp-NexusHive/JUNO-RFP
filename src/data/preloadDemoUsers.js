@@ -74,7 +74,11 @@ export function preloadDemoUsers() {
   for (const u of merged) {
     if (u?.role === "RFP Auditor") u.role = "Team Member";
   }
-  localStorage.setItem(key, JSON.stringify(merged));
+  try {
+    localStorage.setItem(key, JSON.stringify(merged));
+  } catch {
+    /* ignore storage quota / private browsing errors */
+  }
 
   try {
     const curRaw = localStorage.getItem("rbac_current_user");

@@ -81,7 +81,8 @@ export default function ProposalManagerLayout() {
   const location = useLocation();
   const userLabel = sidebarUserLabel();
   const brandLogo = sidebarBrandLogo();
-  const baseFeatures = useMemo(() => allSidebarFeatures(), []);
+  const trialFlag = isTrialUser();
+  const baseFeatures = useMemo(() => allSidebarFeatures(), [trialFlag]);
 
   useEffect(() => subscribeNavMode(setNavModeState), []);
 

@@ -8,7 +8,7 @@ import TourOverlay from "../../../components/tours/TourOverlay";
 import { TourProvider } from "../../../components/tours/TourContext";
 
 export default function DirectorLayout() {
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const [expanded, setExpanded] = useState(false);
   const { isRTLMode } = useLocalization();
   const { t } = useTranslation();

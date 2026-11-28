@@ -11,9 +11,13 @@ const EXCERPT_PATH = path.join(__dirname, "data", "sbir-excerpt.json");
 const SBIR_AWARDS = "https://api.www.sbir.gov/public/api/awards";
 const SBIR_SOLICITATIONS = "https://api.www.sbir.gov/public/api/solicitations";
 
+let excerptCache = null;
+
 function loadExcerpt() {
+  if (excerptCache) return excerptCache;
   try {
-    return JSON.parse(fs.readFileSync(EXCERPT_PATH, "utf8"));
+    excerptCache = JSON.parse(fs.readFileSync(EXCERPT_PATH, "utf8"));
+    return excerptCache;
   } catch {
     return { awards: [], topics: [], source: "SBIR excerpt" };
   }
@@ -115,7 +119,10 @@ function searchExcerpt({ kind, keyword, agency, status, page, pageSize }) {
 }
 
 async function fetchJson(url) {
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(25_000),
+    headers: { Accept: "application/json" },
+  });
   const text = await res.text();
   let json;
   try {
@@ -175,7 +182,7 @@ async function searchLiveTopics({ keyword, agency, status, page, pageSize }) {
   const params = new URLSearchParams();
   if (agency) params.set("agency", agency);
   if (keyword) params.set("keyword", keyword);
-  if (status) params.set("keyword", keyword || status);
+  else if (status) params.set("keyword", status);
   const json = await fetchJson(`${SBIR_SOLICITATIONS}${params.toString() ? `?${params}` : ""}`);
   const rows = Array.isArray(json) ? json : Array.isArray(json?.results) ? json.results : [];
   if (!rows.length) throw new Error("SBIR topics empty");

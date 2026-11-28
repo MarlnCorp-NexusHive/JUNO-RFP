@@ -5,7 +5,18 @@
 import { timingSafeEqual } from "node:crypto";
 import { store, budgetFor } from "./copilot.mjs";
 const json = (b, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { "content-type": "application/json", "cache-control": "no-store" } });
-function isAdmin(req) { const t = process.env.ADMIN_TOKEN || ""; const h = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, ""); if (!t || !h || h.length !== t.length) return false; return timingSafeEqual(Buffer.from(h), Buffer.from(t)); }
+function safeEqual(a, b) {
+  if (!a || !b) return false;
+  const ba = Buffer.from(a, "utf8");
+  const bb = Buffer.from(b, "utf8");
+  if (ba.length !== bb.length) return false;
+  return timingSafeEqual(ba, bb);
+}
+function isAdmin(req) {
+  const t = process.env.ADMIN_TOKEN || "";
+  const h = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  return safeEqual(h, t);
+}
 export default async (req) => {
   if (req.method !== "GET") return json({ error: "method_not_allowed" }, 405);
   const u = new URL(req.url); const mk = u.searchParams.get("month") || new Date().toISOString().slice(0, 7);
@@ -16,6 +27,10 @@ export default async (req) => {
     const { blobs } = await st.list({ prefix: `${mk}:` }); const rows = {};
     for (const b of blobs) { const ws = b.key.split(":")[1]; const v = await st.get(b.key, { type: "json" }); rows[ws] = { ...v, cap: ws === "_all" ? Number(process.env.AI_GLOBAL_BUDGET_USD || 2500) : budgetFor(ws) }; }
     return json({ month: mk, workspaces: rows });
+  }
+  const code = process.env.ACCESS_CODE || "";
+  if (code && !isAdmin(req) && !safeEqual(req.headers.get("x-juno-code") || "", code)) {
+    return json({ error: "unauthorized" }, 401);
   }
   const ws = /^[a-z0-9_-]{1,40}$/i.test(u.searchParams.get("ws") || "") ? u.searchParams.get("ws") : "default";
   const v = (await st.get(`${mk}:${ws}`, { type: "json" })) || { tokens: 0, cost: 0, calls: 0 };

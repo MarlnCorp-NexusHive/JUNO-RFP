@@ -132,7 +132,8 @@ export async function extractQaLibraryItems(openai, documentText) {
   const text = String(documentText ?? "").trim();
   if (!text.length) return { qa_items: [] };
 
-  const chunks = chunkDocumentText(text);
+  const MAX_CHUNKS = 20;
+  const chunks = chunkDocumentText(text).slice(0, MAX_CHUNKS);
   const merged = [];
   let lastError = null;
 

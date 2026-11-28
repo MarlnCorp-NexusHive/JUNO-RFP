@@ -73,14 +73,39 @@ export async function loadTrialFeatureData(key, fallbackEmpty = {}) {
 }
 
 /**
+ * Per-key write coalescer so rapid mutations for the same feature key never race
+ * out of order and overwrite newer state with older in-flight PUTs.
+ */
+const inFlightByKey = new Set();
+const pendingDataByKey = new Map();
+
+/**
  * Persist feature data for trial tenants. No-op when not in trial mode.
  */
 export async function persistTrialFeatureData(key, data) {
   if (!canUseTrialFeatures()) return null;
-  try {
-    return await saveTrialFeature(key, data);
-  } catch (err) {
-    console.warn(`[trial-features] save failed (${key}):`, err?.message || err);
+  if (inFlightByKey.has(key)) {
+    pendingDataByKey.set(key, data);
     return null;
+  }
+  inFlightByKey.add(key);
+  let current = data;
+  let lastResult = null;
+  try {
+    while (true) {
+      try {
+        lastResult = await saveTrialFeature(key, current);
+      } catch (err) {
+        console.warn(`[trial-features] save failed (${key}):`, err?.message || err);
+        lastResult = null;
+      }
+      if (!pendingDataByKey.has(key)) break;
+      current = pendingDataByKey.get(key);
+      pendingDataByKey.delete(key);
+      if (!canUseTrialFeatures()) break;
+    }
+    return lastResult;
+  } finally {
+    inFlightByKey.delete(key);
   }
 }

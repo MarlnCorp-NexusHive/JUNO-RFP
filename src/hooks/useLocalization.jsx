@@ -1,4 +1,4 @@
-import { useContext, createContext, useState, useEffect, useCallback } from 'react';
+import { useContext, createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { isRTL, getTextDirection, forceRTLScrollbar, cleanupRTLStyling, debugRTLState } from '../utils/rtl';
@@ -115,23 +115,31 @@ export const LocalizationProvider = ({ children }) => {
     return () => window.removeEventListener('storage', onStorage);
   }, [changeLanguage, i18n]);
 
-  const toggleLanguage = () => {
+  const toggleLanguage = useCallback(() => {
     if (!isArabicUiEnabled(window.location?.pathname)) return;
     const current = normalizeLanguageCode(currentLanguage);
     const newLanguage = current === 'ar' ? 'en' : 'ar';
     void changeLanguage(newLanguage);
-  };
+  }, [currentLanguage, changeLanguage]);
 
-  const value = {
-    currentLanguage,
-    isRTLMode,
-    changeLanguage,
-    toggleLanguage,
-    textDirection: getTextDirection(currentLanguage),
-    arabicEnabled,
-    featureArabicEnabled: ARABIC_LANGUAGE_ENABLED,
-    supportedLanguages: getSupportedLanguages(location.pathname),
-  };
+  const supportedLanguages = useMemo(
+    () => getSupportedLanguages(location.pathname),
+    [location.pathname],
+  );
+
+  const value = useMemo(
+    () => ({
+      currentLanguage,
+      isRTLMode,
+      changeLanguage,
+      toggleLanguage,
+      textDirection: getTextDirection(currentLanguage),
+      arabicEnabled,
+      featureArabicEnabled: ARABIC_LANGUAGE_ENABLED,
+      supportedLanguages,
+    }),
+    [currentLanguage, isRTLMode, changeLanguage, toggleLanguage, arabicEnabled, supportedLanguages],
+  );
 
   return (
     <LocalizationContext.Provider value={value}>

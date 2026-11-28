@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { FiBold, FiItalic, FiList, FiType } from "react-icons/fi";
+import { sanitizeRichHtml } from "../../../../utils/sanitizeHtml.js";
 
 function run(cmd, value = null) {
   try {
@@ -26,7 +27,7 @@ export default function RichTextAnswerEditor({
   const ref = useRef(null);
 
   useEffect(() => {
-    const next = valueHtml && valueHtml.trim() ? valueHtml : "<p></p>";
+    const next = sanitizeRichHtml(valueHtml && valueHtml.trim() ? valueHtml : "<p></p>");
     if (ref.current && ref.current.innerHTML !== next) {
       ref.current.innerHTML = next;
     }

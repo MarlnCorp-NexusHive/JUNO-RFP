@@ -32,7 +32,7 @@ export default function DirectorAuditCompliance() {
   const location = useLocation();
   const isPM = location.pathname.includes("/app/compliance");
   const isTrialPm = isPM && isTrialUserSession();
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const [logFilter, setLogFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedRisk, setSelectedRisk] = useState("all");

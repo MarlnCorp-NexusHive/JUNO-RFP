@@ -4,7 +4,27 @@ import dotenv from "dotenv";
 import OpenAI from "openai";
 import multer from "multer";
 import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
+import PizZip from "pizzip";
+import { createRequire } from "module";
+
+let _PDFParse = null;
+async function getPDFParse() {
+  if (_PDFParse) return _PDFParse;
+  // Compatibility shim for Node < 20.16 where pdfjs-dist expects process.getBuiltinModule
+  if (typeof process.getBuiltinModule !== "function") {
+    const req = createRequire(import.meta.url);
+    process.getBuiltinModule = (id) => {
+      try {
+        return req(id);
+      } catch {
+        return undefined;
+      }
+    };
+  }
+  const mod = await import("pdf-parse");
+  _PDFParse = mod.PDFParse;
+  return _PDFParse;
+}
 
 import { buildGeneratedRfpDocument } from "./rfpDocumentBuilder.js";
 import { extractImportantDates } from "./extractImportantDates.js";
@@ -32,7 +52,11 @@ import { registerPricingAiRoutes } from "./pricingAiService.js";
 import { registerPursuitLifecycleAiRoutes } from "./pursuitLifecycleAiService.js";
 import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
+import { metricsMiddleware, registerMonitoringRoutes } from "./monitoring/metricsService.js";
+import { redactPiiDeep } from "./utils/piiRedact.js";
 import { instrumentOpenAiForTrialSettings } from "./trial/aiUsageTelemetry.js";
+
+const IS_PROD = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER);
 import {
   isEmailConfigured,
   sendWorkspaceDocumentEmail,
@@ -50,6 +74,7 @@ import { registerGrantBriefRoutes } from "./grantBriefService.js";
 import { registerPhilanthropicGrantmakersRoutes } from "./philanthropicGrantmakersService.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { logger, requestLoggerMiddleware } from "./utils/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
@@ -75,27 +100,161 @@ function attachmentContentDisposition(filename) {
 }
 
 const app = express();
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
 
 /* ================= CORE MIDDLEWARE ================= */
-app.use(cors());
-app.use(express.json({ limit: "16mb" }));
-app.use(express.urlencoded({ extended: true, limit: "16mb" }));
+const ALLOWED_ORIGINS = String(process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-/* ================= DEBUG LOGGER ================= */
+if (IS_PROD && !ALLOWED_ORIGINS.length) {
+  logger.error("production_cors_misconfigured", {
+    msg: "ALLOWED_ORIGINS is empty in production. Browser cross-origin calls will be rejected until you set it.",
+  });
+}
+
+app.use(
+  cors(
+    ALLOWED_ORIGINS.length
+      ? {
+          origin(origin, cb) {
+            if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+            return cb(new Error("Origin not allowed by CORS"));
+          },
+        }
+      : IS_PROD
+        ? {
+            // Fail closed in production when allowlist is missing: allow non-browser (no Origin) only.
+            origin(origin, cb) {
+              if (!origin) return cb(null, true);
+              return cb(new Error("Origin not allowed by CORS — set ALLOWED_ORIGINS"));
+            },
+          }
+        : {},
+  ),
+);
+
+/* ================= SECURITY & PRIVACY HEADERS ================= */
 app.use((req, res, next) => {
-  console.log("\n--- REQUEST ---");
-  console.log("METHOD:", req.method);
-  console.log("URL:", req.url);
-  console.log("CONTENT-TYPE:", req.headers["content-type"]);
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  const isHttps = req.secure || String(req.headers["x-forwarded-proto"] || "").includes("https");
+  if (IS_PROD || isHttps) {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
   next();
 });
 
-/* ================= OPENAI ================= */
+app.use(express.json({ limit: "16mb" }));
+app.use(express.urlencoded({ extended: true, limit: "16mb" }));
+
+/* ================= LIGHTWEIGHT RATE LIMITER ================= */
+function createRateLimiter({ windowMs, max, keyPrefix, keyFn }) {
+  const hits = new Map();
+  let lastPrune = Date.now();
+  return (req, res, next) => {
+    const now = Date.now();
+    if (now - lastPrune > windowMs) {
+      lastPrune = now;
+      for (const [k, rec] of hits.entries()) {
+        if (now >= rec.resetAt) hits.delete(k);
+      }
+    }
+    const ip = String(req.ip || req.socket?.remoteAddress || "unknown");
+    const suffix = typeof keyFn === "function" ? keyFn(req, ip) : ip;
+    const key = `${keyPrefix}:${suffix}`;
+    const existing = hits.get(key);
+    if (!existing || now >= existing.resetAt) {
+      hits.set(key, { count: 1, resetAt: now + windowMs });
+      return next();
+    }
+    existing.count += 1;
+    if (existing.count > max) {
+      res.setHeader("Retry-After", String(Math.ceil((existing.resetAt - now) / 1000)));
+      logger.warn("rate_limit_exceeded", { keyPrefix, ip, path: req.path });
+      return res.status(429).json({
+        error: "Too many requests. Please wait a moment and try again.",
+        code: "rate_limited",
+      });
+    }
+    return next();
+  };
+}
+
+// High per-IP cap so 50+ colleagues behind one office NAT can log in simultaneously,
+// combined with per-account (ip+email) brute-force throttling.
+const authIpRateLimit = createRateLimiter({ windowMs: 15 * 60_000, max: 300, keyPrefix: "auth_ip" });
+const authAccountRateLimit = createRateLimiter({
+  windowMs: 15 * 60_000,
+  max: 25,
+  keyPrefix: "auth_acct",
+  keyFn: (req, ip) => {
+    const ident = String(req.body?.email || req.body?.username || "anon").trim().toLowerCase().slice(0, 120);
+    return `${ip}:${ident}`;
+  },
+});
+const emailRateLimit = createRateLimiter({ windowMs: 15 * 60_000, max: 15, keyPrefix: "email" });
+const testAiRateLimit = createRateLimiter({ windowMs: 15 * 60_000, max: 10, keyPrefix: "testai" });
+const aiRouteRateLimit = createRateLimiter({ windowMs: 15 * 60_000, max: 300, keyPrefix: "ai" });
+
+app.use(["/trial/auth/login", "/trial/auth/signup", "/trial/auth/resend-confirmation", "/trial/auth/forgot-password", "/trial/auth/reset-password", "/rfp-collab/auth/login"], authIpRateLimit, authAccountRateLimit);
+app.use("/workspace/email-document", emailRateLimit);
+app.use("/test-ai", testAiRateLimit);
+app.use(
+  [
+    "/generate-answer",
+    "/generate-rfp-document",
+    "/ask-with-file",
+    "/ask-with-context",
+    "/extract-dates",
+    "/extract-qas",
+    "/extract-structured-data",
+    "/structure-rfp-requirements",
+    "/generate-slide-deck",
+    "/technical-solution",
+    "/communication/ai",
+    "/pricing/ai",
+    "/pursuit/ai",
+    "/grants/brief",
+    "/grants/philanthropic/opportunities",
+  ],
+  aiRouteRateLimit,
+);
+
+/* ================= STRUCTURED REQUEST LOGGER & PROMETHEUS METRICS ================= */
+app.use(requestLoggerMiddleware);
+app.use(metricsMiddleware);
+registerMonitoringRoutes(app);
+
+/* ================= OPENAI (PII-redacted + trial usage telemetry) ================= */
 const openai = instrumentOpenAiForTrialSettings(
   new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   }),
 );
+{
+  const originalCreate = openai.chat.completions.create.bind(openai.chat.completions);
+  openai.chat.completions.create = (params, options) => {
+    const safeParams =
+      params && typeof params === "object"
+        ? {
+            ...params,
+            messages: Array.isArray(params.messages) ? redactPiiDeep(params.messages) : params.messages,
+          }
+        : params;
+    return originalCreate(safeParams, options);
+  };
+}
+
+if (IS_PROD && !(process.env.ADMIN_METRICS_TOKEN || process.env.METRICS_TOKEN)) {
+  logger.error("production_metrics_unprotected", {
+    msg: "ADMIN_METRICS_TOKEN (or METRICS_TOKEN) is required in production. /metrics and /admin/health-metrics will return 401 until set.",
+  });
+}
 
 registerTrialSystem(app);
 
@@ -121,12 +280,39 @@ registerGrantBriefRoutes(app, openai);
 registerPhilanthropicGrantmakersRoutes(app, openai);
 
 /* ================= MULTER ================= */
+const ALLOWED_UPLOAD_EXTS = new Set([".pdf", ".docx", ".doc", ".txt", ".csv", ".md"]);
+
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024, files: 1 },
+  fileFilter(_req, file, cb) {
+    const ext = path.extname(String(file?.originalname || "").toLowerCase());
+    if (!ext || ALLOWED_UPLOAD_EXTS.has(ext)) return cb(null, true);
+    const err = new Error("Unsupported file type. Use .txt, .pdf, or .docx.");
+    err.statusCode = 400;
+    return cb(err);
+  },
 });
 
 const MIN_EXTRACTED_CHARS = 24;
+const MAX_DOCX_UNCOMPRESSED_BYTES = 100 * 1024 * 1024;
+const MAX_DOCX_ENTRIES = 5000;
+
+function assertSafeDocxArchive(buffer) {
+  const zip = new PizZip(buffer);
+  const files = Object.values(zip.files || {});
+  if (files.length > MAX_DOCX_ENTRIES) {
+    throw new Error("DOCX archive contains too many entries.");
+  }
+  let totalUncompressed = 0;
+  for (const entry of files) {
+    const size = Number(entry?._data?.uncompressedSize || 0);
+    if (size > 0) totalUncompressed += size;
+    if (totalUncompressed > MAX_DOCX_UNCOMPRESSED_BYTES) {
+      throw new Error("DOCX decompressed content exceeds safe size limit.");
+    }
+  }
+}
 
 async function extractUploadedDocumentText(buffer, originalname = "", mimetype = "") {
   const name = (originalname || "").toLowerCase();
@@ -137,13 +323,15 @@ async function extractUploadedDocumentText(buffer, originalname = "", mimetype =
   }
 
   if (name.endsWith(".pdf") || type.includes("pdf")) {
-    const parser = new PDFParse({ data: buffer });
+    let parser = null;
     try {
+      const PDFParse = await getPDFParse();
+      parser = new PDFParse({ data: buffer });
       const result = await parser.getText();
       await parser.destroy();
       return { text: (result?.text || "").trim(), format: "pdf" };
     } catch (e) {
-      await parser.destroy().catch(() => {});
+      await parser?.destroy?.().catch(() => {});
       return { text: "", format: "pdf", error: e?.message || "Could not read PDF text." };
     }
   }
@@ -154,6 +342,7 @@ async function extractUploadedDocumentText(buffer, originalname = "", mimetype =
     type.includes("officedocument.wordprocessingml")
   ) {
     try {
+      assertSafeDocxArchive(buffer);
       const result = await mammoth.extractRawText({ buffer });
       return { text: (result?.value || "").trim(), format: "docx" };
     } catch (e) {
@@ -188,9 +377,13 @@ async function extractUploadedDocumentText(buffer, originalname = "", mimetype =
 
 /* ================= ROUTES ================= */
 
-// ROOT
+// ROOT & HEALTH
 app.get("/", (req, res) => {
   res.json({ message: "Backend running" });
+});
+
+app.get("/health", (_req, res) => {
+  res.json({ ok: true, status: "healthy" });
 });
 
 // TEST AI
@@ -726,7 +919,11 @@ app.post("/generate-slide-deck", async (req, res) => {
 /* ================= GLOBAL ERROR ================= */
 
 app.use((err, req, res, next) => {
-  console.error("GLOBAL ERROR:", err.message);
+  logger.error("express_global_error", err, {
+    reqId: req.requestId,
+    method: req.method,
+    path: req.path,
+  });
 
   if (err.type === "entity.parse.failed") {
     return res.status(400).json({
@@ -734,9 +931,31 @@ app.use((err, req, res, next) => {
     });
   }
 
-  res.status(500).json({
-    error: "Server error",
+  if (err instanceof multer.MulterError) {
+    const status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+    return res.status(status).json({
+      error: err.code === "LIMIT_FILE_SIZE" ? "Uploaded file exceeds 25 MB limit." : err.message,
+      code: err.code,
+    });
+  }
+
+  if (err.message === "Origin not allowed by CORS") {
+    return res.status(403).json({ error: "Origin not allowed" });
+  }
+
+  const status = err.statusCode && err.statusCode >= 400 && err.statusCode < 600 ? err.statusCode : 500;
+  res.status(status).json({
+    error: status < 500 ? err.message : "Server error",
+    requestId: req.requestId,
   });
+});
+
+process.on("unhandledRejection", (reason) => {
+  logger.error("unhandled_rejection", reason instanceof Error ? reason : { reason: String(reason) });
+});
+
+process.on("uncaughtException", (err) => {
+  logger.error("uncaught_exception", err);
 });
 
 /* ================= START ================= */

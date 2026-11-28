@@ -27,10 +27,10 @@ jobs:
           head -c 500 /tmp/wake-body.json || true
           echo
           if [ "$code" != "200" ]; then
-            echo "storage-status failed; trying /test-ai ..."
+            echo "storage-status failed; trying /health ..."
             code2=$(curl -sS -o /tmp/wake-body2.txt -w "%{http_code}" \
               --connect-timeout 30 --max-time 90 \
-              "${RENDER_URL}/test-ai" || true)
+              "${RENDER_URL}/health" || true)
             echo "HTTP ${code2}"
             head -c 200 /tmp/wake-body2.txt || true
             echo

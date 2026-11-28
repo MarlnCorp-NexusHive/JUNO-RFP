@@ -228,6 +228,17 @@ function workspaceTitle(workspaceId) {
   return collabStore.workspaces.get(workspaceId)?.title || "RFP workspace";
 }
 
+function isDemoWorkspace(workspaceId) {
+  const ws = collabStore.workspaces.get(workspaceId);
+  if (!ws) return false;
+  return !String(ws.createdBy || "").startsWith("user_pm_trial_");
+}
+
+function isDemoAuditor(u) {
+  if (!u || u.role !== "auditor") return false;
+  return !u.tenantId && !String(u.id || "").startsWith("user_aud_trial_");
+}
+
 function synthesizeCollaborationEvents() {
   /** @type {import('./types.js').CalendarEventRecord[]} */
   const events = [];
@@ -245,6 +256,7 @@ function synthesizeCollaborationEvents() {
   };
 
   for (const log of collabStore.logs) {
+    if (!isDemoWorkspace(log.workspaceId)) continue;
     const type = actionMap[log.action];
     if (!type) continue;
     const bid = workspaceTitle(log.workspaceId);
@@ -275,6 +287,7 @@ function synthesizeCollaborationEvents() {
   const today = new Date().toISOString().slice(0, 10);
 
   for (const q of collabStore.questions.values()) {
+    if (!isDemoWorkspace(q.workspaceId)) continue;
     if (!q.assignedTo) continue;
     if (!["assigned", "in_progress", "submitted", "changes_requested"].includes(q.status)) continue;
     const bid = workspaceTitle(q.workspaceId);
@@ -323,7 +336,9 @@ function synthesizeCollaborationEvents() {
     }
   }
 
-  const unassigned = [...collabStore.questions.values()].filter((q) => q.status === "unassigned").length;
+  const unassigned = [...collabStore.questions.values()].filter(
+    (q) => isDemoWorkspace(q.workspaceId) && q.status === "unassigned",
+  ).length;
   if (unassigned > 0) {
     events.push(
       withColor({
@@ -355,9 +370,15 @@ export function getTeamSummary(tenantId = null) {
     };
   }
 
-  const auditors = [...collabStore.usersById.values()].filter((u) => u.role === "auditor");
+  const demoWorkspaces = [...collabStore.workspaces.values()].filter((w) =>
+    isDemoWorkspace(w.id),
+  );
+  const demoQuestions = [...collabStore.questions.values()].filter((q) =>
+    isDemoWorkspace(q.workspaceId),
+  );
+  const auditors = [...collabStore.usersById.values()].filter((u) => isDemoAuditor(u));
   const byAuditor = auditors.map((aud) => {
-    const assigned = [...collabStore.questions.values()].filter((q) => q.assignedTo === aud.id);
+    const assigned = demoQuestions.filter((q) => q.assignedTo === aud.id);
     return {
       id: aud.id,
       name: aud.name,
@@ -371,15 +392,14 @@ export function getTeamSummary(tenantId = null) {
     };
   });
 
-  const questions = [...collabStore.questions.values()];
   return {
-    workspaces: collabStore.workspaces.size,
+    workspaces: demoWorkspaces.length,
     auditors: byAuditor,
     totals: {
-      unassigned: questions.filter((q) => q.status === "unassigned").length,
-      assigned: questions.filter((q) => q.status === "assigned" || q.status === "in_progress").length,
-      submitted: questions.filter((q) => q.status === "submitted").length,
-      approved: questions.filter((q) => q.status === "approved").length,
+      unassigned: demoQuestions.filter((q) => q.status === "unassigned").length,
+      assigned: demoQuestions.filter((q) => q.status === "assigned" || q.status === "in_progress").length,
+      submitted: demoQuestions.filter((q) => q.status === "submitted").length,
+      approved: demoQuestions.filter((q) => q.status === "approved").length,
     },
   };
 }

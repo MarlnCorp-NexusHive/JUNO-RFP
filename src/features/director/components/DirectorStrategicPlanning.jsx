@@ -83,7 +83,7 @@ export default function DirectorStrategicPlanning() {
     };
     return map[value] || value;
   };
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const [selectedDept, setSelectedDept] = useState("All Departments");
   const [selectedYear, setSelectedYear] = useState("2026");
 

@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { localStorageService } from "../services/localStorageService";
 import { preloadDemoUsers } from "../data/preloadDemoUsers";
 import API, {
   confirmTrialEmail,
   signupTrial,
+  forgotTrialPassword,
+  resetTrialPassword,
 } from "../services/api.js";
 import {
   clearTrialSession,
   setTrialSession,
   trialUserToRbacUser,
 } from "../services/trialAuthSession.js";
+import { startTabSession } from "../services/tabSessionManager.js";
 import { proposalManagerLandingPath } from "../features/proposal-manager/services/navModeStore.js";
 import { useRTL } from "../hooks/useRTL";
 import LanguageSwitcher from "./localization/LanguageSwitcher";
@@ -97,7 +100,11 @@ function EyeIcon({ off = false }) {
 }
 
 function LoginPageContent() {
-  const [mode, setMode] = useState("login"); // login | signup
+  const [mode, setMode] = useState("login"); // login | signup | forgot | reset
+  const [resetToken, setResetToken] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetConfirm, setResetConfirm] = useState("");
+  const [devResetUrl, setDevResetUrl] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -108,6 +115,10 @@ function LoginPageContent() {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirm, setSignupConfirm] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const demoUsersEnabled = import.meta.env.PROD
+    ? String(import.meta.env.VITE_ENABLE_DEMO_USERS || "false").toLowerCase() === "true"
+    : String(import.meta.env.VITE_ENABLE_DEMO_USERS ?? "true").toLowerCase() !== "false";
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [devConfirmUrl, setDevConfirmUrl] = useState("");
@@ -138,6 +149,40 @@ function LoginPageContent() {
       document.body.classList.remove('dark');
     }
   }, []);
+
+  // Show session redirect notice when redirected by single-tab / timeout guard
+  useEffect(() => {
+    const reason = searchParams.get("reason");
+    if (!reason) return;
+    const messages = {
+      session_expired: "Your 60-minute session has expired. Please sign in again.",
+      idle_timeout: "You were signed out due to 5 minutes of inactivity. Please sign in again.",
+      another_tab:
+        "Your session ended because you signed in on another tab. Only one active tab is allowed.",
+      duplicate_tab:
+        "Sessions are active in one tab only. Please sign in to continue in this tab.",
+      no_session:
+        "Sessions are active in one tab only. Please sign in to access this page.",
+    };
+    if (messages[reason]) {
+      setInfo(messages[reason]);
+    }
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("reason");
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  // Password reset deep link: /login?resetToken=TOKEN
+  useEffect(() => {
+    const token = searchParams.get("resetToken");
+    if (!token) return;
+    setResetToken(token);
+    setMode("reset");
+    setInfo("Choose a new password for your account.");
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("resetToken");
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   // Handle email confirmation link: /login?trialConfirm=TOKEN
   useEffect(() => {
@@ -218,22 +263,30 @@ function LoginPageContent() {
       const ident = username.trim().toLowerCase();
       const passIn = password.trim();
 
-      // 1) Demo accounts first (local, instant).
+      // 1) Demo accounts first (local, instant) — can be disabled in production via VITE_ENABLE_DEMO_USERS=false.
       clearTrialSession();
-      preloadDemoUsers();
+      if (demoUsersEnabled) {
+        preloadDemoUsers();
 
-      const users = localStorageService.getUsers();
-      const demoUser = users.find((u) => {
-        const uName = String(u.username || "").toLowerCase();
-        const uMail = String(u.collabEmail || "").toLowerCase();
-        const passOk = String(u.password || "") === passIn;
-        if (!passOk) return false;
-        return uName === ident || (uMail && uMail === ident);
-      });
-      if (demoUser) {
-        localStorage.setItem("rbac_current_user", JSON.stringify(demoUser));
-        navigate(dashboardRoute(demoUser), { replace: true });
-        return;
+        const users = localStorageService.getUsers();
+        const demoUser = users.find((u) => {
+          const uName = String(u.username || "").toLowerCase();
+          const uMail = String(u.collabEmail || "").toLowerCase();
+          const passOk = String(u.password || "") === passIn;
+          if (!passOk) return false;
+          return uName === ident || (uMail && uMail === ident);
+        });
+        if (demoUser) {
+          const { password: _omitPassword, ...safeDemoUser } = demoUser;
+          try {
+            localStorage.setItem("rbac_current_user", JSON.stringify(safeDemoUser));
+          } catch {
+            /* ignore storage quota / private mode errors */
+          }
+          startTabSession(safeDemoUser);
+          navigate(dashboardRoute(safeDemoUser), { replace: true });
+          return;
+        }
       }
 
       // 2) Trial tenants (backend) — long timeout: Render free tier can cold-start slowly.
@@ -244,7 +297,13 @@ function LoginPageContent() {
           { timeout: 90_000 },
         );
         setTrialSession(data);
-        localStorage.setItem("rbac_current_user", JSON.stringify(trialUserToRbacUser(data)));
+        const rbacTrialUser = trialUserToRbacUser(data);
+        try {
+          localStorage.setItem("rbac_current_user", JSON.stringify(rbacTrialUser));
+        } catch {
+          /* ignore storage quota / private mode errors */
+        }
+        startTabSession(rbacTrialUser);
         navigate(proposalManagerLandingPath(), { replace: true });
         return;
       } catch (trialErr) {
@@ -278,6 +337,63 @@ function LoginPageContent() {
     }
   };
 
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    setError("");
+    setInfo("");
+    setDevResetUrl("");
+    const email = username.trim().toLowerCase();
+    if (!email) {
+      setError("Enter your work email to reset your password.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const data = await forgotTrialPassword(email);
+      setInfo(
+        data.emailSent
+          ? "If an account exists for that email, a reset link has been sent."
+          : data.message || "If an account exists for that email, a reset link has been sent.",
+      );
+      if (data.resetUrl) setDevResetUrl(data.resetUrl);
+    } catch (err) {
+      setError(err?.response?.data?.error || "Could not send reset email.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setError("");
+    setInfo("");
+    if (resetPassword.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (resetPassword !== resetConfirm) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (!resetToken) {
+      setError("Reset token is missing. Request a new link.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await resetTrialPassword({ token: resetToken, newPassword: resetPassword });
+      setInfo("Password updated. You can sign in now.");
+      setMode("login");
+      setResetPassword("");
+      setResetConfirm("");
+      setResetToken("");
+    } catch (err) {
+      setError(err?.response?.data?.error || "Could not reset password.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
@@ -292,6 +408,10 @@ function LoginPageContent() {
       setError(t("auth.signup.mismatch"));
       return;
     }
+    if (!privacyAccepted) {
+      setError("Please accept the Privacy Policy to create your account.");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -300,6 +420,8 @@ function LoginPageContent() {
         companyName: signupCompany.trim(),
         email: signupEmail.trim().toLowerCase(),
         password: signupPassword,
+        privacyAccepted: true,
+        privacyPolicyVersion: "2026-11",
       });
       setInfo(data.emailSent ? t("auth.signup.success") : t("auth.signup.successDev"));
       if (data.confirmUrl) setDevConfirmUrl(data.confirmUrl);
@@ -444,7 +566,7 @@ function LoginPageContent() {
 
       <main className="relative z-[1] mx-auto flex w-full max-w-[460px] flex-col px-5 pb-16 pt-6 font-loginUi sm:pt-10">
         <div className={panelClass}>
-        {mode === "login" ? (
+        {mode === "login" && (
           <>
             <p className={`text-[13px] font-medium tracking-[0.18em] uppercase ${accent}`}>
               {t("auth.login.welcomeBack", { defaultValue: "Welcome back" })}
@@ -489,7 +611,6 @@ function LoginPageContent() {
                   <input
                     type={showPassword ? "text" : "password"}
                     className={`${inputClass} ${isRTL ? "pl-11" : "pr-11"}`}
-                    placeholder={t("auth.login.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading || confirming}
@@ -501,9 +622,7 @@ function LoginPageContent() {
                     className={`absolute top-1/2 -translate-y-1/2 rounded p-1.5 ${fieldIcon} ${
                       isRTL ? "left-2" : "right-2"
                     }`}
-                    aria-label={
-                      showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")
-                    }
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     <EyeIcon off={showPassword} />
                   </button>
@@ -535,14 +654,12 @@ function LoginPageContent() {
                 <button
                   type="button"
                   className={linkClass}
-                  onClick={() =>
-                    setInfo(
-                      t("auth.login.forgotComingSoon", {
-                        defaultValue:
-                          "Password reset is coming soon. Contact support if you need help.",
-                      }),
-                    )
-                  }
+                  onClick={() => {
+                    setMode("forgot");
+                    setError("");
+                    setInfo("");
+                    setDevResetUrl("");
+                  }}
                 >
                   {t("auth.login.forgotPassword", {
                     defaultValue: "Forgot your password?",
@@ -588,6 +705,18 @@ function LoginPageContent() {
               <button type="submit" disabled={isLoading || confirming} className={ctaClass}>
                 {isLoading ? t("auth.login.loading") : t("auth.login.signInButton")}
               </button>
+
+              <p className={`text-center text-[12px] leading-relaxed ${muted}`}>
+                By signing in, you agree to our{" "}
+                <Link to="/privacy-policy" className={linkClass}>
+                  Privacy Policy
+                </Link>{" "}
+                and{" "}
+                <Link to="/cookie-policy" className={linkClass}>
+                  Cookie Policy
+                </Link>
+                . Sessions are protected to one active tab.
+              </p>
             </form>
 
             <p className={`mt-9 text-center text-[14px] ${muted}`}>
@@ -604,6 +733,7 @@ function LoginPageContent() {
                 {t("auth.login.signUp")}
               </button>
             </p>
+            {demoUsersEnabled && (
             <button
               type="button"
               onClick={handleReloadDemoUsers}
@@ -611,8 +741,111 @@ function LoginPageContent() {
             >
               Reload demo credentials
             </button>
+            )}
           </>
-        ) : (
+        )}
+
+        {mode === "forgot" && (
+          <>
+            <p className={`text-[13px] font-medium tracking-[0.18em] uppercase ${accent}`}>Password reset</p>
+            <h1 className={`mt-3 font-loginDisplay text-[2.15rem] font-semibold leading-[1.18] ${ink}`}>
+              Forgot your password?
+            </h1>
+            <p className={`mt-3 text-[15px] leading-relaxed ${muted}`}>
+              Enter your work email and we will send a secure reset link (expires in 1 hour).
+            </p>
+            <form onSubmit={handleForgot} className="mt-9 space-y-5">
+              <div>
+                <label className={labelClass}>Email</label>
+                <input
+                  type="email"
+                  className={inputClass}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  autoFocus
+                />
+              </div>
+              {(error || info) && (
+                <div
+                  className={`rounded-xl px-4 py-3 text-center text-[13.5px] font-medium ${
+                    error
+                      ? "border border-red-200 bg-red-50 text-red-700"
+                      : "border border-emerald-200 bg-emerald-50 text-emerald-800"
+                  }`}
+                >
+                  {error || info}
+                </div>
+              )}
+              {devResetUrl && (
+                <a href={devResetUrl} className={`block text-center text-sm font-semibold ${linkClass}`}>
+                  Open reset link (dev)
+                </a>
+              )}
+              <button type="submit" disabled={isLoading} className={ctaClass}>
+                {isLoading ? "Sending…" : "Send reset link"}
+              </button>
+            </form>
+            <p className={`mt-9 text-center text-[14px] ${muted}`}>
+              <button type="button" className={linkClass} onClick={() => setMode("login")}>
+                Back to Sign In
+              </button>
+            </p>
+          </>
+        )}
+
+        {mode === "reset" && (
+          <>
+            <p className={`text-[13px] font-medium tracking-[0.18em] uppercase ${accent}`}>New password</p>
+            <h1 className={`mt-3 font-loginDisplay text-[2.15rem] font-semibold leading-[1.18] ${ink}`}>
+              Choose a new password
+            </h1>
+            <form onSubmit={handleReset} className="mt-9 space-y-5">
+              <div>
+                <label className={labelClass}>New password</label>
+                <input
+                  type="password"
+                  className={inputClass}
+                  value={resetPassword}
+                  onChange={(e) => setResetPassword(e.target.value)}
+                  minLength={8}
+                  required
+                  disabled={isLoading}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Confirm password</label>
+                <input
+                  type="password"
+                  className={inputClass}
+                  value={resetConfirm}
+                  onChange={(e) => setResetConfirm(e.target.value)}
+                  minLength={8}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {(error || info) && (
+                <div
+                  className={`rounded-xl px-4 py-3 text-center text-[13.5px] font-medium ${
+                    error
+                      ? "border border-red-200 bg-red-50 text-red-700"
+                      : "border border-emerald-200 bg-emerald-50 text-emerald-800"
+                  }`}
+                >
+                  {error || info}
+                </div>
+              )}
+              <button type="submit" disabled={isLoading} className={ctaClass}>
+                {isLoading ? "Updating…" : "Update password"}
+              </button>
+            </form>
+          </>
+        )}
+
+        {mode === "signup" && (
           <>
             <p className={`text-[13px] font-medium tracking-[0.18em] uppercase ${accent}`}>
               {t("auth.signup.subtitle")}
@@ -754,7 +987,29 @@ function LoginPageContent() {
                   {t("auth.signup.openConfirmLink")}
                 </a>
               )}
-              <button type="submit" disabled={isLoading} className={ctaClass}>
+              <label className={`flex items-start gap-2.5 text-[12.5px] leading-relaxed cursor-pointer ${muted}`}>
+                <input
+                  type="checkbox"
+                  checked={privacyAccepted}
+                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                  required
+                  disabled={isLoading}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 accent-[#243F5B]"
+                />
+                <span>
+                  I agree to the{" "}
+                  <Link to="/privacy-policy" className={linkClass}>
+                    Privacy Policy
+                  </Link>{" "}
+                  and{" "}
+                  <Link to="/cookie-policy" className={linkClass}>
+                    Cookie Policy
+                  </Link>
+                  , and understand uploaded documents are processed securely via AI and not used to train public models.
+                </span>
+              </label>
+
+              <button type="submit" disabled={isLoading || !privacyAccepted} className={ctaClass}>
                 {isLoading ? t("auth.signup.loading") : t("auth.signup.submit")}
               </button>
             </form>

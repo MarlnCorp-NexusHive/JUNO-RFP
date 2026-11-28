@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { store } from "./store.js";
 import { putTenantFeature, getTenantFeature, getFeaturesStoragePath } from "../trial/featureStore.js";
 import { getTrialDataPath } from "../trial/tenantStore.js";
+import { readJsonSafe, writeJsonAtomic } from "../utils/atomicFile.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LEGACY_STATE_FILE = path.join(__dirname, "..", "data", "collaboration-runtime-state.json");
@@ -21,24 +22,41 @@ function getStateFile() {
   }
 }
 
+const MAX_PERSISTED_MESSAGES = 5000;
+const MAX_PERSISTED_LOGS = 5000;
+
 function persistNow() {
   try {
     const stateFile = getStateFile();
     const dir = path.dirname(stateFile);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    if (store.messages.length > MAX_PERSISTED_MESSAGES) {
+      store.messages = store.messages.slice(-MAX_PERSISTED_MESSAGES);
+    }
+    if (store.logs.length > MAX_PERSISTED_LOGS) {
+      store.logs = store.logs.slice(-MAX_PERSISTED_LOGS);
+    }
+    const sanitizedUsers = {};
+    for (const [id, u] of store.usersById.entries()) {
+      if (u?.tenantId || String(id).startsWith("user_pm_trial_") || String(id).startsWith("user_aud_trial_")) {
+        const { password: _drop, ...rest } = u;
+        sanitizedUsers[id] = rest;
+      } else {
+        sanitizedUsers[id] = u;
+      }
+    }
     const payload = {
       version: 1,
       savedAt: new Date().toISOString(),
-      users: Object.fromEntries(store.usersById),
+      users: sanitizedUsers,
+      sessions: Object.fromEntries(store.sessionsByToken),
       workspaces: Object.fromEntries(store.workspaces),
       questions: Object.fromEntries(store.questions),
       messages: store.messages,
       logs: store.logs,
       quarterlyByWorkspace: Object.fromEntries(store.quarterlyByWorkspace),
     };
-    const tmp = `${stateFile}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(payload), "utf8");
-    fs.renameSync(tmp, stateFile);
+    writeJsonAtomic(stateFile, payload, { pretty: false, backup: true });
   } catch (e) {
     console.warn("COLLABORATION PERSIST: save failed", e?.message || e);
   }
@@ -191,8 +209,8 @@ export function loadCollaborationState() {
     const stateFile = getStateFile();
     loadLegacyIfNeeded(stateFile);
     if (!fs.existsSync(stateFile)) return;
-    const raw = JSON.parse(fs.readFileSync(stateFile, "utf8"));
-    if (raw.version !== 1) return;
+    const { data: raw } = readJsonSafe(stateFile, "collaboration");
+    if (!raw || raw.version !== 1) return;
 
     store.workspaces = new Map(Object.entries(raw.workspaces || {}));
     store.questions = new Map(Object.entries(raw.questions || {}));
@@ -202,8 +220,19 @@ export function loadCollaborationState() {
     const users = raw.users && typeof raw.users === "object" ? raw.users : {};
     for (const u of Object.values(users)) {
       if (!u?.id || !u?.email) continue;
+      if (u.tenantId || String(u.id).startsWith("user_pm_trial_") || String(u.id).startsWith("user_aud_trial_")) {
+        delete u.password;
+      }
       store.usersById.set(u.id, u);
       store.usersByEmail.set(String(u.email).toLowerCase(), u.id);
+    }
+
+    const sessions = raw.sessions && typeof raw.sessions === "object" ? raw.sessions : {};
+    store.sessionsByToken = new Map();
+    for (const [tok, meta] of Object.entries(sessions)) {
+      if (tok && meta?.userId && store.usersById.has(meta.userId)) {
+        store.sessionsByToken.set(tok, meta);
+      }
     }
 
     const qbw = raw.quarterlyByWorkspace || {};

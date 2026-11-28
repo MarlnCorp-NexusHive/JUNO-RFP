@@ -27,11 +27,20 @@ async function searchFacApi({ keyword, page, limit }) {
     offset: String(pageIndex * pageSize),
   });
   if (kw) {
-    params.set("or", `(auditee_name.ilike.*${kw}*,audit_year.eq.${kw})`);
+    // Strip PostgREST filter syntax characters to prevent filter injection.
+    const safeKw = kw.replace(/[(),.*"\\]/g, " ").replace(/\s+/g, " ").trim();
+    if (safeKw) {
+      if (/^\d{4}$/.test(safeKw)) {
+        params.set("or", `(auditee_name.ilike.*${safeKw}*,audit_year.eq.${safeKw})`);
+      } else {
+        params.set("auditee_name", `ilike.*${safeKw}*`);
+      }
+    }
   }
 
   const url = `${FAC_BASE}/general?${params}`;
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(25_000),
     headers: {
       Accept: "application/json",
       // FAC may require Prefer for exact counts; keep simple for public access

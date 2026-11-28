@@ -353,7 +353,8 @@ export async function hydrateProjectWorkspaceFromServer(opts = {}) {
   try {
     const remote = await loadTrialFeatureData(TRIAL_FEATURE_KEY, EMPTY);
     let next = normalizeBlob(remote);
-    if (hasSeedRows(next)) {
+    const strippedSeeds = hasSeedRows(next);
+    if (strippedSeeds) {
       next = { ...stripSeed(next), freshReset: true };
     } else {
       next = { ...next, freshReset: true };
@@ -362,8 +363,15 @@ export async function hydrateProjectWorkspaceFromServer(opts = {}) {
     const nextJson = JSON.stringify(next);
     const prevJson = localStorage.getItem(storageKey());
     if (prevJson !== nextJson) {
-      localStorage.setItem(storageKey(), nextJson);
-      void persistCompanyWide(next);
+      try {
+        localStorage.setItem(storageKey(), nextJson);
+      } catch {
+        /* ignore quota errors */
+      }
+      // Only write back to server when we actually cleaned legacy seed rows.
+      if (strippedSeeds) {
+        void persistCompanyWide(next);
+      }
       if (notify) {
         try {
           window.dispatchEvent(new CustomEvent(PROJECT_WORKSPACE_CHANGED_EVENT, { detail: next }));

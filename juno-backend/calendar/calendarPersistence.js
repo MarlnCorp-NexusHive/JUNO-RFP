@@ -3,12 +3,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { DEMO_CALENDAR_KEY, eventsByScope, getManualEventsMap } from "./store.js";
 import { getTrialDataPath } from "../trial/tenantStore.js";
+import { readJsonSafe, writeJsonAtomic } from "../utils/atomicFile.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** Legacy path (pre tenant-scoped). Still loaded once for migration. */
 const LEGACY_STATE_FILE = path.join(__dirname, "..", "data", "calendar-runtime-state.json");
 
 let persistTimer = null;
+let exitHookRegistered = false;
 
 function getStateFile() {
   // Prefer same directory as trial-tenants.json so Render Persistent Disk keeps calendar too.
@@ -38,12 +40,27 @@ function persistNow() {
       demo: { manualEvents: demo },
       tenants,
     };
-    const tmp = `${stateFile}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(payload, null, 2), "utf8");
-    fs.renameSync(tmp, stateFile);
+    writeJsonAtomic(stateFile, payload, { pretty: true, backup: true });
   } catch (e) {
     console.warn("CALENDAR PERSIST: save failed", e?.message || e);
   }
+}
+
+export function flushCalendarPersist() {
+  if (persistTimer) {
+    clearTimeout(persistTimer);
+    persistTimer = null;
+  }
+  persistNow();
+}
+
+export function registerCalendarPersistOnExit() {
+  if (exitHookRegistered) return;
+  exitHookRegistered = true;
+  const onExit = () => flushCalendarPersist();
+  process.once("SIGINT", onExit);
+  process.once("SIGTERM", onExit);
+  process.once("beforeExit", onExit);
 }
 
 export function scheduleCalendarPersist() {
@@ -82,12 +99,12 @@ export function loadCalendarState() {
     const stateFile = getStateFile();
     let loadedFrom = null;
     if (fs.existsSync(stateFile)) {
-      const raw = JSON.parse(fs.readFileSync(stateFile, "utf8"));
-      loadFromPayload(raw);
+      const { data: raw } = readJsonSafe(stateFile, "calendar");
+      if (raw) loadFromPayload(raw);
       loadedFrom = stateFile;
     } else if (stateFile !== LEGACY_STATE_FILE && fs.existsSync(LEGACY_STATE_FILE)) {
-      const raw = JSON.parse(fs.readFileSync(LEGACY_STATE_FILE, "utf8"));
-      loadFromPayload(raw);
+      const { data: raw } = readJsonSafe(LEGACY_STATE_FILE, "calendar");
+      if (raw) loadFromPayload(raw);
       loadedFrom = LEGACY_STATE_FILE;
       // Rewrite into the preferred path so future boots use tenant file.
       persistNow();

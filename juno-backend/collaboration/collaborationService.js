@@ -1,4 +1,4 @@
-import { store, generateId, activityBus } from "./store.js";
+import { store, generateId, activityBus, issueCollabToken } from "./store.js";
 import { seedQuarterlyItems } from "./seedData.js";
 import { scheduleCollaborationPersist, persistCollaborationProgressNow } from "./collaborationPersistence.js";
 import { listUsersForTenant } from "../trial/tenantStore.js";
@@ -86,13 +86,15 @@ export function login(email, password) {
     throw e;
   }
   const u = store.usersById.get(id);
-  if (!u || u.password !== password) {
+  if (!u || !u.password || u.password !== password) {
     const e = new Error("Invalid credentials");
     e.statusCode = 401;
     throw e;
   }
+  const token = issueCollabToken(u.id);
+  scheduleCollaborationPersist();
   return {
-    token: u.id,
+    token,
     user: { id: u.id, email: u.email, name: u.name, role: u.role },
   };
 }
@@ -112,13 +114,11 @@ export function ensureTrialProposalManager({ tenantId, name } = {}) {
   }
   const id = `user_pm_trial_${safe}`;
   const email = `trial-pm-${safe}@juno.local`;
-  const password = `trial_${safe}`;
   let u = store.usersById.get(id);
   if (!u) {
     u = {
       id,
       email,
-      password,
       name: String(name || "Proposal Manager").trim() || "Proposal Manager",
       role: "proposal_manager",
       tenantId: safe,
@@ -129,6 +129,10 @@ export function ensureTrialProposalManager({ tenantId, name } = {}) {
     scheduleCollaborationPersist();
   } else {
     let dirty = false;
+    if (u.password) {
+      delete u.password;
+      dirty = true;
+    }
     if (name && String(name).trim() && u.name !== String(name).trim()) {
       u.name = String(name).trim();
       dirty = true;
@@ -143,8 +147,10 @@ export function ensureTrialProposalManager({ tenantId, name } = {}) {
     }
     if (dirty) scheduleCollaborationPersist();
   }
+  const token = issueCollabToken(u.id);
+  scheduleCollaborationPersist();
   return {
-    token: u.id,
+    token,
     user: { id: u.id, email: u.email, name: u.name, role: u.role, tenantId: u.tenantId },
   };
 }
@@ -187,7 +193,6 @@ export function ensureTrialAuditor({ tenantId, email, name } = {}) {
       id,
       email: em,
       collabEmail: localEmail,
-      password: `trial_aud_${safe}_${slug}`,
       name: displayName,
       role: "auditor",
       tenantId: safe,
@@ -298,8 +303,10 @@ export function ensureTrialAuditorSession({ tenantId, email, name } = {}) {
     throw e;
   }
   const u = store.usersById.get(aud.id);
+  const token = issueCollabToken(u.id);
+  scheduleCollaborationPersist();
   return {
-    token: u.id,
+    token,
     user: { id: u.id, email: u.email, name: u.name, role: u.role, tenantId: u.tenantId },
   };
 }
@@ -774,7 +781,12 @@ export function askClarification(auditorUserId, { workspaceId, questionId, messa
 
 export function replyClarification(pmUserId, { workspaceId, questionId, message }) {
   assertPmWorkspace(pmUserId, workspaceId);
-  getQuestionOrThrow(questionId);
+  const q = getQuestionOrThrow(questionId);
+  if (q.workspaceId !== workspaceId) {
+    const e = new Error("Question does not belong to this workspace");
+    e.statusCode = 400;
+    throw e;
+  }
   const body = String(message || "").trim();
   if (!body) {
     const e = new Error("message required");
@@ -824,7 +836,16 @@ export function listClarifications(workspaceId, requesterId, { questionId } = {}
     throw e;
   }
   let list = store.messages.filter((m) => m.workspaceId === workspaceId);
-  if (questionId) list = list.filter((m) => m.questionId === questionId);
+  if (questionId) {
+    list = list.filter((m) => m.questionId === questionId);
+  } else if (requester?.role === "auditor") {
+    const allowedQIds = new Set(
+      [...store.questions.values()]
+        .filter((q) => q.workspaceId === workspaceId && q.assignedTo === requesterId)
+        .map((q) => q.id),
+    );
+    list = list.filter((m) => allowedQIds.has(m.questionId));
+  }
   return list.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 

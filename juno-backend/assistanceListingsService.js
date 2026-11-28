@@ -10,12 +10,16 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EXCERPT_PATH = path.join(__dirname, "data", "assistance-listings-excerpt.json");
 
+let listingsCache = null;
+
 function loadListings() {
+  if (listingsCache) return listingsCache;
   const raw = JSON.parse(fs.readFileSync(EXCERPT_PATH, "utf8"));
-  return {
+  listingsCache = {
     meta: raw,
     listings: Array.isArray(raw.listings) ? raw.listings : [],
   };
+  return listingsCache;
 }
 
 function searchAssistanceListings({

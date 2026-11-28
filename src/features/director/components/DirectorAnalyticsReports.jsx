@@ -429,7 +429,7 @@ export default function DirectorAnalyticsReports() {
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [timeRange, setTimeRange] = useState("6M");
   const [activeTab, setActiveTab] = useState(isBidVault ? "submissions" : isContentHub ? "pastPerformance" : "recruitment");
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
 
   // AI Features State
   const [showFinancialIntelligence, setShowFinancialIntelligence] = useState(false);

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { endTabSession } from "./tabSessionManager.js";
 
 /* ================= BASE API ================= */
 
@@ -30,8 +31,11 @@ const API = axios.create({
 API.interceptors.request.use((config) => {
   try {
     const url = String(config.url || "");
-    // Collab uses its own Bearer user-id tokens — except trial-session, which needs the trial JWT.
-    const isTrialCollabBootstrap = url.includes("/rfp-collab/auth/trial-session");
+    // Collab uses its own Bearer tokens — except trial bootstrap/sync endpoints, which need the trial JWT.
+    const isTrialCollabBootstrap =
+      url.includes("/rfp-collab/auth/trial-session") ||
+      url.includes("/rfp-collab/auth/sync-trial-auditors") ||
+      url.includes("/rfp-collab/auth/trial-auditor-session");
     if (url.includes("/rfp-collab") && !isTrialCollabBootstrap) return config;
     const raw = localStorage.getItem("juno_trial_session");
     if (!raw) return config;
@@ -547,13 +551,54 @@ export const generateRfpDocument = async (payload) => {
   return assertBlobIsDocxOrThrow(res, "Generate RFP document");
 };
 
+/* ================= DATA PRIVACY (GDPR / CCPA / DPDP) ================= */
+export const exportMyTrialData = async () => {
+  const res = await API.get("/trial/auth/export-my-data", { timeout: 30_000 });
+  return res.data;
+};
+
+export const deleteMyTrialAccount = async () => {
+  const res = await API.delete("/trial/auth/account", { timeout: 30_000 });
+  return res.data;
+};
+
+export const forgotTrialPassword = async (email) => {
+  const res = await API.post("/trial/auth/forgot-password", { email }, { timeout: 30_000 });
+  return res.data;
+};
+
+export const resetTrialPassword = async ({ token, newPassword }) => {
+  const res = await API.post(
+    "/trial/auth/reset-password",
+    { token, newPassword },
+    { timeout: 30_000 },
+  );
+  return res.data;
+};
+
+export const updateTrialProfile = async ({ name }) => {
+  const res = await API.patch("/trial/auth/profile", { name }, { timeout: 30_000 });
+  return res.data;
+};
+
 /* ================= ERROR HANDLER ================= */
 API.interceptors.response.use(
   (response) => response,
   (error) => {
+    const status = error?.response?.status;
     const detail = error?.response?.data;
+    const code = typeof detail === "object" && !(detail instanceof Blob) ? detail?.code : "";
+    const reqUrl = String(error?.config?.url || "");
+    // Clear expired/revoked trial JWT so the user isn't stuck with a dead token.
+    if (
+      status === 401 &&
+      (code === "session_expired" || code === "invalid_session" || code === "trial_expired" || code === "tenant_disabled") &&
+      !reqUrl.includes("/trial/auth/login")
+    ) {
+      endTabSession({ clearSharedAuth: true, broadcast: true });
+    }
     if (detail instanceof Blob) {
-      console.error("API error:", error.message, "(response body is a Blob; status", error.response?.status + ")");
+      console.error("API error:", error.message, "(response body is a Blob; status", status + ")");
     } else {
       console.error("API error:", detail || error.message);
     }

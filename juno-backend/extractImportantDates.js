@@ -152,7 +152,8 @@ export async function extractImportantDates(openai, documentText) {
     return { important_dates: [] };
   }
 
-  const chunks = chunkDocumentText(text);
+  const MAX_CHUNKS = 20;
+  const chunks = chunkDocumentText(text).slice(0, MAX_CHUNKS);
   const merged = [];
   let lastError = null;
 

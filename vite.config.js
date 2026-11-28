@@ -30,10 +30,17 @@ export default defineConfig(({ mode }) => {
     "/generate-slide-deck": prox(),
     "/generate-work-document": prox(),
     "/technical-solution": prox(),
+    "/communication/ai": prox(),
+    "/pricing/ai": prox(),
+    "/pursuit/ai": prox(),
     "/competitive-intelligence-enrich": prox(),
     "/trial": prox(),
     "/grants": prox(),
-    "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates)$":
+    "/health": prox(),
+    "/metrics": prox(),
+    "/admin/health-metrics": prox(),
+    "/monitoring": prox(),
+    "^/(generate-answer|structure-rfp-requirements|ask-with-context|company-intelligence-remote|generate-company-profile|generate-rfp-document|ask-with-file|extract-dates|extract-qas|test-ai)$":
       prox(),
   };
 

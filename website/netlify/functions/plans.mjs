@@ -14,16 +14,32 @@ export default async (req) => {
   const portal = /^https:\/\/billing\.stripe\.com\//.test(process.env.STRIPE_PORTAL_URL || "") ? process.env.STRIPE_PORTAL_URL : null;
   if (!key) return json({ configured: false, plans: {}, portal }, 200, { "cache-control": "no-store" });
   const plans = {};
+  const tasks = [];
   for (const [plan, periods] of Object.entries(IDS())) {
     for (const [period, id] of Object.entries(periods)) {
       if (!id || !/^price_[A-Za-z0-9]+$/.test(id)) continue;
-      const r = await fetch(`https://api.stripe.com/v1/prices/${id}`, { headers: { authorization: `Bearer ${key}` } });
-      if (!r.ok) continue;
-      const p = await r.json();
-      if (!p.active || !p.recurring) continue;
-      (plans[plan] ||= {})[period] = { amount: p.unit_amount, currency: p.currency, interval: p.recurring.interval, interval_count: p.recurring.interval_count, per_seat: process.env.STRIPE_PER_SEAT === "true" };
+      tasks.push(
+        fetch(`https://api.stripe.com/v1/prices/${id}`, {
+          signal: AbortSignal.timeout(15_000),
+          headers: { authorization: `Bearer ${key}` },
+        })
+          .then(async (r) => {
+            if (!r.ok) return;
+            const p = await r.json().catch(() => null);
+            if (!p || !p.active || !p.recurring) return;
+            (plans[plan] ||= {})[period] = {
+              amount: p.unit_amount,
+              currency: p.currency,
+              interval: p.recurring.interval,
+              interval_count: p.recurring.interval_count,
+              per_seat: process.env.STRIPE_PER_SEAT === "true",
+            };
+          })
+          .catch(() => {}),
+      );
     }
   }
+  await Promise.all(tasks);
   return json({ configured: Object.keys(plans).length > 0, plans, portal }, 200, { "cache-control": "public, max-age=300" });
 };
 export const config = { path: "/api/plans" };

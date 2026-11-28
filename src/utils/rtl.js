@@ -1,3 +1,5 @@
+import { isArabicUiEnabled } from './languageUtils';
+
 export const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
 
 export const isRTL = (language) => {
@@ -49,7 +51,9 @@ export const restoreRTLState = () => {
   if (typeof document === 'undefined') return false; // SSR safety
   
   try {
-    const savedLanguage = localStorage.getItem('preferred-language') || 'en';
+    const pathname = typeof window !== 'undefined' ? window.location?.pathname : '';
+    const rawSaved = localStorage.getItem('preferred-language') || 'en';
+    const savedLanguage = !isArabicUiEnabled(pathname) && isRTL(rawSaved) ? 'en' : rawSaved;
     const shouldBeRTL = isRTL(savedLanguage);
     
     console.log('Restoring RTL state for language:', savedLanguage, 'RTL:', shouldBeRTL);

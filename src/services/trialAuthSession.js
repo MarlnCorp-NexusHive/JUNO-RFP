@@ -34,7 +34,42 @@ export function setTrialSession(payload) {
     usage: payload.usage || null,
     savedAt: new Date().toISOString(),
   };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch {
+    /* ignore storage quota / private mode errors */
+  }
+  return session;
+}
+
+/** Keep the signed-in profile in sync after a rectification update. */
+export function patchTrialSessionUser(patch) {
+  const current = getTrialSession();
+  if (!current || !patch || typeof patch !== "object") return current;
+  const nextUser = { ...(current.user || {}), ...patch };
+  const session = {
+    ...current,
+    user: nextUser,
+    savedAt: new Date().toISOString(),
+  };
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch {
+    /* ignore storage quota / private mode errors */
+  }
+  if (patch.name) {
+    try {
+      const raw = localStorage.getItem("rbac_current_user");
+      if (raw) {
+        const rbac = JSON.parse(raw);
+        rbac.name = patch.name;
+        rbac.displayName = patch.name;
+        localStorage.setItem("rbac_current_user", JSON.stringify(rbac));
+      }
+    } catch {
+      /* ignore malformed local profile */
+    }
+  }
   return session;
 }
 

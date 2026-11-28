@@ -34,6 +34,7 @@ const US_STATES = new Set(
 async function postGrantsGov(path, body) {
   const res = await fetch(`${GRANTS_GOV_BASE}/${path}`, {
     method: "POST",
+    signal: AbortSignal.timeout(25_000),
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(body || {}),
   });
@@ -109,6 +110,7 @@ async function fetchProPublicaOrg(einDigits) {
   if (!einDigits) return null;
   try {
     const res = await fetch(`${PROPUBLICA_BASE}/organizations/${einDigits}.json`, {
+      signal: AbortSignal.timeout(15_000),
       headers: { Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -131,6 +133,7 @@ async function searchProPublicaPages({ q, state, ntee, pages }) {
     if (ntee) params.set("ntee[id]", ntee);
 
     const res = await fetch(`${PROPUBLICA_BASE}/search.json?${params.toString()}`, {
+      signal: AbortSignal.timeout(20_000),
       headers: { Accept: "application/json" },
     });
     if (!res.ok) {
@@ -365,12 +368,12 @@ async function searchPrivateFunders({
 
   let candidates = [...byEin.values()];
 
-  // When only paging relevance results, take the requested page slice before enrich.
+  // When only paging relevance results, reuse the already-fetched page slice (no duplicate fetch).
   if (!needsEnrichPool) {
     const start = pageIndex * pageSize;
-    // Re-fetch exact page from original ranking rather than deduped map order.
-    const paged = await searchProPublicaPages({ q, state, ntee, pages: pageIndex + 1 });
-    candidates = paged.organizations.slice(start, start + pageSize);
+    candidates = search.organizations.slice(start, start + pageSize);
+  } else if (candidates.length > 80) {
+    candidates = candidates.slice(0, 80);
   }
 
   const enriched = await mapPool(candidates, 8, async (org) => {

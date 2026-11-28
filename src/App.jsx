@@ -2,6 +2,10 @@
 import React from "react";
 import LandingPage from "./components/LandingPage";
 import CookiePolicy from "./components/CookiePolicy";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import PrivacyConsentBanner from "./components/PrivacyConsentBanner";
+import SubprocessorsPage from "./components/SubprocessorsPage";
+import TermsOfService from "./components/TermsOfService";
 import LoginPage from "./components/LoginPage";
 import CorporateInfo from "./components/CorporateInfo";
 import SuperAdminDashboard from "./components/SuperAdminDashboard";
@@ -9,6 +13,7 @@ import RBACUsers from "./components/RBACUsers";
 import RBACTeams from "./components/RBACTeams";
 import RBACTemplates from "./components/RBACTemplates";
 import RBACLogs from "./components/RBACLogs";
+import SystemHealthDashboard from "./components/SystemHealthDashboard";
 import MarketingHeadLayout from "./features/marketing-head/pages/MarketingHeadLayout";
 import MarketingHeadDashboard from "./features/marketing-head/pages/MarketingHeadDashboard";
 import MarketingHeadTeamManagement from './features/marketing-head/components/MarketingHeadTeamManagement';
@@ -131,6 +136,7 @@ import AdmissionHeadEnhanced from './features/ai-enhanced/admission-head/pages/A
 import DirectorAIChat from "./features/director/pages/DirectorAIChat";
 import MarketingHeadAIChat from "./features/marketing-head/pages/MarketingHeadAIChat";
 import AdmissionHeadAIChat from "./features/admission-head/pages/AdmissionHeadAIChat";
+import SessionManagerGuard from "./components/SessionManagerGuard";
 
 /** Old bookmarks: /rbac/proposal-manager/... → /app/... */
 function LegacyProposalManagerRedirect() {
@@ -159,6 +165,7 @@ export default function App() {
       // Router wraps LocalizationProvider so Arabic gating can follow /login vs /app.
       <Router basename="/">
     <LocalizationProvider>
+      <SessionManagerGuard>
         <Routes>
         {/* <Route path="/" element={<LandingPage />} /> */}
         <Route path="/" element={<LoginPage />} />
@@ -171,6 +178,9 @@ export default function App() {
           <Route path="workspace/:workspaceId/question/:questionId" element={<RfpAuditorQuestion />} />
         </Route>
         <Route path="/cookie-policy" element={<CookiePolicy />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/subprocessors" element={<SubprocessorsPage />} />
+        <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/corporate-info" element={<CorporateInfo />} />
         <Route path="/rbac" element={<SuperAdminDashboard />} />
@@ -178,6 +188,7 @@ export default function App() {
         <Route path="/rbac/teams" element={<RBACTeams />} />
         <Route path="/rbac/templates" element={<RBACTemplates />} />
         <Route path="/rbac/logs" element={<RBACLogs />} />
+        <Route path="/rbac/system-health" element={<SystemHealthDashboard />} />
         <Route path="/rbac/settings" element={<JunoWorkspaceSettings />} />
         
         {/* Marketing Head Routes */}
@@ -316,7 +327,10 @@ export default function App() {
         <Route path="/rbac/hod" element={<HoDDashboard />} />
         {/* University-specific routes removed for corporate ERP */}
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </SessionManagerGuard>
+      <PrivacyConsentBanner />
     </LocalizationProvider>
       </Router>
   );

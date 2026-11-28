@@ -200,7 +200,7 @@ const replySuggestionsRef = useRef(null);
   console.log('Marketing Communication - Ready:', ready);
   console.log('Marketing Communication - Title translation:', t('communication.title'));
 
-  const user = JSON.parse(localStorage.getItem('rbac_current_user'));
+  const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
 
   const handleChannelClick = (channel) => {
     setSelectedChannel(channel);

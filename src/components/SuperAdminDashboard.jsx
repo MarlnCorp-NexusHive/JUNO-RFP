@@ -2,6 +2,7 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { TourProvider } from "./tours/TourContext";
 
 const features = [
   { label: "Dashboard", icon: "🏠", route: "/rbac" },
@@ -9,6 +10,7 @@ const features = [
   { label: "Teams & Roles", icon: "👥", route: "/rbac/teams" },
   { label: "Role Templates", icon: "📄", route: "/rbac/templates" },
   { label: "Audit Logs", icon: "📝", route: "/rbac/logs" },
+  { label: "System Health", icon: "📊", route: "/rbac/system-health" },
   { label: "System Settings", icon: "⚙️", route: "/rbac/settings" },
 ];
 
@@ -18,6 +20,7 @@ export default function SuperAdminDashboard() {
   const user = (() => { try { return JSON.parse(localStorage.getItem('rbac_current_user')); } catch { return null; } })();
   const welcomeMessage = t(user?.username || 'superadmin');
   return (
+    <TourProvider>
     <div className="flex min-h-screen bg-[#F4F6F9]">
       <Sidebar features={features} />
       {/* Main Content */}
@@ -50,6 +53,12 @@ export default function SuperAdminDashboard() {
             <button className="text-primary font-semibold hover:underline" onClick={() => navigate('/rbac/logs')}>View Logs</button>
           </div>
           <div className="bg-card rounded-2xl shadow p-6 flex flex-col items-start">
+            <span className="text-2xl mb-2">📊</span>
+            <div className="font-semibold text-lg mb-1 text-foreground">System Health &amp; Usage</div>
+            <div className="text-muted-foreground mb-4">Monitor live memory, CPU, active users, logins, and time spent.</div>
+            <button className="text-primary font-semibold hover:underline" onClick={() => navigate('/rbac/system-health')}>Open Health Dashboard</button>
+          </div>
+          <div className="bg-card rounded-2xl shadow p-6 flex flex-col items-start">
             <span className="text-2xl mb-2">⚙️</span>
             <div className="font-semibold text-lg mb-1 text-foreground">System Settings</div>
             <div className="text-muted-foreground mb-4">Configure system-wide settings.</div>
@@ -58,5 +67,6 @@ export default function SuperAdminDashboard() {
         </div>
       </main>
     </div>
+    </TourProvider>
   );
 } 

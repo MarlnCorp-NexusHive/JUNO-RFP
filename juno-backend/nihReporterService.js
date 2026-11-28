@@ -44,6 +44,7 @@ async function searchNih({ keyword = "", agency = "", page = 0, limit = 25 } = {
 
   const res = await fetch(NIH_URL, {
     method: "POST",
+    signal: AbortSignal.timeout(25_000),
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(body),
   });

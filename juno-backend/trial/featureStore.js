@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getTrialDataPath } from "./tenantStore.js";
+import { readJsonSafe, writeJsonAtomic, writeJsonAtomicAsync } from "../utils/atomicFile.js";
 
 /** Allowed feature keys for PM clean-slate tabs. */
 export const FEATURE_KEYS = [
@@ -89,45 +90,91 @@ function ensureDir() {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
+let cachedFeaturesDb = null;
+let cachedFeaturesPath = null;
+let featuresFlushTimer = null;
+let featuresFlushInFlight = false;
+let featuresFlushPending = false;
+let featuresExitRegistered = false;
+
+function registerFeaturesExitOnce() {
+  if (featuresExitRegistered) return;
+  featuresExitRegistered = true;
+  const onExit = () => {
+    try {
+      flushFeaturesDbSync();
+    } catch {
+      /* best-effort */
+    }
+  };
+  process.once("SIGINT", onExit);
+  process.once("SIGTERM", onExit);
+  process.once("beforeExit", onExit);
+}
+
+async function runFeaturesAsyncFlush() {
+  if (featuresFlushInFlight || !cachedFeaturesDb || !cachedFeaturesPath) return;
+  featuresFlushInFlight = true;
+  try {
+    do {
+      featuresFlushPending = false;
+      await writeJsonAtomicAsync(cachedFeaturesPath, cachedFeaturesDb, { pretty: false, backup: true });
+    } while (featuresFlushPending);
+  } catch (err) {
+    console.error("[trial-features] async flush failed:", err?.message || err);
+  } finally {
+    featuresFlushInFlight = false;
+  }
+}
+
+function scheduleFeaturesFlush() {
+  featuresFlushPending = true;
+  registerFeaturesExitOnce();
+  if (featuresFlushTimer) return;
+  featuresFlushTimer = setTimeout(() => {
+    featuresFlushTimer = null;
+    void runFeaturesAsyncFlush();
+  }, 50);
+  if (typeof featuresFlushTimer.unref === "function") featuresFlushTimer.unref();
+}
+
+export function flushFeaturesDbSync() {
+  if (featuresFlushTimer) {
+    clearTimeout(featuresFlushTimer);
+    featuresFlushTimer = null;
+  }
+  if (!cachedFeaturesDb || !cachedFeaturesPath) return;
+  featuresFlushPending = false;
+  ensureDir();
+  writeJsonAtomic(cachedFeaturesPath, cachedFeaturesDb, { pretty: false, dirFsync: true, backup: true });
+}
+
+export function invalidateFeaturesDbCache() {
+  cachedFeaturesDb = null;
+  cachedFeaturesPath = null;
+}
+
 function loadFeaturesDb() {
   const dataPath = getFeaturesDataPath();
-  try {
-    if (!fs.existsSync(dataPath)) return emptyFeaturesDb();
-    const raw = fs.readFileSync(dataPath, "utf8");
-    const parsed = JSON.parse(raw);
-    return {
-      tenants:
-        parsed?.tenants && typeof parsed.tenants === "object" ? parsed.tenants : {},
-    };
-  } catch (err) {
-    console.warn("[trial-features] failed to load:", dataPath, err.message);
-    return emptyFeaturesDb();
+  if (cachedFeaturesDb && cachedFeaturesPath === dataPath) {
+    return cachedFeaturesDb;
   }
+  const { exists, data: parsed } = readJsonSafe(dataPath, "trial-features");
+  cachedFeaturesDb = !exists || !parsed
+    ? emptyFeaturesDb()
+    : {
+        tenants:
+          parsed?.tenants && typeof parsed.tenants === "object" ? parsed.tenants : {},
+      };
+  cachedFeaturesPath = dataPath;
+  return cachedFeaturesDb;
 }
 
 function saveFeaturesDb(db) {
   const dataPath = getFeaturesDataPath();
-  ensureDir();
-  const payload = JSON.stringify(db, null, 2);
-  const tmp = `${dataPath}.tmp`;
-  const fd = fs.openSync(tmp, "w");
-  try {
-    fs.writeFileSync(fd, payload, "utf8");
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmp, dataPath);
-  try {
-    const dirFd = fs.openSync(path.dirname(dataPath), "r");
-    try {
-      fs.fsyncSync(dirFd);
-    } finally {
-      fs.closeSync(dirFd);
-    }
-  } catch {
-    /* best-effort */
-  }
+  cachedFeaturesDb = db;
+  cachedFeaturesPath = dataPath;
+  scheduleFeaturesFlush();
 }
 
 export function isValidFeatureKey(key) {
@@ -200,6 +247,30 @@ export function deleteTenantFeature(tenantId, key) {
     saveFeaturesDb(db);
   }
   return { key, data: getEmptyFeature(key), updatedAt: null };
+}
+
+export function exportAllTenantFeatures(tenantId) {
+  if (!tenantId) return {};
+  const db = loadFeaturesDb();
+  const tenant = db.tenants[tenantId] || {};
+  const out = {};
+  for (const key of FEATURE_KEYS) {
+    if (tenant[key]) {
+      out[key] = tenant[key];
+    }
+  }
+  return out;
+}
+
+export function purgeTenantFeatures(tenantId) {
+  if (!tenantId) return false;
+  const db = loadFeaturesDb();
+  if (db.tenants[tenantId]) {
+    delete db.tenants[tenantId];
+    saveFeaturesDb(db);
+    return true;
+  }
+  return false;
 }
 
 export function getFeaturesStoragePath() {
