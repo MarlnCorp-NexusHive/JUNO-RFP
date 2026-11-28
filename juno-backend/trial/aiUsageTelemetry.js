@@ -300,3 +300,40 @@ aiSettingsRouter.delete("/", requireTrialAuth, (req, res) => {
     return res.status(500).json({ error: err?.message || "Failed to reset settings" });
   }
 });
+
+const PLAN_TOKENS = { team: 20e6, pro: 40e6, ent: 60e6 };
+
+/** Lightweight live summary for the header meter: this month's tenant usage vs allowance. */
+aiSettingsRouter.get("/usage", requireTrialAuth, (req, res) => {
+  try {
+    const tid = req.tenantId;
+    const existing = getTenantFeature(tid, "settings");
+    const norm = normalizeTenantSettings(existing.data, tid);
+    const mk = todayISO().slice(0, 7);
+    const monthEntries = norm.log.filter(
+      (x) => x && x.ws === tid && String(x.day || "").slice(0, 7) === mk,
+    );
+    const tok = monthEntries.reduce((s, x) => s + (x.tin || 0) + (x.tout || 0), 0);
+    const cost = monthEntries.reduce((s, x) => s + (x.cost || 0), 0);
+    const wsCfg = norm.cfg.ws[tid] || { plan: "pro", topup: 0, cap: 250 };
+    const allow = (PLAN_TOKENS[wsCfg.plan] || PLAN_TOKENS.pro) + (wsCfg.topup || 0);
+    const cap = Number(wsCfg.cap) || 0;
+    return res.json({
+      ok: true,
+      tenantId: tid,
+      month: mk,
+      tokens: Math.round(tok),
+      allowance: allow,
+      pct: allow ? (tok / allow) * 100 : 0,
+      cost,
+      cap,
+      capPct: cap ? (cost / cap) * 100 : 0,
+      calls: monthEntries.length,
+      overage: norm.cfg.overage,
+      blocked: (cap > 0 && cost >= cap) ? "cap" : tok >= allow && norm.cfg.overage === "block" ? "allowance" : "",
+      updatedAt: existing.updatedAt,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err?.message || "Failed to load usage" });
+  }
+});

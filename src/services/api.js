@@ -53,13 +53,17 @@ API.interceptors.response.use((response) => {
     const method = String(response?.config?.method || "").toLowerCase();
     const url = String(response?.config?.url || "");
     if (
-      method === "post" &&
-      !url.includes("/trial/settings") &&
+      ["post", "put", "patch", "delete"].includes(method) &&
       !url.includes("/trial/auth") &&
       typeof window !== "undefined" &&
       localStorage.getItem("juno_trial_session")
     ) {
-      window.dispatchEvent(new CustomEvent("juno:ai-usage-updated"));
+      if (method === "post" && !url.includes("/trial/settings")) {
+        window.dispatchEvent(new CustomEvent("juno:ai-usage-updated"));
+      }
+      if (!url.includes("/trial/activity")) {
+        window.dispatchEvent(new CustomEvent("juno:activity-updated"));
+      }
     }
   } catch {
     /* ignore */

@@ -152,6 +152,12 @@ export async function fetchTrialSettings() {
   return res.data;
 }
 
+/** Lightweight this-month tenant usage summary used by the live header meter. */
+export async function fetchTrialUsageSummary() {
+  const res = await API.get("/trial/settings/usage", { timeout: 15_000 });
+  return res.data;
+}
+
 export async function saveTrialSettings(cfg) {
   const res = await API.put("/trial/settings", { cfg }, { timeout: 20_000 });
   return res.data;

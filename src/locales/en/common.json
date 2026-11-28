@@ -233,7 +233,8 @@
     "topology": "Topology",
     "grants": "RFP/Grants",
     "awardManagement": "Award management",
-    "projectWorkspace": "Project workspace"
+    "projectWorkspace": "Project workspace",
+    "grantPipeline": "Grant pipeline"
   },
   "proposalManagerNav": {
     "home": "Home",

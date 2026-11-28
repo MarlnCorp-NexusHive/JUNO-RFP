@@ -104,6 +104,7 @@ import WinSlidePage from './features/proposal-manager/components/WinSlidePage';
 import GrantsPage from './features/proposal-manager/components/GrantsPage';
 import AwardManagementPage from './features/proposal-manager/components/AwardManagementPage';
 import ProjectWorkspacePage from './features/proposal-manager/components/ProjectWorkspacePage';
+import GrantPipelinePage from './features/proposal-manager/components/GrantPipelinePage';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
@@ -272,6 +273,7 @@ export default function App() {
           <Route path="grants" element={<GrantsPage />} />
           <Route path="award-management" element={<AwardManagementPage />} />
           <Route path="project-workspace" element={<ProjectWorkspacePage />} />
+          <Route path="grant-pipeline" element={<GrantPipelinePage />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
           <Route path="content-hub" element={<ProposalManagerContentHub />} />
           <Route path="pricing" element={<ProposalPricingPage />} />
