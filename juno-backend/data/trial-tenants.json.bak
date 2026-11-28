@@ -1,0 +1,255 @@
+{
+  "tenants": [
+    {
+      "id": "t_juno-walkthrough_b330477716c8",
+      "name": "JUNO Walkthrough",
+      "status": "active",
+      "permanent": true,
+      "neverExpires": true,
+      "trialDays": null,
+      "trialStartsAt": "2026-11-21T19:13:50.933Z",
+      "trialEndsAt": null,
+      "aiDailyLimit": null,
+      "aiMonthlyLimit": null,
+      "brandLogo": "marln",
+      "createdAt": "2026-11-21T19:13:50.933Z",
+      "walkthrough": true
+    },
+    {
+      "id": "t_mrln_b828efd68a16",
+      "name": "MRLN",
+      "status": "active",
+      "trialDays": 7,
+      "trialStartsAt": "2026-11-21T19:16:02.622Z",
+      "trialEndsAt": "2026-11-30T19:16:02.622Z",
+      "aiDailyLimit": null,
+      "aiMonthlyLimit": null,
+      "brandLogo": "marln",
+      "createdAt": "2026-11-21T19:15:53.072Z",
+      "activatedAt": "2026-11-21T19:16:02.622Z"
+    },
+    {
+      "id": "t_e2e-final-labs_be419253d3ef",
+      "name": "E2E Final Labs",
+      "status": "active",
+      "trialDays": 7,
+      "trialStartsAt": "2026-11-28T20:36:55.071Z",
+      "trialEndsAt": "2026-12-07T20:36:55.071Z",
+      "aiDailyLimit": null,
+      "aiMonthlyLimit": null,
+      "brandLogo": "marln",
+      "createdAt": "2026-11-28T20:36:45.791Z",
+      "activatedAt": "2026-11-28T20:36:55.071Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "u_4c4b935902cb",
+      "tenantId": "t_juno-walkthrough_b330477716c8",
+      "email": "maharshi@marlncorp.ai",
+      "name": "Maharshi Nath",
+      "passwordSalt": "33959d169c812b4fb0e14985c9f58990",
+      "passwordHash": "5ed5270a01cfc4ed2abd079d9c954755e51c0e508adce15eb35979515007d1b4062f57140b7a317b7cd52bdfff3f33678baa9c9f72ff453a39efb004599e65d1",
+      "role": "Proposal Manager",
+      "team": "Proposal Team",
+      "emailVerified": true,
+      "createdAt": "2026-11-21T19:13:50.933Z",
+      "walkthrough": true
+    },
+    {
+      "id": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "email": "nk.das0099@gmail.com",
+      "name": "Nitu Kumar Das",
+      "passwordSalt": "05e7e6a7b7704e31473bfafac91460a5",
+      "passwordHash": "8e3f427f5980b7e3d652a4dbb4be6072e194778628f530adca7a047a5b4b96ac6e40ced7b4dca7776f57961a47450d96f34d645f230ad8f41b329f9d9e11f996",
+      "role": "Proposal Manager",
+      "team": "Proposal Team",
+      "emailVerified": true,
+      "createdAt": "2026-11-21T19:15:53.072Z",
+      "emailVerifiedAt": "2026-11-21T19:16:02.622Z"
+    },
+    {
+      "id": "u_55d23a19cbc4",
+      "tenantId": "t_e2e-final-labs_be419253d3ef",
+      "email": "e2e.final.20261129@example.com",
+      "name": "Final Tester Updated",
+      "passwordSalt": "2ab90b6d1ce8c19217cfffaacebb6da3",
+      "passwordHash": "1d598b4c8f7f17b7aec557af926703eb7ebf1918061e61f1179cdc7694009604ad4ffe2ec1e9d1490d5aa2a2b11313906c68099c6b0eb2b9ff226be78ffa49d4",
+      "role": "Proposal Manager",
+      "team": "Proposal Team",
+      "emailVerified": true,
+      "privacyConsent": {
+        "accepted": true,
+        "version": "2026-11",
+        "acceptedAt": "2026-11-28T20:36:45.791Z",
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Cursor/3.31.11 Chrome/150.0.7871.250 Electron/43.8.9 Safari/537.36",
+        "source": "signup"
+      },
+      "createdAt": "2026-11-28T20:36:45.791Z",
+      "emailVerifiedAt": "2026-11-28T20:36:55.071Z",
+      "updatedAt": "2026-11-28T20:37:33.169Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "1eff9cb04fe9b1c2274872b4d43d7c3c0987fd15851b999987ee6b5e07e99ded",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:16:09.193Z",
+      "createdAt": "2026-11-21T19:16:09.193Z"
+    },
+    {
+      "token": "66d1b0bec6be5f72369e4210c9b6c56d903260dadd71292f0784153860b1554e",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:18:30.677Z",
+      "createdAt": "2026-11-21T19:18:30.677Z"
+    },
+    {
+      "token": "60f9b612f76480523f8652eab48fb553b8ba801e9a1143b112b332c80a1e6b82",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:18:41.032Z",
+      "createdAt": "2026-11-21T19:18:41.032Z"
+    },
+    {
+      "token": "c4ef44138f27c672b616380be679fcac50adc62c203b2250fd1bcd5e7fa7bb37",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:27:16.180Z",
+      "createdAt": "2026-11-21T19:27:16.180Z"
+    },
+    {
+      "token": "b681d351ebdf9889f6ac1ee173c98cb8c26c512032a965136c611cf48def79af",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:27:29.497Z",
+      "createdAt": "2026-11-21T19:27:29.497Z"
+    },
+    {
+      "token": "9a7cfdafcc2a5ca08d317b5c4bacbfcd9e5911ae1ad7a8868859f84b9c78b793",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:27:38.179Z",
+      "createdAt": "2026-11-21T19:27:38.179Z"
+    },
+    {
+      "token": "c09cf2d87672bc9306a66bd3fc9b845c58584a3a712c5a9a169780b5d90ea3c9",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:27:41.092Z",
+      "createdAt": "2026-11-21T19:27:41.092Z"
+    },
+    {
+      "token": "b202be5d361400be77b119f10905ffe6ba1afcccf08a9921096b726bfe30ac57",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:27:56.026Z",
+      "createdAt": "2026-11-21T19:27:56.027Z"
+    },
+    {
+      "token": "85abe998b1f017c2c8a5b9600df639e73648d2102c757f501b46dba7aaca22bf",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:30:12.688Z",
+      "createdAt": "2026-11-21T19:30:12.688Z"
+    },
+    {
+      "token": "e15c86808397c099615a91b8c0ee70fa1cfef4cea843e4b1b52a7ad66779e90f",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:30:23.352Z",
+      "createdAt": "2026-11-21T19:30:23.352Z"
+    },
+    {
+      "token": "17d44dd0683ee87553edfda322c784bc4fd4ce825c641afb602df83dad1fba30",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:32:03.348Z",
+      "createdAt": "2026-11-21T19:32:03.348Z"
+    },
+    {
+      "token": "a4d9698328a16ddb027d8de020749b53efe13b19b1f8cb05e1cc2a4a043d336c",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:32:29.391Z",
+      "createdAt": "2026-11-21T19:32:29.391Z"
+    },
+    {
+      "token": "e94a332f0a3ef52107eef34cbd3889deb52fb9920df31383eada6193490f9061",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-05T19:43:33.966Z",
+      "createdAt": "2026-11-21T19:43:33.966Z"
+    },
+    {
+      "token": "a7fcfdfba970277f784587640056456221ccefc6a3a0500840d314033fcd02d5",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-06T15:11:10.472Z",
+      "createdAt": "2026-11-22T15:11:10.472Z"
+    },
+    {
+      "token": "4e36f69dc2ef4263a413a301e0a2aef2a56d9e9478a5a864b3c2c344331255ab",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-06T15:12:32.592Z",
+      "createdAt": "2026-11-22T15:12:32.592Z"
+    },
+    {
+      "token": "acf1f951badaac46a19dd6ebcc389497d61a44671954bbe4c792423a1dffd975",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-06T15:25:13.132Z",
+      "createdAt": "2026-11-22T15:25:13.132Z"
+    },
+    {
+      "token": "b43475cfa51adf2f8cfede2a7887a5e6368b2e5accd266f91d50e65b940a70d6",
+      "userId": "u_38843068e799",
+      "tenantId": "t_mrln_b828efd68a16",
+      "expiresAt": "2026-12-06T15:25:22.265Z",
+      "createdAt": "2026-11-22T15:25:22.265Z"
+    },
+    {
+      "token": "0cb87b4df3b0f4d02b7b078967c9a0a166da326905ae055c6f9a205ea0080850",
+      "userId": "u_55d23a19cbc4",
+      "tenantId": "t_e2e-final-labs_be419253d3ef",
+      "expiresAt": "2026-12-12T20:37:10.804Z",
+      "createdAt": "2026-11-28T20:37:10.805Z"
+    }
+  ],
+  "usage": {
+    "t_juno-walkthrough_b330477716c8": {},
+    "t_mrln_b828efd68a16": {},
+    "t_e2e-final-labs_be419253d3ef": {}
+  },
+  "emailTokens": [],
+  "usedEmailTokens": [
+    {
+      "token": "49742e7a5e64147727bb976d7995d7c760b28806baa3741b6ca173fded73c408",
+      "userId": "u_3972c76c9390",
+      "tenantId": "t_e2e-privacy-labs_3a1980935258",
+      "usedAt": "2026-11-28T19:45:23.860Z"
+    },
+    {
+      "token": "2573149d3644eca333432a14fd638bee4fa8d9c958e3f419879f3f60f0a31c53",
+      "userId": "u_55efe3815f51",
+      "tenantId": "t_no-consent-co_2c16dabe95e6",
+      "usedAt": "2026-11-28T19:47:03.142Z"
+    },
+    {
+      "token": "2b33ad12d22570a935133f2abfc1c2efca963bb44cdb36b7952cab6f6fc892e3",
+      "userId": "u_1768197c9b09",
+      "tenantId": "t_consent-fix-co_755357d60ac7",
+      "usedAt": "2026-11-28T19:52:24.270Z"
+    },
+    {
+      "token": "0c49c6a291f068a4be0b239613333978b9e0acc589fb454c409b2f215326cfa5",
+      "userId": "u_55d23a19cbc4",
+      "tenantId": "t_e2e-final-labs_be419253d3ef",
+      "usedAt": "2026-11-28T20:36:55.071Z"
+    }
+  ]
+}
