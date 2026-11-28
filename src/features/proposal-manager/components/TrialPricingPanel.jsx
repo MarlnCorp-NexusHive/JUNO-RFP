@@ -405,7 +405,7 @@ export default function TrialPricingPanel({ issuer, clearLink }) {
               onClick={runSuggestRates}
               className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-sm font-medium px-3 py-2 dark:border-amber-600 dark:bg-amber-950/40 dark:text-amber-100 disabled:opacity-50"
             >
-              <FiZap /> {aiBusy === "rates" ? label("Suggesting…", "جاري الاقتراح…") : label("AI suggest rate card", "اقتراح بطاقة أسعار")}
+              <FiZap /> {aiBusy === "rates" ? label("Suggesting…", "جاري الاقتراح…") : label("Sage AI suggest rate card", "اقتراح بطاقة أسعار")}
             </button>
           </div>
 
@@ -458,7 +458,7 @@ export default function TrialPricingPanel({ issuer, clearLink }) {
               </ResponsiveContainer>
             </motion.section>
           ) : (
-            <p className="text-sm text-gray-500 text-center py-6">{label("No rates yet. Add a role or use AI suggest.", "لا أسعار بعد. أضف دوراً أو استخدم الاقتراح.")}</p>
+            <p className="text-sm text-gray-500 text-center py-6">{label("No rates yet. Add a role or use Sage AI suggest.", "لا أسعار بعد. أضف دوراً أو استخدم الاقتراح.")}</p>
           )}
 
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-700 overflow-hidden">

@@ -656,7 +656,7 @@ export default function Applications() {
             </div>
             <AISearchComponent
               onSearch={handleAISearch}
-              placeholder={isRTLMode ? 'ابحث في الطلبات أو اسأل الذكاء الاصطناعي...' : 'Search applications or ask AI anything...'}
+              placeholder={isRTLMode ? 'ابحث في الطلبات أو اسأل الذكاء الاصطناعي...' : 'Search applications or ask Sage AI anything...'}
               className="mb-4"
               useDummyData={true}
             />

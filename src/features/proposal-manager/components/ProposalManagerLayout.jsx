@@ -14,6 +14,8 @@ import { ProposalIssuerProvider } from "./ProposalIssuerContext";
 import { parseLocalStorageJson } from "../../../utils/safeStorage.js";
 import { getTrialSession } from "../../../services/trialAuthSession.js";
 import GlobalFloatingCalendar from "./GlobalFloatingCalendar.jsx";
+import GlobalActivityWidget from "../../activity/GlobalActivityWidget.jsx";
+import LiveAiUsageMeter from "../../settings/LiveAiUsageMeter.jsx";
 import {
   getNavMode,
   proposalManagerLandingPath,
@@ -128,10 +130,12 @@ export default function ProposalManagerLayout() {
             ? (isRTLMode ? 'mr-56' : 'ml-56') 
             : (isRTLMode ? 'mr-12' : 'ml-12')
         }`}>
+          <LiveAiUsageMeter />
           <Outlet />
         </main>
 
         <GlobalFloatingCalendar />
+        <GlobalActivityWidget />
 
         {/* Tour Overlay */}
         <TourOverlay />

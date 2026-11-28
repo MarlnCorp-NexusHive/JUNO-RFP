@@ -24,6 +24,7 @@ export const TRIAL_FEATURE_KEYS = [
   "dashboard",
   "awardManagement",
   "projectWorkspace",
+  "settings",
 ];
 
 export function canUseTrialFeatures() {

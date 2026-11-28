@@ -846,7 +846,7 @@ export default function SourceDocsPage() {
           {doc.synopsisStatus === "scanning" && doc.deadlineScanStatus !== "scanning" && (
             <p className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">
               {t("proposalManagerSourceDocs.generatingSynopsis", {
-                defaultValue: "AI generating document synopsis…",
+                defaultValue: "Sage AI generating document synopsis…",
               })}
             </p>
           )}
@@ -1088,7 +1088,7 @@ export default function SourceDocsPage() {
         data-tour="4"
         data-tour-title-en="Uploaded documents"
         data-tour-title-ar="المستندات المرفوعة"
-        data-tour-content-en="Open, rename, or remove files. Use View synopsis when AI insights are ready."
+        data-tour-content-en="Open, rename, or remove files. Use View synopsis when Sage AI insights are ready."
         data-tour-content-ar="افتح أو أعد تسمية أو احذف الملفات. استخدم عرض الملخص عندما تكون رؤى الذكاء جاهزة."
         data-tour-position="top"
       >
@@ -1172,7 +1172,7 @@ export default function SourceDocsPage() {
             {synopsisDoc.synopsisStatus === "scanning" || synopsisDoc.synopsisStatus === "pending" ? (
               <p className="text-sm text-indigo-600 dark:text-indigo-300">
                 {t("proposalManagerSourceDocs.generatingSynopsis", {
-                  defaultValue: "AI generating document synopsis…",
+                  defaultValue: "Sage AI generating document synopsis…",
                 })}
               </p>
             ) : synopsisModalText || synopsisModalBullets.length ? (

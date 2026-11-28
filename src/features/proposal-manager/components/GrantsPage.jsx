@@ -962,12 +962,12 @@ export default function GrantsPage() {
             runSearch({ nextStart: 0, nextKeyword: next });
           }}
         >
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-            <label className="min-w-0 flex-1">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2.2fr)_minmax(8.5rem,0.85fr)_minmax(6.5rem,0.55fr)_max-content] lg:items-end">
+            <label className="block min-w-0 sm:col-span-2 lg:col-span-1">
               <span className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-200">
                 {t("proposalManagerGrants.keyword")}
               </span>
-              <div className="relative">
+              <div className="relative w-full">
                 <FiSearch
                   aria-hidden
                   className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 ${isRTLMode ? "right-3" : "left-3"}`}
@@ -996,14 +996,14 @@ export default function GrantsPage() {
               </div>
             </label>
 
-            <label className="w-full lg:w-56">
+            <label className="block min-w-0">
               <span className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-200">
                 {t("proposalManagerGrants.statusFilter")}
               </span>
               <select
                 value={oppStatuses}
                 onChange={(e) => setOppStatuses(e.target.value)}
-                className={inputClass}
+                className={`${inputClass} min-w-0`}
               >
                 {STATUS_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -1013,7 +1013,7 @@ export default function GrantsPage() {
               </select>
             </label>
 
-            <label className="w-full lg:w-40">
+            <label className="block min-w-0 max-w-[9.5rem] lg:max-w-none">
               <span className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-200">
                 {t("proposalManagerGrants.agencyCode")}
               </span>
@@ -1025,7 +1025,7 @@ export default function GrantsPage() {
               />
             </label>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-1 lg:flex-nowrap">
               <SortNewestButton
                 active={sortNewest}
                 onToggle={() => {

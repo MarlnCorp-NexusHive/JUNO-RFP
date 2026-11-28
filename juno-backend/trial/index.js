@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { attachTrialContext, meterTrialAi } from "./authMiddleware.js";
+import { aiSettingsRouter, attachAiRequestContext } from "./aiUsageTelemetry.js";
+import { activityRouter, recordTrialActivityMiddleware } from "./activityFeed.js";
 import trialRoutes from "./trialRoutes.js";
 import featureRoutes from "./featureRoutes.js";
 import { getFeaturesStoragePath } from "./featureStore.js";
@@ -167,8 +169,12 @@ export function registerTrialSystem(app) {
   setInterval(runRetentionPurge, retentionHours * 60 * 60 * 1000).unref?.();
 
   app.use(attachTrialContext);
+  app.use(attachAiRequestContext);
+  app.use(recordTrialActivityMiddleware);
   app.use("/trial/auth", trialRoutes);
   app.use("/trial/features", featureRoutes);
+  app.use("/trial/settings", aiSettingsRouter);
+  app.use("/trial/activity", activityRouter);
 
   app.use((req, res, next) => {
     if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return next();

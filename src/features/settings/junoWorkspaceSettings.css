@@ -1,0 +1,770 @@
+/* Settings — adaptive tokens that follow the JUNO app (Tailwind gray + indigo, body.dark) */
+.juno-ws-settings {
+  --bg: transparent;
+  --panel: #ffffff;
+  --paper: #f9fafb;
+  --line: #e5e7eb;
+  --line-2: #f3f4f6;
+  --hover: #f3f4f6;
+  --ink: #111827;
+  --ink-2: #374151;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --pine: #4f46e5;
+  --pine-2: #4338ca;
+  --lime: #818cf8;
+  --lime-2: #e0e7ff;
+  --lime-3: #eef2ff;
+  --sec: #eef2ff;
+  --sec-h: #e0e7ff;
+  --forest: #111827;
+  --forest-2: #1f2937;
+  --on-forest: #ffffff;
+  --warn: #b45309;
+  --warn-bg: #fffbeb;
+  --crit: #dc2626;
+  --crit-bg: #fef2f2;
+  --ok: #059669;
+  --ok-bg: #ecfdf5;
+  --info: #2563eb;
+  --info-bg: #eff6ff;
+  --s-done: #10b981;
+  --s-doing: #f59e0b;
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --f: inherit;
+  --fm: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--ink-2);
+  font: inherit;
+  -webkit-font-smoothing: antialiased;
+  padding: 0 0 1.5rem;
+  min-height: 100%;
+  max-width: 72rem;
+}
+
+body.dark .juno-ws-settings {
+  --bg: transparent;
+  --panel: #1f2937;
+  --paper: #111827;
+  --line: #374151;
+  --line-2: #273140;
+  --hover: #273140;
+  --ink: #f9fafb;
+  --ink-2: #d1d5db;
+  --muted: #9ca3af;
+  --faint: #6b7280;
+  --pine: #818cf8;
+  --pine-2: #a5b4fc;
+  --lime: #818cf8;
+  --lime-2: #312e81;
+  --lime-3: #1e1b4b;
+  --sec: #312e81;
+  --sec-h: #3730a3;
+  --forest: #0f172a;
+  --forest-2: #1e293b;
+  --on-forest: #f8fafc;
+  --warn: #fbbf24;
+  --warn-bg: #422006;
+  --crit: #f87171;
+  --crit-bg: #450a0a;
+  --ok: #34d399;
+  --ok-bg: #064e3b;
+  --info: #93c5fd;
+  --info-bg: #1e3a5f;
+  --s-done: #34d399;
+  --s-doing: #fbbf4c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.juno-ws-settings * {
+  box-sizing: border-box;
+}
+
+.juno-ws-settings .mono {
+  font-family: var(--fm);
+}
+.juno-ws-settings .tnum {
+  font-variant-numeric: tabular-nums;
+}
+.juno-ws-settings h1,
+.juno-ws-settings h2,
+.juno-ws-settings h3 {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.juno-ws-settings p {
+  margin: 0;
+}
+.juno-ws-settings .sub {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.juno-ws-settings .sec-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.juno-ws-settings .greet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+.juno-ws-settings .greet h1 {
+  font-size: 1.75rem;
+}
+
+.juno-ws-settings .ptabs {
+  display: flex;
+  gap: 0.15rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+.juno-ws-settings .ptabs button {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0.65rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--muted);
+  white-space: nowrap;
+  min-height: 2.5rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.juno-ws-settings .ptabs button.on {
+  color: var(--pine);
+  border-bottom-color: var(--pine);
+}
+.juno-ws-settings .ptabs button:hover {
+  color: var(--ink);
+}
+
+.juno-ws-settings .card-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+.juno-ws-settings .kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.juno-ws-settings .kpi {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.juno-ws-settings .kpi small {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.juno-ws-settings .kpi strong {
+  color: var(--ink);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.juno-ws-settings .kpi em {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+@media (max-width: 1100px) {
+  .juno-ws-settings .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.juno-ws-settings .panel-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--line-2);
+  flex-wrap: wrap;
+}
+
+.juno-ws-settings .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.25rem;
+  padding: 0 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.juno-ws-settings .btn:hover {
+  background: var(--hover);
+  border-color: var(--muted);
+}
+.juno-ws-settings .btn.primary {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
+}
+.juno-ws-settings .btn.primary:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+body.dark .juno-ws-settings .btn.primary {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+body.dark .juno-ws-settings .btn.primary:hover {
+  background: #818cf8;
+  border-color: #818cf8;
+  color: #111827;
+}
+.juno-ws-settings .btn.ghost {
+  border-color: transparent;
+  background: none;
+}
+.juno-ws-settings .btn.ghost:hover {
+  background: var(--hover);
+}
+.juno-ws-settings .btn.sm {
+  height: 1.875rem;
+  padding: 0 0.65rem;
+  font-size: 0.75rem;
+}
+.juno-ws-settings a.btn {
+  color: inherit;
+}
+
+.juno-ws-settings .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.juno-ws-settings .pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.juno-ws-settings .pill.np::before {
+  display: none;
+}
+.juno-ws-settings .ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.juno-ws-settings .warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.juno-ws-settings .crit {
+  background: var(--crit-bg);
+  color: var(--crit);
+}
+.juno-ws-settings .info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.juno-ws-settings .meter {
+  position: relative;
+}
+.juno-ws-settings .meter-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--line-2);
+  overflow: visible;
+}
+.juno-ws-settings .meter-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+.juno-ws-settings .meter-bar .tick {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--warn);
+}
+.juno-ws-settings .meter-l {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  font: 500 0.7rem var(--fm);
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+.juno-ws-settings .alertset {
+  display: flex;
+  gap: 0.85rem 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line-2);
+}
+.juno-ws-settings .alertset b {
+  color: var(--ink);
+}
+.juno-ws-settings .toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  min-height: 2.25rem;
+  padding: 0 0.25rem;
+}
+.juno-ws-settings .toggle input {
+  accent-color: var(--pine);
+  width: 1rem;
+  height: 1rem;
+}
+.juno-ws-settings .sel {
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  padding: 0 0.65rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: var(--ink);
+}
+
+.juno-ws-settings .two {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.juno-ws-settings .grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.juno-ws-settings .grid2 > *,
+.juno-ws-settings .two > * {
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .juno-ws-settings .two,
+  .juno-ws-settings .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+.juno-ws-settings .rank {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font: 700 12px var(--fm);
+  background: var(--line-2);
+  color: var(--ink);
+}
+.juno-ws-settings .rank.r0 {
+  background: #fef3c7;
+  color: #b45309;
+}
+.juno-ws-settings .rank.r1 {
+  background: #e2e8f0;
+  color: #475569;
+}
+.juno-ws-settings .rank.r2 {
+  background: #ffedd5;
+  color: #c2410c;
+}
+body.dark .juno-ws-settings .rank.r0 {
+  background: #451a03;
+  color: #fbbf24;
+}
+body.dark .juno-ws-settings .rank.r1 {
+  background: #334155;
+  color: #e2e8f0;
+}
+body.dark .juno-ws-settings .rank.r2 {
+  background: #431407;
+  color: #fb923c;
+}
+
+.juno-ws-settings .btab {
+  width: 100%;
+  border-collapse: collapse;
+}
+.juno-ws-settings .btab th,
+.juno-ws-settings .btab td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--line-2);
+  text-align: left;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.juno-ws-settings .btab th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.juno-ws-settings .btab td.r,
+.juno-ws-settings .btab th.r {
+  text-align: right;
+}
+
+.juno-ws-settings .av {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  color: #fff;
+  font: 600 0.625rem / 1 inherit;
+  flex: none;
+  vertical-align: middle;
+}
+
+.juno-ws-settings .planpick {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+@media (max-width: 800px) {
+  .juno-ws-settings .planpick {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.juno-ws-settings .pp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.875rem;
+  background: var(--paper);
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink-2);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.juno-ws-settings .pp b {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+.juno-ws-settings .pp.on {
+  border-color: var(--pine);
+  box-shadow: 0 0 0 3px var(--lime-2);
+  background: var(--lime-3);
+}
+
+.juno-ws-settings .ins {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line-2);
+  align-items: flex-start;
+}
+.juno-ws-settings .ins:last-child {
+  border-bottom: 0;
+}
+.juno-ws-settings .ins b {
+  font-weight: 600;
+  display: block;
+  font-size: 0.875rem;
+  color: var(--ink);
+}
+.juno-ws-settings .ins p {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+.juno-ws-settings .ixf {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.juno-ws-settings .ixf label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+.juno-ws-settings .ixf .sel {
+  width: 100%;
+}
+.juno-ws-settings .ixr {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.juno-ws-settings .ixr > label {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+.juno-ws-settings .ixr > .sel {
+  flex: 1;
+  min-width: 120px;
+  width: auto;
+}
+
+.juno-ws-settings .cell-in {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.4rem;
+  height: 1.875rem;
+  font-size: 0.8rem;
+  font-family: var(--fm);
+  color: var(--ink);
+}
+.juno-ws-settings .cell-in:hover,
+.juno-ws-settings .cell-in:focus {
+  border-color: var(--line);
+  background: var(--paper);
+  outline: none;
+}
+
+.juno-ws-settings .flagbox {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
+  background: var(--warn-bg);
+  color: var(--warn);
+  border: 1px solid transparent;
+}
+.juno-ws-settings .flagbox.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.juno-ws-settings .flagbox svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+  margin-top: 0.15rem;
+}
+.juno-ws-settings .flagbox b {
+  display: block;
+  color: inherit;
+}
+.juno-ws-settings .flagbox p {
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.juno-ws-settings .nosale-app {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1.1rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--lime-3);
+  border: 1px solid var(--lime-2);
+}
+.juno-ws-settings .nosale-app svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--pine);
+  flex: none;
+  margin-top: 0.15rem;
+}
+.juno-ws-settings .nosale-app p {
+  margin-top: 0.25rem;
+  color: var(--ink-2);
+}
+.juno-ws-settings .plist {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.juno-ws-settings .track {
+  height: 6px;
+  background: var(--line-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.juno-ws-settings .track i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+}
+.juno-ws-settings .wsdot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.juno-ws-settings .donut {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.juno-ws-settings .dleg {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 180px;
+  flex: 1;
+}
+.juno-ws-settings .dleg div {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto 40px;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+.juno-ws-settings .dleg i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.juno-ws-settings .dleg small {
+  color: var(--muted);
+  text-align: right;
+}
+.juno-ws-settings .hstack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.juno-ws-settings .hs-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 30px;
+  gap: 0.65rem;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+.juno-ws-settings .hs-bar {
+  display: flex;
+  height: 12px;
+  background: var(--line-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.juno-ws-settings .hs-bar i {
+  display: block;
+  height: 100%;
+}
+.juno-ws-settings .hs-l {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.juno-ws-settings .legend {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.65rem;
+  align-items: center;
+}
+.juno-ws-settings .legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.juno-ws-settings .ax {
+  font: 500 0.65rem var(--fm);
+  fill: var(--muted);
+}
+
+.juno-ws-settings .ws-switch {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.juno-ws-settings .ws-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ink-2);
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.juno-ws-settings .ws-chip:hover {
+  background: var(--hover);
+}
+.juno-ws-settings .ws-chip.on {
+  border-color: var(--pine);
+  background: var(--lime-3);
+  color: var(--ink);
+  box-shadow: 0 0 0 2px var(--lime-2);
+}
+
+.juno-ws-settings .toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 80;
+  background: var(--forest);
+  color: var(--on-forest);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+  font-size: 0.875rem;
+  max-width: min(22rem, calc(100vw - 2rem));
+}

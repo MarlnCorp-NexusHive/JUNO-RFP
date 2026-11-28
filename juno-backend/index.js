@@ -54,6 +54,7 @@ import { DOCUMENT_QA_SYSTEM_PROMPT } from "./documentQaPrompt.js";
 import { registerTrialSystem } from "./trial/index.js";
 import { metricsMiddleware, registerMonitoringRoutes } from "./monitoring/metricsService.js";
 import { redactPiiDeep } from "./utils/piiRedact.js";
+import { instrumentOpenAiForTrialSettings } from "./trial/aiUsageTelemetry.js";
 
 const IS_PROD = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER);
 import {
@@ -229,10 +230,12 @@ app.use(requestLoggerMiddleware);
 app.use(metricsMiddleware);
 registerMonitoringRoutes(app);
 
-/* ================= OPENAI (PII-redacted chat completions by default) ================= */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+/* ================= OPENAI (PII-redacted + trial usage telemetry) ================= */
+const openai = instrumentOpenAiForTrialSettings(
+  new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  }),
+);
 {
   const originalCreate = openai.chat.completions.create.bind(openai.chat.completions);
   openai.chat.completions.create = (params, options) => {

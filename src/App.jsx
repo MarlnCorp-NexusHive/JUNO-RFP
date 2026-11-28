@@ -13,7 +13,6 @@ import RBACUsers from "./components/RBACUsers";
 import RBACTeams from "./components/RBACTeams";
 import RBACTemplates from "./components/RBACTemplates";
 import RBACLogs from "./components/RBACLogs";
-import RBACSettings from "./components/RBACSettings";
 import SystemHealthDashboard from "./components/SystemHealthDashboard";
 import MarketingHeadLayout from "./features/marketing-head/pages/MarketingHeadLayout";
 import MarketingHeadDashboard from "./features/marketing-head/pages/MarketingHeadDashboard";
@@ -57,7 +56,7 @@ import HoDDashboard from "./components/HoDDashboard";
 // ExamHeadDashboard, LibraryHeadDashboard, TransportHeadDashboard
 import DirectorRiskManagement from './features/director/components/DirectorRiskManagement';
 
-import DirectorSettings from './features/director/components/DirectorSettings';
+import JunoWorkspaceSettings from './features/settings/JunoWorkspaceSettings';
 import Workspace from './features/hr-head/pages/Workspace';
 import MarketingHeadWorkspace from './features/marketing-head/components/MarketingHeadWorkspace';
 import RFPPage from './features/marketing-head/components/RFPPage';
@@ -80,7 +79,6 @@ import PayrollOverview from "./features/hr-head/pages/PayrollOverview";
 import BudgetManagement from "./features/hr-head/pages/BudgetManagement";
 import ReportsAnalytics from "./features/hr-head/pages/ReportsAnalytics";
 import AuditLogs from "./features/hr-head/pages/AuditLogs";
-import Settings from "./features/hr-head/pages/Settings";
 import SupportTickets from "./features/hr-head/pages/SupportTickets";
 import AdminUserRoleManagement from "./features/admin-head/pages/AdminUserRoleManagement";
 import AdminDepartmentsHierarchy from "./features/admin-head/pages/AdminDepartmentsHierarchy";
@@ -91,7 +89,6 @@ import AdminIntegrations from "./features/admin-head/pages/AdminIntegrations";
 import AdminLogsAudit from "./features/admin-head/pages/AdminLogsAudit";
 import AdminBackupSecurity from "./features/admin-head/pages/AdminBackupSecurity";
 import AdminReportsAnalytics from "./features/admin-head/pages/AdminReportsAnalytics";
-import AdminSettings from "./features/admin-head/pages/AdminSettings";
 import AdminHelpSupport from "./features/admin-head/pages/AdminHelpSupport";
 import AdminCommunicationHub from "./features/admin-head/pages/AdminCommunicationHub";
 import AdminTrainingDevelopment from "./features/admin-head/pages/AdminTrainingDevelopment";
@@ -112,6 +109,7 @@ import WinSlidePage from './features/proposal-manager/components/WinSlidePage';
 import GrantsPage from './features/proposal-manager/components/GrantsPage';
 import AwardManagementPage from './features/proposal-manager/components/AwardManagementPage';
 import ProjectWorkspacePage from './features/proposal-manager/components/ProjectWorkspacePage';
+import GrantPipelinePage from './features/proposal-manager/components/GrantPipelinePage';
 import SourceDocsPage from './features/proposal-manager/components/SourceDocsPage';
 import ProposalPricingPage from './features/proposal-manager/components/ProposalPricingPage';
 import ProposalManagerWorkspace from './features/proposal-manager/components/ProposalManagerWorkspace';
@@ -191,7 +189,7 @@ export default function App() {
         <Route path="/rbac/templates" element={<RBACTemplates />} />
         <Route path="/rbac/logs" element={<RBACLogs />} />
         <Route path="/rbac/system-health" element={<SystemHealthDashboard />} />
-        <Route path="/rbac/settings" element={<RBACSettings />} />
+        <Route path="/rbac/settings" element={<JunoWorkspaceSettings />} />
         
         {/* Marketing Head Routes */}
         <Route path="/rbac/marketing-head" element={<MarketingHeadLayout />}>
@@ -244,7 +242,7 @@ export default function App() {
           <Route path="reports" element={<ReportsAnalytics />} />
           <Route path="approvals" element={<DirectorApprovalCenter />} />
           <Route path="audit" element={<AuditLogs />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="settings" element={<JunoWorkspaceSettings />} />
           <Route path="communication" element={<CommunicationHub />} />
           <Route path="training" element={<TrainingDevelopmentPage />} />
           <Route path="compliance" element={<MarketingHeadComplianceQuality />} />
@@ -263,7 +261,7 @@ export default function App() {
           <Route path="audit" element={<DirectorAuditCompliance />} />
           <Route path="calendar" element={<DirectorMeetingsCalendar />} />
           <Route path="users" element={<DirectorUserManagement />} />
-          <Route path="settings" element={<DirectorSettings />} />
+          <Route path="settings" element={<JunoWorkspaceSettings />} />
           <Route path="workspace" element={<DirectorWorkspace />} />
           <Route path="support" element={<DirectorSupport />} />
           <Route path="ai-chat" element={<DirectorAIChat />} />
@@ -286,6 +284,7 @@ export default function App() {
           <Route path="grants" element={<GrantsPage />} />
           <Route path="award-management" element={<AwardManagementPage />} />
           <Route path="project-workspace" element={<ProjectWorkspacePage />} />
+          <Route path="grant-pipeline" element={<GrantPipelinePage />} />
           <Route path="capture-strategy" element={<DirectorStrategicPlanning />} />
           <Route path="content-hub" element={<ProposalManagerContentHub />} />
           <Route path="pricing" element={<ProposalPricingPage />} />
@@ -299,7 +298,7 @@ export default function App() {
           <Route path="topology" element={<TopologyPage />} />
           <Route path="workspace" element={<ProposalManagerWorkspace />} />
           <Route path="help-support" element={<DirectorSupport />} />
-          <Route path="settings" element={<DirectorSettings />} />
+          <Route path="settings" element={<JunoWorkspaceSettings />} />
           <Route path="ai-chat" element={<DirectorAIChat />} />
         </Route>
         <Route path="/rbac/marketing-head/support" element={<MarketingHeadSupport />} />
@@ -315,7 +314,7 @@ export default function App() {
           <Route path="logs-audit" element={<AdminLogsAudit />} />
           <Route path="backup-security" element={<AdminBackupSecurity />} />
           <Route path="reports-analytics" element={<AdminReportsAnalytics />} />
-          <Route path="settings" element={<AdminSettings />} />
+          <Route path="settings" element={<JunoWorkspaceSettings />} />
           <Route path="help-support" element={<AdminHelpSupport />} />
           <Route path="communication-hub" element={<AdminCommunicationHub />} />
           <Route path="training-development" element={<AdminTrainingDevelopment />} />

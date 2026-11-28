@@ -198,7 +198,7 @@ export default function TrialCommunicationHub({ isArabic = false }) {
       });
       if (result?.body) setComposer(result.body);
     } catch (err) {
-      setAiError(err?.response?.data?.error || err?.message || label("AI draft failed", "فشل المسودة"));
+      setAiError(err?.response?.data?.error || err?.message || label("Sage AI draft failed", "فشل المسودة"));
     } finally {
       setAiBusy("");
     }

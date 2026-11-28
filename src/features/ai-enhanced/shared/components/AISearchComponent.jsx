@@ -5,7 +5,7 @@ import aiSearchService from '../services/aiSearchService';
 
 const AISearchComponent = ({ 
   onSearch, 
-  placeholder = 'Search leads, campaigns, or ask AI anything...',
+  placeholder = 'Search leads, campaigns, or ask Sage AI anything...',
   className = '',
   showSuggestions = true,
   data = []

@@ -98,7 +98,7 @@ class ReplySuggestionsService {
       
       قدم الردود مع شرح سبب كل رد مناسب.`
       
-      : `You are an AI assistant for writing marketing replies. Lead context:
+      : `You are Sage AI, an assistant for writing marketing replies. Lead context:
       
       Name: ${leadContext.name}
       Location: ${leadContext.location || 'Not specified'}

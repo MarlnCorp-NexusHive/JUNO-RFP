@@ -10,6 +10,7 @@ import {
   FiColumns,
   FiFlag,
   FiFolder,
+  FiLink,
   FiList,
   FiPlus,
   FiSend,
@@ -42,6 +43,7 @@ import {
   removeProject,
   removeTask,
   subscribeProjectWorkspace,
+  updateManyTasks,
   updateProject,
   updateTask,
 } from "../services/projectWorkspaceStore.js";
@@ -91,6 +93,11 @@ const STATUS_DEFAULTS = {
   done: "Done",
 };
 const PRIORITY_DEFAULTS = { low: "Low", med: "Medium", high: "High", urgent: "Urgent" };
+const STATUS_ORDER = Object.fromEntries(TASK_STATUSES.map((status, index) => [status, index]));
+const PRIORITY_ORDER = { urgent: 0, high: 1, med: 2, low: 3 };
+const BOARD_WIP_LIMITS = { doing: 6, review: 4 };
+const CLAUSE_OPTIONS = ["—", "§4.2", "§4.3", "§5.2", "§6.1", "§7.4", "§8.2", "NOFO"];
+const BUDGET_LINE_OPTIONS = ["—", "Personnel", "Fringe benefits", "Travel", "Supplies", "Contractual", "Other direct", "Indirect"];
 const RAG_DEFAULTS = { g: "On track", y: "Watch", r: "At risk" };
 
 const STATUS_TONE = {
@@ -136,6 +143,17 @@ function addDays(date, n) {
   const next = new Date(date);
   next.setDate(next.getDate() + n);
   return next;
+}
+
+function shiftIso(iso, days) {
+  const date = parseDay(iso);
+  if (!date || !days) return iso || "";
+  return toIso(addDays(date, days));
+}
+
+function withCurrentOption(options, value) {
+  if (!value || options.includes(value)) return options;
+  return [...options, value];
 }
 
 function diffDays(a, b) {
@@ -595,92 +613,253 @@ function TaskDrawer({ tx, task, isNew, projectTasks, people, demoMode, ownerOpti
 
 /* ───────── Work views ───────── */
 
-function KanbanView({ tx, tasks, people, onOpen, onAdd, onMove }) {
+function BoardView({
+  tx,
+  tasks,
+  lookupTasks,
+  people,
+  demoMode,
+  ownerOptions,
+  onOpen,
+  onAdd,
+  onQuickAdd,
+  onMove,
+}) {
   const [dragOver, setDragOver] = useState("");
+  const [query, setQuery] = useState("");
+  const [ownerFilter, setOwnerFilter] = useState("");
+  const [priFilter, setPriFilter] = useState("");
+  const [addingCol, setAddingCol] = useState("");
+  const [draftTitle, setDraftTitle] = useState("");
+
+  const byId = useMemo(() => {
+    const map = new Map();
+    (lookupTasks || tasks).forEach((task) => map.set(task.id, task));
+    return map;
+  }, [lookupTasks, tasks]);
+
+  const owners = useMemo(() => {
+    if (demoMode) return Object.entries(DEMO_PW_PEOPLE).map(([id, person]) => ({ id, label: person.n }));
+    const names = new Set(ownerOptions);
+    tasks.forEach((task) => {
+      if (task.owner) names.add(task.owner);
+    });
+    return [...names].filter(Boolean).map((id) => ({ id, label: people(id)?.n || id }));
+  }, [demoMode, ownerOptions, tasks, people]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return tasks.filter((task) => {
+      if (ownerFilter && task.owner !== ownerFilter) return false;
+      if (priFilter && task.pri !== priFilter) return false;
+      if (!q) return true;
+      const ownerName = people(task.owner)?.n || task.owner || "";
+      return `${task.title} ${task.clause} ${task.line} ${ownerName}`.toLowerCase().includes(q);
+    });
+  }, [tasks, query, ownerFilter, priFilter, people]);
+
+  const commitQuickAdd = (status) => {
+    const title = draftTitle.trim();
+    if (title) {
+      onQuickAdd(status, title);
+    }
+    setDraftTitle("");
+    setAddingCol("");
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
-      {TASK_STATUSES.map((status) => {
-        const col = tasks.filter((t) => t.status === status);
-        return (
-          <div
-            key={status}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragOver(status);
-            }}
-            onDragLeave={() => setDragOver("")}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragOver("");
-              const id = e.dataTransfer.getData("text/plain");
-              if (id) onMove(id, status);
-            }}
-            className={`${GRANARY_CARD_SOFT} flex min-h-[12rem] flex-col gap-2 p-2.5 ${
-              dragOver === status ? "ring-2 ring-[#3D4F66]/30" : ""
-            }`}
-          >
-            <div className="flex items-center justify-between px-1">
-              <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${STATUS_TONE[status]}`}>
-                {tx(`statuses.${status}`, STATUS_DEFAULTS[status])}
-              </span>
-              <span className="text-[11px] font-semibold tabular-nums text-slate-500">{col.length}</span>
-            </div>
-            {col.map((task) => {
-              const subDone = task.sub.filter((s) => s.d).length;
-              return (
-                <article
-                  key={task.id}
-                  draggable
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", task.id)}
-                  onClick={() => onOpen(task)}
-                  className={`${GRANARY_CARD} cursor-pointer space-y-2 p-2.5 transition hover:border-[#3D4F66]/40`}
-                >
-                  <p className="text-sm font-medium leading-snug text-slate-900 dark:text-white">{task.title}</p>
-                  <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                    <span className={`rounded px-1.5 py-0.5 font-semibold ${PRIORITY_TONE[task.pri]}`}>
-                      {tx(`priorities.${task.pri}`, PRIORITY_DEFAULTS[task.pri])}
-                    </span>
-                    {task.ms ? <FiFlag className="h-3 w-3 text-amber-600" aria-hidden /> : null}
-                    {task.due ? (
-                      <span className={isOverdue(task) ? "font-semibold text-red-600" : "text-slate-500"}>
-                        {fmtDate(task.due)}
-                      </span>
-                    ) : null}
-                    {task.sub.length > 0 ? (
-                      <span className="inline-flex items-center gap-0.5 text-slate-500">
-                        <FiCheckSquare className="h-3 w-3" aria-hidden />
-                        {subDone}/{task.sub.length}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    {people(task.owner) ? <Avatar person={people(task.owner)} /> : <span />}
-                    <select
-                      value={task.status}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => onMove(task.id, e.target.value)}
-                      aria-label={tx("colStatus", "Status")}
-                      className="rounded-md border border-[#D8E0EA] bg-white px-1 py-0.5 text-[11px] text-slate-600 dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-slate-300"
-                    >
-                      {TASK_STATUSES.map((s) => (
-                        <option key={s} value={s}>{tx(`statuses.${s}`, STATUS_DEFAULTS[s])}</option>
-                      ))}
-                    </select>
-                  </div>
-                </article>
-              );
-            })}
-            <button
-              type="button"
-              onClick={() => onAdd(status)}
-              className="mt-auto inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-[#3D4F66] hover:bg-white dark:text-[#B8C5D6] dark:hover:bg-[#151D2A]"
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={tx("filterTasks", "Filter tasks")}
+          aria-label={tx("filterTasks", "Filter tasks")}
+          className="min-w-[12rem] flex-1 rounded-md border border-[#D8E0EA] bg-white px-2.5 py-1.5 text-sm text-slate-900 outline-none focus:border-[#3D4F66] dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-white"
+        />
+        <select
+          value={ownerFilter}
+          onChange={(e) => setOwnerFilter(e.target.value)}
+          aria-label={tx("filterOwner", "Filter by owner")}
+          className="rounded-md border border-[#D8E0EA] bg-white px-2 py-1.5 text-sm dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-white"
+        >
+          <option value="">{tx("allPeople", "All people")}</option>
+          {owners.map((owner) => (
+            <option key={owner.id} value={owner.id}>{owner.label}</option>
+          ))}
+        </select>
+        <select
+          value={priFilter}
+          onChange={(e) => setPriFilter(e.target.value)}
+          aria-label={tx("filterPriority", "Filter by priority")}
+          className="rounded-md border border-[#D8E0EA] bg-white px-2 py-1.5 text-sm dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-white"
+        >
+          <option value="">{tx("anyPriority", "Any priority")}</option>
+          {TASK_PRIORITIES.map((priority) => (
+            <option key={priority} value={priority}>{tx(`priorities.${priority}`, PRIORITY_DEFAULTS[priority])}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
+        {TASK_STATUSES.map((status) => {
+          const col = visible
+            .filter((t) => t.status === status)
+            .sort((a, b) => {
+              const pa = PRIORITY_ORDER[a.pri] ?? 2;
+              const pb = PRIORITY_ORDER[b.pri] ?? 2;
+              if (pa !== pb) return pa - pb;
+              return String(a.due || "9999").localeCompare(String(b.due || "9999"));
+            });
+          const wipLimit = BOARD_WIP_LIMITS[status];
+          const overWip = Boolean(wipLimit && col.length > wipLimit);
+          return (
+            <div
+              key={status}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(status);
+              }}
+              onDragLeave={() => setDragOver("")}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver("");
+                const id = e.dataTransfer.getData("text/plain");
+                if (id) onMove(id, status);
+              }}
+              className={`${GRANARY_CARD_SOFT} flex min-h-[12rem] flex-col gap-2 p-2.5 ${
+                dragOver === status ? "ring-2 ring-[#3D4F66]/30" : ""
+              }`}
             >
-              <FiPlus className="h-3.5 w-3.5" aria-hidden />
-              {tx("addTask", "Add task")}
-            </button>
-          </div>
-        );
-      })}
+              <div className="flex items-center justify-between gap-1 px-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${STATUS_TONE[status]}`}>
+                    {tx(`statuses.${status}`, STATUS_DEFAULTS[status])}
+                  </span>
+                  <span className="text-[11px] font-semibold tabular-nums text-slate-500">{col.length}</span>
+                </div>
+                {wipLimit ? (
+                  <span className={`text-[10px] font-semibold tabular-nums ${overWip ? "text-red-600" : "text-slate-400"}`}>
+                    WIP {col.length}/{wipLimit}
+                  </span>
+                ) : null}
+              </div>
+
+              {col.map((task) => {
+                const subTotal = task.sub.length;
+                const subDone = task.sub.filter((s) => s.d).length;
+                const subPct = subTotal ? Math.round((subDone / subTotal) * 100) : null;
+                const blockerCount =
+                  task.status === "done"
+                    ? 0
+                    : (task.deps || []).filter((id) => {
+                        const dep = byId.get(id);
+                        return dep && dep.status !== "done";
+                      }).length;
+                return (
+                  <article
+                    key={task.id}
+                    draggable
+                    onDragStart={(e) => e.dataTransfer.setData("text/plain", task.id)}
+                    onClick={() => onOpen(task)}
+                    className={`${GRANARY_CARD} cursor-pointer space-y-2 p-2.5 transition hover:border-[#3D4F66]/40`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+                      <span className={`rounded px-1.5 py-0.5 font-semibold ${PRIORITY_TONE[task.pri]}`}>
+                        {tx(`priorities.${task.pri}`, PRIORITY_DEFAULTS[task.pri])}
+                      </span>
+                      {task.clause && task.clause !== "—" ? (
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          {task.clause}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <p className="flex items-start gap-1 text-sm font-medium leading-snug text-slate-900 dark:text-white">
+                      {task.ms ? <FiFlag className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" aria-hidden /> : null}
+                      <span>{task.title}</span>
+                    </p>
+
+                    {blockerCount > 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                        <FiLink className="h-3 w-3" aria-hidden />
+                        {tx("blockedBy", "Blocked by {{count}}", { count: blockerCount })}
+                      </span>
+                    ) : null}
+
+                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                      {task.due ? (
+                        <span className={isOverdue(task) ? "font-semibold text-red-600" : "text-slate-500"}>
+                          {fmtDate(task.due)}
+                        </span>
+                      ) : null}
+                      {subPct !== null ? (
+                        <span className="inline-flex items-center gap-1 text-slate-500">
+                          <span className="h-1.5 w-10 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                            <span className="block h-full bg-emerald-500" style={{ width: `${subPct}%` }} />
+                          </span>
+                          <span className="tabular-nums">{subPct}%</span>
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2">
+                      {people(task.owner) ? <Avatar person={people(task.owner)} /> : <span />}
+                      <select
+                        value={task.status}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => onMove(task.id, e.target.value)}
+                        aria-label={tx("colStatus", "Status")}
+                        className="rounded-md border border-[#D8E0EA] bg-white px-1 py-0.5 text-[11px] text-slate-600 dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-slate-300"
+                      >
+                        {TASK_STATUSES.map((s) => (
+                          <option key={s} value={s}>{tx(`statuses.${s}`, STATUS_DEFAULTS[s])}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </article>
+                );
+              })}
+
+              {addingCol === status ? (
+                <input
+                  type="text"
+                  autoFocus
+                  value={draftTitle}
+                  onChange={(e) => setDraftTitle(e.target.value)}
+                  onBlur={() => commitQuickAdd(status)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      commitQuickAdd(status);
+                    } else if (e.key === "Escape") {
+                      setDraftTitle("");
+                      setAddingCol("");
+                    }
+                  }}
+                  placeholder={tx("quickTaskPlaceholder", "Task name, then Enter")}
+                  aria-label={tx("quickTaskLabel", "New task name")}
+                  className="mt-auto w-full rounded-md border border-[#3D4F66] bg-white px-2 py-1.5 text-xs text-slate-900 outline-none dark:border-[#8FA3B8] dark:bg-[#0B1017] dark:text-white"
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingCol(status);
+                    setDraftTitle("");
+                  }}
+                  onDoubleClick={() => onAdd(status)}
+                  className="mt-auto inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-[#3D4F66] hover:bg-white dark:text-[#B8C5D6] dark:hover:bg-[#151D2A]"
+                >
+                  <FiPlus className="h-3.5 w-3.5" aria-hidden />
+                  {tx("addTask", "Add task")}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -701,89 +880,356 @@ function CellInput({ value, onCommit, type = "text", className = "", ...rest }) 
   );
 }
 
-function TableView({ tx, tasks, people, demoMode, ownerOptions, onOpen, onPatch, onAdd }) {
+function TaskListView({ tx, tasks, lookupTasks, people, demoMode, ownerOptions, onOpen, onPatch, onPatchMany, onAdd }) {
   const selectCls =
-    "w-full rounded border border-transparent bg-transparent px-1 py-1 text-sm text-slate-900 outline-none hover:border-[#D8E0EA] focus:border-[#3D4F66] dark:text-white dark:hover:border-[#2A3548] dark:[&>option]:bg-[#151D2A]";
+    "w-full min-w-0 rounded border border-transparent bg-transparent px-1 py-1 text-sm text-slate-900 outline-none hover:border-[#D8E0EA] focus:border-[#3D4F66] dark:text-white dark:hover:border-[#2A3548] dark:[&>option]:bg-[#151D2A]";
+  const [sortKey, setSortKey] = useState("due");
+  const [sortDir, setSortDir] = useState(1);
+  const [query, setQuery] = useState("");
+  const [ownerFilter, setOwnerFilter] = useState("");
+  const [priFilter, setPriFilter] = useState("");
+  const [groupByStatus, setGroupByStatus] = useState(false);
+  const [selected, setSelected] = useState(() => new Set());
+
+  const byId = useMemo(() => {
+    const map = new Map();
+    (lookupTasks || tasks).forEach((task) => map.set(task.id, task));
+    return map;
+  }, [lookupTasks, tasks]);
+
+  const owners = useMemo(() => {
+    if (demoMode) return Object.entries(DEMO_PW_PEOPLE).map(([id, person]) => ({ id, label: person.n }));
+    const names = new Set(ownerOptions);
+    tasks.forEach((task) => {
+      if (task.owner) names.add(task.owner);
+    });
+    return [...names].filter(Boolean).map((id) => ({ id, label: people(id)?.n || id }));
+  }, [demoMode, ownerOptions, tasks, people]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const filtered = tasks.filter((task) => {
+      if (ownerFilter && task.owner !== ownerFilter) return false;
+      if (priFilter && task.pri !== priFilter) return false;
+      if (!q) return true;
+      const ownerName = people(task.owner)?.n || task.owner || "";
+      return `${task.title} ${task.clause} ${task.line} ${ownerName}`.toLowerCase().includes(q);
+    });
+    const valueOf = (task) => {
+      if (sortKey === "status") return STATUS_ORDER[task.status] ?? 0;
+      if (sortKey === "pri") return PRIORITY_ORDER[task.pri] ?? 0;
+      if (sortKey === "owner") return (people(task.owner)?.n || task.owner || "").toLowerCase();
+      if (sortKey === "est") return Number(task.est) || 0;
+      if (sortKey === "title") return task.title.toLowerCase();
+      return String(task[sortKey] || "");
+    };
+    return [...filtered].sort((a, b) => {
+      const left = valueOf(a);
+      const right = valueOf(b);
+      if (left < right) return -1 * sortDir;
+      if (left > right) return 1 * sortDir;
+      return 0;
+    });
+  }, [tasks, query, ownerFilter, priFilter, sortKey, sortDir, people]);
+
+  useEffect(() => {
+    const ids = new Set(tasks.map((task) => task.id));
+    setSelected((prev) => {
+      const next = new Set([...prev].filter((id) => ids.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [tasks]);
+
+  const hours = visible.reduce((sum, task) => sum + (Number(task.est) || 0), 0);
+  const allChecked = visible.length > 0 && visible.every((task) => selected.has(task.id));
+
+  const toggleSort = (key) => {
+    if (sortKey === key) setSortDir((dir) => -dir);
+    else {
+      setSortKey(key);
+      setSortDir(1);
+    }
+  };
+
+  const toggleOne = (id) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allChecked) visible.forEach((task) => next.delete(task.id));
+      else visible.forEach((task) => next.add(task.id));
+      return next;
+    });
+  };
+
+  const selectedIds = [...selected];
+
+  const columns = [
+    ["title", tx("colTitle", "Task")],
+    ["status", tx("colStatus", "Status")],
+    ["owner", tx("colOwner", "Owner")],
+    ["pri", tx("colPriority", "Priority")],
+    ["start", tx("colStart", "Start")],
+    ["due", tx("colDue", "Due")],
+    ["est", tx("colEst", "Est. h")],
+    ["clause", tx("colClause", "Clause")],
+    ["line", tx("colLine", "Budget line")],
+  ];
+
+  const renderRow = (task) => {
+    const blocked = task.status !== "done" && (task.deps || []).some((id) => {
+      const dep = byId.get(id);
+      return dep && dep.status !== "done";
+    });
+    const person = people(task.owner);
+    return (
+      <tr
+        key={task.id}
+        className={`border-b border-[#D8E0EA]/80 dark:border-[#2A3548]/80 ${selected.has(task.id) ? "bg-[#F4F6F9] dark:bg-[#0B1017]" : ""}`}
+      >
+        <td className="px-2 py-1">
+          <input
+            type="checkbox"
+            checked={selected.has(task.id)}
+            onChange={() => toggleOne(task.id)}
+            aria-label={tx("selectTask", "Select {{title}}", { title: task.title })}
+          />
+        </td>
+        <td className="min-w-[14rem] px-1 py-1">
+          <div className="flex items-center gap-1.5">
+            {task.ms ? <FiFlag className="h-3.5 w-3.5 shrink-0 text-amber-600" aria-hidden /> : null}
+            <button
+              type="button"
+              onClick={() => onOpen(task)}
+              className="truncate text-left text-sm font-medium text-slate-900 hover:underline dark:text-white"
+            >
+              {task.title}
+            </button>
+            {blocked ? <FiLink className="h-3.5 w-3.5 shrink-0 text-red-600" title={tx("blocked", "Blocked")} aria-label={tx("blocked", "Blocked")} /> : null}
+          </div>
+        </td>
+        <td className="px-1 py-1">
+          <select value={task.status} onChange={(e) => onPatch(task.id, { status: e.target.value })} className={selectCls} aria-label={tx("colStatus", "Status")}>
+            {TASK_STATUSES.map((status) => (
+              <option key={status} value={status}>{tx(`statuses.${status}`, STATUS_DEFAULTS[status])}</option>
+            ))}
+          </select>
+        </td>
+        <td className="min-w-[9rem] px-1 py-1">
+          <div className="flex items-center gap-1">
+            {person ? <Avatar person={person} /> : null}
+            {demoMode || owners.length ? (
+              <select value={task.owner} onChange={(e) => onPatch(task.id, { owner: e.target.value })} className={selectCls} aria-label={tx("colOwner", "Owner")}>
+                <option value="">{tx("unassigned", "Unassigned")}</option>
+                {owners.map((owner) => (
+                  <option key={owner.id} value={owner.id}>{owner.label}</option>
+                ))}
+              </select>
+            ) : (
+              <CellInput value={task.owner} onCommit={(value) => onPatch(task.id, { owner: value })} />
+            )}
+          </div>
+        </td>
+        <td className="px-1 py-1">
+          <select value={task.pri} onChange={(e) => onPatch(task.id, { pri: e.target.value })} className={selectCls} aria-label={tx("colPriority", "Priority")}>
+            {TASK_PRIORITIES.map((priority) => (
+              <option key={priority} value={priority}>{tx(`priorities.${priority}`, PRIORITY_DEFAULTS[priority])}</option>
+            ))}
+          </select>
+        </td>
+        <td className="px-1 py-1">
+          <CellInput type="date" value={task.start} onCommit={(value) => onPatch(task.id, { start: value })} aria-label={tx("colStart", "Start")} />
+        </td>
+        <td className="px-1 py-1">
+          <CellInput
+            type="date"
+            value={task.due}
+            onCommit={(value) => onPatch(task.id, { due: value })}
+            className={isOverdue(task) ? "font-semibold !text-red-600" : ""}
+            aria-label={tx("colDue", "Due")}
+          />
+        </td>
+        <td className="w-20 px-1 py-1">
+          <CellInput type="number" min={0} value={task.est} onCommit={(value) => onPatch(task.id, { est: Number(value) || 0 })} aria-label={tx("colEst", "Est. h")} />
+        </td>
+        <td className="px-1 py-1">
+          <select value={task.clause || "—"} onChange={(e) => onPatch(task.id, { clause: e.target.value })} className={selectCls} aria-label={tx("colClause", "Clause")}>
+            {withCurrentOption(CLAUSE_OPTIONS, task.clause).map((clause) => (
+              <option key={clause} value={clause}>{clause}</option>
+            ))}
+          </select>
+        </td>
+        <td className="min-w-[8rem] px-1 py-1">
+          <select value={task.line || "—"} onChange={(e) => onPatch(task.id, { line: e.target.value })} className={selectCls} aria-label={tx("colLine", "Budget line")}>
+            {withCurrentOption(BUDGET_LINE_OPTIONS, task.line).map((line) => (
+              <option key={line} value={line}>{line}</option>
+            ))}
+          </select>
+        </td>
+      </tr>
+    );
+  };
+
+  const groups = groupByStatus
+    ? TASK_STATUSES.map((status) => ({
+        status,
+        rows: visible.filter((task) => task.status === status),
+      })).filter((group) => group.rows.length)
+    : [{ status: "", rows: visible }];
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={tx("filterTasks", "Filter tasks")}
+          aria-label={tx("filterTasks", "Filter tasks")}
+          className="min-w-[12rem] flex-1 rounded-md border border-[#D8E0EA] bg-white px-2.5 py-1.5 text-sm text-slate-900 outline-none focus:border-[#3D4F66] dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-white"
+        />
+        <select value={ownerFilter} onChange={(e) => setOwnerFilter(e.target.value)} aria-label={tx("filterOwner", "Filter by owner")} className="rounded-md border border-[#D8E0EA] bg-white px-2 py-1.5 text-sm dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-white">
+          <option value="">{tx("allPeople", "All people")}</option>
+          {owners.map((owner) => (
+            <option key={owner.id} value={owner.id}>{owner.label}</option>
+          ))}
+        </select>
+        <select value={priFilter} onChange={(e) => setPriFilter(e.target.value)} aria-label={tx("filterPriority", "Filter by priority")} className="rounded-md border border-[#D8E0EA] bg-white px-2 py-1.5 text-sm dark:border-[#2A3548] dark:bg-[#0B1017] dark:text-white">
+          <option value="">{tx("anyPriority", "Any priority")}</option>
+          {TASK_PRIORITIES.map((priority) => (
+            <option key={priority} value={priority}>{tx(`priorities.${priority}`, PRIORITY_DEFAULTS[priority])}</option>
+          ))}
+        </select>
+        <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+          <input type="checkbox" checked={groupByStatus} onChange={(e) => setGroupByStatus(e.target.checked)} />
+          {tx("groupByStatus", "Group by status")}
+        </label>
+      </div>
+
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[52rem] border-collapse text-left text-sm">
+        <table className="w-full min-w-[72rem] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-[#D8E0EA] text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:border-[#2A3548] dark:text-slate-400">
-              <th className="px-1.5 py-2">{tx("colTitle", "Title")}</th>
-              <th className="px-1.5 py-2">{tx("colStatus", "Status")}</th>
-              <th className="px-1.5 py-2">{tx("colOwner", "Owner")}</th>
-              <th className="px-1.5 py-2">{tx("colPriority", "Priority")}</th>
-              <th className="px-1.5 py-2">{tx("colStart", "Start")}</th>
-              <th className="px-1.5 py-2">{tx("colDue", "Due")}</th>
-              <th className="px-1.5 py-2">{tx("colEst", "Est. hrs")}</th>
-              <th className="px-1.5 py-2"><span className="sr-only">{tx("editTask", "Edit task")}</span></th>
+              <th className="w-9 px-2 py-2">
+                <input type="checkbox" checked={allChecked} onChange={toggleAll} aria-label={tx("selectAll", "Select all")} />
+              </th>
+              {columns.map(([key, label]) => (
+                <th key={key} className="px-1.5 py-2">
+                  <button type="button" onClick={() => toggleSort(key)} className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-slate-800 dark:hover:text-white">
+                    {label}
+                    {sortKey === key ? (sortDir > 0 ? " ↑" : " ↓") : ""}
+                  </button>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id} className="border-b border-[#D8E0EA]/80 last:border-0 dark:border-[#2A3548]/80">
-                <td className="min-w-[14rem] px-1 py-1">
-                  <CellInput value={task.title} onCommit={(v) => v.trim() && onPatch(task.id, { title: v })} />
-                </td>
-                <td className="px-1 py-1">
-                  <select value={task.status} onChange={(e) => onPatch(task.id, { status: e.target.value })} className={selectCls}>
-                    {TASK_STATUSES.map((s) => (<option key={s} value={s}>{tx(`statuses.${s}`, STATUS_DEFAULTS[s])}</option>))}
-                  </select>
-                </td>
-                <td className="px-1 py-1">
-                  {demoMode ? (
-                    <select value={task.owner} onChange={(e) => onPatch(task.id, { owner: e.target.value })} className={selectCls}>
-                      <option value="">{tx("unassigned", "Unassigned")}</option>
-                      {Object.entries(DEMO_PW_PEOPLE).map(([key, p]) => (<option key={key} value={key}>{p.n}</option>))}
-                    </select>
-                  ) : (
-                    <CellInput value={task.owner} list="pw-owner-options" onCommit={(v) => onPatch(task.id, { owner: v })} />
-                  )}
-                </td>
-                <td className="px-1 py-1">
-                  <select value={task.pri} onChange={(e) => onPatch(task.id, { pri: e.target.value })} className={selectCls}>
-                    {TASK_PRIORITIES.map((p) => (<option key={p} value={p}>{tx(`priorities.${p}`, PRIORITY_DEFAULTS[p])}</option>))}
-                  </select>
-                </td>
-                <td className="px-1 py-1"><CellInput type="date" value={task.start} onCommit={(v) => onPatch(task.id, { start: v })} /></td>
-                <td className="px-1 py-1">
-                  <CellInput
-                    type="date"
-                    value={task.due}
-                    onCommit={(v) => onPatch(task.id, { due: v })}
-                    className={isOverdue(task) ? "font-semibold !text-red-600" : ""}
-                  />
-                </td>
-                <td className="w-20 px-1 py-1">
-                  <CellInput type="number" min={0} value={task.est} onCommit={(v) => onPatch(task.id, { est: Number(v) || 0 })} />
-                </td>
-                <td className="px-1 py-1 text-right">
-                  <button
-                    type="button"
-                    onClick={() => onOpen(task)}
-                    className="rounded-md px-2 py-1 text-xs font-semibold text-[#3D4F66] hover:bg-[#F0F3F7] dark:text-[#B8C5D6] dark:hover:bg-[#2A3548]"
-                  >
-                    {tx("details", "Details")}
-                  </button>
+            {groups.map((group) => (
+              <React.Fragment key={group.status || "all"}>
+                {group.status ? (
+                  <tr className="bg-[#F4F6F9] dark:bg-[#0B1017]">
+                    <td colSpan={columns.length + 1} className="px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                      <span className={`mr-2 rounded-md px-2 py-0.5 ${STATUS_TONE[group.status]}`}>
+                        {tx(`statuses.${group.status}`, STATUS_DEFAULTS[group.status])}
+                      </span>
+                      {group.rows.length} · {group.rows.reduce((sum, task) => sum + (Number(task.est) || 0), 0)} h
+                    </td>
+                  </tr>
+                ) : null}
+                {group.rows.map(renderRow)}
+              </React.Fragment>
+            ))}
+            {visible.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length + 1} className="px-3 py-8 text-center text-sm text-slate-500">
+                  {tasks.length
+                    ? tx("noTaskMatch", "No tasks match these filters.")
+                    : tx("noTasks", "No tasks yet. Add one to start the list.")}
                 </td>
               </tr>
-            ))}
+            ) : null}
           </tbody>
         </table>
       </div>
-      {!demoMode ? (
-        <datalist id="pw-owner-options">
-          {ownerOptions.map((o) => (<option key={o} value={o} />))}
-        </datalist>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="button" className={GRANARY_BTN_SECONDARY} onClick={() => onAdd("todo")}>
+          <FiPlus className="h-4 w-4" aria-hidden />
+          {tx("addTask", "Add task")}
+        </button>
+        <span className="ml-auto text-xs font-medium tabular-nums text-slate-500">
+          {tx("taskSummary", "{{count}} tasks · {{hours}} estimated hours", {
+            count: visible.length,
+            hours: Math.round(hours * 10) / 10,
+          })}
+        </span>
+      </div>
+
+      {selectedIds.length ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#D8E0EA] bg-[#3D4F66] px-3 py-2 text-white dark:border-[#2A3548]" role="toolbar" aria-label={tx("bulkActions", "Bulk actions")}>
+          <span className="text-sm font-semibold">{tx("selectedCount", "{{count}} selected", { count: selectedIds.length })}</span>
+          <select
+            defaultValue=""
+            aria-label={tx("setStatus", "Set status")}
+            onChange={(e) => {
+              if (!e.target.value) return;
+              onPatchMany(selectedIds, { status: e.target.value });
+              e.target.value = "";
+            }}
+            className="rounded-md border border-white/30 bg-white px-2 py-1 text-sm text-slate-900"
+          >
+            <option value="">{tx("setStatus", "Set status…")}</option>
+            {TASK_STATUSES.map((status) => (
+              <option key={status} value={status}>{tx(`statuses.${status}`, STATUS_DEFAULTS[status])}</option>
+            ))}
+          </select>
+          <select
+            defaultValue=""
+            aria-label={tx("assignTo", "Assign to")}
+            onChange={(e) => {
+              if (!e.target.value) return;
+              onPatchMany(selectedIds, { owner: e.target.value });
+              e.target.value = "";
+            }}
+            className="rounded-md border border-white/30 bg-white px-2 py-1 text-sm text-slate-900"
+          >
+            <option value="">{tx("assignTo", "Assign to…")}</option>
+            {owners.map((owner) => (
+              <option key={owner.id} value={owner.id}>{owner.label}</option>
+            ))}
+          </select>
+          <select
+            defaultValue=""
+            aria-label={tx("shiftDates", "Shift dates")}
+            onChange={(e) => {
+              const days = Number(e.target.value);
+              if (!days) return;
+              onPatchMany(selectedIds, (task) => ({
+                start: shiftIso(task.start, days),
+                due: shiftIso(task.due, days),
+              }));
+              e.target.value = "";
+            }}
+            className="rounded-md border border-white/30 bg-white px-2 py-1 text-sm text-slate-900"
+          >
+            <option value="">{tx("shiftDates", "Shift dates…")}</option>
+            <option value="1">{tx("shiftDay", "+1 day")}</option>
+            <option value="7">{tx("shiftWeek", "+1 week")}</option>
+            <option value="-1">{tx("shiftBackDay", "−1 day")}</option>
+            <option value="-7">{tx("shiftBackWeek", "−1 week")}</option>
+          </select>
+          <button type="button" onClick={() => setSelected(new Set())} className="rounded-md border border-white/30 px-2 py-1 text-sm font-semibold">
+            {tx("clearSelection", "Clear")}
+          </button>
+        </div>
       ) : null}
-      {tasks.length === 0 ? (
-        <p className="py-6 text-center text-sm text-slate-500">{tx("noTasks", "No tasks yet.")}</p>
-      ) : null}
-      <button type="button" className={GRANARY_BTN_SECONDARY} onClick={() => onAdd("todo")}>
-        <FiPlus className="h-4 w-4" aria-hidden />
-        {tx("addTask", "Add task")}
-      </button>
     </div>
   );
 }
@@ -1121,97 +1567,551 @@ function OverviewTab({ tx, project, tasks, updates, people, onOpenTask }) {
   );
 }
 
-function BudgetTab({ tx, project, tasks, onPatchProject }) {
+const LINE_DEFAULTS = [
+  ["Personnel", 0.45],
+  ["Fringe benefits", 0.13],
+  ["Travel", 0.03],
+  ["Supplies", 0.05],
+  ["Contractual", 0.22],
+  ["Other direct", 0.04],
+  ["Indirect", 0.08],
+];
+
+const DEMO_RATES = { ana: 115, maya: 105, dev: 110, priya: 120, rosa: 145, sam: 100 };
+
+function defaultLinesForDemo(project) {
+  if (project.lines && project.lines.length) return project.lines;
   const total = projectTotal(project);
-  const spentAmt = Math.round((total * project.spent) / 100);
-  const remaining = Math.max(0, total - spentAmt);
+  if (!total) return [];
+  const target = (total * (project.spent || 0)) / 100;
+  return LINE_DEFAULTS.map(([n, frac]) => {
+    const b = Math.round((total * frac) / 100) * 100;
+    const s = Math.min(b, Math.round((target * frac) / 10) * 10);
+    return { n, b, s };
+  });
+}
+
+function BudgetTab({ tx, project, tasks, demoMode, onPatchProject }) {
+  const total = projectTotal(project);
+  const lines = useMemo(() => {
+    if (project.lines && project.lines.length) return project.lines;
+    return demoMode ? defaultLinesForDemo(project) : [];
+  }, [project, demoMode]);
+  const expenses = Array.isArray(project.exp) ? project.exp : [];
+
+  const lineBudgetSum = lines.reduce((sum, l) => sum + (Number(l.b) || 0), 0);
+  const lineSpentSum = lines.reduce((sum, l) => sum + (Number(l.s) || 0), 0);
+  const effectiveTotal = lineBudgetSum || total;
+  const spentAmt = lines.length ? lineSpentSum : Math.round((total * project.spent) / 100);
+  const remaining = Math.max(0, effectiveTotal - spentAmt);
+  const effectiveSpentPct = effectiveTotal ? Math.min(100, Math.round((spentAmt / effectiveTotal) * 100)) : project.spent;
   const elapsed = timePct(project);
   const totalHours = tasks.reduce((s, t) => s + (Number(t.est) || 0), 0);
   const hoursByStatus = TASK_STATUSES.map((s) => [
     s,
     tasks.filter((t) => t.status === s).reduce((sum, t) => sum + (Number(t.est) || 0), 0),
   ]);
-  const burnWarn = project.spent - elapsed > 10;
+  const burnWarn = effectiveSpentPct - elapsed > 10;
+
+  const [newLineName, setNewLineName] = useState("");
+  const [newLineBudget, setNewLineBudget] = useState("");
+  const [expLineIdx, setExpLineIdx] = useState("0");
+  const [expAmt, setExpAmt] = useState("");
+  const [expNote, setExpNote] = useState("");
+
+  const handleAddLine = (e) => {
+    e.preventDefault();
+    const n = newLineName.trim();
+    const b = Math.max(0, Math.round(Number(newLineBudget) || 0));
+    if (!n || b <= 0) return;
+    const nextLines = [...lines, { n, b, s: 0 }];
+    const nextTotal = nextLines.reduce((sum, l) => sum + l.b, 0);
+    const nextSpent = nextLines.reduce((sum, l) => sum + l.s, 0);
+    onPatchProject({
+      lines: nextLines,
+      spent: nextTotal ? Math.round((nextSpent / nextTotal) * 100) : project.spent,
+    });
+    setNewLineName("");
+    setNewLineBudget("");
+  };
+
+  const handleLogExpense = (e) => {
+    e.preventDefault();
+    const idx = Number(expLineIdx);
+    const amt = Math.round(Number(expAmt) * 100) / 100;
+    if (!lines[idx] || !Number.isFinite(amt) || amt <= 0) return;
+    const nextLines = lines.map((l, i) => (i === idx ? { ...l, s: Math.round((l.s + amt) * 100) / 100 } : l));
+    const nextTotal = nextLines.reduce((sum, l) => sum + l.b, 0);
+    const nextSpent = nextLines.reduce((sum, l) => sum + l.s, 0);
+    const entry = {
+      id: newWorkspaceId("exp"),
+      line: lines[idx].n,
+      a: amt,
+      note: expNote.trim() || lines[idx].n,
+      d: todayIso(),
+    };
+    onPatchProject({
+      lines: nextLines,
+      exp: [entry, ...expenses],
+      spent: nextTotal ? Math.min(100, Math.round((nextSpent / nextTotal) * 100)) : project.spent,
+    });
+    setExpAmt("");
+    setExpNote("");
+  };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <section className={`${GRANARY_CARD} space-y-3 p-4`}>
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-          {project.kind === "Proposal" ? tx("fieldBudgetShort", "Prep budget") : tx("fieldAmountShort", "Award amount")}
-        </h3>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            [tx("budgetTotal", "Total"), formatUsdCompact(total)],
-            [tx("budgetSpent", "Spent"), formatUsdCompact(spentAmt)],
-            [tx("budgetRemaining", "Remaining"), formatUsdCompact(remaining)],
-          ].map(([label, value]) => (
-            <div key={label} className={`${GRANARY_CARD_SOFT} p-3`}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-              <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{value}</p>
+    <div className="space-y-4">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className={`${GRANARY_CARD} space-y-3 p-4`}>
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+            {project.kind === "Proposal" ? tx("fieldBudgetShort", "Prep budget") : tx("fieldAmountShort", "Award amount")}
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              [tx("budgetTotal", "Total"), formatUsdCompact(effectiveTotal)],
+              [tx("budgetSpent", "Spent"), formatUsdCompact(spentAmt)],
+              [tx("budgetRemaining", "Remaining"), formatUsdCompact(remaining)],
+            ].map(([label, value]) => (
+              <div key={label} className={`${GRANARY_CARD_SOFT} p-3`}>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+                <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="space-y-1.5">
+            <Bar label={tx("legendTime", "Time")} pct={elapsed} className="bg-slate-400 dark:bg-slate-500" />
+            <Bar label={tx("legendSpent", "Spent")} pct={effectiveSpentPct} className="bg-[#3D4F66] dark:bg-[#8FA3B8]" />
+            <Bar label={tx("legendDone", "Done")} pct={project.done} className="bg-emerald-500 dark:bg-emerald-400" />
+          </div>
+          {burnWarn ? (
+            <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+              {tx("burnWarn", "Spend is running ahead of time elapsed.")}
+            </p>
+          ) : null}
+          <div className="grid grid-cols-2 gap-3 border-t border-[#D8E0EA] pt-3 dark:border-[#2A3548]">
+            <Field label={tx("editSpent", "Spent (%)")}>
+              <input
+                key={`s-${effectiveSpentPct}`}
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={effectiveSpentPct}
+                onBlur={(e) => onPatchProject({ spent: Number(e.target.value) })}
+                className={GRANARY_INPUT}
+              />
+            </Field>
+            <Field label={tx("editDone", "Done (%)")}>
+              <input
+                key={`d-${project.done}`}
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={project.done}
+                onBlur={(e) => onPatchProject({ done: Number(e.target.value) })}
+                className={GRANARY_INPUT}
+              />
+            </Field>
+          </div>
+        </section>
+
+        <section className={`${GRANARY_CARD} space-y-3 p-4`}>
+          <div className="flex items-baseline justify-between">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{tx("taskEstimates", "Task estimates")}</h3>
+            <span className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">
+              {tx("hoursTotal", "{{count}} hrs", { count: Math.round(totalHours * 10) / 10 })}
+            </span>
+          </div>
+          <ul className="space-y-2">
+            {hoursByStatus.map(([status, hrs]) => (
+              <li key={status} className="flex items-center gap-2">
+                <span className={`w-24 shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${STATUS_TONE[status]}`}>
+                  {tx(`statuses.${status}`, STATUS_DEFAULTS[status])}
+                </span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                  <div
+                    className="h-full rounded-full bg-[#3D4F66] dark:bg-[#8FA3B8]"
+                    style={{ width: `${totalHours ? Math.round((hrs / totalHours) * 100) : 0}%` }}
+                  />
+                </div>
+                <span className="w-12 shrink-0 text-right text-[11px] font-semibold tabular-nums text-slate-700 dark:text-slate-200">
+                  {Math.round(hrs * 10) / 10}h
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {/* Budget lines & Expense logging */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <section className={`${GRANARY_CARD} space-y-3 p-4 lg:col-span-2`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+              {tx("budgetLinesTitle", "Budget lines & spend")}
+            </h3>
+            <span className="text-xs text-slate-500">
+              {lines.length} {lines.length === 1 ? "line" : "lines"}
+            </span>
+          </div>
+          {lines.length === 0 ? (
+            <p className="py-6 text-center text-xs text-slate-500">
+              No budget lines yet. Add a line below (e.g. Personnel, Supplies, Contractual) to track spend.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[30rem] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[#D8E0EA] text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:border-[#2A3548]">
+                    <th className="py-2 pr-2">Budget line</th>
+                    <th className="py-2 px-2 text-right">Budget</th>
+                    <th className="py-2 px-2 text-right">Spent</th>
+                    <th className="py-2 px-2 w-32">Used</th>
+                    <th className="py-2 pl-2 text-right">Left</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lines.map((l, idx) => {
+                    const pct = l.b ? Math.min(100, Math.round((l.s / l.b) * 100)) : 0;
+                    const over = pct > elapsed + 25;
+                    return (
+                      <tr key={`${l.n}-${idx}`} className="border-b border-[#D8E0EA]/70 dark:border-[#2A3548]/70">
+                        <td className="py-2 pr-2 font-medium text-slate-900 dark:text-white">{l.n}</td>
+                        <td className="py-2 px-2 text-right tabular-nums text-slate-700 dark:text-slate-200">{formatUsdFull(l.b)}</td>
+                        <td className="py-2 px-2 text-right tabular-nums text-slate-700 dark:text-slate-200">{formatUsdFull(l.s)}</td>
+                        <td className="py-2 px-2">
+                          <div className="flex items-center gap-2">
+                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                              <div
+                                className={`h-full rounded-full ${over ? "bg-amber-500" : "bg-[#3D4F66] dark:bg-[#8FA3B8]"}`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="w-8 text-right text-xs tabular-nums text-slate-500">{pct}%</span>
+                          </div>
+                        </td>
+                        <td className="py-2 pl-2 text-right tabular-nums text-slate-700 dark:text-slate-200">{formatUsdFull(Math.max(0, l.b - l.s))}</td>
+                      </tr>
+                    );
+                  })}
+                  <tr className="font-semibold text-slate-900 dark:text-white">
+                    <td className="pt-2 pr-2">Total</td>
+                    <td className="pt-2 px-2 text-right tabular-nums">{formatUsdFull(lineBudgetSum)}</td>
+                    <td className="pt-2 px-2 text-right tabular-nums">{formatUsdFull(lineSpentSum)}</td>
+                    <td className="pt-2 px-2 text-xs tabular-nums">{effectiveSpentPct}%</td>
+                    <td className="pt-2 pl-2 text-right tabular-nums">{formatUsdFull(Math.max(0, lineBudgetSum - lineSpentSum))}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
-        <div className="space-y-1.5">
-          <Bar label={tx("legendTime", "Time")} pct={elapsed} className="bg-slate-400 dark:bg-slate-500" />
-          <Bar label={tx("legendSpent", "Spent")} pct={project.spent} className="bg-[#3D4F66] dark:bg-[#8FA3B8]" />
-          <Bar label={tx("legendDone", "Done")} pct={project.done} className="bg-emerald-500 dark:bg-emerald-400" />
-        </div>
-        {burnWarn ? (
-          <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
-            {tx("burnWarn", "Spend is running ahead of time elapsed.")}
-          </p>
-        ) : null}
-        <div className="grid grid-cols-2 gap-3 border-t border-[#D8E0EA] pt-3 dark:border-[#2A3548]">
-          <Field label={tx("editSpent", "Spent (%)")}>
+          )}
+
+          <form onSubmit={handleAddLine} className="flex flex-wrap items-center gap-2 border-t border-[#D8E0EA] pt-3 dark:border-[#2A3548]">
             <input
-              key={`s-${project.spent}`}
-              type="number"
-              min={0}
-              max={100}
-              defaultValue={project.spent}
-              onBlur={(e) => onPatchProject({ spent: Number(e.target.value) })}
-              className={GRANARY_INPUT}
+              type="text"
+              value={newLineName}
+              onChange={(e) => setNewLineName(e.target.value)}
+              placeholder="New budget line (e.g. Personnel)"
+              className={`${GRANARY_INPUT} min-w-[12rem] flex-1`}
             />
-          </Field>
-          <Field label={tx("editDone", "Done (%)")}>
             <input
-              key={`d-${project.done}`}
               type="number"
-              min={0}
-              max={100}
-              defaultValue={project.done}
-              onBlur={(e) => onPatchProject({ done: Number(e.target.value) })}
-              className={GRANARY_INPUT}
+              min={1}
+              value={newLineBudget}
+              onChange={(e) => setNewLineBudget(e.target.value)}
+              placeholder="Budget ($)"
+              className={`${GRANARY_INPUT} w-32`}
             />
-          </Field>
+            <button type="submit" className={GRANARY_BTN_SECONDARY}>
+              <FiPlus className="h-4 w-4" aria-hidden />
+              Add line
+            </button>
+          </form>
+        </section>
+
+        <section className={`${GRANARY_CARD} space-y-3 p-4`}>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Log an expense</h3>
+            <p className="text-xs text-slate-500">Record spending against a budget line.</p>
+          </div>
+          <form onSubmit={handleLogExpense} className="space-y-2.5">
+            <Field label="Budget line">
+              <select
+                value={expLineIdx}
+                onChange={(e) => setExpLineIdx(e.target.value)}
+                disabled={lines.length === 0}
+                className={GRANARY_INPUT}
+              >
+                {lines.length === 0 ? (
+                  <option value="">Add a budget line first</option>
+                ) : (
+                  lines.map((l, i) => (
+                    <option key={`${l.n}-${i}`} value={i}>
+                      {l.n} · {formatUsdCompact(Math.max(0, l.b - l.s))} left
+                    </option>
+                  ))
+                )}
+              </select>
+            </Field>
+            <Field label="Amount ($)">
+              <input
+                type="number"
+                min={0.01}
+                step="0.01"
+                value={expAmt}
+                onChange={(e) => setExpAmt(e.target.value)}
+                placeholder="0.00"
+                disabled={lines.length === 0}
+                className={GRANARY_INPUT}
+              />
+            </Field>
+            <Field label="Description">
+              <input
+                type="text"
+                value={expNote}
+                onChange={(e) => setExpNote(e.target.value)}
+                placeholder="e.g. Q3 payroll, venue rental"
+                disabled={lines.length === 0}
+                className={GRANARY_INPUT}
+              />
+            </Field>
+            <button
+              type="submit"
+              disabled={lines.length === 0 || !Number(expAmt)}
+              className={GRANARY_BTN_PRIMARY}
+            >
+              Add expense
+            </button>
+          </form>
+
+          <div className="border-t border-[#D8E0EA] pt-3 dark:border-[#2A3548]">
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">Recent expenses</p>
+            {expenses.length === 0 ? (
+              <p className="mt-1.5 text-xs text-slate-500">No expenses logged yet.</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {expenses.slice(0, 6).map((x) => (
+                  <li key={x.id} className="flex items-center justify-between gap-2 text-xs">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-slate-900 dark:text-white">{x.note || x.line}</p>
+                      <p className="text-slate-500">{x.line} · {fmtDate(x.d)}</p>
+                    </div>
+                    <span className="shrink-0 font-semibold tabular-nums text-slate-800 dark:text-slate-200">
+                      {formatUsdFull(x.a)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function ResourcesTab({ projects, tasks, people, demoMode }) {
+  const numWeeks = 8;
+  const weekStarts = useMemo(() => {
+    const now = new Date();
+    const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+    return Array.from({ length: numWeeks }, (_, i) => addDays(mon, i * 7));
+  }, []);
+
+  const ownerKeys = useMemo(() => {
+    if (demoMode) return Object.keys(DEMO_PW_PEOPLE);
+    const set = new Set(tasks.map((t) => t.owner).filter(Boolean));
+    return [...set];
+  }, [demoMode, tasks]);
+
+  const weeklyLoad = useMemo(() => {
+    const map = {};
+    ownerKeys.forEach((k) => {
+      map[k] = Array(numWeeks).fill(0);
+    });
+    tasks.forEach((t) => {
+      if (t.status === "done" || !t.owner || !map[t.owner]) return;
+      const s = parseDay(t.start || t.due);
+      const e = parseDay(t.due || t.start);
+      if (!s || !e) return;
+      const span = Math.max(1, diffDays(s, e) + 1);
+      const est = Number(t.est) || 0;
+      if (est <= 0) return;
+      weekStarts.forEach((ws, wi) => {
+        const we = addDays(ws, 6);
+        const ovStart = s > ws ? s : ws;
+        const ovEnd = e < we ? e : we;
+        if (ovEnd >= ovStart) {
+          const ovDays = diffDays(ovStart, ovEnd) + 1;
+          map[t.owner][wi] += (est * ovDays) / span;
+        }
+      });
+    });
+    return map;
+  }, [ownerKeys, tasks, weekStarts]);
+
+  const allocByProject = useMemo(() => {
+    const end4 = addDays(weekStarts[0], 27);
+    const out = {};
+    ownerKeys.forEach((k) => {
+      out[k] = projects
+        .map((p) => {
+          let hrs = 0;
+          tasks.forEach((t) => {
+            if (t.p !== p.id || t.owner !== k || t.status === "done") return;
+            const s = parseDay(t.start || t.due);
+            const e = parseDay(t.due || t.start);
+            if (!s || !e) return;
+            const span = Math.max(1, diffDays(s, e) + 1);
+            const ovStart = s > weekStarts[0] ? s : weekStarts[0];
+            const ovEnd = e < end4 ? e : end4;
+            if (ovEnd >= ovStart) {
+              hrs += ((Number(t.est) || 0) * (diffDays(ovStart, ovEnd) + 1)) / span;
+            }
+          });
+          return { project: p, hrs };
+        })
+        .filter((x) => x.hrs >= 0.5);
+    });
+    return out;
+  }, [ownerKeys, projects, tasks, weekStarts]);
+
+  const cellTone = (h) => {
+    if (h < 1) return "bg-slate-100 text-slate-400 dark:bg-slate-800/50 dark:text-slate-500";
+    if (h < 24) return "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200";
+    if (h <= 40) return "bg-sky-100 text-sky-900 dark:bg-sky-950/60 dark:text-sky-200";
+    if (h <= 50) return "bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200";
+    return "bg-red-100 font-bold text-red-800 dark:bg-red-950/70 dark:text-red-200";
+  };
+
+  if (ownerKeys.length === 0) {
+    return (
+      <section className={`${GRANARY_CARD} p-8 text-center text-sm text-slate-500`}>
+        No team workload yet. Add tasks with owners, dates, and estimated hours to see weekly capacity and allocation.
+      </section>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <section className={`${GRANARY_CARD} space-y-3 p-4`}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+              Capacity heatmap (next 8 weeks)
+            </h3>
+            <p className="text-xs text-slate-500">
+              Planned hours per person from task estimates · 40 h/week capacity · red is over 50 h.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200">Under 24 h</span>
+            <span className="rounded bg-sky-100 px-2 py-0.5 text-sky-900 dark:bg-sky-950/60 dark:text-sky-200">24–40 h</span>
+            <span className="rounded bg-amber-100 px-2 py-0.5 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200">40–50 h</span>
+            <span className="rounded bg-red-100 px-2 py-0.5 text-red-800 dark:bg-red-950/70 dark:text-red-200">Over 50 h</span>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[44rem] border-collapse text-left text-xs">
+            <thead>
+              <tr className="border-b border-[#D8E0EA] text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:border-[#2A3548]">
+                <th className="py-2 pr-3">Person</th>
+                {weekStarts.map((ws, i) => (
+                  <th key={i} className="px-1.5 py-2 text-center">
+                    {i === 0 ? "This week" : fmtDate(toIso(ws))}
+                  </th>
+                ))}
+                <th className="px-2 py-2 text-right">8-wk total</th>
+                <th className="py-2 pl-2 text-right">Est. cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ownerKeys.map((k) => {
+                const person = people(k);
+                const row = weeklyLoad[k] || [];
+                const tot = row.reduce((a, b) => a + b, 0);
+                const rate = DEMO_RATES[k] || 110;
+                return (
+                  <tr key={k} className="border-b border-[#D8E0EA]/70 dark:border-[#2A3548]/70">
+                    <td className="py-2 pr-3">
+                      <div className="flex items-center gap-2">
+                        {person ? <Avatar person={person} /> : null}
+                        <div>
+                          <p className="font-semibold text-slate-900 dark:text-white">{person?.n || k}</p>
+                          <p className="text-[11px] text-slate-500">${rate}/h</p>
+                        </div>
+                      </div>
+                    </td>
+                    {row.map((h, wi) => (
+                      <td key={wi} className="px-1 py-1.5 text-center">
+                        <span className={`inline-flex min-w-[2.25rem] justify-center rounded px-1.5 py-1 tabular-nums ${cellTone(h)}`}>
+                          {Math.round(h) || "—"}
+                        </span>
+                      </td>
+                    ))}
+                    <td className="px-2 py-2 text-right font-semibold tabular-nums text-slate-900 dark:text-white">
+                      {Math.round(tot)} h
+                    </td>
+                    <td className="py-2 pl-2 text-right font-semibold tabular-nums text-slate-700 dark:text-slate-200">
+                      {formatUsdCompact(Math.round(tot * rate))}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </section>
 
       <section className={`${GRANARY_CARD} space-y-3 p-4`}>
-        <div className="flex items-baseline justify-between">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{tx("taskEstimates", "Task estimates")}</h3>
-          <span className="text-sm font-bold tabular-nums text-slate-900 dark:text-white">
-            {tx("hoursTotal", "{{count}} hrs", { count: Math.round(totalHours * 10) / 10 })}
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+              Allocation by project · next 4 weeks
+            </h3>
+            <p className="text-xs text-slate-500">Where each person’s planned hours go (out of 160 h)</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+            {projects.map((p) => (
+              <span key={p.id} className="inline-flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: p.color }} />
+                {p.name}
+              </span>
+            ))}
+          </div>
         </div>
-        <ul className="space-y-2">
-          {hoursByStatus.map(([status, hrs]) => (
-            <li key={status} className="flex items-center gap-2">
-              <span className={`w-24 shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${STATUS_TONE[status]}`}>
-                {tx(`statuses.${status}`, STATUS_DEFAULTS[status])}
-              </span>
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-                <div
-                  className="h-full rounded-full bg-[#3D4F66] dark:bg-[#8FA3B8]"
-                  style={{ width: `${totalHours ? Math.round((hrs / totalHours) * 100) : 0}%` }}
-                />
+        <div className="space-y-2.5">
+          {ownerKeys.map((k) => {
+            const person = people(k);
+            const parts = allocByProject[k] || [];
+            const tot = parts.reduce((sum, x) => sum + x.hrs, 0);
+            return (
+              <div key={k} className="grid grid-cols-[8rem_1fr_5rem] items-center gap-3 text-xs">
+                <div className="flex items-center gap-2 truncate">
+                  {person ? <Avatar person={person} /> : null}
+                  <span className="truncate font-medium text-slate-900 dark:text-white">
+                    {(person?.n || k).split(" ")[0]}
+                  </span>
+                </div>
+                <div className="flex h-3 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                  {parts.map((x) => (
+                    <div
+                      key={x.project.id}
+                      title={`${x.project.name}: ${Math.round(x.hrs)} h`}
+                      style={{
+                        width: `${Math.min(100, (x.hrs / 160) * 100)}%`,
+                        backgroundColor: x.project.color,
+                      }}
+                    />
+                  ))}
+                </div>
+                <span className="text-right font-semibold tabular-nums text-slate-700 dark:text-slate-200">
+                  {Math.round(tot)} / 160 h
+                </span>
               </div>
-              <span className="w-12 shrink-0 text-right text-[11px] font-semibold tabular-nums text-slate-700 dark:text-slate-200">
-                {Math.round(hrs * 10) / 10}h
-              </span>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
@@ -1452,9 +2352,11 @@ export default function ProjectWorkspacePage() {
   const [selectedId, setSelectedId] = useState("");
   const [myOnly, setMyOnly] = useState(false);
   const [tab, setTab] = useState("overview");
-  const [workView, setWorkView] = useState("kanban"); // kanban | table (schedule views live under Meetings & Calendar)
+  const [workView, setWorkView] = useState("board"); // board | list | calendar | gantt
   useEffect(() => {
-    if (workView !== "kanban" && workView !== "table") setWorkView("kanban");
+    if (workView === "kanban") setWorkView("board");
+    else if (workView === "table") setWorkView("list");
+    else if (!["board", "list", "calendar", "gantt"].includes(workView)) setWorkView("board");
   }, [workView]);
   const [showCreate, setShowCreate] = useState(false);
   const [drawer, setDrawer] = useState(null); // { task, isNew }
@@ -1539,6 +2441,17 @@ export default function ProjectWorkspacePage() {
             ...d,
             tasks: d.tasks.map((x) => (x.id === id ? normalizeTask({ ...x, ...patch, id, p: x.p }) : x)),
           })),
+        updateManyTasks: (ids, patch) => {
+          const idSet = new Set(ids);
+          setDemoBlob((d) => ({
+            ...d,
+            tasks: d.tasks.map((task) => {
+              if (!idSet.has(task.id)) return task;
+              const extra = typeof patch === "function" ? patch(task) : patch;
+              return normalizeTask({ ...task, ...extra, id: task.id, p: task.p });
+            }),
+          }));
+        },
         removeTask: (id) =>
           setDemoBlob((d) => ({
             ...d,
@@ -1559,6 +2472,7 @@ export default function ProjectWorkspacePage() {
       removeProject,
       addTask,
       updateTask,
+      updateManyTasks,
       removeTask,
       addUpdate,
     };
@@ -1628,6 +2542,9 @@ export default function ProjectWorkspacePage() {
               {tx("demoBadge", "Demo data")}
             </span>
           ) : null}
+          <Link to="/app/grant-pipeline" className={GRANARY_BTN_SECONDARY}>
+            {tx("openGrantPipeline", "Grant pipeline")}
+          </Link>
           <Link to="/app/award-management" className={GRANARY_BTN_SECONDARY}>
             {tx("openAwards", "Open award management")}
           </Link>
@@ -1770,8 +2687,9 @@ export default function ProjectWorkspacePage() {
               <div className="flex flex-wrap gap-1 border-b border-[#D8E0EA] dark:border-[#2A3548]" role="tablist">
                 {[
                   ["overview", tx("tabs.overview", "Overview")],
-                  ["work", tx("tabs.work", "Work")],
+                  ["work", tx("tabs.scope", "Scope & Tasks")],
                   ["budget", tx("tabs.budget", "Budget")],
+                  ["resources", tx("tabs.resources", "Resources")],
                   ["status", tx("tabs.status", "Status")],
                 ].map(([key, label]) => (
                   <button
@@ -1807,8 +2725,10 @@ export default function ProjectWorkspacePage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="inline-flex overflow-hidden rounded-[10px] border border-[#B8C5D6] dark:border-[#2A3548]" role="group">
                       {[
-                        ["kanban", FiColumns, tx("views.kanban", "Kanban")],
-                        ["table", FiList, tx("views.table", "Table")],
+                        ["board", FiColumns, tx("views.board", "Board")],
+                        ["list", FiList, tx("views.list", "List")],
+                        ["calendar", FiCalendar, tx("views.calendar", "Calendar")],
+                        ["gantt", FiBarChart2, tx("views.gantt", "Gantt")],
                       ].map(([key, Icon, label]) => (
                         <button
                           key={key}
@@ -1857,26 +2777,58 @@ export default function ProjectWorkspacePage() {
                     </div>
                   </div>
 
-                  {workView === "kanban" ? (
-                    <KanbanView
+                  {workView === "board" ? (
+                    <BoardView
                       tx={tx}
                       tasks={scopedTasks}
+                      lookupTasks={projectTasks}
                       people={personFor}
+                      demoMode={demoMode}
+                      ownerOptions={ownerOptions}
                       onOpen={(task) => setDrawer({ isNew: false, task })}
                       onAdd={openNewTask}
+                      onQuickAdd={(status, title) =>
+                        actions.addTask({
+                          p: project.id,
+                          title,
+                          status,
+                          owner: meKey,
+                          pri: "med",
+                          start: todayIso(),
+                          due: toIso(addDays(new Date(), 5)),
+                          est: 4,
+                        })
+                      }
                       onMove={(id, status) => actions.updateTask(id, { status })}
                     />
                   ) : null}
-                  {workView === "table" ? (
-                    <TableView
+                  {workView === "list" ? (
+                    <TaskListView
                       tx={tx}
                       tasks={scopedTasks}
+                      lookupTasks={projectTasks}
                       people={personFor}
                       demoMode={demoMode}
                       ownerOptions={ownerOptions}
                       onOpen={(task) => setDrawer({ isNew: false, task })}
                       onPatch={(id, patch) => actions.updateTask(id, patch)}
+                      onPatchMany={(ids, patch) => actions.updateManyTasks(ids, patch)}
                       onAdd={openNewTask}
+                    />
+                  ) : null}
+                  {workView === "calendar" ? (
+                    <CalendarView
+                      tx={tx}
+                      tasks={scopedTasks}
+                      onOpen={(task) => setDrawer({ isNew: false, task })}
+                    />
+                  ) : null}
+                  {workView === "gantt" ? (
+                    <GanttView
+                      tx={tx}
+                      tasks={scopedTasks}
+                      color={project.color}
+                      onOpen={(task) => setDrawer({ isNew: false, task })}
                     />
                   ) : null}
                 </section>
@@ -1887,7 +2839,17 @@ export default function ProjectWorkspacePage() {
                   tx={tx}
                   project={project}
                   tasks={projectTasks}
+                  demoMode={demoMode}
                   onPatchProject={(patch) => actions.updateProject(project.id, patch)}
+                />
+              ) : null}
+
+              {tab === "resources" ? (
+                <ResourcesTab
+                  projects={projects}
+                  tasks={tasks}
+                  people={personFor}
+                  demoMode={demoMode}
                 />
               ) : null}
 

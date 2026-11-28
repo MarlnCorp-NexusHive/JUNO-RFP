@@ -78,6 +78,26 @@ function isoDay(value) {
 }
 
 export function normalizeProject(raw = {}) {
+  const lines = Array.isArray(raw.lines)
+    ? raw.lines
+        .map((l) => ({
+          n: String(l?.n || "").trim(),
+          b: Math.max(0, Math.round(Number(l?.b) || 0)),
+          s: Math.max(0, Math.round(Number(l?.s) || 0)),
+        }))
+        .filter((l) => l.n)
+    : [];
+  const exp = Array.isArray(raw.exp)
+    ? raw.exp
+        .map((x) => ({
+          id: String(x?.id || newWorkspaceId("exp")),
+          line: String(x?.line || "").trim(),
+          a: Math.max(0, Math.round(Number(x?.a) * 100) / 100 || 0),
+          note: String(x?.note || "").trim(),
+          d: isoDay(x?.d) || new Date().toISOString().slice(0, 10),
+        }))
+        .filter((x) => x.a > 0)
+    : [];
   return {
     id: String(raw.id || newWorkspaceId("proj")),
     name: String(raw.name || "").trim() || "Untitled project",
@@ -91,6 +111,8 @@ export function normalizeProject(raw = {}) {
     color: String(raw.color || "").trim() || "#4F6BFF",
     kind: raw.kind === "Proposal" ? "Proposal" : "Award",
     pm: String(raw.pm || "").trim(),
+    lines,
+    exp,
   };
 }
 
@@ -284,6 +306,20 @@ export function updateTask(id, patch = {}) {
   if (idx < 0) return data;
   const cur = data.tasks[idx];
   data.tasks[idx] = normalizeTask({ ...cur, ...patch, id: cur.id, p: cur.p });
+  data.freshReset = true;
+  return writeRaw(data);
+}
+
+/** Apply one patch, or a per-task function, and persist the tenant list once. */
+export function updateManyTasks(ids, patch) {
+  const idSet = new Set(ids || []);
+  if (!idSet.size) return readRaw();
+  const data = readRaw();
+  data.tasks = data.tasks.map((task) => {
+    if (!idSet.has(task.id)) return task;
+    const extra = typeof patch === "function" ? patch(task) : patch;
+    return normalizeTask({ ...task, ...extra, id: task.id, p: task.p });
+  });
   data.freshReset = true;
   return writeRaw(data);
 }
